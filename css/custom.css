@@ -1,0 +1,128 @@
+body {
+	font-size: 12px !important;
+
+    /*background-image: url("images/8.png");*/
+    /*background-image: url("images/foggy_birds.png");*/
+    /*position: fixed; */
+
+    /*background-image: url("images/8.png");*/
+    /*background-repeat: repeat;*/
+    /*
+    background-size: 100%;
+    width:100%;
+    height:100%;*/
+
+    background-image: url("images/whitey.png");
+    background-repeat: repeat;
+    /* background-size: 100%;
+    width:100%;
+    height:100%;*/
+
+    /*background-repeat: no-repeat;*/
+    /*background-attachment: scroll;*/
+    /*background-position: center center;*/
+    /*background-size: cover; // this makes img full-screen (full-width & full-height)*/
+
+    /*background-size:     cover;                      /* <------ */
+    /*background-repeat:   no-repeat;*/
+    /*background-position: center center;  */
+
+    /*
+    background: url("images/5.jpg") no-repeat center center fixed;
+    -webkit-background-size: cover; 
+    -moz-background-size: cover;    
+    -o-background-size: cover;      
+    background-size: cover;
+    */
+}
+
+.navbar-default {
+    /* border-color: #faebcc !important; */
+    /* background-image: linear-gradient(#FFFFFF, #F1F1F1 60%, #EAEAEA) !important; */
+    border-color: #080808 !important;
+    background-image: linear-gradient(rgb(234, 234, 234), rgb(251, 133, 133) 60%, rgba(148, 148, 148, 0.92)) !important;
+}
+.palletup {
+	border-top: 2px solid #000 !important;
+	border-left: 2px solid #000 !important;
+	border-right: 2px solid #000 !important;
+	width: 120px !important;
+	height: 80px !important;
+}
+.palletdown {
+	border-bottom: 2px solid #000 !important;
+	border-left: 2px solid #000 !important;
+	border-right: 2px solid #000 !important;
+	width: 120px !important;
+	height: 80px !important;
+}
+.zuto{
+    background-color: #FFFC98;
+}
+.zeleno {
+    background-color: #98FFB3;
+}
+.crveno {
+    background-color: #FF9F9F;
+}
+
+.navbar-default {
+    /* border-color: #faebcc !important; */
+    /* background-image: linear-gradient(#FFFFFF, #F1F1F1 60%, #EAEAEA) !important; */
+    border-color: #080808 !important;
+    background-image: linear-gradient(rgb(234, 234, 234), rgb(251, 133, 133) 60%, rgba(148, 148, 148, 0.92)) !important;
+}
+
+.navbar-default .navbar-brand {
+    color: #ffffff !important;
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: #ffffff !important;
+}
+
+.visina-panel{
+    /*padding: 0px !important;*/
+}
+
+.visina_text {
+    min-height: 70px !important;
+}
+
+.visina-basic {
+    height: 130px !important;
+    /*border: 1px #eee solid;*/
+    /*margin: 1px;*/
+    /*padding: 0px;*/
+    /*-webkit-box-shadow:inset 0px 0px 10px 1px #9F9;*/
+    /*-moz-box-shadow:inset 0px 0px 10px 1px #9F9;*/
+    /*box-shadow: inset 0px 0px 20px 1px #9F9;*/
+    box-shadow: inset 0px 0px 5px 1px #777;
+}
+.visina-critical {
+    /*height: 100px !important;*/
+    /*border: 1px #eee solid;*/
+    /*margin: 1px;*/
+    /*padding: 0px;*/
+    /*-webkit-box-shadow:inset 0px 0px 10px 1px #FBB;*/
+    /*-moz-box-shadow:inset 0px 0px 10px 1px #FBB;*/
+    /*box-shadow: inset 0px 0px 20px 1px #FBB;*/
+}
+
+#check {
+    box-shadow: inset 0 0px 0px rgba(0,0,0,0.075);
+    vertical-align: center;
+    /*-webkit-appearance: radio;*/
+    /*position: absolute;*/
+    /*margin: 0px 50px;*/
+    /*-webkit-mask-position-x: center*/
+    /*-webkit-mask-position-y: center*/
+}
+
+input[type="radio"]{
+    /*-webkit-appearance: radio;*/
+}
+
+.panel-body {
+    /*padding: 0px !important;*/
+}
