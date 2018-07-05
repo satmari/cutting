@@ -320,10 +320,12 @@ class reservationController extends Controller {
 		$reservation_table = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			SUM(balance) as bal,
 			COUNT(hu) as coun,
-			(SELECT SUM(balance) FROM [cutting].[dbo].[reservations] where res_status = 'NO' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."') as reserv_not,
-			(SELECT COUNT(hu) FROM [cutting].[dbo].[reservations] where res_status = 'NO' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."') as coun_not,
-			(SELECT SUM(balance) FROM [cutting].[dbo].[reservations] where res_status = 'YES' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."') as reserv_yes,
-			(SELECT COUNT(hu) FROM [cutting].[dbo].[reservations] where res_status = 'YES' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."') as coun_yes
+			(SELECT SUM(balance) FROM [cutting].[dbo].[reservations] where res_status = 'NO' and status = 'Open' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."') as reserv_not,
+			(SELECT COUNT(hu) FROM [cutting].[dbo].[reservations] where res_status = 'NO' and status = 'Open' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."') as coun_not,
+			(SELECT SUM(balance) FROM [cutting].[dbo].[reservations] where res_status = 'YES' and status = 'Open' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."') as reserv_yes,
+			(SELECT COUNT(hu) FROM [cutting].[dbo].[reservations] where res_status = 'YES' and status = 'Open' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."') as coun_yes,
+			(SELECT SUM(balance) FROM [cutting].[dbo].[reservations] where res_status = 'YES' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."') as reserv_all,
+			(SELECT COUNT(hu) FROM [cutting].[dbo].[reservations] where res_status = 'YES' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."') as coun_all
 		  FROM [cutting].[dbo].[reservations]
 		  where item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."'
 		  group by item, variant, batch"));
@@ -377,7 +379,19 @@ class reservationController extends Controller {
 			$coun_yes = 0;
 		}
 
-		return view('reservations.reserv_mat_select', compact('input_item','input_variant','input_batch','bal','coun','reserv_not','coun_not','reserv_yes','coun_yes','reserved_mat'));
+		if (isset($reservation_table[0]->reserv_all)) {
+			$reserv_all = floatval(round($reservation_table[0]->reserv_all, 2));
+		}	else {
+			$reserv_all = 0;
+		}
+
+		if (isset($reservation_table[0]->coun_all)) {
+			$coun_all = floatval(round($reservation_table[0]->coun_all, 2));
+		}	else {
+			$coun_all = 0;
+		}
+
+		return view('reservations.reserv_mat_select', compact('input_item','input_variant','input_batch','bal','coun','reserv_not','coun_not','reserv_yes','coun_yes','reserv_all','coun_all','reserved_mat'));
 
 	}
 
@@ -569,7 +583,7 @@ class reservationController extends Controller {
 		$input_batch = $input['batch'];
 		// dd($input_batch);
 
-		$list = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM [cutting].[dbo].[reservations] where item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."' "));
+		$list = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM [cutting].[dbo].[reservations] where res_status = 'YES' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."' "));
 		// dd($list);
 
 		for ($i=0; $i < count($list); $i++) { 
@@ -614,14 +628,16 @@ class reservationController extends Controller {
 			rz.item, 
 			rz.variant, 
 			rz.batch,
-			SUM(rz.balance) as bal,
-			COUNT(rz.hu) as coun,
-			(SELECT SUM(balance) FROM [reservations]  where res_status = 'NO' and item = rz.item and variant = rz.variant and batch = rz.batch) as reserv_not,
-			(SELECT COUNT(hu) FROM [reservations]  where res_status = 'NO' and item = rz.item and variant = rz.variant and batch = rz.batch) as coun_not,
-			(SELECT SUM(balance) FROM [reservations] where res_status = 'YES' and item = rz.item and variant = rz.variant and batch = rz.batch) as reserv_yes,
-			(SELECT COUNT(hu) FROM [reservations] where res_status = 'YES' and item = rz.item and variant = rz.variant and batch = rz.batch) as coun_yes
+			--SUM(rz.balance) as bal,
+			--COUNT(rz.hu) as coun,
+			(SELECT SUM(balance) FROM [reservations]  where res_status = 'NO' and status = 'Open' and item = rz.item and variant = rz.variant and batch = rz.batch) as reserv_not,
+			(SELECT COUNT(hu) FROM [reservations]  where res_status = 'NO' and status = 'Open' and item = rz.item and variant = rz.variant and batch = rz.batch) as coun_not,
+			(SELECT SUM(balance) FROM [reservations] where res_status = 'YES' and status = 'Open' and item = rz.item and variant = rz.variant and batch = rz.batch) as reserv_yes,
+			(SELECT COUNT(hu) FROM [reservations] where res_status = 'YES' and status = 'Open' and item = rz.item and variant = rz.variant and batch = rz.batch) as coun_yes,
+			(SELECT SUM(balance) FROM [reservations] where res_status = 'YES' and item = rz.item and variant = rz.variant and batch = rz.batch) as reserv_all,
+			(SELECT COUNT(hu) FROM [reservations] where res_status = 'YES' and item = rz.item and variant = rz.variant and batch = rz.batch) as coun_all
 		FROM [reservations] as rz
-		GROUP BY rz.item, rz.variant, rz.batch "));
+		GROUP BY rz.item, rz.variant, rz.batch"));
 
 
 		if (isset($data[0])) {
@@ -647,6 +663,54 @@ class reservationController extends Controller {
 		$input_batch = $input['batch'];
 		// dd($input_batch);
 
+
+	}
+
+	public function reserv_table_filter() 
+	{
+		
+		return view('reservations.reserv_table_filter');
+
+	}
+
+	public function reserv_filter(Request $request) 
+	{	
+		$input = $request->all();
+		
+		$input_item = $input['item'];
+		$input_variant = $input['variant'];
+		$input_batch = $input['batch'];
+		// dd($input_batch);
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			rz.item, 
+			rz.variant, 
+			rz.batch,
+			--SUM(rz.balance) as bal,
+			--COUNT(rz.hu) as coun,
+			(SELECT SUM(balance) FROM [reservations]  where res_status = 'NO' and status = 'Open' and item = rz.item and variant = rz.variant and batch = rz.batch) as reserv_not,
+			(SELECT COUNT(hu) FROM [reservations]  where res_status = 'NO' and status = 'Open' and item = rz.item and variant = rz.variant and batch = rz.batch) as coun_not,
+			(SELECT SUM(balance) FROM [reservations] where res_status = 'YES' and status = 'Open' and item = rz.item and variant = rz.variant and batch = rz.batch) as reserv_yes,
+			(SELECT COUNT(hu) FROM [reservations] where res_status = 'YES' and status = 'Open' and item = rz.item and variant = rz.variant and batch = rz.batch) as coun_yes,
+			(SELECT SUM(balance) FROM [reservations] where res_status = 'YES' and item = rz.item and variant = rz.variant and batch = rz.batch) as reserv_all,
+			(SELECT COUNT(hu) FROM [reservations] where res_status = 'YES' and item = rz.item and variant = rz.variant and batch = rz.batch) as coun_all
+		FROM [reservations] as rz
+		WHERE (rz.item = case when '".$input_item."' <> '' then '".$input_item."' else rz.item end ) and
+		(rz.variant = case when '".$input_variant."' <> '' then '".$input_variant."' else rz.variant end ) and
+		(rz.batch = case when '".$input_batch."' <> '' then '".$input_batch."' else rz.batch end )
+		GROUP BY rz.item, rz.variant, rz.batch
+		"));
+
+
+		if (isset($data[0])) {
+			
+  			return view('reservations.reserv_table',compact('data'));
+
+		} else {
+			
+			$msg = "Nothing in Reservation table";
+			return view('reservations.error',compact('msg'));
+		}
 
 	}
 

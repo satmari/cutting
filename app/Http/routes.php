@@ -36,6 +36,8 @@ Route::post('reserv_by_hu_insert_po', 'reservationController@reserv_by_hu_insert
 Route::post('reserv_by_hu_confirm', 'reservationController@reserv_by_hu_confirm');
 Route::get('reserv_table', 'reservationController@reserv_table');
 Route::post('reserv_table_by_po', 'reservationController@reserv_table_by_po');
+Route::get('reserv_table_filter', 'reservationController@reserv_table_filter');
+Route::post('reserv_filter', 'reservationController@reserv_filter');
 
 
 Route::any('getitemdata', function() {

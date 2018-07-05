@@ -10,14 +10,17 @@
                 <div class="panel-body">
                     Item: <b>{{$input_item}}</b>, Variant: <b>{{$input_variant}}</b>, Batch: <b>{{$input_batch}}</b>
                 </div>
-                <div class="panel-body">
+                {{--<div class="panel-body">
                     <div>Total quantity of material: <big><b>{{ $bal }}</b></big> m  , on <big><b>{{ $coun }}</b></big> rolls.</div> 
-                </div>
+                </div>--}}
                  <div class="panel-body">
-                    <div>Total quantity of <b>available </b>material: <big><b>{{ $reserv_not }}</b></big> m, on <big><b>{{ $coun_not }}</b></big> rolls.</div>
+                    <div>Total quantity of <b>available (free) </b>material: <big><b>{{ $reserv_not }}</b></big> m, on <big><b>{{ $coun_not }}</b></big> rolls. <i>Hu with status Open, Not reserved</i></div>
                 </div>
                 <div class="panel-body">
-                    <div>Total quantity of <b>reserved </b>material: <big><b>{{ $reserv_yes }}</b></big> m, on <big><b>{{ $coun_yes }}</b></big> rolls.</div>
+                    <div>Total quantity of <b>remaining reserved </b>material: <big><b>{{ $reserv_yes }}</b></big> m, on <big><b>{{ $coun_yes }}</b></big> rolls. <i>Hu with status Open, Reserved</i></div>
+                </div>
+                <div class="panel-body">
+                    <div>Total quantity of <b>origianlly reserved </b>material: <big><b>{{ $reserv_all }}</b></big> m, on <big><b>{{ $coun_all }}</b></big> rolls.<i>Hu with status Open+Consumed, Reserved</i></div>
                 </div>
 
                 
@@ -71,6 +74,15 @@
                     {!! Form::close() !!}
                 </div>
             </br>
+
+
+            </div>
+
+            <div class="panel panel-default">
+               <div class="panel-body">
+                    <div><a href="{{url('/reserv_table')}}" class="btn btn-efault btn-info center-block">Back to reservations</a></div>    
+                </div>
+                
             </div>
         </div>
     </div>

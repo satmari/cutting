@@ -14,7 +14,7 @@
 				--}}
 
 				<div class="panel-body">
-					<a href="{{ url('/update_reservation_table') }}" class="btn btn-primary btn-m ">Update reservation table</a> [it takes around 1 min]
+					<a href="{{ url('/update_reservation_table') }}" class="btn btn-primary btn-m ">Update reservation table</a> <i>[it takes around 1 min]</i>
 				</div>
 
 				<div class="panel-body">
@@ -28,7 +28,10 @@
 				<div class="panel-heading">Reservation - Tables</div>
 
 				<div class="panel-body">
-					<a href="{{ url('/reserv_table') }}" class="btn btn-warning btn-m ">Reservation table by item, variant, batch</a>
+					<a href="{{ url('/reserv_table') }}" class="btn btn-warning btn-m ">Reservation table by item, variant, batch (full table)</a> <i>[it takes around 1 min]</i>
+				</div>
+				<div class="panel-body">
+					<a href="{{ url('/reserv_table_filter') }}" class="btn btn-warning btn-m ">Reservation table by item, variant, batch (with filter)</a>
 				</div>
 
 				
