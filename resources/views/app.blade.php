@@ -40,9 +40,9 @@
 			</div>
 
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-				<ul class="nav navbar-nav">
+				{{--<ul class="nav navbar-nav">
 					<li><a href="{{ url('/') }}">Home</a></li>
-				</ul>
+				</ul>--}}
 				<ul class="nav navbar-nav">
 					<li><a href="{{ url('/reservation') }}">Reservations</a></li>
 				</ul>

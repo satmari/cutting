@@ -80,7 +80,7 @@
 
             <div class="panel panel-default">
                <div class="panel-body">
-                    <div><a href="{{url('/reserv_table')}}" class="btn btn-efault btn-info center-block">Back to reservations</a></div>    
+                    <div><a href="{{url('/reservation')}}" class="btn btn-efault btn-info center-block">Back to reservations</a></div>    
                 </div>
                 
             </div>

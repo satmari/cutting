@@ -194,7 +194,7 @@ class reservationController extends Controller {
 					try {
 						
 						// $table->hu = $temp_table_hu[$i]->hu;
-						$table->father_hu = $temp_table_hu[$i]->father_hu;
+						// $table->father_hu = $temp_table_hu[$i]->father_hu;
 						// $table->item = $temp_table_hu[$i]->item;
 						// $table->variant = $temp_table_hu[$i]->variant;
 						$table->status = $temp_table_hu[$i]->status;
@@ -213,6 +213,7 @@ class reservationController extends Controller {
 					$update_count = $update_count + 1;
 
 				} else {
+
 
 					try {
 						$table = new Reservation;
@@ -294,7 +295,46 @@ class reservationController extends Controller {
 
 		}
 
-		return view('reservations.hu_updated', compact('update_count','add_count','consumed_count'));
+		//check if partialy consumed (new) rolls should keep reservation from father
+		if (isset($reservation_table[0]->id)) {
+
+			$reserved_by_father = 0;
+
+			for ($i=0; $i < count($reservation_table) ; $i++) {
+
+				if ($reservation_table[$i]->hu != $reservation_table[$i]->father_hu) {
+					// dd($reservation_table[$i]->hu);
+
+					$res_table_father = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE res_status = 'YES' and hu = '".$reservation_table[$i]->father_hu."' "));
+					// dd($res_table_father[0]);
+					// var_dump($res_table_father);
+
+
+					if (isset($res_table_father[0]->id)) {
+						// dd($res_table_father);
+
+							$table = Reservation::findOrFail($reservation_table[$i]->id);
+							
+							try {
+
+								$table->res_po = $res_table_father[0]->res_po;
+								$table->res_qty = $temp_table_hu[$i]->balance;
+								$table->res_date = $res_table_father[0]->res_date;
+								$table->res_status = 'YES';
+
+								$table->save();
+							}
+							catch (\Illuminate\Database\QueryException $e) {
+								return view('reservations.error');
+							}
+
+							$reserved_by_father = $reserved_by_father + 1;
+					} 	
+				}
+			}
+		}
+
+		return view('reservations.hu_updated', compact('update_count','add_count','consumed_count','reserved_by_father'));
 		// return Redirect::to('/');
 
 	}
@@ -583,7 +623,7 @@ class reservationController extends Controller {
 		$input_batch = $input['batch'];
 		// dd($input_batch);
 
-		$list = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM [cutting].[dbo].[reservations] where res_status = 'YES' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."' "));
+		$list = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM [cutting].[dbo].[reservations] where res_status = 'YES' and status = 'Open' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."' "));
 		// dd($list);
 
 		for ($i=0; $i < count($list); $i++) { 
@@ -647,7 +687,7 @@ class reservationController extends Controller {
 		} else {
 			
 			$msg = "Nothing in Reservation table";
-			return view('reservations.error',compact('msg'));
+			return view('reservations.errorm',compact('msg'));
 		}
 
 
@@ -709,7 +749,7 @@ class reservationController extends Controller {
 		} else {
 			
 			$msg = "Nothing in Reservation table";
-			return view('reservations.error',compact('msg'));
+			return view('reservations.errorm',compact('msg'));
 		}
 
 	}
