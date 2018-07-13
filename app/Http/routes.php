@@ -38,6 +38,7 @@ Route::get('reserv_table', 'reservationController@reserv_table');
 Route::post('reserv_table_by_po', 'reservationController@reserv_table_by_po');
 Route::get('reserv_table_filter', 'reservationController@reserv_table_filter');
 Route::post('reserv_filter', 'reservationController@reserv_filter');
+Route::get('cancel_reservation_for_closed_po', 'reservationController@cancel_reservation_for_closed_po');
 
 
 Route::any('getitemdata', function() {

@@ -195,8 +195,8 @@ class reservationController extends Controller {
 						
 						// $table->hu = $temp_table_hu[$i]->hu;
 						// $table->father_hu = $temp_table_hu[$i]->father_hu;
-						// $table->item = $temp_table_hu[$i]->item;
-						// $table->variant = $temp_table_hu[$i]->variant;
+						$table->item = $temp_table_hu[$i]->item;
+						$table->variant = $temp_table_hu[$i]->variant;
 						$table->status = $temp_table_hu[$i]->status;
 						$table->balance = $temp_table_hu[$i]->balance;
 						$table->batch = $temp_table_hu[$i]->batch;
@@ -295,6 +295,9 @@ class reservationController extends Controller {
 
 		}
 
+
+		$reservation_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE status = 'Open' ORDER BY id"));
+		
 		//check if partialy consumed (new) rolls should keep reservation from father
 		if (isset($reservation_table[0]->id)) {
 
@@ -318,7 +321,7 @@ class reservationController extends Controller {
 							try {
 
 								$table->res_po = $res_table_father[0]->res_po;
-								$table->res_qty = $temp_table_hu[$i]->balance;
+								$table->res_qty = $reservation_table[$i]->balance;
 								$table->res_date = $res_table_father[0]->res_date;
 								$table->res_status = 'YES';
 
@@ -334,7 +337,11 @@ class reservationController extends Controller {
 			}
 		}
 
-		return view('reservations.hu_updated', compact('update_count','add_count','consumed_count','reserved_by_father'));
+		$unreserved_hu = 0; 
+		$unreserved_mt = 0; 
+
+
+		return view('reservations.hu_updated', compact('update_count','add_count','consumed_count','reserved_by_father', 'unreserved_hu', 'unreserved_mt'));
 		// return Redirect::to('/');
 
 	}
@@ -751,6 +758,76 @@ class reservationController extends Controller {
 			$msg = "Nothing in Reservation table";
 			return view('reservations.errorm',compact('msg'));
 		}
+
+	}
+
+
+	public function cancel_reservation_for_closed_po() 
+	{	
+		//cancel_reservation_for_closed_po
+
+		// $open_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT [No_],[Status]
+		// 	FROM [Gordon_LIVE].[dbo].[GORDON\$Production Order]
+		// 	where Status = '3'"));
+  		
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [cutting].[dbo].[reservations] where status = 'Open' and res_status = 'YES' "));
+
+		$unreserved_hu = 0;
+		$unreserved_mt = 0;
+
+		for ($i=0; $i < count($data) ; $i++) { 
+				
+			// dd($data[$i]->res_po);
+
+			$open_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT [No_] as no,[Status] as status
+			FROM [Gordon_LIVE].[dbo].[GORDON\$Production Order]
+			where Status = '3' and [No_] like '%".$data[$i]->res_po."' "));
+
+			// dd($open_po);
+			
+			if (isset($open_po[0])) {
+				// var_dump($open_po[0]->no);
+
+				$table = Reservation::findOrFail($data[$i]->id);
+			
+				$unreserved_hu = $unreserved_hu + 1;
+				$unreserved_mt = $unreserved_mt + $table->res_qty;
+
+				try {
+					
+					// $table->hu = $temp_table_hu[$i]->hu;
+					// $table->father_hu = $temp_table_hu[$i]->father_hu;
+					// $table->item = $temp_table_hu[$i]->item;
+					// $table->variant = $temp_table_hu[$i]->variant;
+					// $table->status = $temp_table_hu[$i]->status;
+					// $table->balance = $temp_table_hu[$i]->balance;
+					// $table->batch = $temp_table_hu[$i]->batch;
+					// $table->document = $temp_table_hu[$i]->document;
+					// $table->bin = $temp_table_hu[$i]->bin;
+					// $table->location = $temp_table_hu[$i]->location;
+
+					$table->res_po = NULL;
+					$table->res_qty = NULL;
+					$table->res_date = NULL;
+					$table->res_status = 'NO';
+								
+					$table->save();
+				}
+				catch (\Illuminate\Database\QueryException $e) {
+					return view('reservations.error');			
+				}
+
+			}
+
+		}
+
+		$update_count = 0;
+		$add_count = 0;
+		$consumed_count = 0;
+		$reserved_by_father = 0;
+
+		return view('reservations.hu_updated', compact('update_count','add_count','consumed_count','reserved_by_father','unreserved_hu','unreserved_mt'));
 
 	}
 
