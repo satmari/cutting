@@ -377,7 +377,7 @@ class reservationController extends Controller {
 		  where item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."'
 		  group by item, variant, batch"));
 
-		$reserved_mat = DB::connection('sqlsrv')->select(DB::raw("SELECT SUM(balance) as bal, COUNT(hu) as coun_po, res_po FROM [cutting].[dbo].[reservations] where res_status = 'YES' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."' group by res_po"));
+		$reserved_mat = DB::connection('sqlsrv')->select(DB::raw("SELECT SUM(balance) as bal, COUNT(hu) as coun_po, res_po FROM [cutting].[dbo].[reservations] where res_status = 'YES' and status = 'Open' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."' group by res_po"));
 
 
 		if (isset($reservation_table[0]->bal)) {
@@ -473,7 +473,7 @@ class reservationController extends Controller {
 	public function reserv_all_available_confirm(Request $request)
 	{
 
-		$this->validate($request, ['item'=>'required', 'variant'=>'required', 'batch'=>'required', 'po'=> 'required|min:6|max:6']);
+		$this->validate($request, ['item'=>'required', 'variant'=>'required', 'batch'=>'required', 'po'=> 'required']);
 		$input = $request->all(); // change use (delete or comment user Requestl; )
 		
 		$input_item = $input['item'];

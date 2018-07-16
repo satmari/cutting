@@ -28,7 +28,7 @@
 
                     
                         <div class="panel-body">
-                        <p>Production order: (6 characters) <span style="color:red;">*</span></p>
+                        <p>Production order:  <span style="color:red;">*</span></p>
                             {!! Form::text('po', null, ['id' => 'po','class' => 'form-control', 'autofocus' => 'autofocus']) !!}
                         </div>
                         </br>

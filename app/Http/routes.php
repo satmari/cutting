@@ -40,6 +40,15 @@ Route::get('reserv_table_filter', 'reservationController@reserv_table_filter');
 Route::post('reserv_filter', 'reservationController@reserv_filter');
 Route::get('cancel_reservation_for_closed_po', 'reservationController@cancel_reservation_for_closed_po');
 
+// Komesa
+Route::get('po', 'poController@index');
+Route::get('new_po', 'poController@new_po');
+Route::post('post_new_po', 'poController@post_new_po');
+Route::get('/edit_status/{id}', 'poController@edit_status');
+Route::post('/edit_status/{id}', 'poController@update_status');
+Route::get('/edit_po/{id}', 'poController@edit_po');
+Route::post('/edit_po/{id}', 'poController@update_po');
+
 
 Route::any('getitemdata', function() {
 	$term = Input::get('term');
