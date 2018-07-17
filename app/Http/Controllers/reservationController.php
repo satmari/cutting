@@ -439,7 +439,6 @@ class reservationController extends Controller {
 		}
 
 		return view('reservations.reserv_mat_select', compact('input_item','input_variant','input_batch','bal','coun','reserv_not','coun_not','reserv_yes','coun_yes','reserv_all','coun_all','reserved_mat'));
-
 	}
 
 
@@ -481,6 +480,13 @@ class reservationController extends Controller {
 		$input_batch = $input['batch'];
 		$input_po = $input['po'];
 		// dd($input_po);
+
+		$po_list = DB::connection('sqlsrv')->select(DB::raw("SELECT po FROM pos where status = 'OPEN' and po = '".$input_po."' "));
+
+		if (count($po_list) == 0) {
+			$msg = "This komesa is not in Komesa table or have status CLOSED.";
+			return view('reservations.errorm', compact('msg'));
+		}
 
 		$list = DB::connection('sqlsrv')->select(DB::raw("SELECT id,balance FROM [cutting].[dbo].[reservations] where res_status = 'NO' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."' "));
 		// dd($list);
@@ -584,6 +590,13 @@ class reservationController extends Controller {
 		$input_po = $input['po'];
 		$input_checked = $input_checked[0];
 		// dd($input_checked);
+
+		$po_list = DB::connection('sqlsrv')->select(DB::raw("SELECT po FROM pos where status = 'OPEN' and po = '".$input_po."' "));
+
+		if (count($po_list) == 0) {
+			$msg = "This komesa is not in Komesa table or have status CLOSED.";
+			return view('reservations.errorm', compact('msg'));
+		}
 
 		for ($i=0; $i < count($input_checked); $i++) { 
 			// dd($input_checked[$i]);

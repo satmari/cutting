@@ -99,3 +99,14 @@ Route::any('getpodata', function() {
 return Response::json($retun_array);
 });
 
+Route::any('getpordata', function() {
+	$term = Input::get('term');
+
+	$data = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 10 po as po FROM pos WHERE status = 'OPEN' AND po like '%".$term."%'"));
+	// var_dump($data);
+	foreach ($data as $v) {
+		$retun_array[] = array('value' => $v->po);
+	}
+return Response::json($retun_array);
+});
+

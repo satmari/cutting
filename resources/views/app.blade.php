@@ -134,6 +134,11 @@ $(function() {
 		autoFocus: true,
 		source: '{{ URL('getpodata')}}'
 	});
+	$('#por').autocomplete({
+		minLength: 1,
+		autoFocus: true,
+		source: '{{ URL('getpordata')}}'
+	});
 
 	$('#filter').keyup(function () {
 

@@ -21,7 +21,7 @@
                     
                         <div class="panel-body">
                         <p>Production order: <span style="color:red;">*</span></p>
-                            {!! Form::text('po', null, ['id' => 'po','class' => 'form-control', 'autofocus' => 'autofocus']) !!}
+                            {!! Form::text('po', null, ['id' => 'por','class' => 'form-control', 'autofocus' => 'autofocus']) !!}
                         </div>
                         </br>
                         {!! Form::submit('Confirm', ['class' => 'btn  btn-success center-block']) !!}

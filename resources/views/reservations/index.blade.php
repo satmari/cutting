@@ -20,9 +20,11 @@
 				<div class="panel-body">
 					<a href="{{ url('/reserv_mat') }}" class="btn btn-primary btn-m center-block">Reserve material</a>
 				</div>
+				{{-- 
 				<div class="panel-body">
 					<a href="{{ url('/cancel_reservation_for_closed_po') }}" class="btn btn-primary btn-m center-block">Cancel reservation for closed PO</a>
 				</div>
+				--}}
 
 			</div>
 
