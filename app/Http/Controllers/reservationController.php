@@ -312,7 +312,6 @@ class reservationController extends Controller {
 					// dd($res_table_father[0]);
 					// var_dump($res_table_father);
 
-
 					if (isset($res_table_father[0]->id)) {
 						// dd($res_table_father);
 
@@ -330,6 +329,24 @@ class reservationController extends Controller {
 							catch (\Illuminate\Database\QueryException $e) {
 								return view('reservations.error');
 							}
+
+							// Update Father HU reserved qty if hu was splited
+							$table_f = Reservation::findOrFail($res_table_father[0]->id);
+							
+							try {
+
+								// $table->res_po = $res_table_father[0]->res_po;
+								$table->res_qty = $res_table_father[0]->balance - $reservation_table[$i]->balance;
+								// $table->res_date = $res_table_father[0]->res_date;
+								// $table->res_status = 'YES';
+
+								$table->save();
+							}
+							catch (\Illuminate\Database\QueryException $e) {
+								return view('reservations.error');
+							}
+
+
 
 							$reserved_by_father = $reserved_by_father + 1;
 					} 	
