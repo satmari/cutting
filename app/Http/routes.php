@@ -26,6 +26,7 @@ Route::controllers([
 Route::get('reservation', 'reservationController@index');
 Route::get('hu_list', 'reservationController@hu_list');
 Route::get('update_reservation_table', 'reservationController@update_reservation_table');
+Route::get('update_reservation_table_oposite', 'reservationController@update_reservation_table_oposite');
 Route::get('reserv_mat', 'reservationController@reserv_mat');
 Route::post('reserv_input', 'reservationController@reserv_input');
 Route::post('reserv_all_available', 'reservationController@reserv_all_available');

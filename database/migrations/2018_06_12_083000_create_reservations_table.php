@@ -16,7 +16,7 @@ class CreateReservationsTable extends Migration {
 		{
 			$table->increments('id');
 
-			$table->string('hu');
+			$table->string('hu')->unique();
 			$table->string('father_hu')->nullable();
 			$table->string('item')->nullable();
 			$table->string('variant')->nullable();
@@ -28,7 +28,7 @@ class CreateReservationsTable extends Migration {
 			$table->string('location')->nullable();
 
 			$table->string('res_po')->nullable();
-			$table->double('res_qty')->nullable();
+			$table->string('res_log_id')->nullable();
 			$table->dateTime('res_date')->nullable();
 			$table->string('res_status')->nullable();
 

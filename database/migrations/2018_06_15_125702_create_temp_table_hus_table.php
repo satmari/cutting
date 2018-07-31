@@ -16,7 +16,7 @@ class CreateTempTableHusTable extends Migration {
 		{
 			$table->increments('id');
 
-			$table->string('hu');
+			$table->string('hu')->unique();
 			$table->string('father_hu')->nullable();
 			$table->string('item')->nullable();
 			$table->string('variant')->nullable();
@@ -40,18 +40,4 @@ class CreateTempTableHusTable extends Migration {
 	{
 		Schema::drop('temp_table_hus');
 	}
-
 }
-
-
-
-/*
-[HU No_] as hu,
-[Item No_] as item, 
-		 [Variant Code] as variant, 
-		 [Status] as status, 
-		 [Balance] as balance, 
-		 [Quantity] as qty, 
-		 [Batch_Dye lot] as batch,
-		 [Document No_] as inv
-*/
