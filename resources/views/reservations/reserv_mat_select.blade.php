@@ -69,7 +69,7 @@
                         {!! Form::hidden('item', $input_item, ['class' => 'form-control']) !!}
                         {!! Form::hidden('variant', $input_variant, ['class' => 'form-control']) !!}
                         {!! Form::hidden('batch', $input_batch, ['class' => 'form-control']) !!}
-                        {!! Form::submit('Cancel all reservations for this material', ['class' => 'btn  btn-danger center-block']) !!}
+                        {!! Form::submit('Cancel reservations for this material', ['class' => 'btn  btn-danger center-block']) !!}
                         @include('errors.list')
                     {!! Form::close() !!}
                 </div>

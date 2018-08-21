@@ -44,7 +44,10 @@
 					<li><a href="{{ url('/') }}">Home</a></li>
 				</ul>--}}
 				<ul class="nav navbar-nav">
-					<li><a href="{{ url('/reservation') }}">Reservation table</a></li>
+					<li><a href="{{ url('/reservation') }}">Reservation by hu</a></li>
+				</ul>
+				<ul class="nav navbar-nav">
+					<li><a href="{{ url('/reserv_by_po') }}">Reservation by po</a></li>
 				</ul>
 				<ul class="nav navbar-nav">
 					<li><a href="{{ url('/po') }}">Komesa table</a></li>

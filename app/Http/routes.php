@@ -32,6 +32,11 @@ Route::post('reserv_input', 'reservationController@reserv_input');
 Route::post('reserv_all_available', 'reservationController@reserv_all_available');
 Route::post('reserv_by_hu', 'reservationController@reserv_by_hu');
 Route::post('reserv_cancel', 'reservationController@reserv_cancel');
+Route::post('cancel_all', 'reservationController@cancel_all');
+Route::post('cancel_po_imput', 'reservationController@cancel_po_imput');
+Route::post('cancel_po', 'reservationController@cancel_po');
+Route::post('cancel_hu_imput', 'reservationController@cancel_hu_imput');
+Route::post('cancel_hu', 'reservationController@cancel_hu');
 Route::post('reserv_all_available_confirm', 'reservationController@reserv_all_available_confirm');
 Route::post('reserv_by_hu_insert_po', 'reservationController@reserv_by_hu_insert_po');
 Route::post('reserv_by_hu_confirm', 'reservationController@reserv_by_hu_confirm');
@@ -40,6 +45,7 @@ Route::post('reserv_table_by_po', 'reservationController@reserv_table_by_po');
 Route::get('reserv_table_filter', 'reservationController@reserv_table_filter');
 Route::post('reserv_filter', 'reservationController@reserv_filter');
 Route::get('cancel_reservation_for_closed_po', 'reservationController@cancel_reservation_for_closed_po');
+Route::get('reserv_by_po', 'reservationController@reserv_by_po');
 
 // Komesa
 Route::get('po', 'poController@index');

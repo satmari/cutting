@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Redirect;
 use App\temp_table_hu;
 use App\res_log;
 use App\Reservation;
+use App\pos;
 use DB;
 
 use App\User;
@@ -808,7 +809,14 @@ class reservationController extends Controller {
 					$table_log->res_qty = floatval(round($list[0]->bal_sum, 2));
 
 					$table_log->res_hus = count($list);
-								
+
+					$po_status = DB::connection('sqlsrv')->select(DB::raw("SELECT status FROM pos where po = '".$input_po."' "));
+					if (isset($po_status[0]->status)) {
+						$table_log->po_status = $po_status[0]->status;
+					} else {
+						$table_log->po_status = NULL;
+					}
+							
 					$table_log->save();
 				}
 				catch (\Illuminate\Database\QueryException $e) {
@@ -949,6 +957,13 @@ class reservationController extends Controller {
 			$table_log->res_hus = count($input_checked);
 
 			$table_log->res_qty = floatval(round($qty, 2));
+
+			$po_status = DB::connection('sqlsrv')->select(DB::raw("SELECT status FROM pos where po = '".$input_po."' "));
+			if (isset($po_status[0]->status)) {
+				$table_log->po_status = $po_status[0]->status;
+			} else {
+				$table_log->po_status = NULL;
+			}
 						
 			$table_log->save();
 		}
@@ -999,6 +1014,19 @@ class reservationController extends Controller {
 
 		$input_item = $input['item'];
 		$input_variant = $input['variant'];
+		$input_batch = $input['batch'];	
+
+		return view('reservations.reserv_cancel', compact('input_item','input_variant','input_batch'));
+	}
+
+
+	public function cancel_all(Request $request)
+	{
+		$this->validate($request, ['item'=>'required', 'variant'=>'required', 'batch'=>'required']);
+		$input = $request->all();
+
+		$input_item = $input['item'];
+		$input_variant = $input['variant'];
 		$input_batch = $input['batch'];
 		// dd($input_batch);
 
@@ -1023,6 +1051,13 @@ class reservationController extends Controller {
 					$table_log->res_hus = $list[$i]->hus;
 
 					$table_log->res_qty = floatval(round($list[$i]->bal*(-1), 2));
+
+					$po_status = DB::connection('sqlsrv')->select(DB::raw("SELECT status FROM pos where po = '".$list[$i]->po."' "));
+					if (isset($po_status[0]->status)) {
+						$table_log->po_status = $po_status[0]->status;
+					} else {
+						$table_log->po_status = NULL;
+					}
 								
 					$table_log->save();
 				}
@@ -1042,7 +1077,6 @@ class reservationController extends Controller {
 
 		for ($i=0; $i < count($list); $i++) { 
 					
-			
 			$table = Reservation::findOrFail($list[$i]->id);
 			
 			try {
@@ -1068,13 +1102,251 @@ class reservationController extends Controller {
 			catch (\Illuminate\Database\QueryException $e) {
 				return view('reservations.error');			
 			}
-			
+		}
+		return Redirect::to('reservation/');
+
+	}
+
+	public function cancel_po_imput(Request $request)
+	{
+		$this->validate($request, ['item'=>'required', 'variant'=>'required', 'batch'=>'required']);
+		$input = $request->all();
+
+		$input_item = $input['item'];
+		$input_variant = $input['variant'];
+		$input_batch = $input['batch'];
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT DISTINCT(res_po) as po,SUM(balance) as qty FROM reservations where status = 'Open' and res_status = 'YES' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."' group by res_po order by res_po desc "));
+		// dd($po_list);
+		
+		return view('reservations.cancel_po', compact('input_item', 'input_variant', 'input_batch', 'data'));
+	}
+
+	public function cancel_po(Request $request)
+	{
+		$this->validate($request, ['item'=>'required', 'variant'=>'required', 'batch'=>'required']);
+		$input = $request->all();
+
+		$input_item = $input['item'];
+		$input_variant = $input['variant'];
+		$input_batch = $input['batch'];
+
+		if (isset($input['checked'])) {
+			// $input_checked[] = $input['checked'];
+			// $po = $input_checked[0];
+
+			// dd($input['checked']);
+
+			for ($i=0; $i < count($input['checked']) ; $i++) {
+				
+				$po = $input['checked'][$i];
+
+				$list_po = DB::connection('sqlsrv')->select(DB::raw("SELECT SUM(r.balance) as bal,
+						 r.res_po as po,
+						 (SELECT COUNT(hu) as hu FROM [cutting].[dbo].[reservations] where res_status = 'YES' and status = 'Open' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."' and res_po = r.res_po) as hus
+						 FROM [cutting].[dbo].[reservations] as r where res_status = 'YES' and status = 'Open' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."' and res_po = '".$po."' GROUP BY res_po"));
+				
+				for ($i=0; $i < count($list_po); $i++) { 
+					
+					if ($list_po[$i]->bal > 0) {
+					
+						$table_log = new res_log;
+
+						try {
+							
+							$table_log->res_po = $list_po[$i]->po;
+							$table_log->item = $input_item;
+							$table_log->variant = $input_variant;
+							$table_log->batch = $input_batch;
+							$table_log->res_hus = $list_po[$i]->hus*(-1);
+
+							$table_log->res_qty = floatval(round($list_po[$i]->bal*(-1), 2));
+
+							$po_status = DB::connection('sqlsrv')->select(DB::raw("SELECT status FROM pos where po = '".$list_po[$i]->po."' "));
+							if (isset($po_status[0]->status)) {
+								$table_log->po_status = $po_status[0]->status;
+							} else {
+								$table_log->po_status = NULL;
+							}
+										
+							$table_log->save();
+						}
+						catch (\Illuminate\Database\QueryException $e) {
+							$msg = "Problem to save in log table";
+							return view('reservations.errorm', compact('msg'));
+						}		
+
+					} else {
+						$msg = "There is no hu with status = open , reserved = yes";
+						return view('reservations.errorm', compact('msg'));
+					}
+				}
+
+				$list_hu = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM [cutting].[dbo].[reservations] where res_status = 'YES' and status = 'Open' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."' and res_po = '".$po."' "));
+				// dd($list_hu);
+
+				for ($i=0; $i < count($list_hu); $i++) { 
+							
+					$table = Reservation::findOrFail($list_hu[$i]->id);
+					
+					try {
+						
+						// $table->hu = $temp_table_hu[$i]->hu;
+						// $table->father_hu = $temp_table_hu[$i]->father_hu;
+						// $table->item = $temp_table_hu[$i]->item;
+						// $table->variant = $temp_table_hu[$i]->variant;
+						// $table->status = $temp_table_hu[$i]->status;
+						// $table->balance = $temp_table_hu[$i]->balance;
+						// $table->batch = $temp_table_hu[$i]->batch;
+						// $table->document = $temp_table_hu[$i]->document;
+						// $table->bin = $temp_table_hu[$i]->bin;
+						// $table->location = $temp_table_hu[$i]->location;
+
+						$table->res_po = NULL;
+						$table->res_log_id = NULL;
+						$table->res_date = NULL;
+						$table->res_status = 'NO';
+									
+						$table->save();
+					}
+					catch (\Illuminate\Database\QueryException $e) {
+						return view('reservations.error');			
+					}
+				}
+
+			}
+
+			// return view('reservations.reserv_by_hu_insert_po', compact('input_item', 'input_variant', 'input_batch', 'input_checked'));
+		} else {
+			// $input_checked[] = [];
+			$msg = "You should select some po's if you want to cancel reservations";
+			return view('reservations.errorm', compact('msg'));
 		}
 
 		return Redirect::to('reservation/');
 
 	}
 
+	public function cancel_hu_imput(Request $request)
+	{
+		$this->validate($request, ['item'=>'required', 'variant'=>'required', 'batch'=>'required']);
+		$input = $request->all();
+
+		$input_item = $input['item'];
+		$input_variant = $input['variant'];
+		$input_batch = $input['batch'];
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT id, hu, res_po, balance FROM reservations where status = 'Open' and res_status = 'YES' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."' order by res_po desc "));
+		// dd($po_list);
+		
+		return view('reservations.cancel_hu', compact('input_item', 'input_variant', 'input_batch', 'data'));
+	}
+
+	public function cancel_hu(Request $request)
+	{
+		$this->validate($request, ['item'=>'required', 'variant'=>'required', 'batch'=>'required']);
+		$input = $request->all();
+
+		$input_item = $input['item'];
+		$input_variant = $input['variant'];
+		$input_batch = $input['batch'];
+
+		if (isset($input['checked'])) {
+			// $input_checked[] = $input['checked'];
+			// $po = $input_checked[0];
+
+			// dd($input['checked']);
+
+			for ($i=0; $i < count($input['checked']) ; $i++) {
+				
+				$hu = $input['checked'][$i];
+				// dd($hu);
+				// var_dump($hu." ". $i);
+
+				$list_po = DB::connection('sqlsrv')->select(DB::raw("SELECT balance,res_po FROM [cutting].[dbo].[reservations] where res_status = 'YES' and status = 'Open' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."' and hu = '".$hu."' "));
+				
+				// for ($i=0; $i < count($list_po); $i++) { 
+					// if ($list_po[$i]->balance > 0) {
+					
+						$table_log = new res_log;
+
+						try {
+							
+							$table_log->res_po = $list_po[0]->res_po;
+							// $table_log->res_po = $list_po[$i]->res_po;
+							// $table_log->res_po = "TEST";
+							$table_log->item = $input_item;
+							$table_log->variant = $input_variant;
+							$table_log->batch = $input_batch;
+							$table_log->res_hus = -1;
+
+							$table_log->res_qty = floatval(round($list_po[0]->balance*(-1), 2));
+							// $table_log->res_qty = floatval(round($list_po[$i]->balance*(-1), 2));
+
+							$po_status = DB::connection('sqlsrv')->select(DB::raw("SELECT status FROM pos where po = '".$list_po[0]->res_po."' "));
+							if (isset($po_status[0]->status)) {
+								$table_log->po_status = $po_status[0]->status;
+							} else {
+								$table_log->po_status = NULL;
+							}
+										
+							$table_log->save();
+						}
+						catch (\Illuminate\Database\QueryException $e) {
+							$msg = "Problem to save in log table";
+							return view('reservations.errorm', compact('msg'));
+						}
+
+					// } else {
+						// $msg = "There is no hu with status = open , reserved = yes";
+						// return view('reservations.errorm', compact('msg'));
+					// }
+				// }
+
+				$list_hu = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM [cutting].[dbo].[reservations] where res_status = 'YES' and status = 'Open' and item = '".$input_item."' and variant = '".$input_variant."' and batch = '".$input_batch."' and hu = '".$hu."' "));
+				// dd($list_hu);
+
+				// for ($i=0; $i < count($list_hu); $i++) { 
+							
+					// $table = Reservation::findOrFail($list_hu[$i]->id);
+					$table = Reservation::findOrFail($list_hu[0]->id);
+					
+					try {
+						
+						// $table->hu = $temp_table_hu[$i]->hu;
+						// $table->father_hu = $temp_table_hu[$i]->father_hu;
+						// $table->item = $temp_table_hu[$i]->item;
+						// $table->variant = $temp_table_hu[$i]->variant;
+						// $table->status = $temp_table_hu[$i]->status;
+						// $table->balance = $temp_table_hu[$i]->balance;
+						// $table->batch = $temp_table_hu[$i]->batch;
+						// $table->document = $temp_table_hu[$i]->document;
+						// $table->bin = $temp_table_hu[$i]->bin;
+						// $table->location = $temp_table_hu[$i]->location;
+
+						$table->res_po = NULL;
+						$table->res_log_id = NULL;
+						$table->res_date = NULL;
+						$table->res_status = 'NO';
+									
+						$table->save();
+					}
+					catch (\Illuminate\Database\QueryException $e) {
+						return view('reservations.error');			
+					}
+				// }
+			}
+			// return view('reservations.reserv_by_hu_insert_po', compact('input_item', 'input_variant', 'input_batch', 'input_checked'));
+			return view('reservations.index');
+
+		} else {
+			// $input_checked[] = [];
+			$msg = "You should select some po's if you want to cancel reservations";
+			return view('reservations.errorm', compact('msg'));
+		}
+
+		// return Redirect::to('reservation/');
+	}
 
 	public function reserv_table() 
 	{
@@ -1235,6 +1507,15 @@ class reservationController extends Controller {
 		$reserved_by_father = 0;
 
 		return view('reservations.hu_updated', compact('update_count','add_count','consumed_count','reserved_by_father','unreserved_hu','unreserved_mt'));
+
+	}
+
+	public function reserv_by_po() {
+
+		
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM res_logs ORDER BY id"));	
+
+		return view('reservations.reserv_by_po', compact('data'));
 
 	}
 

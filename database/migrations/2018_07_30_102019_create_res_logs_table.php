@@ -23,6 +23,8 @@ class CreateResLogsTable extends Migration {
 
 			$table->double('res_qty');
 			$table->integer('res_hus');
+
+			$table->string('po_status')->nullable();
 						
 			$table->timestamps();
 		});

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
 use App\temp_table_hu;
+use App\res_log;
 use App\Reservation;
 use App\po;
 use DB;
@@ -101,7 +102,7 @@ class poController extends Controller {
 			try {
 				
 				$table->res_po = NULL;
-				$table->res_qty = NULL;
+				$table->res_log_id = NULL;
 				$table->res_date = NULL;
 				$table->res_status = 'NO';
 
@@ -156,6 +157,26 @@ class poController extends Controller {
 				
 				$table->res_po = $input['new_name'];
 				$table->save();
+
+			}
+			catch (\Illuminate\Database\QueryException $e) {
+				return view('reservations.error');
+			}		
+		}
+
+		$data1 = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM res_logs WHERE res_po =  '".$po."' "));
+
+		// dd(count($data));
+
+		for ($i=0; $i < count($data1); $i++) { 
+
+			// dd($data[$i]->id);
+			$table1 = res_log::findOrFail($data1[$i]->id);
+		
+			try {
+				
+				$table1->res_po = $input['new_name'];
+				$table1->save();
 
 			}
 			catch (\Illuminate\Database\QueryException $e) {
