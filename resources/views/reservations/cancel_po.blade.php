@@ -59,7 +59,7 @@
                         <tr>
                             
                             <td><big><b>{{ $req->po }}</b></big></td>
-                            <td>{{ floatval(round($req->qty, 2)) }}</td>
+                            <td><span class="amount"> {{ floatval($req->qty) }}</span></td>
                             
                             <td>
                                     <input type="checkbox" id="box" class="btn box" name='checked[]' value="{{ $req->po }}">
@@ -72,11 +72,11 @@
                     </tbody>   
 
                 </table>    
-                    {{-- 
+                    
                     <div class="panel-body">
-                        Total: <b><div id="total"></div></b>
+                        Total quantity: <b><div id="total"></div></b>
                     </div>
-                    --}}
+                    
 
                     <div class="panel-body">
                         {!! Form::submit('Confirm', ['class' => 'btn btn-warning center-block']) !!}

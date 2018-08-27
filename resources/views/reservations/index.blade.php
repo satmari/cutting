@@ -14,11 +14,17 @@
 				--}}
 
 				<div class="panel-body">
-					<a href="{{ url('/update_reservation_table') }}" class="btn btn-primary btn-m center-block">Update reservation table</a> <i>[it takes around 1 min]</i>
+					<a href="{{ url('/update_reservation_table') }}" class="btn btn-info btn-m center-block">Update reservation table</a> <i>[it takes around 1 min]</i>
 				</div>
 
 				<div class="panel-body">
-					<a href="{{ url('/reserv_mat') }}" class="btn btn-primary btn-m center-block">Reserve material</a>
+					<a href="{{ url('/reserv_mat') }}" class="btn btn-primary btn-m center-block">Reserve by material</a>
+				</div>
+				<div class="panel-body">
+					<a href="{{ url('/unreserv_mat') }}" class="btn btn-primary btn-m center-block">Unreserve by material</a>
+				</div>
+				<div class="panel-body">
+					<a href="{{ url('/unreserv_po') }}" class="btn btn-primary btn-m center-block">Unreserve by PO</a>
 				</div>
 				{{-- 
 				<div class="panel-body">

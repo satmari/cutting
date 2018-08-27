@@ -5,7 +5,7 @@
     <div class="row vertical-center-row">
         <div class="text-center">
             <div class="panel panel-default">
-                <div class="panel-heading">Reservation table by Item, Variant and Batch</div>
+                <div class="panel-heading">UnReservation table by Po: <big><b>{{ $input_po }}</b></big></div>
      
 
                 <div class="input-group"> <span class="input-group-addon">Filter</span>
@@ -46,14 +46,8 @@
                             <th><b>Item</b></th>
                             <th><b>Variant</b></th>
                             <th><b>Batch</b></th>
-                            {{--<th><b>Balance</b></th>--}}
-                            {{--<th><b>Count of rolls</b></th>--}}
-                            <th><b>Free Qty</b></th>
-                            <th><b>Free rolls</b></th>
-                            <th><b>Remaining Reserved Qty</b></th>
-                            <th><b>Remaining Reserved rolls</b></th>
-                            <th><b>Originally Reserved Qty</b></th>
-                            <th><b>Originally Reserved rolls</b></th>
+                            <th><b>Reserved Qty</b></th>
+                            <th><b>Reserved rolls</b></th>
                             <th></th>
 
                             
@@ -66,25 +60,20 @@
                             <td>{{ $req->item }}</td>
                             <td>{{ $req->variant }}</td>
                             <td>{{ $req->batch }}</td>
-                            {{--<td>{{ floatval(round($req->bal,2)) }}</td>--}}
-                            {{--<td>{{ str_replace(".", ",", floatval($req->bal)) }}</td>--}}
-                            {{--<td>{{ $req->coun }}</td>--}}
-                            <td>{{ str_replace(".", ",", floatval($req->reserv_not)) }}</td>
-                            <td>{{ $req->coun_not }}</td>
-                            <td>{{ str_replace(".", ",", floatval($req->reserv_yes)) }}</td>
-                            <td>{{ $req->coun_yes }}</td>
-                            <td>{{ str_replace(".", ",", floatval($req->reserv_all)) }}</td>
-                            <td>{{ $req->coun_all }}</td>
-
+                           
+                            <td>{{ str_replace(".", ",", floatval($req->bal)) }}</td>
+                            <td>{{ str_replace(".", ",", floatval($req->coun)) }}</td>
+                            
                             <td>
 
-                                 {!! Form::open(['method'=>'POST', 'url'=>'/reserv_input']) !!}
+                                 {!! Form::open(['method'=>'POST', 'url'=>'/unreserv_po_confirm']) !!}
 
                                     {!! Form::hidden('item', $req->item) !!}
                                     {!! Form::hidden('variant', $req->variant) !!}
                                     {!! Form::hidden('batch', $req->batch) !!}
+                                    {!! Form::hidden('po', $input_po) !!}
 
-                                    {!! Form::submit('Edit', ['class' => 'btn-xs  btn-success']) !!}
+                                    {!! Form::submit('Unreserve', ['class' => 'btn-xs  btn-success']) !!}
 
                                     @include('errors.list')
                                 {!! Form::close() !!}

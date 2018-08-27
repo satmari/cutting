@@ -91,7 +91,7 @@
                 </table>    
 
                     <div class="panel-body">
-                        Total: <b><div id="total"></div></b>
+                        Total quantity: <b><div id="total"></div></b>
                     </div>
 
                     <div class="panel-body">

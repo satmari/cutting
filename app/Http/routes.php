@@ -46,6 +46,11 @@ Route::get('reserv_table_filter', 'reservationController@reserv_table_filter');
 Route::post('reserv_filter', 'reservationController@reserv_filter');
 Route::get('cancel_reservation_for_closed_po', 'reservationController@cancel_reservation_for_closed_po');
 Route::get('reserv_by_po', 'reservationController@reserv_by_po');
+Route::get('unreserv_mat', 'reservationController@unreserve_mat');
+Route::post('unreserv_mat_input', 'reservationController@unreserv_mat_input');
+Route::get('unreserv_po', 'reservationController@unreserve_po');
+Route::post('unreserv_po_input', 'reservationController@unreserv_po_input');
+Route::post('unreserv_po_confirm', 'reservationController@unreserv_po_confirm');
 
 // Komesa
 Route::get('po', 'poController@index');

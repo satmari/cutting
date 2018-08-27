@@ -59,7 +59,7 @@
                         <tr>
                             <td><b>{{ $req->hu }}</b></td>
                             <td><big><b>{{ $req->res_po }}</b></big></td>
-                            <td>{{ floatval(round($req->balance, 2)) }}</td>
+                            <td><span class="amount"> {{ floatval($req->balance) }}</span></td>
                             
                             <td>
                                     <input type="checkbox" id="box" class="btn box" name='checked[]' value="{{ $req->hu }}">
@@ -73,11 +73,11 @@
                     </tbody>   
 
                 </table>    
-                    {{-- 
+                    
                     <div class="panel-body">
-                        Total: <b><div id="total"></div></b>
+                        Total quantity: <b><div id="total"></div></b>
                     </div>
-                    --}}
+                    
 
                     <div class="panel-body">
                         {!! Form::submit('Confirm', ['class' => 'btn btn-warning center-block']) !!}
