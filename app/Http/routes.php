@@ -61,6 +61,17 @@ Route::post('/edit_status/{id}', 'poController@update_status');
 Route::get('/edit_po/{id}', 'poController@edit_po');
 Route::post('/edit_po/{id}', 'poController@update_po');
 
+//Cosnumption
+Route::get('cons', 'consController@index');
+Route::get('cons_table', 'consController@cons_table');
+
+Route::get('update_cons_table', 'consController@update_cons_table');
+
+Route::get('add_po_cons_table', 'consController@add_po_cons_table');
+Route::get('add_po', 'consController@add_po');
+Route::post('add_new_po_cons', 'consController@add_new_po_cons');
+
+
 
 Route::any('getitemdata', function() {
 	$term = Input::get('term');

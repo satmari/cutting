@@ -2,8 +2,8 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="row vertical-center-row">
-        <div class="text-center">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
             <div class="panel panel-default">
                 <div class="panel-heading">UnReservation table by Po: <big><b>{{ $input_po }}</b></big></div>
      
@@ -11,6 +11,9 @@
                 <div class="input-group"> <span class="input-group-addon">Filter</span>
                     <input id="filter" type="text" class="form-control" placeholder="Type here...">
                 </div>
+
+                {!! Form::open(['method'=>'POST', 'url'=>'/unreserv_po_confirm']) !!}
+
 
                 <table class="table table-striped table-bordered" id="sort" 
                 data-export-types="['excel']"
@@ -49,7 +52,6 @@
                             <th><b>Reserved Qty</b></th>
                             <th><b>Reserved rolls</b></th>
                             <th></th>
-
                             
                         </tr>
                     </thead>
@@ -65,27 +67,26 @@
                             <td>{{ str_replace(".", ",", floatval($req->coun)) }}</td>
                             
                             <td>
-
-                                 {!! Form::open(['method'=>'POST', 'url'=>'/unreserv_po_confirm']) !!}
-
-                                    {!! Form::hidden('item', $req->item) !!}
-                                    {!! Form::hidden('variant', $req->variant) !!}
-                                    {!! Form::hidden('batch', $req->batch) !!}
-                                    {!! Form::hidden('po', $input_po) !!}
-
-                                    {!! Form::submit('Unreserve', ['class' => 'btn-xs  btn-success']) !!}
-
-                                    @include('errors.list')
-                                {!! Form::close() !!}
-
-
+                                <input type="checkbox" id="box" class="btn box" name='checked[]' value="{{ $req->item."&".$req->variant."&".$req->batch."&".$input_po }}">
+                                <input name="hidden[]" type='hidden' value="{{ $req->item."&".$req->variant."&".$req->batch."&".$input_po }}"> 
                             </td>
-                            
                             
                         </tr>
                     @endforeach
                     
-                    </tbody>                
+                    </tbody>     
+                    </table>           
+
+                    <div class="panel-body">
+                        Total quantity: <b><div id="total"></div></b>
+                    </div>
+
+                    <div class="panel-body">
+                        {!! Form::submit('Confirm', ['class' => 'btn btn-success center-block']) !!}
+                    </div>
+
+                    @include('errors.list')
+                    {!! Form::close() !!}     
             </div>
         </div>
     </div>

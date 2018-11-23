@@ -45,9 +45,17 @@
 					<a href="{{ url('/reserv_table_filter') }}" class="btn btn-warning btn-m center-block">Reservation table by item, variant, batch (with filter)</a>
 				</div>
 
-				
-
 			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">Reservation by Po table</div>
+				<div class="panel-body">
+					<a href="{{ url('/reserv_by_po') }}" class="btn btn-success btn-m center-block">Reservation by po</a>
+				</div>
+				<div class="panel-body">
+					<a href="{{ url('/po') }}" class="btn btn-success btn-m center-block">Komesa table</a>
+				</div>
+			</div>			
 		</div>
 	</div>
 </div>
