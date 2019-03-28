@@ -17,6 +17,7 @@
 	<link href="{{ asset('/css/jquery-ui.min.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/custom.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/app.css') }}" rel='stylesheet' type='text/css'>
+	<link href="{{ asset('/css/choosen.css') }}" rel='stylesheet' type='text/css'>
 
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -36,22 +37,38 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="http://172.27.161.171/cutting/">Cutting App</a>
+				@if(Auth::check() && Auth::user()->level() == 5)
+				@else
+				<a class="navbar-brand" href="http://172.27.161.171/preparation"><b>Preparation</b></a>
+				<a class="navbar-brand" href="#">|</a>
+				<a class="navbar-brand" href="http://172.27.161.171/trebovanje"><b>Trebovanje</b></a>
+				<a class="navbar-brand" href="#">|</a>
+				<a class="navbar-brand" href="http://172.27.161.171/downtime"><b>Downtime</b></a>
+				<a class="navbar-brand" href="#">|</a>
+				@endif
+				<a class="navbar-brand" href="http://172.27.161.171/cutting"><b>Cutting</b></a>
+				<a class="navbar-brand" href="#">|</a>
+
 			</div>
 
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-				{{--<ul class="nav navbar-nav">
+				{{--
+				<ul class="nav navbar-nav">
 					<li><a href="{{ url('/') }}">Home</a></li>
-				</ul>--}}
+				</ul>
+				--}}
+
+				@if(Auth::check() && Auth::user()->level() != 4)
 				<ul class="nav navbar-nav">
-					<li><a href="{{ url('/reservation') }}">Reservations of material</a></li>
+					<li><a href="{{ url('/reservation') }}">Reservations of materials</a></li>
 				</ul>
 				<ul class="nav navbar-nav">
-					<li><a href="{{ url('/cons') }}">Consumption of material</a></li>
+					<li><a href="{{ url('/cons') }}">TRN mat cons</a></li>
 				</ul>
 				<ul class="nav navbar-nav">
-					<li></li>
+					<li><a href="{{ url('/table_select') }}">Requests from modules</a></li>
 				</ul>
+				@endif
 
 				<ul class="nav navbar-nav navbar-right">
 					@if (Auth::guest())
@@ -85,6 +102,7 @@
 	<!--<script src="{{ asset('/js/jspdf.min.js') }}" type="text/javascript" ></script>-->
 	<script src="{{ asset('/js/FileSaver.min.js') }}" type="text/javascript" ></script>
 	<script src="{{ asset('/js/bootstrap-table-export.js') }}" type="text/javascript" ></script>
+	<script src="{{ asset('/js/choosen.js') }}" type="text/javascript" ></script>
 
 	<script type="text/javascript">
 	   $.ajaxSetup({
@@ -166,6 +184,8 @@ $(function() {
 	$('#sort').bootstrapTable({
     	
 	});
+
+	$(".chosen").chosen();
 
 	//$('.table tr').each(function(){
   		

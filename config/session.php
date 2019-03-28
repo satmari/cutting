@@ -16,7 +16,8 @@ return [
 	|
 	*/
 
-	'driver' => env('SESSION_DRIVER', 'file'),
+	// 'driver' => env('SESSION_DRIVER', 'file'),
+	'driver' => env('SESSION_DRIVER', 'cookie'),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -29,8 +30,9 @@ return [
 	|
 	*/
 
-	'lifetime' => 120,
-
+	// 'lifetime' => 120,
+	// 'expire_on_close' => false,
+	'lifetime' => 60*24*365,
 	'expire_on_close' => false,
 
 	/*
@@ -83,7 +85,7 @@ return [
 	|
 	*/
 
-	'table' => 'sessions',
+	'table' => 'sessions_bbs2',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -109,7 +111,7 @@ return [
 	|
 	*/
 
-	'cookie' => 'cutting_session',
+	'cookie' => 'laravel_session_bbs2',
 
 	/*
 	|--------------------------------------------------------------------------

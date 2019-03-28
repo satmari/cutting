@@ -62,6 +62,7 @@
                             <th><b>Extra Item</b></th>
                             <th><b>Extra Variant</b></th>
                             <th><b>Extra Consumed</b></th>
+                            <th><b>Still available to Con</b></th>
                             <th><b>Error</b></th>
                             
                         </tr>
@@ -70,7 +71,7 @@
                     @foreach ($data as $req)
                         <tr>
                            
-                            <td>{{ $req->po}}</td>
+                            <td><b>{{ $req->po}}</b></td>
                             <td>{{ $req->status }}</td>
                             <td>{{ $req->to_be_finished }}</td>
                             <td>{{ $req->cut_prod_line }}</td>
@@ -78,11 +79,12 @@
                             <td>{{ $req->main_item }}</td>
                             <td>{{ $req->main_variant }}</td>
                             <td>{{ round($req->qty_per,3) }}</td>
-                            <td>{{ round($req->teo_cons,3) }}</td>
-                            <td>{{ round($req->over_cons,3)}}</td>
+                            <td>{{ round($req->teo_cons,1) }}</td>
+                            <td>{{ round($req->over_cons,1)}}</td>
                             <td>{{ $req->extra_item }}</td>
                             <td>{{ $req->extra_variant }}</td>                        
-                            <td>{{ round($req->extra_consumed,3) }}</td>                        
+                            <td>{{ round($req->extra_consumed,1) }}</td>                        
+                            <td><b>{{ round($req->over_cons,1)-round($req->extra_consumed,1) }}</b></td>
                             <td>{{ $req->error }}</td>                        
                             
                         </tr>

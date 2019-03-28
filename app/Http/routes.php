@@ -13,7 +13,6 @@
 
 // Route::get('/', 'WelcomeController@index');
 Route::get('/', 'HomeController@index');
-
 Route::get('home', 'HomeController@index');
 
 Route::controllers([
@@ -64,14 +63,53 @@ Route::post('/edit_po/{id}', 'poController@update_po');
 //Cosnumption
 Route::get('cons', 'consController@index');
 Route::get('cons_table', 'consController@cons_table');
-
 Route::get('update_cons_table', 'consController@update_cons_table');
-
 Route::get('add_po_cons_table', 'consController@add_po_cons_table');
 Route::get('add_po', 'consController@add_po');
 Route::post('add_new_po_cons', 'consController@add_new_po_cons');
 
+//Requests
+Route::get('request', 'requestController@index');
+Route::post('logincheck', 'requestController@logincheck');
+Route::get('select', 'requestController@select');
 
+Route::get('req_extrabb', 'requestController@req_extrabb');
+Route::post('req_extrabbconfirm', 'requestController@req_extrabbconfirm');
+Route::get('/req_extrabb_status/{id}', 'requestController@edit_req_extrabb_status');
+Route::post('/req_extrabb_status', 'requestController@req_extrabb_status');
+
+Route::get('req_cartonbox', 'requestController@req_cartonbox');
+Route::post('req_cartonboxconfirm', 'requestController@req_cartonboxconfirm');
+Route::get('/req_cartonbox_status/{id}', 'requestController@edit_req_cartonbox_status');
+Route::post('/req_cartonbox_status', 'requestController@req_cartonbox_status');
+
+Route::get('req_reprintbb', 'requestController@req_reprintbb');
+Route::post('req_reprintbbconfirm', 'requestController@req_reprintbbconfirm');
+Route::get('/req_reprintbb_status/{id}', 'requestController@edit_req_reprintbb_status');
+Route::post('/req_reprintbb_status', 'requestController@req_reprintbb_status');
+
+Route::get('req_padprint', 'requestController@req_padprint');
+Route::post('req_padprintconfirm', 'requestController@req_padprintconfirm');
+Route::get('/req_padprint_status/{id}', 'requestController@edit_req_padprint_status');
+Route::post('/req_padprint_status', 'requestController@req_padprint_status');
+Route::post('/req_padprint_status1', 'requestController@req_padprint_status1');
+
+
+// Request tables
+Route::get('table_select', 'requestController@table_select');
+Route::get('req_extrabb_table', 'requestController@req_extrabb_table');
+Route::get('req_extrabb_table_history', 'requestController@req_extrabb_table_history');
+Route::get('req_cartonbox_table', 'requestController@req_cartonbox_table');
+Route::get('req_cartonbox_table_history', 'requestController@req_cartonbox_table_history');
+Route::get('req_reprintbb_table', 'requestController@req_reprintbb_table');
+Route::get('req_reprintbb_table_history', 'requestController@req_reprintbb_table_history');
+Route::get('req_padprint_table', 'requestController@req_padprint_table');
+Route::get('req_padprint_table_history', 'requestController@req_padprint_table_history');
+
+
+// Import
+Route::get('import', 'importController@index');
+Route::post('postImportConsPo', 'importController@postImportConsPo');
 
 Route::any('getitemdata', function() {
 	$term = Input::get('term');

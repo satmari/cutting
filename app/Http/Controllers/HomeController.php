@@ -1,5 +1,13 @@
 <?php namespace App\Http\Controllers;
 
+use App\User;
+use Bican\Roles\Models\Role;
+use Bican\Roles\Models\Permission;
+use Auth;
+
+use Session;
+use Validator;
+
 class HomeController extends Controller {
 
 	/*
@@ -29,7 +37,30 @@ class HomeController extends Controller {
 	 * @return Response
 	 */
 	public function index()
-	{
+	{	
+		$user = User::find(Auth::id());
+
+		// if ($user->is('admin')) { 
+		//     // if user has at least one role
+		//     $msg = "Hi admin";
+		// }
+		// if ($user->is('preparacija')) { 
+		//     // if user has at least one role
+		//     $msg = "Pa gde ste preparacija?";
+		//     //return redirect('/maintable');
+		// }
+
+		// dd($user);
+
+		if (!is_null($user)) {
+
+			if ($user->is('modul')) { 
+			    // if user has at least one role
+			    $msg = "Hi modul";
+			  	return redirect('/request');
+		 	}
+		}
+
 		return view('home');
 	}
 

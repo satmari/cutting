@@ -13,7 +13,8 @@ return [
 	|
 	*/
 
-	'debug' => env('APP_DEBUG'),
+	'debug' => env('APP_DEBUG', false),
+	// 'debug' => env('APP_DEBUG'),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -146,11 +147,13 @@ return [
 		'App\Providers\EventServiceProvider',
 		'App\Providers\RouteServiceProvider',
 
-		//'Collective\Html\HtmlServiceProvider',
-		'Illuminate\Html\HtmlServiceProvider',
-		'Maatwebsite\Excel\ExcelServiceProvider',
-		'Bican\Roles\RolesServiceProvider',	
+		//'Illuminate\Html\HtmlServiceProvider',
 
+		'Collective\Html\HtmlServiceProvider',
+		'Bican\Roles\RolesServiceProvider',	
+		'Maatwebsite\Excel\ExcelServiceProvider',
+		//'Gbrock\Table\Providers\TableServiceProvider',
+		
 	],
 
 	/*
