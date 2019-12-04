@@ -80,12 +80,30 @@ class requestController extends Controller {
 				$msg = 'Modul is not autenticated';
 				return view('InteosLogin.error',compact('msg'));
 			}
-			$module_line = substr($module, 0, 1);
-    		$module_name = substr($module, 1, 3);
-    		
-    		$module = $module_line." ".$module_name;
 
-    		Session::set('module', $module);
+
+			$crtica = substr($module, 1, 1);
+
+			if ($crtica == "-") {
+
+				$module_line = substr($module, 0, 1);
+	    		$module_name = substr($module, 2, 3);
+	    		
+	    		$module = $module_line." ".$module_name;
+
+	    		Session::set('module', $module);	
+
+			} else {
+
+				$module_line = substr($module, 0, 1);
+	    		$module_name = substr($module, 1, 3);
+	    		
+	    		$module = $module_line." ".$module_name;
+
+	    		Session::set('module', $module);	
+			}
+
+			
     	}
 
     	$leaderid = Session::get('leaderid');

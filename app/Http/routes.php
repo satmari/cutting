@@ -110,6 +110,7 @@ Route::get('req_padprint_table_history', 'requestController@req_padprint_table_h
 // Import
 Route::get('import', 'importController@index');
 Route::post('postImportConsPo', 'importController@postImportConsPo');
+Route::get('postImportUpdatePass', 'importController@postImportUpdatePass');
 
 Route::any('getitemdata', function() {
 	$term = Input::get('term');
