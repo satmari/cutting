@@ -59,6 +59,17 @@ class requestController extends Controller {
 		// dd($pin);
 
 		$inteosll = DB::connection('sqlsrv2')->select(DB::raw("SELECT Cod,Name FROM BdkCLZG.dbo.WEA_PersData WHERE Func = 23 AND FlgAct = 1 AND PinCode = '".$pin."'"));
+		/*
+		$inteosleaders = DB::connection('sqlsrv2')->select(DB::raw("SELECT 
+			Name 
+		FROM [BdkCLZG].[dbo].[WEA_PersData] 
+		WHERE (Func = 23) and (FlgAct = 1) and (PinCode = ".$pin.")
+		UNION ALL
+		SELECT 
+			Name 
+		FROM [SBT-SQLDB01P\\INTEOSKKA].[BdkCLZKKA].[dbo].[WEA_PersData]
+		WHERE (Func = 23) and (FlgAct = 1) and (PinCode = ".$pin.")"));
+		*/
 
 		if (empty($inteosll)) {
 			$msg = 'LineLeader with this PIN is not active';
@@ -354,9 +365,19 @@ class requestController extends Controller {
 		$po = $input['po'];
 		$bb = $input['bb'];
 		
+		// $check_bb = DB::connection('sqlsrv2')->select(DB::raw("SELECT [BlueBoxNum]
+		// FROM [BdkCLZG].[dbo].[CNF_BlueBox]
+		// WHERE BlueBoxNum like '%".$po.$bb."'"));
+
 		$check_bb = DB::connection('sqlsrv2')->select(DB::raw("SELECT [BlueBoxNum]
 		FROM [BdkCLZG].[dbo].[CNF_BlueBox]
-		WHERE BlueBoxNum like '%".$po.$bb."'"));
+		WHERE BlueBoxNum like '%".$po.$bb."'
+		UNION ALL
+		SELECT [BlueBoxNum]
+		FROM [SBT-SQLDB01P\\INTEOSKKA].[BdkCLZKKA].[dbo].[CNF_BlueBox]
+		WHERE BlueBoxNum like '%".$po.$bb."' "));
+
+
 		// dd($check_bb[0]);
 
 		if (!isset($check_bb[0])) {
