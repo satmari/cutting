@@ -52,22 +52,24 @@
 			</div>
 
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-				{{--
-				<ul class="nav navbar-nav">
-					<li><a href="{{ url('/') }}">Home</a></li>
-				</ul>
-				--}}
-
+				
 				@if(Auth::check() && Auth::user()->level() != 4)
-				<ul class="nav navbar-nav">
-					<li><a href="{{ url('/reservation') }}">Reservations of materials</a></li>
-				</ul>
-				<ul class="nav navbar-nav">
-					<li><a href="{{ url('/cons') }}">TRN mat cons</a></li>
-				</ul>
-				<ul class="nav navbar-nav">
-					<li><a href="{{ url('/table_select') }}">Requests from modules</a></li>
-				</ul>
+			
+					@if(Auth::user()->name == 'cutting')
+						<ul class="nav navbar-nav">
+							<li><a href="{{ url('/table_select') }}">Requests from lines</a></li>
+						</ul>
+						<ul class="nav navbar-nav">
+							<li><a href="{{ url('/wastage_cut') }}">TPP wastage</a></li>
+						</ul>
+					@endif
+
+					@if(Auth::user()->name == 'magacin')
+						<ul class="nav navbar-nav">
+							<li><a href="{{ url('/wastage_wh') }}">TPP wastage (wh)</a></li>
+						</ul>
+					@endif
+
 				@endif
 
 				<ul class="nav navbar-nav navbar-right">

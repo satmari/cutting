@@ -3,9 +3,9 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <div class="text-center col-md-6 col-md-offset-3">
+        <div class="text-center col-md-8 col-md-offset-2">
             <div class="panel panel-info">
-                <div class="panel-heading"><b><big>Extra BB</big></b> table requests from module</div>
+                <div class="panel-heading"><b><big>Extra BB</big></b> table requests from lines</div>
 
                 @if(isset($h))
                     <p>
@@ -13,6 +13,7 @@
                         <a href="{{url('/req_reprintbb_table/')}}" class="btn btn-primary btn-xs ">ReprintBB requests</a>
                         <a href="{{url('/req_cartonbox_table/')}}" class="btn btn-warning btn-xs ">Cartonbox requests</a>
                         <a href="{{url('/req_padprint_table/')}}" class="btn btn-success btn-xs ">Padprint requests</a>
+                        <a href="{{url('/req_cut_part_table/')}}" class="btn btn-default btn-xs ">Cut part requests</a>
                     </p>
                     History of last 30 days
                     <p><a href="{{url('/req_extrabb_table/')}}" class="btn btn-xs">Back</a></p>
@@ -23,6 +24,7 @@
                         <a href="{{url('/req_reprintbb_table/')}}" class="btn btn-primary btn-xs ">ReprintBB requests</a>
                         <a href="{{url('/req_cartonbox_table/')}}" class="btn btn-warning btn-xs ">Cartonbox requests</a>
                         <a href="{{url('/req_padprint_table/')}}" class="btn btn-success btn-xs ">Padprint requests</a>
+                        <a href="{{url('/req_cut_part_table/')}}" class="btn btn-default btn-xs ">Cut part requests</a>
                     </p>
                     <a href="{{url('/req_extrabb_table_history/')}}" class="btn btn-danger btn-xs ">History</a>
                 @endif
@@ -64,7 +66,7 @@
                             <th><b>Komesa</b></th>
                             <th><b>Size</b></th>
                             <th>Bagno</th>
-                            <th><big>Module</big></th>
+                            <th><big>Line</big></th>
                             <th>Leader</th>
                             <th><b>Qty</b></th>
                             <th>Status</th>

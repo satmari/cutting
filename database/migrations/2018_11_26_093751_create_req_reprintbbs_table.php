@@ -24,6 +24,8 @@ class CreateReqReprintbbsTable extends Migration {
 			$table->string('status');
 			$table->string('comment')->nullable();
 
+			$table->string('size')->nullable();
+
 			$table->timestamps();
 		});
 	}

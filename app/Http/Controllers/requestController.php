@@ -15,6 +15,7 @@ use App\req_extrabb;
 use App\req_cartonbox;
 use App\req_reprintbb;
 use App\req_padprint;
+use App\req_cut_part;
 
 use App\User;
 use Bican\Roles\Models\Role;
@@ -120,6 +121,15 @@ class requestController extends Controller {
     	$leaderid = Session::get('leaderid');
     	$leader = Session::get('leader');
     	$module = Session::get('module');
+
+    	if (!isset($module)) {
+			$msg = 'Module is not autenticated';
+			return view('requests.error',compact('msg'));
+		}
+		if (!isset($leader)) {
+			$msg = 'LineLeader is not autenticated';
+			return view('requests.error',compact('msg'));
+		}
     	
 		// dd($leader);
     	// dd($module);
@@ -140,6 +150,15 @@ class requestController extends Controller {
     	$leader = Session::get('leader');
     	$module = Session::get('module');
 
+    	if (!isset($module)) {
+			$msg = 'Module is not autenticated';
+			return view('requests.error',compact('msg'));
+		}
+		if (!isset($leader)) {
+			$msg = 'LineLeader is not autenticated';
+			return view('requests.error',compact('msg'));
+		}
+
     	// dd($module);
     	return view('requests.req_extrabb_form', compact('leaderid','leader','module'));
 
@@ -156,10 +175,15 @@ class requestController extends Controller {
 		$bagno = $input['bagno'];
 		$qty = (int)$input['qty'];
 
-		$check_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT [Prod_ Order No_]
-		FROM [Gordon_LIVE].[dbo].[GORDON\$Prod_ Order Line]
-		WHERE [Status]= '3' and [Prod_ Order No_] like '%".$po."%' and [Variant Code] like '%".$size."%' "));
+		// $check_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT [Prod_ Order No_]
+		// FROM [Gordon_LIVE].[dbo].[GORDON\$Prod_ Order Line]
+		// WHERE [Status]= '3' and [Prod_ Order No_] like '%".$po."%' and [Variant Code] like '%".$size."%' "));
 		// dd($check_po[0]);
+
+		$check_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT DISTINCT (CASE WHEN po like '%-%' THEN substring(po, 1,6) ELSE substring (po, 4,6) END) as po
+		FROM [trebovanje].[dbo].[sap_coois] WHERE po like '%".$po."%' AND substring(fg,14,5) = '".$size."' "));
+		// dd($check_po);
+
 
 		if (!isset($check_po[0])) {
 			$msg = 'Komesa + velicina ne postoji ili nije vise otvorena';
@@ -247,6 +271,15 @@ class requestController extends Controller {
     	$leader = Session::get('leader');
     	$module = Session::get('module');
 
+    	if (!isset($module)) {
+			$msg = 'Module is not autenticated';
+			return view('requests.error',compact('msg'));
+		}
+		if (!isset($leader)) {
+			$msg = 'LineLeader is not autenticated';
+			return view('requests.error',compact('msg'));
+		}
+
     	// dd($module);
     	return view('requests.req_cartonbox_form', compact('leaderid','leader','module'));
 
@@ -261,15 +294,19 @@ class requestController extends Controller {
 		$po = $input['po'];
 		$size = $input['size'];
 		
-		$check_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT [Prod_ Order No_]
-		FROM [Gordon_LIVE].[dbo].[GORDON\$Prod_ Order Line]
-		WHERE [Status]= '3' and [Prod_ Order No_] like '%".$po."%' and [Variant Code] like '%".$size."%' "));
-		// dd($check_po[0]);
+		// $check_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT [Prod_ Order No_]
+		// FROM [Gordon_LIVE].[dbo].[GORDON\$Prod_ Order Line]
+		// WHERE [Status]= '3' and [Prod_ Order No_] like '%".$po."%' and [Variant Code] like '%".$size."%' "));
+		// // dd($check_po[0]);
+		$check_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT DISTINCT (CASE WHEN po like '%-%' THEN substring(po, 1,6) ELSE substring (po, 4,6) END) as po
+		FROM [trebovanje].[dbo].[sap_coois] WHERE po like '%".$po."%' AND substring(fg,14,5) = '".$size."' "));
+		// dd($check_po);
 
 		if (!isset($check_po[0])) {
 			$msg = 'Komesa + velicina ne postoji ili nije vise otvorena';
 			return view('requests.error',compact('msg'));	
 		}
+
 		
     	$module = Session::get('module');
     	$leader = Session::get('leader');
@@ -351,6 +388,15 @@ class requestController extends Controller {
     	$leader = Session::get('leader');
     	$module = Session::get('module');
 
+    	if (!isset($module)) {
+			$msg = 'Module is not autenticated';
+			return view('requests.error',compact('msg'));
+		}
+		if (!isset($leader)) {
+			$msg = 'LineLeader is not autenticated';
+			return view('requests.error',compact('msg'));
+		}
+
     	// dd($module);
     	return view('requests.req_reprintbb_form', compact('leaderid','leader','module'));
 
@@ -358,32 +404,35 @@ class requestController extends Controller {
 
 	public function req_reprintbbconfirm(Request $request) {
 
-		$this->validate($request, ['po'=>'required|min:6|max:7', 'bb'=>'required|min:3|max:4']);
+		$this->validate($request, ['po'=>'required|min:6|max:7', 'bb'=>'required|min:3|max:4', 'size'=>'required']);
 
 		$input = $request->all(); // change use (delete or comment user Requestl; )
 		
 		$po = $input['po'];
 		$bb = $input['bb'];
+		$size = $input['size'];
+		// dd($size);
 		
 		// $check_bb = DB::connection('sqlsrv2')->select(DB::raw("SELECT [BlueBoxNum]
 		// FROM [BdkCLZG].[dbo].[CNF_BlueBox]
 		// WHERE BlueBoxNum like '%".$po.$bb."'"));
 
-		$check_bb = DB::connection('sqlsrv2')->select(DB::raw("SELECT [BlueBoxNum]
-		FROM [BdkCLZG].[dbo].[CNF_BlueBox]
-		WHERE BlueBoxNum like '%".$po.$bb."'
-		UNION ALL
-		SELECT [BlueBoxNum]
-		FROM [SBT-SQLDB01P\\INTEOSKKA].[BdkCLZKKA].[dbo].[CNF_BlueBox]
-		WHERE BlueBoxNum like '%".$po.$bb."' "));
+		// $check_bb = DB::connection('sqlsrv2')->select(DB::raw("SELECT [BlueBoxNum] as bb
+		// FROM [BdkCLZG].[dbo].[CNF_BlueBox]
+
+		// WHERE BlueBoxNum like '%".$po."%".$bb."' 
+		// UNION ALL
+		// SELECT [BlueBoxNum]
+		// FROM [SBT-SQLDB01P\\INTEOSKKA].[BdkCLZKKA].[dbo].[CNF_BlueBox]
+		// WHERE BlueBoxNum like '%".$po."%".$bb."' "));
 
 
-		// dd($check_bb[0]);
+		// dd($check_bb);
 
-		if (!isset($check_bb[0])) {
-			$msg = 'Komesa + bb ne postoji';
-			return view('requests.error',compact('msg'));
-		}
+		// if (!isset($check_bb[0])) {
+		// 	$msg = 'Komesa + bb ne postoji';
+		// 	return view('requests.error',compact('msg'));
+		// }
 		
     	$module = Session::get('module');
     	$leader = Session::get('leader');
@@ -402,6 +451,8 @@ class requestController extends Controller {
 
 			$table->po = $po;
 			$table->bb = $bb;
+			// $table->bb = $check_bb[0]->bb;
+			$table->size = $size;
 			$table->module = $module;
 			$table->leader = $leader;
 			
@@ -460,10 +511,20 @@ class requestController extends Controller {
 
 	// PadPrint
 	public function req_padprint() {
+		// dd("CAO");
 
 		$leaderid = Session::get('leaderid');
     	$leader = Session::get('leader');
     	$module = Session::get('module');
+    	// dd($module);
+    	if (!isset($module)) {
+			$msg = 'Module is not autenticated';
+			return view('requests.error',compact('msg'));
+		}
+		if (!isset($leader)) {
+			$msg = 'LineLeader is not autenticated';
+			return view('requests.error',compact('msg'));
+		}
 
     	$style_data = DB::connection('sqlsrv3')->select(DB::raw("SELECT style FROM styles WHERE LEN(style) < 9 ORDER BY style asc"));
     	// dd($style_data);
@@ -592,4 +653,71 @@ class requestController extends Controller {
 
 		return Redirect::to('req_padprint_table/');
 	}
+
+	public function req_cut_part_table() {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM req_cut_parts WHERE status = 'Pending' ORDER BY created_at asc"));
+		return view('requests.req_cut_part_table', compact('data'));
+	}
+
+	public function req_cut_part_table_history() {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM req_cut_parts WHERE created_at >= DATEADD(day,-30,GETDATE()) ORDER BY created_at desc"));
+		$h = 'History';
+		return view('requests.req_cut_part_table', compact('data', 'h'));
+	}
+	
+	public function edit_req_cut_part_status($id) {
+		// dd($id);
+		return view('requests.req_cut_part_status', compact('id'));
+	}
+
+	public function req_cut_part_status(Request $request) {	
+
+		$this->validate($request, ['id'=>'required']);
+		$input = $request->all();
+		$id = $input['id'];
+		// $comment = $input['comment'];
+
+		try {
+			$table = req_cut_part::findOrFail($id);
+
+			$table->status = "Completed";
+			// $table->comment = $comment;
+			$table->save();
+		}
+		catch (\Illuminate\Database\QueryException $e) {
+			$msg = "Problem to save"; 
+			return view('requests.error', compact('msg'));
+		}
+
+		return Redirect::to('req_cut_part_table/');
+	}
+
+	public function req_cut_part_status_c(Request $request) {	
+
+		$this->validate($request, ['id'=>'required']);
+		$input = $request->all();
+		$id = $input['id'];
+		
+		// $comment = $input['comment'];
+
+		try {
+			$table = req_cut_part::findOrFail($id);
+
+			$table->status = "Canceled";
+			// $table->comment = $comment;
+			$table->save();
+		}
+		catch (\Illuminate\Database\QueryException $e) {
+			$msg = "Problem to save"; 
+			return view('requests.error', compact('msg'));
+		}
+
+		return Redirect::to('req_cut_part_table/');
+	}
+	
+	
+
+	
 }

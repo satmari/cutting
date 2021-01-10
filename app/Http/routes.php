@@ -94,6 +94,10 @@ Route::get('/req_padprint_status/{id}', 'requestController@edit_req_padprint_sta
 Route::post('/req_padprint_status', 'requestController@req_padprint_status');
 Route::post('/req_padprint_status1', 'requestController@req_padprint_status1');
 
+Route::get('/req_cut_part_status/{id}', 'requestController@edit_req_cut_part_status');
+Route::post('/req_cut_part_status', 'requestController@req_cut_part_status');
+Route::post('/req_cut_part_status_c', 'requestController@req_cut_part_status_c');
+// Route::post('/req_cut_part_status1', 'requestController@req_cut_part_status1');
 
 // Request tables
 Route::get('table_select', 'requestController@table_select');
@@ -105,7 +109,55 @@ Route::get('req_reprintbb_table', 'requestController@req_reprintbb_table');
 Route::get('req_reprintbb_table_history', 'requestController@req_reprintbb_table_history');
 Route::get('req_padprint_table', 'requestController@req_padprint_table');
 Route::get('req_padprint_table_history', 'requestController@req_padprint_table_history');
+Route::get('req_cut_part_table', 'requestController@req_cut_part_table');
+Route::get('req_cut_part_table_history', 'requestController@req_cut_part_table_history');
 
+//http://172.27.161.171/cutting/bb/519205
+Route::get('/bb/{line}/{id}','cut_pcsController@req_cut_part');
+Route::post('requeststore_cut_part', 'cut_pcsController@requeststore_cut_part');
+Route::get('req_extrabb_table', 'requestController@req_extrabb_table');
+Route::get('req_extrabb_table_history', 'requestController@req_extrabb_table_history');
+
+// Wastage
+Route::get('/wastage_cut','wastageController@index_cut');
+Route::post('req_wastage_cut', 'wastageController@req_wastage_cut');
+Route::get('/wastage_cut_mm','wastageController@index_cut_mm');
+Route::post('req_wastage_cut_mm', 'wastageController@req_wastage_cut_mm');
+
+Route::get('/wastage_wh','wastageController@index_wh');
+Route::get('/wastage_wh_scan','wastageController@wastage_wh_scan');
+Route::post('req_wastage_wh', 'wastageController@req_wastage_wh');
+Route::post('req_wastage_wh_insert', 'wastageController@req_wastage_wh_insert');
+Route::get('wastage_table','wastageController@table');
+
+Route::get('move_sapbin_container','wastageController@move_sapbin_container');
+Route::post('move_sapbin_container_post','wastageController@move_sapbin_container_post');
+Route::get('move_sapbin_container_1','wastageController@move_sapbin_container_1');
+Route::post('move_sapbin_container_post_1','wastageController@move_sapbin_container_post_1');
+
+Route::get('move_container_location','wastageController@move_container_location');
+Route::post('move_container_location_post','wastageController@move_container_location_post');
+Route::get('move_container_location_1','wastageController@move_container_location_1');
+Route::post('move_container_location_post_1','wastageController@move_container_location_post_1');
+
+Route::get('wastage_remove_skeda','wastageController@wastage_remove_skeda');
+Route::get('wastage_remove_skeda/{id}','wastageController@wastage_remove_skeda_post');
+
+// W bin
+Route::get('wastage_bin','wastage_binController@index');
+Route::get('add_wastage_bin','wastage_binController@add');
+Route::post('add_wastage_bin_post', 'wastage_binController@add_post');
+Route::get('edit_wastage_bin/{id}','wastage_binController@edit');
+Route::post('edit_wastage_bin_post/{id}', 'wastage_binController@edit_post');
+// Route::get('remove_wastage_bin/{id}', 'wastage_binController@remove_wastage_bin');
+
+// W locaion
+Route::get('wastage_location','wastage_locationController@index');
+Route::get('add_wastage_location','wastage_locationController@add');
+Route::post('add_wastage_location_post', 'wastage_locationController@add_post');
+Route::get('edit_wastage_location/{id}','wastage_locationController@edit');
+Route::post('edit_wastage_location_post/{id}', 'wastage_locationController@edit_post');
+// Route::get('remove_wastage_location/{id}', 'wastage_locationController@remove_wastage_location');
 
 // Import
 Route::get('import', 'importController@index');
@@ -153,7 +205,9 @@ return Response::json($retun_array);
 Route::any('getpodata', function() {
 	$term = Input::get('term');
 
-	$data = DB::connection('sqlsrv1')->select(DB::raw("SELECT TOP 10 (RIGHT([No_],6)) as po FROM [Gordon_LIVE].[dbo].[GORDON\$Production Order] WHERE [Status] = '3' AND [No_] like '%".$term."%'"));
+	// $data = DB::connection('sqlsrv1')->select(DB::raw("SELECT TOP 10 (RIGHT([No_],6)) as po FROM [Gordon_LIVE].[dbo].[GORDON\$Production Order] WHERE [Status] = '3' AND [No_] like '%".$term."%'"));
+	$data = DB::connection('sqlsrv4')->select(DB::raw("SELECT DISTINCT (CASE WHEN po like '%-%' THEN substring(po, 1,6) ELSE substring (po, 4,6)	END) as po
+		FROM [trebovanje].[dbo].[sap_coois] WHERE po like '%".$term."%'"));
 	// var_dump($data);
 	foreach ($data as $v) {
 		$retun_array[] = array('value' => $v->po);

@@ -5,7 +5,7 @@
 	<div class="row vertical-center-row">
 		<div class="text-center col-md-4 col-md-offset-4">
 			<div class="panel panel-default">
-				<div class="panel-heading">Request tables from modules</div>
+				<div class="panel-heading">Request tables from lines</div>
 				
 				<div class="panel-body">
 					<div class="">
@@ -31,6 +31,11 @@
 					</div>
 				</div>
 				
+				<div class="panel-body">
+					<div class="">
+						<a href="{{url('/req_cut_part_table')}}" class="btn btn-default center-block">Cut parts</a>
+					</div>
+				</div>
 
 			</div>
 		</div>

@@ -13,10 +13,17 @@ class ChangeResLog extends Migration {
 	public function up()
 	{
 		//
-		Schema::table('res_logs', function($table)
+		// Schema::table('res_logs', function($table)
+		// {
+    		
+  //   		// $table->string('po_status')->nullable();
+    		
+    		
+		// });
+		Schema::table('req_reprintbbs', function($table)
 		{
     		
-    		// $table->string('po_status')->nullable();
+    		// $table->string('size')->nullable();
     		
     		
 		});
