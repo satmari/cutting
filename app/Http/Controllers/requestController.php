@@ -46,7 +46,6 @@ class requestController extends Controller {
 			return view('requests.select', compact('leaderid','leader','module'));
 		}
 		*/
-
 		return view('InteosLogin.index');
 
 	}

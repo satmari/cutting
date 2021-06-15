@@ -17,7 +17,7 @@
                 <div class="panel-body">
                     <div class="">
                         <a href="{{url('/move_sapbin_container')}}" class="btn btn-warning center-block">
-                            Move SAP bin (all bags) to Contianer</a>
+                            Move SAP bin (all bags) to Container</a>
                     </div>
                 </div>
                 <div class="panel-body">

@@ -27,34 +27,69 @@ class wastageController extends Controller {
 
 	public function table() {
 		//
-		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [wastages] "));
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+			,(SELECT TOP 1 tpp_shipments FROM [posummary].[dbo].[pro] WHERE skeda = [cutting].[dbo].[wastages].skeda) as tpp_shipment
+			,(SELECT TOP 1 approval FROM [posummary].[dbo].[pro] WHERE skeda = [cutting].[dbo].[wastages].skeda) as approval  
+		FROM [wastages] "));
+
 		return view('Wastage.table', compact('data'));
 	}
 
 	public function index_cut() {
 		//
 		$skeda_data = DB::connection('sqlsrv6')->select(DB::raw("SELECT DISTINCT [skeda] FROM [posummary].[dbo].[pro]"));
+		// $material_data = DB::connection('sqlsrv')->select(DB::raw("SELECT DISTINCT tpp_material FROM [cutting].[dbo].[tpp_materials]"));
 		// dd($skeda_data);
-		return view('Wastage.index_cut',compact('skeda_data'));
+		// dd($material_data);
+
+		return view('Wastage.index_cut',compact('skeda_data'/*,'material_data'*/));
+	}
+
+	public function req_wastage_c(Request $request) {
+
+		$this->validate($request, ['skeda'=>'required']);
+		$forminput = $request->all();
+		// dd($forminput);
+		
+		$skeda = $forminput['skeda'];
+		// dd($skeda);
+
+		$material_data = DB::connection('sqlsrv6')->select(DB::raw("SELECT 
+  		    DISTINCT c.material as tpp_material
+      		FROM [posummary].[dbo].[pro] as p
+  			LEFT JOIN [172.27.161.221\GPD].[trebovanje].[dbo].[sap_coois] as c ON c.po = p.pro --and (c.wc = 'WC02A' or c.wc = 'WC02M')
+  			JOIN [172.27.161.221\GPD].[cutting].[dbo].[tpp_materials] as t ON t.tpp_material = c.material
+  			WHERE  p.skeda = '".$skeda."' "));
+		// dd($material_data);
+
+		$material_data_tpp = DB::connection('sqlsrv')->select(DB::raw("SELECT DISTINCT tpp_material FROM [cutting].[dbo].[tpp_materials]"));
+
+		return view('Wastage.index_c',compact('material_data','material_data_tpp','skeda'));
+
 	}
 
 	public function req_wastage_cut(Request $request) {
 		//
-		$this->validate($request, ['skeda'=>'required', 'sap_bin'=>'required', 'qty'=>'required|min:1|max:9']);
+		$this->validate($request, ['skeda'=>'required', 'sap_bin'=>'required', 'qty'=>'required|min:1|max:9', 'material'=>'required']);
 		$forminput = $request->all();
 		// dd($forminput);
 		
 		$skeda = $forminput['skeda'];
 		$sap_bin = strtoupper($forminput['sap_bin']);
 		$qty = (int)$forminput['qty'];
+		$material = $forminput['material'];
 
 		if ($qty > 10) {
 			dd("Maksimalna kolicina je 10 nalepnica, verovatno ste skenirali barkod umesto da ste uneli kolicinu. Pokusajte ponovo");
 		}
 		
+		$mattress_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT [skeda], [sap_bin] FROM [wastages] WHERE skeda= '".$skeda."' AND  sap_bin = '".$sap_bin."' "));
+		
 		// dd($skeda);
 		// dd($sap_bin);
 		// dd($qty);
+		// $start = count($mattress_exist) + 1 ;
+		// dd($start);
 
 		if ($qty > 0) {
 			
@@ -63,11 +98,12 @@ class wastageController extends Controller {
 				try {
 					$table = new wastage;
 
-					$table->no = $i;
+					$table->no = $i + count($mattress_exist);
 					$table->skeda = $skeda;
 					$table->sap_bin = $sap_bin;
 					$table->weight;
 					$table->location;
+					$table->material = $material;
 										
 					$table->save();
 				}
@@ -78,11 +114,12 @@ class wastageController extends Controller {
 				try {
 					$table = new wastages_print;
 
-					$table->no = $i;
+					$table->no = $i + count($mattress_exist);
 					$table->skeda = $skeda;
 					$table->bin = $sap_bin;
 					$table->printer = 'Krojacnica';
 					$table->printed = 0;
+					// $table->material = $material;
 
 					$table->save();
 				}
@@ -95,20 +132,44 @@ class wastageController extends Controller {
 	}
 
 	public function index_cut_mm() {
-		//
+
 		$pro_data = DB::connection('sqlsrv6')->select(DB::raw("SELECT DISTINCT [pro] as pro FROM pro"));
+		// $material_data = DB::connection('sqlsrv')->select(DB::raw("SELECT DISTINCT tpp_material FROM [cutting].[dbo].[tpp_materials]"));
 		// dd($skeda_data);
-		return view('Wastage.index_cut_mm',compact('pro_data'));
+		return view('Wastage.index_cut_mm',compact('pro_data'/*,'material_data'*/));
+	}
+
+	public function req_wastage_c_mm(Request $request) {
+
+		$this->validate($request, ['pro'=>'required']);
+		$forminput = $request->all();
+		// dd($forminput);
+		
+		$pro = $forminput['pro'];
+
+		$material_data = DB::connection('sqlsrv6')->select(DB::raw("SELECT 
+  		    DISTINCT c.material as tpp_material
+      		FROM [posummary].[dbo].[pro] as p
+  			LEFT JOIN [172.27.161.221\GPD].[trebovanje].[dbo].[sap_coois] as c ON c.po = p.pro --and (c.wc = 'WC02A' or c.wc = 'WC02M')
+  			JOIN [172.27.161.221\GPD].[cutting].[dbo].[tpp_materials] as t ON t.tpp_material = c.material
+  			WHERE  p.pro = '".$pro."' "));
+		// dd($material_data);
+
+		$material_data_tpp = DB::connection('sqlsrv')->select(DB::raw("SELECT DISTINCT tpp_material FROM [cutting].[dbo].[tpp_materials]"));
+
+		return view('Wastage.index_c_mm',compact('material_data','material_data_tpp','pro'));
+
 	}
 
 	public function req_wastage_cut_mm(Request $request) {
 		//
-		$this->validate($request, ['pro'=>'required', 'qty'=>'required|min:1|max:9']);
+		$this->validate($request, ['pro'=>'required', 'qty'=>'required|min:1|max:9', 'material'=>'required']);
 		$forminput = $request->all();
 		// dd($forminput);
 		
 		$pro = $forminput['pro'];
 		$qty = (int)$forminput['qty'];
+		$material = $forminput['material'];
 		
 		// Find Skeda
 		$pro_data = DB::connection('sqlsrv6')->select(DB::raw("SELECT skeda  FROM pro WHERE pro = '".$pro."' "));
@@ -121,9 +182,13 @@ class wastageController extends Controller {
 		// dd($skeda);
 		
 		// Find Mini marker barcode
-		$sap_bin_data = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT(sap_bin) as c_mm FROM wastages WHERE sap_bin not like 'G%' "));
-		// dd((int)$sap_bin_data[0]->c_mm);
-		$mmnum = (int)$sap_bin_data[0]->c_mm;
+		// dd("zovi IT, radimo na ovome");
+		// $sap_bin_data = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT(sap_bin) as c_mm FROM wastages WHERE sap_bin not like 'G%' "));
+		$sap_bin_data = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 sap_bin as c_mm FROM wastages WHERE sap_bin like 'M%' ORDER BY sap_bin desc"));
+		// dd((int)substr($sap_bin_data[0]->c_mm,-6));
+
+		$mmnum = (int)substr($sap_bin_data[0]->c_mm,-7);
+		// dd($mmnum);
 		$mmnum = $mmnum + 1;
 		$mmn = str_pad($mmnum, 8, '0', STR_PAD_LEFT);
 		$mm = "MM".$mmn;
@@ -142,6 +207,7 @@ class wastageController extends Controller {
 					$table->sap_bin = $mm;
 					$table->weight;
 					$table->location;
+					$table->material = $material;
 										
 					$table->save();
 				}
@@ -157,6 +223,7 @@ class wastageController extends Controller {
 					$table->bin = $mm;
 					$table->printer = 'Krojacnica';
 					$table->printed = 0;
+					// $table->material = $material;
 
 					$table->save();
 				}
@@ -393,7 +460,8 @@ class wastageController extends Controller {
 					$table_log->container_id = $table->container_id;					
 					$table_log->container = $table->container;					
 					$table_log->location_id = $table->location_id;					
-					$table_log->location = $table->location;					
+					$table_log->location = $table->location;
+					$table_log->material = $table->material;
 
 					$table_log->save();
 				}
@@ -409,5 +477,43 @@ class wastageController extends Controller {
 		}
 
 		return Redirect::to('wastage_wh');
+	}
+
+	public function delete_wastage_line(Request $request) {	
+
+		// $this->validate($request, ['location'=>'required', 'container'=>'required']);
+		$forminput = $request->all();
+		$id = $forminput['id'];
+
+		dd("Zlatko treba da potvrdi");
+		$table = wastage::findOrFail($id);
+		// $table->delete();
+
+		return Redirect::to('/');
+
+	}
+
+	public function wastage_edit($id) {	
+
+		// dd($id);
+		$wastage_line = wastage::findOrFail($id);
+		// dd($table);
+		return view('wastage.edit', compact('wastage_line'));
+	}
+
+	public function wastage_edit_post(Request $request) {	
+
+		// $this->validate($request, ['location'=>'required', 'container'=>'required']);
+		$forminput = $request->all();
+		$id = $forminput['id'];
+		$log_rep = $forminput['log_rep'];
+		// dd($id);
+
+		$table = wastage::findOrFail($id);
+		$table->log_rep = $log_rep;
+		$table->save();
+		
+		return Redirect::to('wastage_table');
+
 	}
 }

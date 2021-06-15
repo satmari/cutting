@@ -10,7 +10,7 @@
                 <a href="{{url('/wastage_cut_mm')}}" class="btn btn-warning btn-xs ">Mini Marker</a>
                 <div class="panel-body">
 
-                {!! Form::open(['method'=>'POST', 'url'=>'/req_wastage_cut_mm']) !!}
+                {!! Form::open(['method'=>'POST', 'url'=>'/req_wastage_c_mm']) !!}
 
                       
                         <div class="panel-body">
@@ -24,17 +24,9 @@
                             @endforeach
                             </select>
                         </div>
-                        
-                        <div class="panel-body">
-                        <p>Kolicina: <span style="color:red;">*</span></p>
-                            {!! Form::input('number', 'qty', 0, ['class' => 'form-control']) !!}
-                        </div>
 
                         <br>
-                        <div class="panel-info"><u>Default printer is: Zebra Krojacnica</u></div>
-
-                        <br>
-                        {!! Form::submit('Confirm', ['class' => 'btn  btn-success center-block']) !!}
+                        {!! Form::submit('Next', ['class' => 'btn  btn-success center-block']) !!}
 
                         @include('errors.list')
 

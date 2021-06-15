@@ -1,0 +1,126 @@
+@extends('app')
+
+@section('content')
+<div class="container-fluid">
+    <div class="row">
+        <div class="text-center">
+            <div class="panel panel-default">
+                <div class="panel-heading">Marker header table</div>
+              
+                <div class="input-group"> <span class="input-group-addon">Filter</span>
+                    <input id="filter" type="text" class="form-control" placeholder="Type here...">
+                </div>
+
+                <table class="table table-striped table-bordered" id="sort" 
+                data-export-types="['excel']"
+                data-show-export="true"
+                
+                >
+                <!--
+                
+                data-export-types="['excel']"
+                data-search="true"
+                data-show-refresh="true"
+                data-show-toggle="true"
+                data-query-params="queryParams" 
+                data-pagination="true"
+                data-height="300"
+                data-show-columns="true" 
+                data-export-options='{
+                         "fileName": "preparation_app", 
+                         "worksheetName": "test1",         
+                         "jspdf": {                  
+                           "autotable": {
+                             "styles": { "rowHeight": 20, "fontSize": 10 },
+                             "headerStyles": { "fillColor": 255, "textColor": 0 },
+                             "alternateRowStyles": { "fillColor": [60, 69, 79], "textColor": 255 }
+                           }
+                         }
+                       }'
+                -->
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            
+                            <th><b>Marker name</b></th>
+                            <th><b>Width</b></th>
+                            <th><b>Lenght</b></th>
+                            <th><b>Type</b></th>
+                            <th><b>Code</b></th>
+                            <th><b>F Code</b></th>
+                            <th><b>Constraint</b></th>
+                            <th><b>Spacing</b></th>
+                            <th><b>Top</b></th>
+                            <th><b>Bottom</b></th>
+                            <th><b>Right</b></th>
+                            <th><b>Left</b></th>
+                            <th><b>Proc. date</b></th>
+                            <th><b>Eff</b></th>
+                            <th><b>Cut per</b></th>
+                            <th><b>Per</b></th>
+                            <th><b>Avg. Cons</b></th>
+                            <th><b>Lines</b></th>
+                            <th><b>Curves</b></th>
+                            <th><b>Areas</b></th>
+                            <th><b>Angles</b></th>
+                            <th><b>Notches</b></th>
+                            <th><b>Tot. Pcs</b></th>
+                            <!-- <th><b>Var Mod</b></th> -->
+                            <th><b>Key</b></th>
+                            <th><b>Min Len</b></th>
+                            <th><b>Status</b></th>
+                            <th></th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody class="searchable">
+                    @foreach ($data as $req)
+                        <tr>
+                           
+                            <td>{{ $req->id}}</td>
+                            <td><b>{{ $req->marker_name}}</b></td>
+                            
+                            <td>{{ round($req->marker_width,3) }}</td>
+                            <td>{{ round($req->marker_length,3)  }}</td>
+
+                            <td>{{ $req->marker_type }}</td>
+                            <td>{{ $req->marker_code }}</td>
+                            <td>{{ $req->fabric_type }}</td>
+                            <td>{{ $req->constraint }}</td>
+
+                            <td>{{ $req->spacing_around_pieces }}</td>
+                            <td>{{ $req->spacing_around_pieces_top }}</td>
+                            <td>{{ $req->spacing_around_pieces_bottom }}</td>
+                            <td>{{ $req->spacing_around_pieces_right }}</td>
+                            <td>{{ $req->spacing_around_pieces_left }}</td>
+
+                            <td>{{ substr($req->processing_date, 0, 10) }}</td>
+
+                            <td>{{ round($req->efficiency,2) }}</td>
+                            <td>{{ round($req->cutting_perimeter,2) }}</td>
+                            <td>{{ round($req->perimeter,2) }}</td>
+                            <td>{{ round($req->average_consumption,2) }}</td>
+                            <td>{{ round($req->lines,2)}}</td>
+                            <td>{{ round($req->curves,2)}}</td>
+                            <td>{{ round($req->areas,2)}}</td>
+                            <td>{{ round($req->angles,2)}}</td>
+                            <td>{{ round($req->notches,2)}}</td>
+                            <td>{{ round($req->total_pcs,2)}}</td>
+                            
+                            <!-- <td>{{ $req->variant_model }}</td> -->
+                            <td>{{ $req->key }}</td>
+
+                            <td>{{ round($req->min_length,2) }}</td>
+                            <td>{{ $req->status }}</td>
+                            <td>
+                                <a href="{{ url('marker_details/'.$req->id) }}" class="btn btn-info btn-xs center-block">Details</a>
+                            </td>
+                        </tr>
+                    @endforeach
+                    
+                    </tbody>                
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

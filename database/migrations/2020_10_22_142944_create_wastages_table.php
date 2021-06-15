@@ -29,6 +29,12 @@ class CreateWastagesTable extends Migration {
 			$table->float('location_id')->nullable();
 			$table->string('location')->nullable();
 
+			$table->string('material')->nullable();
+
+			$table->string('tpp_ship')->nullable();
+			$table->string('approval')->nullable();
+			$table->string('log_rep')->nullable();
+
 			$table->timestamps();
 		});
 	}

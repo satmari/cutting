@@ -64,13 +64,13 @@
                         <tr>
                             <!-- <th>Id</th> -->
                             
-                            <th><b>Komesa</b></th>
+                            <th data-sortable="true"><b>Komesa</b></th>
                             <th><b>BlueBox</b></th>
                             <th>Size</th>
-                            <th><big>Line</big></th>
+                            <th data-sortable="true"><big>Line</big></th>
                             <th>Leader</th>
-                            <th>Status</th>
-                            <th>Created</th>
+                            <th data-sortable="true">Status</th>
+                            <th data-sortable="true">Created</th>
                             <th>Comment</th>
                             <th></th>
                             

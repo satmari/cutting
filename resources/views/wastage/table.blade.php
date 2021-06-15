@@ -3,9 +3,10 @@
 @section('content')
 <div class="container-fluid">
 	<div class="row vertical-center-row">
-		<div class="text-center col-md-5 col-md-offset-4">
+		<div class="text-center col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
-				<div class="panel-heading">Wastage table</div>
+				<div class="panel-heading">Wastage table &nbsp &nbsp &nbsp 
+					<a href="wastage_table_import">|Import Reported to Log|</a></div>
 
 				
                 <div class="input-group"> <span class="input-group-addon">Filter</span>
@@ -44,10 +45,17 @@
 				           <th>Bag no</th>
 				           <th>Skeda</th>
 				           <th>SAP Bin</th>
+				           <th>Material</th>
 				           <th>Weight</th>
 				           <th>Coment</th>
 				           <th>Container</th>
 				           <th>Location</th>
+				           <th>TPP ship.</th>
+				           <th>Approval</th>
+				           <th>Reported to Log</th>
+
+				           <th></th>
+				           <th></th>
 
 
 
@@ -63,10 +71,25 @@
 				        	<td>{{ $d->no }}</td>
 				        	<td>{{ $d->skeda }}</td>
 				        	<td>{{ $d->sap_bin }}</td>
+				        	<td>{{ $d->material }}</td>
 				        	<td>{{ round($d->weight,2) }}</td>
 				        	<td>{{ $d->coment }}</td>
 				        	<td>{{ $d->container }}</td>
 				        	<td>{{ $d->location }}</td>
+				        	<td>{{ $d->tpp_shipment }}</td>
+				        	<td>{{ $d->approval }}</td>
+				        	<td>{{ $d->log_rep }}</td>
+				        	<td>
+				        		<a href="{{ url('wastage_edit/'.$d->id) }}" class="btn btn-success btn-xs center-block">Edit</a>
+				        	</td>
+				        	<td>
+                                {!! Form::open(['method'=>'POST', 'url'=>'/delete_wastage_line' ]) !!}
+                                    {!! Form::hidden('id', $d->id, ['class' => 'form-control']) !!}
+
+                                    {!! Form::submit('Delete line', ['class' => 'btn btn-danger btn-xs center-block']) !!}
+                                    @include('errors.list')
+                                {!! Form::close() !!}
+                            </td>
 				    
 				    @endforeach
 				    </tbody>

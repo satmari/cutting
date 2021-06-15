@@ -10,32 +10,12 @@ use Validator;
 
 class HomeController extends Controller {
 
-	/*
-	|--------------------------------------------------------------------------
-	| Home Controller
-	|--------------------------------------------------------------------------
-	|
-	| This controller renders your application's "dashboard" for users that
-	| are authenticated. Of course, you are free to change or remove the
-	| controller as you wish. It is just here to get your app started!
-	|
-	*/
 
-	/**
-	 * Create a new controller instance.
-	 *
-	 * @return void
-	 */
 	public function __construct()
 	{
-		// $this->middleware('auth');
+		$this->middleware('auth');
 	}
 
-	/**
-	 * Show the application dashboard to the user.
-	 *
-	 * @return Response
-	 */
 	public function index()
 	{	
 		$user = User::find(Auth::id());
@@ -59,6 +39,97 @@ class HomeController extends Controller {
 			    $msg = "Hi modul";
 			  	return redirect('/request');
 		 	}
+
+		 	if ($user->is('planner')) { 
+			    // if user has at least one role
+			    // dd("planner");
+			    // $msg = "Hi SP";
+			  	return redirect('/plan_mattress/BOARD');
+		 	}
+
+		 	if ($user->is('SP')) { 
+			    // if user has at least one role
+			    // dd("SP");
+			    // $msg = "Hi SP";
+			 //    $operator = Session::get('operator');
+				// $work_place = Session::get('work_place');
+				// $operators = DB::connection('sqlsrv')->select(DB::raw("SELECT [id]
+				//       ,[operator]
+				//       ,[device]
+				//       ,[device_array]
+				//   FROM [cutting].[dbo].[operators]
+				//   WHERE device like '%".$work_place."%' AND status = 'ACTIVE' "));
+				// dd($operators);
+				
+			  	return redirect('/spreader');
+			  	
+		 	}
+
+		 	if ($user->is('MS')) { 
+			    // if user has at least one role
+			    // dd("MS");
+			    // $msg = "Hi MS";
+			  	// return redirect('/request');
+			  	return redirect('/spreader');
+		 	}
+
+		 	if ($user->is('MM')) { 
+			    // if user has at least one role
+			    // dd("MM");
+			    // $msg = "Hi MS";
+			  	// return redirect('/request');
+			  	return redirect('/spreader');
+		 	}
+
+		 	if ($user->is('LR')) { 
+			    // if user has at least one role
+			    // dd("LR");
+			    // $msg = "Hi MS";
+			  	return redirect('/lr');
+		 	}
+
+		 	if ($user->is('PSO')) { 
+			    // if user has at least one role
+			    // dd("PSO");
+			    // $msg = "Hi MS";
+			  	return redirect('/pso');
+		 	}
+
+		 	if ($user->is('PRW')) { 
+			    // if user has at least one role
+			    // dd("PRW");
+			    // $msg = "Hi MS";
+			  	return redirect('/prw');
+		 	}
+
+		 	if ($user->is('PCO')) { 
+			    // if user has at least one role
+			    // dd("PCO");
+			    // $msg = "Hi MS";
+			  	return redirect('/pco');
+		 	}
+
+		 	if ($user->is('PACK')) { 
+			    // if user has at least one role
+			    // dd("PACK");
+			    // $msg = "Hi MS";
+			  	return redirect('/pack');
+		 	}
+
+		 	if ($user->is('PLOT')) { 
+			    // if user has at least one role
+			    // dd("PLOT");
+			    // $msg = "Hi MS";
+			  	return redirect('/plot');
+		 	}
+
+		 	if ($user->is('LEC')) { 
+			    // if user has at least one role
+			    // dd("LEC");
+			    // $msg = "Hi MS";
+			  	return redirect('/cutter');
+		 	}
+
 		}
 
 		return view('home');

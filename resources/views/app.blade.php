@@ -4,21 +4,19 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Cutting</title>
+	<title>Cutting App</title>
 
 	<!-- <link href="{{ asset('/css/app.css') }}" rel="stylesheet"> -->
 	<!-- <link href="{{ asset('/css/css.css') }}" rel="stylesheet"> -->
 	<!-- <link href="{{ asset('/css/custom.css') }}" rel="stylesheet"> -->
-
-
+	<link href="{{ asset('/css/custom.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/bootstrap.min.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/bootstrap-table.css') }}" rel='stylesheet' type='text/css'>
 	<!-- <link href="{{ asset('/css/jquery.dataTables.min.css') }}" rel='stylesheet' type='text/css'> -->
 	<link href="{{ asset('/css/jquery-ui.min.css') }}" rel='stylesheet' type='text/css'>
-	<link href="{{ asset('/css/custom.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/app.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/choosen.css') }}" rel='stylesheet' type='text/css'>
-
+	
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
@@ -37,7 +35,7 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				@if(Auth::check() && Auth::user()->level() == 5)
+				@if(Auth::check() AND (Auth::user()->level() >= 5 OR Auth::user()->level() == 3 OR Auth::user()->level() == 1 OR Auth::user()->level() == 20))
 				@else
 				<a class="navbar-brand" href="http://172.27.161.171/preparation"><b>Preparation</b></a>
 				<a class="navbar-brand" href="#">|</a>
@@ -48,7 +46,6 @@
 				@endif
 				<a class="navbar-brand" href="http://172.27.161.171/cutting"><b>Cutting</b></a>
 				<a class="navbar-brand" href="#">|</a>
-
 			</div>
 
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -62,6 +59,12 @@
 						<ul class="nav navbar-nav">
 							<li><a href="{{ url('/wastage_cut') }}">TPP wastage</a></li>
 						</ul>
+						<ul class="nav navbar-nav">
+							<li><a href="{{ url('/import') }}">Import TPP material</a></li>
+						</ul>
+						<ul class="nav navbar-nav">
+							<li><a href="{{ url('/cutting_xml') }}">SAP phase adv</a></li>
+						</ul>
 					@endif
 
 					@if(Auth::user()->name == 'magacin')
@@ -69,6 +72,470 @@
 							<li><a href="{{ url('/wastage_wh') }}">TPP wastage (wh)</a></li>
 						</ul>
 					@endif
+
+					@if(Auth::user()->level() == 1)
+						<ul class="nav navbar-nav">
+							<li><a href="{{ url('#') }}">Admin test</a></li>
+							<!-- <li><a href="{{ url('import') }}">Import</a></li> -->
+							<li><a href="{{ url('operators') }}">Operators</a></li>
+
+						</ul> 
+						<ul class="nav navbar-nav navbar-rig ht">
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Tables<span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="{{ url('marker') }}">Markers (xml)</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('pro_skeda') }}">Pro skeda (excel)</a></li>
+									<li><a href="{{ url('paspul') }}">Paspul (excel)</a></li>
+									<li><a href="{{ url('mattress') }}">Mattress (excel)</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('paspul_bin') }}">Paspul bin</a></li>
+									
+								</ul>
+							</li>
+							<li><a href="{{ url('plan_mattress/BOARD') }}">Plan mattress</a></li>
+							<li><a href="{{ url('plan_mini_marker') }}">Plan mini-markers</a></li>
+							<li><a href="{{ url('plan_paspul/NOT_SET') }}">Plan paspul</a></li>
+							<li><a href="{{ url('print_mattress_multiple') }}">Print nalog</a></li>
+							
+						</ul>
+						
+					@endif
+
+					@if(Auth::user()->level() == 3)
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">Planner test</a></li> -->
+							@if (isset($operators))
+							<li>
+								<form class="form-inline" style="width:350px; padding: 8px;" 
+								action="{{ url('operator_login_planner') }}" method="get" >
+								@if (!isset($operator))
+								<select name="selected_operator" class="select form-control select-form" 
+								style="width:150px !important">
+	                                <option value="" selected></option>
+	                        	    @foreach ($operators as $line)
+	                                <option value="{{ $line->operator }}">
+	                                    {{ $line->operator }}
+	                            	</option>
+	                            	@endforeach
+	                            </select>
+	                            <input type="submit" value="Login" class="btn btn-success">
+	                            @else
+	                            <span style="color: white;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+	                            <a href="{{ url('operator_logout_planner')}}" class="btn btn-danger">Logout</a>
+	                            @endif
+	                        </li>
+							@else
+								@if(Session::has('operator'))
+								<li>
+									<div style="width:350px; padding: 8px;">
+			                            <span style="color: white;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+				                        <a href="{{ url('operator_logout_planner')}}" class="btn btn-danger">Logout</a>
+			                    	</div>
+			                    </li>
+		                        @endif
+		                    @endif
+
+							<li><a href="{{ url('import') }}">Import</a></li>
+							<li><a href="{{ url('operators') }}">Operators</a></li>
+						</ul>
+						<ul class="nav navbar-nav navbar-rig ht">
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Tables<span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="{{ url('marker') }}">Markers (xml)</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('pro_skeda') }}">Pro skeda (excel)</a></li>
+									<li><a href="{{ url('paspul') }}">Paspul (excel)</a></li>
+									<li><a href="{{ url('mattress') }}">Mattress (excel)</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('paspul_bin') }}">Paspul bin</a></li>
+								</ul>
+							</li>
+							<li><a href="{{ url('plan_mattress/BOARD') }}">Plan mattress</a></li>
+							<li><a href="{{ url('plan_mini_marker') }}">Plan mini-mattress</a></li>
+							<li><a href="{{ url('plan_paspul/NOT_SET') }}">Plan paspul</a></li>
+							<li><a href="{{ url('print_mattress_multiple') }}">Print nalog</a></li>
+							
+						</ul>
+
+					@endif
+
+					@if(Auth::user()->level() == 20)
+						<ul class="nav navbar-nav">
+							<li><a href="{{ url('#') }}">Guest test</a></li>
+						</ul>
+					@endif
+
+					@if(Auth::user()->level() == 10)
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">SP test</a></li> -->
+
+						@if (isset($operators))
+						<li>
+							<form class="form-inline" style="width:350px; padding: 8px;" 
+							action="{{ url('operator_login') }}" method="get" >
+							@if (!isset($operator))
+							<select name="selected_operator" class="select form-control select-form" 
+							style="width:150px !important">
+                                <option value="" selected></option>
+                        	    @foreach ($operators as $line)
+                                <option value="{{ $line->operator }}">
+                                    {{ $line->operator }}
+                            	</option>
+                            	@endforeach
+                            </select>
+                            <input type="submit" value="Login" class="btn btn-success">
+                            @else
+                            <span style="color: white;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="{{ url('operator_logout')}}" class="btn btn-danger">Logout</a>
+                            @endif
+                        </li>
+						@else
+							@if(Session::has('operator'))
+							<li>
+							<div style="width:350px; padding: 8px;">
+	                            <span style="color: white;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+		                        <a href="{{ url('operator_logout')}}" class="btn btn-danger">Logout</a>
+	                        </div>
+	                        </li>
+	                        @endif
+	                    @endif
+
+						</ul>
+
+					@endif
+
+					@if(Auth::user()->level() == 11)
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">MS test</a></li> -->
+
+						@if (isset($operators))
+						<li>
+							<form class="form-inline" style="width:350px; padding: 8px;" 
+							action="{{ url('operator_login') }}" method="get" >
+							@if (!isset($operator))
+							<select name="selected_operator" class="select form-control select-form" 
+							style="width:150px !important">
+                                <option value="" selected></option>
+                        	    @foreach ($operators as $line)
+                                <option value="{{ $line->operator }}">
+                                    {{ $line->operator }}
+                            	</option>
+                            	@endforeach
+                            </select>
+                            <input type="submit" value="Login" class="btn btn-success">
+                            @else
+                            <span style="color: white;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="{{ url('operator_logout')}}" class="btn btn-danger">Logout</a>
+                            @endif
+                        </li>
+						@else
+							@if(Session::has('operator'))
+							<li>
+							<div style="width:350px; padding: 8px;">
+	                            <span style="color: white;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+		                        <a href="{{ url('operator_logout')}}" class="btn btn-danger">Logout</a>
+	                        </div>
+	                        </li>
+	                        @endif
+	                    @endif
+
+						</ul>
+					@endif
+
+					@if(Auth::user()->level() == 12)
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">MM test</a></li> -->
+
+						@if (isset($operators))
+						<li>
+							<form class="form-inline" style="width:350px; padding: 8px;" 
+							action="{{ url('operator_login') }}" method="get" >
+							@if (!isset($operator))
+							<select name="selected_operator" class="select form-control select-form" 
+							style="width:150px !important">
+                                <option value="" selected></option>
+                        	    @foreach ($operators as $line)
+                                <option value="{{ $line->operator }}">
+                                    {{ $line->operator }}
+                            	</option>
+                            	@endforeach
+                            </select>
+                            <input type="submit" value="Login" class="btn btn-success">
+                            @else
+                            <span style="color: white;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="{{ url('operator_logout')}}" class="btn btn-danger">Logout</a>
+                            @endif
+                        </li>
+						@else
+							@if(Session::has('operator'))
+							<li>
+							<div style="width:350px; padding: 8px;">
+	                            <span style="color: white;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+		                        <a href="{{ url('operator_logout')}}" class="btn btn-danger">Logout</a>
+	                        </div>
+	                        </li>
+	                        @endif
+	                    @endif
+						</ul>
+					@endif
+
+					@if(Auth::user()->level() == 13)
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">LR test</a></li> -->
+							@if (isset($operators))
+						<li>
+							<form class="form-inline" style="width:350px; padding: 8px;" 
+							action="{{ url('operator_login_lr') }}" method="get" >
+							@if (!isset($operator))
+							<select name="selected_operator" class="select form-control select-form" 
+							style="width:150px !important">
+                                <option value="" selected></option>
+                        	    @foreach ($operators as $line)
+                                <option value="{{ $line->operator }}">
+                                    {{ $line->operator }}
+                            	</option>
+                            	@endforeach
+                            </select>
+                            <input type="submit" value="Login" class="btn btn-success">
+                            @else
+                            <span style="color: white;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="{{ url('operator_logout_lr')}}" class="btn btn-danger">Logout</a>
+                            @endif
+                        </li>
+						@else
+							@if(Session::has('operator'))
+							<li>
+							<div style="width:350px; padding: 8px;">
+	                            <span style="color: white;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+		                        <a href="{{ url('operator_logout_lr')}}" class="btn btn-danger">Logout</a>
+	                        </div>
+	                        </li>
+	                        @endif
+	                    @endif
+						</ul>
+					@endif
+
+					@if(Auth::user()->level() == 14)
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">PSO test</a></li> -->
+							@if (isset($operators))
+						<li>
+							<form class="form-inline" style="width:350px; padding: 8px;" 
+							action="{{ url('operator_login_pso') }}" method="get" >
+							@if (!isset($operator))
+							<select name="selected_operator" class="select form-control select-form" 
+							style="width:150px !important">
+                                <option value="" selected></option>
+                        	    @foreach ($operators as $line)
+                                <option value="{{ $line->operator }}">
+                                    {{ $line->operator }}
+                            	</option>
+                            	@endforeach
+                            </select>
+                            <input type="submit" value="Login" class="btn btn-success">
+                            @else
+                            <span style="color: white;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="{{ url('operator_logout_pso')}}" class="btn btn-danger">Logout</a>
+                            @endif
+                        </li>
+						@else
+							@if(Session::has('operator'))
+							<li>
+							<div style="width:350px; padding: 8px;">
+	                            <span style="color: white;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+		                        <a href="{{ url('operator_logout_pso')}}" class="btn btn-danger">Logout</a>
+	                        </div>
+	                        </li>
+	                        @endif
+	                    @endif
+						</ul>
+					@endif
+
+					@if(Auth::user()->level() == 15)
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">PRW test</a></li> -->
+							@if (isset($operators))
+						<li>
+							<form class="form-inline" style="width:350px; padding: 8px;" 
+							action="{{ url('operator_login_prw') }}" method="get" >
+							@if (!isset($operator))
+							<select name="selected_operator" class="select form-control select-form" 
+							style="width:150px !important">
+                                <option value="" selected></option>
+                        	    @foreach ($operators as $line)
+                                <option value="{{ $line->operator }}">
+                                    {{ $line->operator }}
+                            	</option>
+                            	@endforeach
+                            </select>
+                            <input type="submit" value="Login" class="btn btn-success">
+                            @else
+                            <span style="color: white;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="{{ url('operator_logout_prw')}}" class="btn btn-danger">Logout</a>
+                            @endif
+                        </li>
+						@else
+							@if(Session::has('operator'))
+							<li>
+							<div style="width:350px; padding: 8px;">
+	                            <span style="color: white;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+		                        <a href="{{ url('operator_logout_prw')}}" class="btn btn-danger">Logout</a>
+	                        </div>
+	                        </li>
+	                        @endif
+	                    @endif
+						</ul>
+					@endif
+
+					@if(Auth::user()->level() == 16)
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">PCO test</a></li> -->
+								@if (isset($operators))
+							<li>
+								<form class="form-inline" style="width:350px; padding: 8px;" 
+								action="{{ url('operator_login_pco') }}" method="get" >
+								@if (!isset($operator))
+								<select name="selected_operator" class="select form-control select-form" 
+								style="width:150px !important">
+	                                <option value="" selected></option>
+	                        	    @foreach ($operators as $line)
+	                                <option value="{{ $line->operator }}">
+	                                    {{ $line->operator }}
+	                            	</option>
+	                            	@endforeach
+	                            </select>
+	                            <input type="submit" value="Login" class="btn btn-success">
+	                            @else
+	                            <span style="color: white;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+	                            <a href="{{ url('operator_logout_pco')}}" class="btn btn-danger">Logout</a>
+	                            @endif
+	                        </li>
+							@else
+								@if(Session::has('operator'))
+								<li>
+								<div style="width:350px; padding: 8px;">
+		                            <span style="color: white;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout_pco')}}" class="btn btn-danger">Logout</a>
+		                        </div>
+		                        </li>
+		                        @endif
+		                    @endif
+						</ul>
+					@endif
+
+					@if(Auth::user()->level() == 17)
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">PACK test</a></li> -->
+							@if (isset($operators))
+							<li>
+								<form class="form-inline" style="width:350px; padding: 8px;" 
+								action="{{ url('operator_login_pack') }}" method="get" >
+								@if (!isset($operator))
+								<select name="selected_operator" class="select form-control select-form" 
+								style="width:150px !important">
+	                                <option value="" selected></option>
+	                        	    @foreach ($operators as $line)
+	                                <option value="{{ $line->operator }}">
+	                                    {{ $line->operator }}
+	                            	</option>
+	                            	@endforeach
+	                            </select>
+	                            <input type="submit" value="Login" class="btn btn-success">
+	                            @else
+	                            <span style="color: white;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+	                            <a href="{{ url('operator_logout_pack')}}" class="btn btn-danger">Logout</a>
+	                            @endif
+	                        </li>
+							@else
+								@if(Session::has('operator'))
+								<li>
+								<div style="width:350px; padding: 8px;">
+		                            <span style="color: white;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout_pack')}}" class="btn btn-danger">Logout</a>
+		                        </div>
+		                        </li>
+		                        @endif
+		                    @endif
+						</ul>
+
+					@endif
+
+					@if(Auth::user()->level() == 18)
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">PLOT test</a></li> -->
+							@if (isset($operators))
+							<li>
+								<form class="form-inline" style="width:350px; padding: 8px;" 
+								action="{{ url('operator_login_plot') }}" method="get" >
+								@if (!isset($operator))
+								<select name="selected_operator" class="select form-control select-form" 
+								style="width:150px !important">
+	                                <option value="" selected></option>
+	                        	    @foreach ($operators as $line)
+	                                <option value="{{ $line->operator }}">
+	                                    {{ $line->operator }}
+	                            	</option>
+	                            	@endforeach
+	                            </select>
+	                            <input type="submit" value="Login" class="btn btn-success">
+	                            @else
+	                            <span style="color: white;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+	                            <a href="{{ url('operator_logout_plot')}}" class="btn btn-danger">Logout</a>
+	                            @endif
+	                        </li>
+							@else
+								@if(Session::has('operator'))
+								<li>
+								<div style="width:350px; padding: 8px;">
+		                            <span style="color: white;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout_plot')}}" class="btn btn-danger">Logout</a>
+		                        </div>
+		                        </li>
+		                        @endif
+		                    @endif
+						</ul>
+					@endif
+
+					@if(Auth::user()->level() == 19)
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">CUT test</a></li> -->
+							@if (isset($operators))
+							<li>
+								<form class="form-inline" style="width:350px; padding: 8px;" 
+								action="{{ url('operator_login_cut') }}" method="get" >
+								@if (!isset($operator))
+								<select name="selected_operator" class="select form-control select-form" 
+								style="width:150px !important">
+	                                <option value="" selected></option>
+	                        	    @foreach ($operators as $line)
+	                                <option value="{{ $line->operator }}">
+	                                    {{ $line->operator }}
+	                            	</option>
+	                            	@endforeach
+	                            </select>
+	                            <input type="submit" value="Login" class="btn btn-success">
+	                            @else
+	                            <span style="color: white;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+	                            <a href="{{ url('operator_logout_cut')}}" class="btn btn-danger">Logout</a>
+	                            @endif
+	                        </li>
+							@else
+								@if(Session::has('operator'))
+								<li>
+								<div style="width:350px; padding: 8px;">
+		                            <span style="color: white;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout_cut')}}" class="btn btn-danger">Logout</a>
+		                        </div>
+		                    	</li>
+		                        @endif
+		                    @endif
+						</ul>
+					@endif
+
+					
 
 				@endif
 
@@ -93,9 +560,10 @@
 <!-- Scripts -->
 	
 	<script src="{{ asset('/js/jquery.min.js') }}" type="text/javascript" ></script>
+	<script src="{{ asset('/js/jquery-ui.min.js') }}" type="text/javascript" ></script>
     <script src="{{ asset('/js/bootstrap.min.js') }}" type="text/javascript" ></script>
     <script src="{{ asset('/js/bootstrap-table.js') }}" type="text/javascript" ></script>
-	<script src="{{ asset('/js/jquery-ui.min.js') }}" type="text/javascript" ></script>
+	
 	<!-- <script src="{{ asset('/js/jquery.dataTables.min.js') }}" type="text/javascript" ></script>-->
 	<!--<script src="{{ asset('/js/jquery.tablesorter.min.js') }}" type="text/javascript" ></script>-->
 	<!--<script src="{{ asset('/js/custom.js') }}" type="text/javascript" ></script>-->
@@ -189,6 +657,7 @@ $(function() {
 
 	$(".chosen").chosen();
 
+
 	//$('.table tr').each(function(){
   		
   		//$("td:contains('pending')").addClass('pending');
@@ -239,5 +708,264 @@ $(function() {
 
 });
 </script>
+<script>
+  $(document).ready(function() {
+
+  	$("#sortable1 , #sortable2 , #sortable3 , #sortable4 , #sortable5, #sortable6, #sortable7, #sortable7, #sortable8, #sortable9" ).sortable({
+    	connectWith: ".connectedSortable_ul_1",
+    	dropOnEmpty: true
+    }).disableSelection();
+
+  //   var $tabs=$('#table-draggable2')
+  //   $( "tbody.connectedSortable_table" )
+  //       .sortable({
+  //           connectWith: ".connectedSortable_table",
+  //           // items: "> tr:not(:first)",
+  //           items: "> tr",
+  //           appendTo: $tabs,
+  //           helper:"clone",
+  //           zIndex: 999990
+  //       })
+  //       .disableSelection()
+  //   ;
+    
+  //   var $tab_items = $( ".nav-tabs > li", $tabs ).droppable({
+  //     accept: ".connectedSortable_table tr",
+  //     hoverClass: "ui-state-hover",
+      
+  //     drop: function( event, ui ) {
+  //       return false;
+  //     }
+  //   });
+
+    $('#sortable2').sortable({
+        // axis: 'y',
+        update: function (event, ui) {
+            var data = $(this).sortable('serialize');
+            console.log("position changed 2");
+            console.log(data);
+            // POST to server using $.post or $.ajax
+          	  $.ajax({
+          	      data: data,
+          	      type: 'POST',
+          	      url: '{{ route('posts.reposition2') }}'
+         	});
+    	}
+    });
+    $('#sortable3').sortable({
+        // axis: 'y',
+        update: function (event, ui) {
+            var data = $(this).sortable('serialize');
+            console.log("position changed 3");
+            console.log(data);
+            // POST to server using $.post or $.ajax
+          	  $.ajax({
+          	      data: data,
+          	      type: 'POST',
+          	      url: '{{ route('posts.reposition3') }}'
+         	});
+    	}
+    });
+    $('#sortable4').sortable({
+        // axis: 'y',
+        update: function (event, ui) {
+            var data = $(this).sortable('serialize');
+            console.log("position changed 4");
+            console.log(data);
+            // POST to server using $.post or $.ajax
+          	  $.ajax({
+          	      data: data,
+          	      type: 'POST',
+          	      url: '{{ route('posts.reposition4') }}'
+         	});
+    	}
+    });
+    $('#sortable5').sortable({
+        // axis: 'y',
+        update: function (event, ui) {
+            var data = $(this).sortable('serialize');
+            console.log("position changed 5");
+            console.log(data);
+            // POST to server using $.post or $.ajax
+          	  $.ajax({
+          	      data: data,
+          	      type: 'POST',
+          	      url: '{{ route('posts.reposition5') }}'
+         	});
+    	}
+    });
+    $('#sortable6').sortable({
+        // axis: 'y',
+        update: function (event, ui) {
+            var data = $(this).sortable('serialize');
+            console.log("position changed 6");
+            console.log(data);
+            // POST to server using $.post or $.ajax
+          	  $.ajax({
+          	      data: data,
+          	      type: 'POST',
+          	      url: '{{ route('posts.reposition6') }}'
+         	});
+    	}
+    });
+    $('#sortable7').sortable({
+        // axis: 'y',
+        update: function (event, ui) {
+            var data = $(this).sortable('serialize');
+            console.log("position changed 7");
+            console.log(data);
+            // POST to server using $.post or $.ajax
+          	  $.ajax({
+          	      data: data,
+          	      type: 'POST',
+          	      url: '{{ route('posts.reposition7') }}'
+         	});
+    	}
+    });
+    $('#sortable8').sortable({
+        // axis: 'y',
+        update: function (event, ui) {
+            var data = $(this).sortable('serialize');
+            console.log("position changed 8");
+            console.log(data);
+            // POST to server using $.post or $.ajax
+          	  $.ajax({
+          	      data: data,
+          	      type: 'POST',
+          	      url: '{{ route('posts.reposition8') }}'
+         	});
+    	}
+    });
+    $('#sortable9').sortable({
+        // axis: 'y',
+        update: function (event, ui) {
+            var data = $(this).sortable('serialize');
+            console.log("position changed 9");
+            console.log(data);
+            // POST to server using $.post or $.ajax
+          	  $.ajax({
+          	      data: data,
+          	      type: 'POST',
+          	      url: '{{ route('posts.reposition9') }}'
+         	});
+    	}
+    });
+
+    var ids = [];
+    $('#sortable10').sortable({
+     	// var ids = [];
+     	
+	    // items: "li",
+	    // start: function(event, ui) {
+	    //   //Empty the array to avoid duplication.
+	    //   ids = [];
+	    //   //Store the ids in the array.
+	    //   $.each(event.target.children, function() {
+	    //     ids.push($(this).attr('id'));
+	    //   })
+	    // },
+
+        axis: 'y',
+        update: function (event, ui) {
+            var ids = [];
+
+			console.log("position changed sortable10");
+
+		    //Store the ids in the array.
+	      	$.each(event.target.children, function() {
+	      		
+	        	// ids.push($(this).attr('id'));
+	        	ids.push($(this).attr('id'));
+	        	// console.log($(this).attr('id'));
+	        	// var ids = '';
+	      	})
+		    // console.log(ids.﻿toString());
+		    data = ids.toString().replace(/\,/g, '&');
+		    console.log(data);
+
+		    $.ajax({
+                data: data,
+                type: 'POST',
+                url: '{{ route('posts.reposition') }}'
+         	});
+    	}
+    });
+
+     var ids = [];
+    $('#sortable11').sortable({
+     	// var ids = [];
+     	
+	    // items: "li",
+	    // start: function(event, ui) {
+	    //   //Empty the array to avoid duplication.
+	    //   ids = [];
+	    //   //Store the ids in the array.
+	    //   $.each(event.target.children, function() {
+	    //     ids.push($(this).attr('id'));
+	    //   })
+	    // },
+
+        axis: 'y',
+        update: function (event, ui) {
+            var ids = [];
+
+			console.log("position changed sortable11");
+
+		    //Store the ids in the array.
+	      	$.each(event.target.children, function() {
+	      		
+	        	// ids.push($(this).attr('id'));
+	        	ids.push($(this).attr('id'));
+	        	// console.log($(this).attr('id'));
+	        	// var ids = '';
+	      	})
+		    // console.log(ids.﻿toString());
+		    data = ids.toString().replace(/\,/g, '&');
+		    console.log(data);
+
+		    $.ajax({
+                data: data,
+                type: 'POST',
+                url: '{{ route('posts.reposition_pas') }}'
+         	});
+    	}
+    });
+
+
+	$('.connectedSortable_ul_1 li').tooltip({
+	    track: true
+	});
+
+	// $(document).ready(function() { $('#exampleModalCenter').modal("show"); });
+	// showEditor() {
+	//     $("#EditModal").modal("show");
+	//     $("#EditModal").appendTo("body");
+	// }
+
+	// $('.connectedSortable_ul_1 li span').tooltip({
+
+	// $(document).ready(function() {
+	//   $('a[data-toggle=modal], button[data-toggle=modal]').click(function () {
+	//   	console.log("modal run");
+	//     var data_id = '';
+	//     // if (typeof $(this).data('id') !== 'undefined') {
+	//       data_id = $(this).data('id');
+	//       data_value = $(this).attr('data-value');
+	//       data_push = $(this).attr('data-push');
+	//       console.log(data_id);
+	//       console.log(data_value);
+	//       console.log(data_push);
+	//     // }
+	//     // $('#my_element_id').text('test');
+	//     $('#my_element_id').text(data_id);
+	//     $('#my_element_value').text(data_value);
+	//     $('#my_element_push').text(data_push);
+	    
+	//   })
+	// });
+	
+});
+</script>
+
 </body>
 </html>

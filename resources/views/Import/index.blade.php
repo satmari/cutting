@@ -8,24 +8,73 @@
 
 			@if(Auth::check() )
 
-			<div class="panel panel-default">
-				<div class="panel-heading">Import <b>Pos</b> from Excel file to Cons table</div>
+				@if(Auth::check() && Auth::user()->name == 'cutting') 
+				<div class="panel panel-default">
+					<div class="panel-heading">Import TPP material from Excel file</div>
 
-				{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImportConsPo']]) !!}
-				
-					<div class="panel-body">
-						{!! Form::file('file1', ['class' => 'center-block']) !!}
-					</div>
-					<div class="panel-body">
-						{!! Form::submit('Import Items', ['class' => 'btn btn-warning center-block']) !!}
-					</div>
-					@include('errors.list')
-				{!! Form::close() !!}
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImportMaterials']]) !!}
+					
+						<div class="panel-body">
+							{!! Form::file('file1', ['class' => 'center-block']) !!}
+						</div>
+						<div class="panel-body">
+							{!! Form::submit('Import Items', ['class' => 'btn btn-warning center-block']) !!}
+						</div>
+						@include('errors.list')
+					{!! Form::close() !!}
+				</div>
+				@endif
 
-			</div>
+				@if(Auth::check() && Auth::user()->name == 'magacin') 
+				<div class="panel panel-default">
+					<div class="panel-heading">Import Reported to logistic with Excel file</div>
+					<p>Note: Excel file should contian: skeda, reported_to_log (YES/NO)</p>
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImportWastage_report']]) !!}
+					
+						<div class="panel-body">
+							{!! Form::file('file2', ['class' => 'center-block']) !!}
+						</div>
+						<div class="panel-body">
+							{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
+						</div>
+						@include('errors.list')
+					{!! Form::close() !!}
+				</div>
+				@endif
 
+				@if(Auth::check() && (Auth::user()->name == 'admin') OR (Auth::user()->name == 'planner'))
+				<div class="panel panel-default">
+					<div class="panel-heading">Import Marker XML file</div>
+					
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['postImport_marker']]) !!}
+					
+						<div class="panel-body">
+							{!! Form::file('file3', ['class' => 'center-block']) !!}
+						</div>
+						<div class="panel-body">
+							{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
+						</div>
+						@include('errors.list')
+					{!! Form::close() !!}
+				</div>
+				<br>
+				<div class="panel panel-default">
+					<div class="panel-heading">Import Excel file (MAT, PRO, PAS)</div>
+					
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImport_skeda']]) !!}
+					
+						<div class="panel-body">
+							{!! Form::file('file4', ['class' => 'center-block']) !!}
+						</div>
+						<div class="panel-body">
+							{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
+						</div>
+						@include('errors.list')
+					{!! Form::close() !!}
+				</div>
+
+				@endif
 			@endif
-			
 
 			<div class="panel panel-default">
 				<div class="panel-body">

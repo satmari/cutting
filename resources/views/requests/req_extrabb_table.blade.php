@@ -63,14 +63,14 @@
                     <thead>
                         <tr>
                             <!-- <th>Id</th> -->
-                            <th><b>Komesa</b></th>
+                            <th data-sortable="true"><b>Komesa</b></th>
                             <th><b>Size</b></th>
                             <th>Bagno</th>
-                            <th><big>Line</big></th>
+                            <th data-sortable="true"><big>Line</big></th>
                             <th>Leader</th>
                             <th><b>Qty</b></th>
-                            <th>Status</th>
-                            <th>Created</th>
+                            <th data-sortable="true">Status</th>
+                            <th data-sortable="true">Created</th>
                             <th>Comment</th>
                             <th></th>
                             

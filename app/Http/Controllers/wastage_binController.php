@@ -50,12 +50,10 @@ class wastage_binController extends Controller {
 			$table = new Wastage_bin;
 			$table->container = strtoupper($container);
 			$table->save();
-			
 		}
 		catch (\Illuminate\Database\QueryException $e) {
 			return Redirect::to('/wastage_bin');
 		}		
-
 		return Redirect::to('/wastage_bin');
 	}
 
@@ -76,23 +74,19 @@ class wastage_binController extends Controller {
 		try {
 			$box = Wastage_bin::findOrFail($id);
 			$box->container = strtoupper($container);
-			
 			$box->save();
 			
 		}
 		catch (\Illuminate\Database\QueryException $e) {
 			return Redirect::to('/wastage_bin');
 		}
-
 		return Redirect::to('/wastage_bin');
 	}
 
 	public function remove($id)
 	{
-		
 		try {
 			$table = Wastage_bin::findOrFail($id);
-		
 			$table->delete();
 		}
 		catch (\Illuminate\Database\QueryException $e) {

@@ -66,12 +66,12 @@
                             <!-- <th>Id</th> -->
                             
                             
-                            <th><b>Line</b></th>
+                            <th data-sortable="true"><b>Line</b></th>
                             <th>Leader</th>
-                            <th>Style</th>
+                            <th data-sortable="true">Style</th>
                             <th><b>Qty</b></th>
-                            <th>Status</th>
-                            <th>Created</th>
+                            <th data-sortable="true">Status</th>
+                            <th data-sortable="true">Created</th>
                             <th>Comment</th>
                             <th></th>
                             

@@ -29,6 +29,8 @@ class CreateWastageLogsTable extends Migration {
 			$table->float('location_id')->nullable();
 			$table->string('location')->nullable();
 
+			$table->string('material')->nullable();
+
 			$table->timestamps();
 		});
 	}
