@@ -65,6 +65,7 @@
                             <!-- <th>Id</th> -->
                             <th data-sortable="true"><b>Komesa</b></th>
                             <th><b>Size</b></th>
+                            <th><b>Style</b></th>
                             <th>Bagno</th>
                             <th data-sortable="true"><big>Line</big></th>
                             <th>Leader</th>
@@ -82,6 +83,7 @@
                            
                             <td><b>{{ $req->po}}</b></td>
                             <td><b>{{ $req->size }}</b></td>
+                            <td><b>{{ $req->style }}</b></td>
                             <td>{{ $req->bagno }}</td>
                             <td>{{ $req->module }}</td>
                             <td>{{ $req->leader }}</td>

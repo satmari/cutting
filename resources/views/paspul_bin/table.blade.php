@@ -5,7 +5,7 @@
     <div class="row">
         <div class="text-center">
             <div class="panel panel-default">
-                <div class="panel-heading">Pas_bin table (manually/importing?)</div>
+                <div class="panel-heading">Pas_bin table (importing from Excel)</div>
               
                 <div class="input-group"> <span class="input-group-addon">Filter</span>
                     <input id="filter" type="text" class="form-control" placeholder="Type here...">
@@ -44,12 +44,8 @@
                            <th class="rot ate"><div><span>pas_bin</div></span></th>
                            <th class="rota te"><div><span>adez_bin</div></span></th>
                            <th class="rotat e"><div><span>created_at</div></span></th>
+                           
 
-                            
-
-                     
-                            
-                            
                         </tr>
                     </thead>
                     <tbody class="searchable">

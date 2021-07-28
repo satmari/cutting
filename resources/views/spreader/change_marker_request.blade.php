@@ -5,7 +5,7 @@
     <div class="row vertical-center-row">
         <div class="text-center col-md-5 col-md-offset-4">
             <div class="panel panel-default">
-                <div class="panel-heading">Change width for mattress: <big><b>{{ $mattress }}</b></big></div>
+                <div class="panel-heading">Change width for g_bin: <big><b>{{ $g_bin }}</b></big></div>
               
                 <div class="panel-body">
                 <br>
@@ -14,13 +14,15 @@
 
                         {!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
                         {!! Form::hidden('mattress', $mattress, ['class' => 'form-control']) !!}
+                        {!! Form::hidden('g_bin', $g_bin, ['class' => 'form-control']) !!}
                         {!! Form::hidden('status', $status, ['class' => 'form-control']) !!}
                         {!! Form::hidden('md_id', $md_id, ['class' => 'form-control']) !!}
 
                             
                         <br>
                         <p>
-                            Mattress <b>{{ $mattress }}</b> have (marker) width of <b>{{ (int)$marker_width }} cm</b><br>
+                            Mattress <b>{{ $mattress }}</b> (g bin <b>{{ $g_bin }}</b>) <br> 
+                            have marker width of <b>{{ (int)$marker_width }} cm</b><br>
                             Theoretical usable width: <b>{{ round($width_theor_usable*100,2) }} cm</b>
                             <br><br>
                         </p>

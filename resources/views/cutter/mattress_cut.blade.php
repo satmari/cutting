@@ -5,7 +5,7 @@
 	<div class="row vertical-center-row">
 		<div class="text-center col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
-				<div class="panel-heading"><b>Cut mattress: {{ $mattress }}</b></div>
+				<div class="panel-heading"><b>Cut g bin: {{ $g_bin }}</b></div>
 				<br>
 			    	
 				<div class="panel-body">	
@@ -13,6 +13,7 @@
 				{!! Form::open(['method'=>'POST', 'url'=>'mattress_cut_post']) !!}
 					{!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
 					{!! Form::hidden('mattress', $mattress, ['class' => 'form-control']) !!}
+					{!! Form::hidden('g_bin', $g_bin, ['class' => 'form-control']) !!}
 					{!! Form::hidden('mattress_id', $mattress_id, ['class' => 'form-control']) !!}
 					{!! Form::hidden('status', $status, ['class' => 'form-control']) !!}
 					{!! Form::hidden('layers_a', $layers_a, ['class' => 'form-control']) !!}
@@ -61,7 +62,7 @@
 
 				<div class="panel-body">
 	                <p>Comment operator:</p>
-	            	{!! Form::text('comment_operator', $comment_operator , ['class' => 'form-control']) !!}
+	            	{!! Form::textarea('comment_operator', $comment_operator , ['class' => 'form-control', 'rows' => 2]) !!}
 				</div>
 				<br>
 				{!! Form::submit('Confirm cut', ['class' => 'btn  btn-danger center-block']) !!}

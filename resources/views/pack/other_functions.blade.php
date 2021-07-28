@@ -9,8 +9,7 @@
 					<br>
 			    <div class="panel-body">	
 				
-				@if (($status == 'TO_CUT') OR ($status == 'ON_CUT'))
-
+				
 					<table style="width:100%" class="table table-striped table-bordered">
 						<tr>
 							<th>Pro</th>
@@ -21,7 +20,7 @@
 							<th>Pad print item</th>
 							<th>Pad print color</th>
 						</tr>
-						@foreach ($take_comment_operator as $req) 
+						@foreach ($data as $req) 
 						<tr>
 							<td>{{ $req->pro }} </td>
                         	<td>{{ $req->sku }} </td>
@@ -33,25 +32,9 @@
 	                     </tr>
                     	@endforeach
 					</table>					
-				@endif
+				
 
-				<!-- <hr> -->
-				{!! Form::open(['method'=>'POST', 'url'=>'add_operator_comment_cut']) !!}
-					{!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
-					{!! Form::hidden('mattress', $mattress, ['class' => 'form-control']) !!}
-					{!! Form::hidden('g_bin', $g_bin, ['class' => 'form-control']) !!}
-					{!! Form::hidden('status', $status, ['class' => 'form-control']) !!}
-
-				<div class="panel-body">
-	                <p>Comment operator:</p>
-	            	{!! Form::textarea('comment_operator', $comment_operator , ['class' => 'form-control', 'rows' => 2]) !!}
-				</div>
-
-				{!! Form::submit('Save comment', ['class' => 'btn  btn-success center-block']) !!}
-	            <br>
-	            @include('errors.list')
-	            {!! Form::close() !!}
-
+				
 	            @if (isset($success))
 				<div class="alert alert-success" role="alert">
 				  {{ $success }}
@@ -63,8 +46,8 @@
 				</div>
 				@endif
 
-	            <hr>
-	            <a href="{{ url('cutter') }}" class="btn btn-default center-bl ock">Back</a>
+	            <!-- <hr> -->
+	            <a href="{{ url('pack') }}" class="btn btn-default center-bl ock">Back</a>
 	            <br>
 	            <br>
 			</div>	

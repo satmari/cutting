@@ -54,7 +54,7 @@
                             <th class="rotate"><div><span>|</div></span></th>
                             <th class="rotate"><div><span>layers</div></span></th>
                             <th class="rotate"><div><span>layers_a</div></span></th>
-                            <th class="rotate"><div><span>length_usable</div></span></th>
+                            <th class="rotate"><div><span>length_mattress</div></span></th>
                             <th class="rotate"><div><span>cons_planned</div></span></th>
                             <th class="rotate"><div><span>extra</div></span></th>
                             <th class="rotate"><div><span>pcs_bundle</div></span></th>
@@ -116,7 +116,7 @@
                             <td><span style="background-color: aqua;">#</span></td>
                             <td>{{ $req->layers}}</td>
                             <td>{{ $req->layers_a}}</td>
-                            <td>{{ round($req->length_usable,3)}}</td>
+                            <td>{{ round($req->length_mattress,3)}}</td>
                             <td>{{ round($req->cons_planned,3) }}</td>
                             <td>{{ $req->extra}}</td>
                             <td>{{ $req->pcs_bundle}}</td>

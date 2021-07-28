@@ -1,6 +1,8 @@
 @extends('app')
 
 @section('content')
+
+{{ header( "refresh:60;url=/cutting" ) }}
 <div class="container-fluid">
     <div class="row">
         <div class="text-center">
@@ -13,9 +15,9 @@
 						@endforeach	  
 						</ul> -->
 
-		        	 	<!-- <div class="input-group"> <span class="input-group-addon">Filter</span>
+		        	 	<div class="input-group"> <span class="input-group-addon">Filter</span>
 		                    <input id="filter" type="text" class="form-control" placeholder="Type here...">
-		                </div> -->
+		                </div>
 
 		                <table class="table table-striped table-bordered" id="table-draggable2" 
 		                
@@ -45,27 +47,12 @@
 		                -->
 		                    <thead>
 		                       <tr>
-		                    		<th >position</th>
-		                            <th >mattress</th>
-		                            <th >material</th>
-		                            <th >dye_lot</th>
-		                            <th >color_desc</th>
-		                            <th >skeda</th>
-		                            <th >spreading_method</th>
-		                            <th >width_theor_usable</th>
-		                            <th >layers</th>
-		                            <th >layers_a</th>
-		                            <th >cons_planned</th>
-		                            <th >priority</th>
-		                            <th >marker_name</th>
-		                            <th >marker_length</th>
-		                            <th >marker_width</th>
-		                            <th >status</th>
-		                            <th >location</th>
-		                            <th >id</th>
+		                    		<th >G-bin</th>
+		                            <th >Mattress</th>
+		                            <th >Priority</th>
 		                            
 		                            <th></th>
-		                            <!-- <th></th> -->
+		                            <th></th>
 		                    	</tr>
 		                    </thead> 
 		                    <tbody class="connectedSortable_t able searchable" id="sortable 10">
@@ -77,35 +64,29 @@
 		                            <th></th>
 		                    	</tr> -->
 		                    @foreach ($data as $req)
-		                        <tr class="ss" id="item[]={{ $req->id }}">
+		                        <tr class="ss" id="item[]={{ $req->id }}" style="border-top: 3px solid grey;
+				                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
+											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
 		                            
-		                            <td>{{ $req->position}}</td>
+		                            <td>{{ $req->g_bin}}</td>
 		                            <td>{{ $req->mattress}}</td>
-		                            <td>{{ $req->material}}</td>
-		                            <td>{{ $req->dye_lot}}</td>
-		                            <td>{{ $req->color_desc}}</td>
-		                            <td>{{ $req->skeda}}</td>
-		                            <td>{{ $req->spreading_method}}</td>
-		                            <td>{{ round($req->width_theor_usable,3)}}</td>
-		                            <td>{{ $req->layers}}</td>
-		                            <td>{{ $req->layers_a}}</td>
-		                            <td>{{ round($req->cons_planned,3)}}</td>
-		                            <td>{{ $req->priority}}</td>
-		                            <td>
-		                            	@if ($req->marker_name != '') 
-		                            		{{ $req->marker_name }}
-		                            	@else
-		                            		<span>PLOCE</span>
-		                            	@endif
-		                            </td>
-		                            <td>{{ round($req->marker_length,3)}}</td>
-		                            <td>{{ round($req->marker_width,3)}}</td>
-		                            <td>{{ $req->status}}</td>
-		                            <td>{{ $req->location}}</td>
-		                            <td>{{ $req->id}}</td>
+		                            <td class="
+		                            @if ($req->priority == 3) top_priority
+				        	    	@elseif ($req->priority == 2) high_priority
+				        	    	@endif
+				        	    	">
+				        	    	@if ($req->priority == 3)Top
+				        	    	@elseif ($req->priority == 2)High
+			        	    		@elseif ($req->priority == 1)Normal
+				        	    	@endif</td>
+		                            
 									<td>
-										<a href="{{ url('mattress_pack/'.$req->id) }}" class="btn btn-info btn-xs center-block">
+										<a href="{{ url('mattress_pack/'.$req->id.'/'.$req->g_bin) }}" class="btn btn-danger btn-xs center-block">
 										Pack mattress</a>
+									</td>
+									<td>
+										<a href="{{ url('other_functions_pack/'.$req->id) }}" class="btn btn-info btn-xs center-block">
+										Details</a>
 									</td>
 
 		                        </tr>

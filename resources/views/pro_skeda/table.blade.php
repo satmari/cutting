@@ -48,6 +48,7 @@
 
                             <th><b>Style</b></th>
                             <th><b>Size</b></th>
+                            <th><b>SKU</b></th>
 
                             <th><b>Padprint item</b></th>
                             <th><b>Padprint color</b></th>
@@ -69,6 +70,7 @@
                         
                             <td>{{ $req->style }}</td>
                             <td>{{ $req->size }}</td>
+                            <td>{{ $req->sku }}</td>
 
                             <td>{{ $req->padprint_item }}</td>
                             <td>{{ $req->padprint_color }}</td>

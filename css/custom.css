@@ -394,14 +394,29 @@ html>body #sortable1 #sortable2 #sortable3 #sortable4 #sortable5 li {
       padding: 1px !important;
 }
 
+.top_priority span{
+  color: #fd0000 !important;
+}
+
 .high_priority span{
-  background-color: #ff00002e !important;
+  color: #ec930d !important;
+}
+
+.top_priority {
+  background-color: #ff00008a !important;
   -moz-border-radius: 5px;
     border-radius: 5px;
 }
 
-.low_priority span{
+.high_priority {
+  background-color: #ffb963cc !important;
+  -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.low_priority {
   background-color: #00800042 !important;
   -moz-border-radius: 5px;
     border-radius: 5px;
 }
+

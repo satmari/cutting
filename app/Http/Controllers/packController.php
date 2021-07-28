@@ -64,7 +64,7 @@ class packController extends Controller {
 		      --,'|'
 		      ,m2.[layers]
 		      ,m2.[layers_a]
-		      ,m2.[length_usable]
+		      ,m2.[length_mattress]
 		      ,m2.[cons_planned]
 		      ,m2.[extra]
 		      ,m2.[pcs_bundle]
@@ -159,7 +159,7 @@ class packController extends Controller {
 		return redirect('/pack');
 	}
 
-	public function mattress_pack($id) {
+	public function mattress_pack($id, $g_bin) {
 
 		$operator = Session::get('operator');
 		if (!isset($operator) OR $operator == '') {
@@ -167,7 +167,7 @@ class packController extends Controller {
 			$msg ='Operator must be logged!';
 			return view('pack.error',compact('msg'));
 		}
-		return view('pack.confirm', compact('id'));
+		return view('pack.confirm', compact('id','g_bin'));
 	}
 
 	public function mattress_pack_confirm ($id) {
@@ -278,7 +278,39 @@ class packController extends Controller {
 		}
 
 		return redirect('/pack');
-
 	}
-	
+
+	public function other_functions($id) {
+		// dd($id);
+
+		$operator = Session::get('operator');
+		if (!isset($operator) OR $operator == '') {
+			// return redirect('/cutter');
+			$msg ='Operator must be logged!';
+			return view('pack.error',compact('msg'));
+		}
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			d.[comment_operator], d.[id],
+			p.[mattress], p.[status], m.[g_bin],
+			mp.[pro_pcs_layer],mp.[pro_pcs_planned],
+			ps.[sku], ps.[pro], ps.[padprint_item], ps.[padprint_color],
+			po.[location_all]
+			FROM [mattress_details] as d
+			JOIN [mattresses] as m ON m.[id] = d.[mattress_id]
+			JOIN [mattress_pros] as mp ON mp.[mattress_id] = m.[id]
+			JOIN [pro_skedas] as ps ON ps.[pro_id] = mp.[pro_id]
+			LEFT JOIN [mattress_phases] as p ON p.[mattress_id] = d.[mattress_id] AND p.[active] = 1
+			LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+			WHERE m.[id] = '".$id."' "));
+
+		// dd($take_comment_operator[0]->comment_operator);
+		$comment_operator = $data[0]->comment_operator;
+		$status = $data[0]->status;
+		$mattress = $data[0]->mattress;
+		$g_bin = $data[0]->g_bin;
+
+		// $operator = Session::get('operator');
+		return view('pack.other_functions', compact('id','comment_operator','status','mattress','g_bin','data'));
+	}
 }

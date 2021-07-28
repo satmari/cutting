@@ -5,7 +5,7 @@
 	<div class="row vertical-center-row">
 		<div class="text-center col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
-				<div class="panel-heading">2. Choose other leftover rolls for new mattress <i>(rolls are filtered by skeda from FIRST roll)</i></div>
+				<div class="panel-heading">2. Choose other leftover rolls for new MINI mattress <i>(rolls are filtered by skeda from FIRST roll)</i></div>
 				
 				@if(isset($warning))
 
@@ -42,17 +42,17 @@
 				</tr>
   				@endfor
 				</table>
-				<br>
+				<hr>
 				{!! Form::submit('Next', ['class' => 'btn btn-success center-block']) !!}
 
 				@include('errors.list')
 				{!! Form::close() !!}
 				</div>
 
-				<hr>
-				<div class="panel-body">
+				<!-- <hr> -->
+				<!-- <div class="panel-body">
 					<a href="{{url('/')}}" class="btn btn-default center-blo ck">Back</a>
-				</div>
+				</div> -->
 				
 				
 			</div>

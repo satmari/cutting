@@ -1,19 +1,12 @@
 @extends('app')
 
 @section('content')
-
 <div class="container-fluid">
     <div class="row">
-        <div class="text-center col-md-6 col-md-offset-3">
+        <div class="text-center">
             <div class="panel panel-default">
-                <div class="panel-heading">Komesa table</div>
-
-                <div class="panel-body">
-                    <div class="">
-                        <a href="{{url('/new_po')}}" class="btn btn-info center-block">Create new komesa</a>
-                    </div>
-                </div>
-
+                <div class="panel-heading">Consumption SAP</div>
+              
                 <div class="input-group"> <span class="input-group-addon">Filter</span>
                     <input id="filter" type="text" class="form-control" placeholder="Type here...">
                 </div>
@@ -47,25 +40,19 @@
                 -->
                     <thead>
                         <tr>
-                            <!-- <th>Id</th> -->
                             
-                            <th><b>Komesa</b></th>
-                            <th><b>Status</b></th>
-                            <th></th>
-                            <th></th>
-                            
+                            <th><b>Gbin</b></th>
+                            <th><b>Real Cons</b></th>
+                                                       
                         </tr>
                     </thead>
                     <tbody class="searchable">
                     @foreach ($data as $req)
-                        <tr>
-                           
-                            <td>{{ $req->po}}</td>
-                            <td>{{ $req->status }}</td>
+                       <tr>
                             
-                            <td><a href="{{url('/edit_status/'.$req->id)}}" class="btn btn-info btn-xs ">Change status</a></td>
-                            <td><a href="{{url('/edit_po/'.$req->id)}}" class="btn btn-info btn-xs ">Change name</a></td>
-                            
+                            <td>{{ $req->g_bin }}</td>
+                            <td>{{ round($req->cons_real,2)  }}</td>
+
                         </tr>
                     @endforeach
                     

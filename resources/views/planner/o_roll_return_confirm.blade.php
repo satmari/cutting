@@ -6,22 +6,22 @@
     <div class="row vertical-center-row">
         <div class="text-center col-md-2 col-md-offset-5">
             <div class="panel panel-default">
-				<div class="panel-heading">Delete leftover roll</div>
+				<div class="panel-heading">Return to stock leftover roll</div>
 				<!-- <br> -->
 					
-					<div class="alert alert-danger" role="alert">
+					<div class="alert alert-warning" role="alert">
 					 
-					 	Are you sure to delete leftover roll?
+					 	Are you sure to return leftover roll?
 					  
 					</div>
 					
-					{!! Form::open(['method'=>'POST', 'url'=>'/o_roll_delete_confirm']) !!}
+					{!! Form::open(['method'=>'POST', 'url'=>'/o_roll_return_confirm']) !!}
 						<input name="_token" type="hidden" value="{!! csrf_token() !!}" />
 
 						{!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
 						
 						
-						{!! Form::submit('Confirm', ['class' => 'btn  btn-danger center-block']) !!}
+						{!! Form::submit('Confirm', ['class' => 'btn  btn-warning center-block']) !!}
 						@include('errors.list')
 
 					{!! Form::close() !!}

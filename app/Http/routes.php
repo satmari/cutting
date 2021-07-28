@@ -174,6 +174,8 @@ Route::get('wastage_table_import','importController@index');
 Route::post('postImportWastage_report','importController@postImportWastage_report');
 Route::post('postImport_marker','importController@postImport_marker');
 Route::post('postImport_skeda','importController@postImport_skeda');
+Route::post('postImport_pas_bin','importController@postImport_pas_bin');
+Route::post('postImport_consumption','importController@postImport_consumption');
 
 // Cutting XML
 Route::get('cutting_xml', 'cutting_xml@cutting_xml');
@@ -202,6 +204,9 @@ Route::get('paspul_bin', 'paspul_binController@index');
 
 // Matress
 Route::get('mattress', 'mattressController@index');
+
+// Consumption SAP
+Route::get('consumption_sap', 'consumption_sapController@index');
 
 // Admin & Planner
 // Route::get('plan_mattress', 'plannerController@plan_mattress');
@@ -234,18 +239,28 @@ Route::get('plan_mini_marker', 'plannerController@plan_mini_marker');
 Route::get('mini_marker_create', 'plannerController@mini_marker_create');
 Route::post('mini_marker_create_1', 'plannerController@mini_marker_create_1');
 Route::post('mini_marker_create_2', 'plannerController@mini_marker_create_2');
+Route::post('mini_marker_add_pro', 'plannerController@mini_marker_add_pro');
 Route::post('mini_marker_add_marker', 'plannerController@mini_marker_add_marker');
+Route::post('mini_marker_add_limit', 'plannerController@mini_marker_add_limit');
 
 Route::get('o_roll_table', 'plannerController@o_roll_table');
 Route::get('o_roll_table_all', 'plannerController@o_roll_table_all');
 Route::get('o_roll_delete/{id}', 'plannerController@o_roll_delete');
 Route::post('o_roll_delete_confirm', 'plannerController@o_roll_delete_confirm');
+Route::get('o_roll_return', 'plannerController@o_roll_return');
+Route::get('o_roll_return/{id}', 'plannerController@o_roll_return');
+Route::post('o_roll_return_confirm', 'plannerController@o_roll_return_confirm');
+Route::get('o_roll_scan', 'plannerController@o_roll_scan');
+Route::post('o_roll_scan_post', 'plannerController@o_roll_scan_post');
+
 
 Route::get('plan_paspul/{location}', 'plannerController@plan_paspul');
 Route::get('plan_paspul_line/{id}', 'plannerController@plan_paspul_line');
 Route::post('plan_paspul_line_confirm', 'plannerController@plan_paspul_line_confirm');
 Route::get('remove_paspul_line/{id}', 'plannerController@remove_paspul_line');
 Route::post('paspul_delete_confirm', 'plannerController@paspul_delete_confirm');
+Route::get('edit_paspul_line/{id}', 'plannerController@edit_paspul');
+Route::post('edit_paspul_line_confirm', 'plannerController@edit_paspul_confirm');
 
 Route::get('print_mattress/{id}', 'plannerController@print_mattress');
 Route::post('print_mattress_confirm', 'plannerController@print_mattress_confirm');
@@ -291,8 +306,9 @@ Route::post('add_operator_comment_cut', 'cutterController@add_operator_comment')
 Route::get('pack', 'packController@index');
 Route::get('operator_login_pack', 'packController@operator_login');
 Route::get('operator_logout_pack', 'packController@operator_logout');
-Route::get('mattress_pack/{id}', 'packController@mattress_pack');
+Route::get('mattress_pack/{id}/{g_bin}', 'packController@mattress_pack');
 Route::get('mattress_pack_confirm/{id}', 'packController@mattress_pack_confirm');
+Route::get('other_functions_pack/{id}', 'packController@other_functions');
 
 // PLOT
 Route::get('plot', 'plotController@index');

@@ -19,9 +19,9 @@ class CreateMattressEffsTable extends Migration {
 			$table->integer('mattress_id')->unique();
 			$table->string('mattress')->unique();
 
-			$table->string('layers_after_cs');
+			$table->float('layers_after_cs');
 			$table->string('operator_after');
-			$table->string('layers_before_cs')->nullable();
+			$table->float('layers_before_cs')->nullable();
 			$table->string('operator_before')->nullable();
 
 			$table->float('stimulation_after');

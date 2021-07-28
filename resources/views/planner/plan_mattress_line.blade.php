@@ -15,9 +15,10 @@
 
                         {!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
                         {!! Form::hidden('mattress', $mattress, ['class' => 'form-control']) !!}
+                        {!! Form::hidden('g_bin', $g_bin, ['class' => 'form-control']) !!}
                         {!! Form::hidden('skeda_item_type', $skeda_item_type, ['class' => 'form-control']) !!}
                             
-                            <br>
+                            <!-- <br>
                             Material: <b>{{ $material }} </b></b><br>
                             Dye lot: <b>{{ $dye_lot}} </b><br>
                             Color desc: <b>{{ $color_desc}} </b><br>
@@ -32,17 +33,35 @@
                             Marker width: <b>{{ round($marker_width,3)}} </b><br>
                             TPP mat. keep wastage: <b>{{ $tpp_mat_keep_wastage }} </b><br>
                             TPA No: <b>{{ $tpa_number }} </b>
-                            <hr>
-                            
-                        <div class="panel-body">
-                        <p>Pcs per bundle: <span style="color:red;">*</span></p>
-                            {!! Form::number('pcs_bundle', 30, ['class' => 'form-control', 'autofocus' => 'autofocus']) !!}
-                        </div>
+                            <hr> -->
 
+                            <table style="width:100%" class="table table-striped table-bordered">
+                            <tr><td>Mattress</td><td><b>{{ $mattress }} </b></td></tr>
+                            <tr><td>Material</td><td><b>{{ $material }} </b></td></tr>
+                            <tr><td>Dye lot</td><td><b>{{ $dye_lot }} </b></td></tr>
+                            <tr><td>Color desc</td><td><b>{{ $color_desc }} </b></td></tr>
+                            <tr><td>Skeda</td><td><b>{{ $skeda }} </b></td></tr>
+                            <tr><td>Skeda type</td><td><b>{{ $skeda_item_type }} </b></td></tr>
+                            <tr><td>Width usable (theoretical)</td><td><b>{{ round($width_theor_usable,3) }} </b></td></tr>
+                            <tr><td>Layers</td><td><b>{{ $layers }} </b></td></tr>
+                            <tr><td>Consumption planned</td><td><b>{{ round($cons_planned,3) }} </b></td></tr>
+                            <tr><td>Marker name</td><td><b>{{ $marker_name }} </b></td></tr>
+                            <tr><td>Marker length</td><td><b>{{ round($marker_length,3) }} </b></td></tr>
+                            <tr><td>Marker width</td><td><b>{{ round($marker_width,3) }} </b></td></tr>
+                            <tr><td>TPP mat. keep wastage</td><td><b>@if ($tpp_mat_keep_wastage == 0) NO @else YES @endif</b></td></tr>
+                            <tr><td>TPA number</td><td><b>{{ $tpa_number }} </b></td></tr>
+                            </table>
+
+                            
                         <div class="panel-body">
                         <p>Priority: <span style="color:red;">*</span></p>
                             <!-- {!! Form::number('priority', $priority, ['class' => 'form-control']) !!} -->
-                            {!! Form::select('priority', array('1'=>'1 low','2'=>'2 medium','3'=>'3 high'), 2, array('class' => 'form-control')) !!} 
+                            {!! Form::select('priority', array('1'=>'Normal','2'=>'High','3'=>'Top'), 1, array('class' => 'form-control')) !!} 
+                        </div>
+
+                        <div class="panel-body">
+                        <p>Pcs per bundle: <span style="color:red;">*</span></p>
+                            {!! Form::number('pcs_bundle', 30, ['class' => 'form-control', 'autofocus' => 'autofocus']) !!}
                         </div>
 
                         <div class="panel-body">
@@ -52,8 +71,12 @@
 
                         <div class="panel-body">
                         <p>Bottom paper: <!-- <span style="color:red;">*</span> --></p>
-                            
                             {!! Form::select('bottom_paper', array('Brown'=>'Brown','White'=>'White',''=>''), 'Brown', array('class' => 'form-control')) !!} 
+                        </div>
+
+                        <div class="panel-body">
+                        <p>Spreading method: </p>
+                            {!! Form::text('spreading_method', $spreading_method , ['class' => 'form-control']) !!}
                         </div>
 
                         <table style="width:100%">
@@ -71,13 +94,10 @@
                                     {!! Form::checkbox('test_marker', '1', $test_marker, ['class' => 'form-control'])!!}
                                 </div>
                             </td>
-                       
                         </tr>
                         </table>
-
                         
                         <hr>
-
                         @if ($skeda_item_type != "MM")
                         <table  style="width:100%">
                         <tr>
@@ -129,8 +149,6 @@
                                 </div>
                             </td>
 
-                           
-                            
                         </tr>
                         </table>
                         @else 
@@ -139,7 +157,6 @@
                             <p>MM1:<!--  <span style="color:red;">*</span> --></p>
                                 <input type="radio" value="MM1" id="mm1" name="location" class="form-control" checked>
                             </div>
-
                         @endif
                         
                         <hr>

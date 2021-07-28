@@ -38,7 +38,7 @@
 
                         <div class="panel-body">
                         <p>Comment operator: </p>
-                            {!! Form::text('comment_operator', $comment_operator, ['class' => 'form-control']) !!}
+                            {!! Form::textarea('comment_operator', $comment_operator , ['class' => 'form-control', 'rows' => 2]) !!}
                         </div>
                         <hr>
                         {!! Form::submit('Confirm cut', ['class' => 'btn  btn-danger center-block']) !!}

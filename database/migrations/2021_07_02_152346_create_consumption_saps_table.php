@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePaspulBinsTable extends Migration {
+class CreateConsumptionSapsTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,14 +12,13 @@ class CreatePaspulBinsTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('paspul_bins', function(Blueprint $table)
+		Schema::create('consumption_saps', function(Blueprint $table)
 		{
 			$table->increments('id');
 
-			$table->string('skeda')->unique();
-			$table->string('pas_bin')->nullable();
-			$table->string('adez_bin')->nullable();
-			
+			$table->string('g_bin')->unique();
+			$table->float('cons_real');
+
 			$table->timestamps();
 		});
 	}
@@ -31,7 +30,7 @@ class CreatePaspulBinsTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('paspul_bins');
+		Schema::drop('consumption_saps');
 	}
 
 }

@@ -21,7 +21,7 @@ class CreateMattressDetailsTable extends Migration {
 
 			$table->float('layers');
 			$table->float('layers_a')->nullable();
-			$table->float('length_usable');
+			$table->float('length_mattress');
 			$table->float('cons_planned');
 			$table->float('cons_actual');
 			$table->float('extra');
@@ -33,6 +33,7 @@ class CreateMattressDetailsTable extends Migration {
 			$table->boolean('call_shift_manager')->default(0);
 			$table->boolean('test_marker')->default(0);
 			$table->boolean('tpp_mat_keep_wastage')->default(0);
+			$table->string('tpa_number')->nullable();
 			$table->boolean('printed_marker')->default(0);
 			$table->boolean('mattress_packed')->default(0);
 			$table->boolean('all_pro_for_main_plant')->default(0);
@@ -44,7 +45,8 @@ class CreateMattressDetailsTable extends Migration {
 			$table->integer('requested_width')->nullable();
 			$table->string('minimattress_code')->nullable();
 			$table->string('overlapping')->nullable();
-			$table->string('tpa_number')->nullable();
+			$table->integer('printed_nalog')->nullable();
+			$table->integer('layer_limit')->nullable();
 			
 			$table->timestamps();
 		});

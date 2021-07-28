@@ -64,7 +64,7 @@ class plotController extends Controller {
 		      --,'|'
 		      ,m2.[layers]
 		      ,m2.[layers_a]
-		      ,m2.[length_usable]
+		      ,m2.[length_mattress]
 		      ,m2.[cons_planned]
 		      ,m2.[extra]
 		      ,m2.[pcs_bundle]
@@ -108,7 +108,9 @@ class plotController extends Controller {
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
 		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
-		  WHERE m4.[active] = '1' AND m2.[printed_marker] = '0' AND m3.[marker_name] != ''
+		  WHERE m4.[active] = '1' AND m2.[printed_marker] = '0' AND m3.[marker_name] != '' 
+		  		AND (m4.[status] != 'DELETED' AND m4.[status] != 'COMPLETED') 
+		  		AND (m1.[skeda_item_type] = 'MS' OR m1.[skeda_item_type] = 'MM')
 		  ORDER BY m2.[position] asc"));
 		// dd($data);
 

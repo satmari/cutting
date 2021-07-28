@@ -43,6 +43,7 @@ class CreatePaspulsTable extends Migration {
 			$table->boolean('call_shift_manager')->default(0);
 
 			$table->string('rewinding_method')->nullable();
+			$table->string('tpa_number')->nullable();
 			
 			$table->timestamps();
 		});

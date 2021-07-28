@@ -23,6 +23,7 @@ class CreatePrintMiniMattressesTable extends Migration {
 
 			$table->string('width_theor_usable_0')->nullable();
 			$table->string('marker_length_0')->nullable();
+			$table->string('marker_width_0')->nullable();
 			$table->string('min_length_0')->nullable();
 			$table->string('spreading_method_0')->nullable();
 			$table->string('material_0')->nullable();
@@ -31,6 +32,7 @@ class CreatePrintMiniMattressesTable extends Migration {
 			$table->string('pcs_bundle_0')->nullable();
 			$table->string('bottom_paper_0')->nullable();
 			$table->string('tpp_mat_keep_wastage_0')->nullable();
+			$table->string('layer_limit_0')->nullable();
 			
 			$table->string('layers_0')->nullable();
 			$table->string('padprint_item_0')->nullable();
@@ -51,6 +53,8 @@ class CreatePrintMiniMattressesTable extends Migration {
 			$table->string('pro_0')->nullable();
 			$table->string('style_size_0')->nullable();
 			$table->string('destination_0')->nullable();
+			$table->string('pro_pcs_layer_0')->nullable();
+			$table->string('multimaterial_0')->nullable();
 
 			// 2
 			$table->string('mattress_1')->nullable();
@@ -61,6 +65,7 @@ class CreatePrintMiniMattressesTable extends Migration {
 			$table->string('width_theor_usable_1')->nullable();
 			$table->string('marker_length_1')->nullable();
 			$table->string('min_length_1')->nullable();
+			$table->string('marker_width_1')->nullable();
 			$table->string('spreading_method_1')->nullable();
 			$table->string('material_1')->nullable();
 			$table->string('color_desc_1')->nullable();
@@ -68,6 +73,7 @@ class CreatePrintMiniMattressesTable extends Migration {
 			$table->string('pcs_bundle_1')->nullable();
 			$table->string('bottom_paper_1')->nullable();
 			$table->string('tpp_mat_keep_wastage_1')->nullable();
+			$table->string('layer_limit_1')->nullable();
 			
 			$table->string('layers_1')->nullable();
 			$table->string('padprint_item_1')->nullable();
@@ -88,6 +94,8 @@ class CreatePrintMiniMattressesTable extends Migration {
 			$table->string('pro_1')->nullable();
 			$table->string('style_size_1')->nullable();
 			$table->string('destination_1')->nullable();
+			$table->string('pro_pcs_layer_1')->nullable();
+			$table->string('multimaterial_1')->nullable();
 			//2
 
 			$table->string('printer')->nullable();

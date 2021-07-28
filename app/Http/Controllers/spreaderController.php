@@ -64,7 +64,7 @@ class spreaderController extends Controller {
 		      --,'|'
 		      ,m2.[layers]
 		      ,m2.[layers_a]
-		      ,m2.[length_usable]
+		      ,m2.[length_mattress]
 		      ,m2.[cons_planned]
 		      ,m2.[extra]
 		      ,m2.[pcs_bundle]
@@ -110,6 +110,40 @@ class spreaderController extends Controller {
 		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
 		  WHERE m4.[location] = '".$location."' AND m4.active = '1' 
 		  ORDER BY m2.position asc"));
+		
+
+		$pros= '';
+		$skus= '';
+		$sku_s= '';
+		for ($i=0; $i < count($data) ; $i++) { 
+			
+			$id = $data[$i]->id;
+			// dd($id);
+
+
+			$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				ps.pro
+				,ps.style_size
+				,ps.sku
+				--,*
+			  FROM [mattress_pros] as mp
+			  JOIN [pro_skedas] as ps ON ps.pro_id = mp.pro_id
+			WHERE mp.mattress_id = '".$id."' "));
+			
+			for ($x=0; $x < count($prom); $x++) { 
+
+				$pros .= $prom[$x]->pro." ";
+				$skus .= $prom[$x]->style_size." ";
+				$sku_s .= $prom[$x]->sku." ";
+			}
+
+			$data[$i]->pro = trim($pros);
+			$data[$i]->style_size = trim($skus);
+			$data[$i]->sku = trim($sku_s);
+			$pros = '';
+			$skus = '';
+			$sku_s = '';
+		}
 		// dd($data);
 
 		$work_place = substr($device, 0,2);
@@ -124,7 +158,26 @@ class spreaderController extends Controller {
 		// dd($operators);
 
 		$operator = Session::get('operator');
+		// dd($operator);
 		// $operator = 'test';
+
+		$timerange = date("d/m/Y");
+
+
+		// dd($timerange);
+
+		// $efficiency_check = DB::connection('sqlsrv')->select(DB::raw("  SELECT 
+		// 	  sUM([stimulation_before]) as s_before
+		// 	  --,SUM([layers_before_cs]) as l_before
+		// 	  --,SUM([stimulation_after]) as s_after
+		// 	  --,SUM([layers_after_cs]) as l_after
+		// 	  FROM [cutting].[dbo].[mattress_effs] 
+		// 	  WHERE (/*[operator_before] = '".$operator."' OR */[operator_after] = '".$operator."' ) AND
+		// 	  created_at like 
+		// "));
+		// dd($efficiency_check);
+
+
 
 		// dd("Test");
 		return view('spreader.index', compact('data','location','operators','operator'));
@@ -226,7 +279,7 @@ class spreaderController extends Controller {
 	}
 
 	public function other_functions($id) {
-
+		// dd($id);
 		$operator = Session::get('operator');
 		if (!isset($operator) OR $operator == '') {
 			// return redirect('/spreader');
@@ -236,7 +289,7 @@ class spreaderController extends Controller {
 
 		$take_comment_operator = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			d.[comment_operator], p.[status], 
-			p.[mattress]
+			p.[mattress], m.[g_bin]
 			FROM [mattress_details] as d
 			JOIN [mattresses] as m ON m.[id] = d.[mattress_id]
 			LEFT JOIN [mattress_phases] as p ON p.[mattress_id] = d.[mattress_id] AND p.[active] = 1
@@ -247,10 +300,11 @@ class spreaderController extends Controller {
 		$comment_operator = $take_comment_operator[0]->comment_operator;
 		$status = $take_comment_operator[0]->status;
 		$mattress = $take_comment_operator[0]->mattress;
+		$g_bin = $take_comment_operator[0]->g_bin;
 
 		// $operator = Session::get('operator');
 
-		return view('spreader.other_functions', compact('id','comment_operator','status','mattress'));
+		return view('spreader.other_functions', compact('id','comment_operator','status','mattress','g_bin'));
 	}
 
 	public function mattress_to_unload($id) {
@@ -277,7 +331,7 @@ class spreaderController extends Controller {
 		// mattress_phasess
 		// all mattress_phases for this mattress set to NOT ACTIVE
 		$find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT
-		 	mp.[id], mp.[mattress], mp.[status]
+		 	mp.[id], mp.[mattress], mp.[status], m.[g_bin]
 		 	FROM [mattress_phases] as mp 
 		 	JOIN [mattresses] as m ON m.[id] = mp.[mattress_id]
 		 	WHERE mp.[mattress_id] = '".$id."' AND mp.[active] = 1  "));
@@ -319,7 +373,7 @@ class spreaderController extends Controller {
 		 	md.[mattress_id], md.[mattress], md.[comment_operator], md.[requested_width],md.[id] as md_id,
 		 	mm.[marker_name], mm.[marker_width],
 		 	p.[status],
-		 	m.[width_theor_usable]
+		 	m.[width_theor_usable], m.[g_bin]
 		 	FROM [mattress_details] as md
 			JOIN [mattresses] as m ON m.[id] = md.[mattress_id]
 		 	JOIN [mattress_markers] as mm ON mm.[mattress_id] = md.[mattress_id]
@@ -328,6 +382,7 @@ class spreaderController extends Controller {
 		// dd($find_mattress);
 
 		$mattress = $find_mattress[0]->mattress;
+		$g_bin = $find_mattress[0]->g_bin;
 		$comment_operator = $find_mattress[0]->comment_operator;
 		$requested_width = $find_mattress[0]->requested_width;
 		$marker_width = $find_mattress[0]->marker_width;
@@ -338,10 +393,10 @@ class spreaderController extends Controller {
 		if (($find_mattress[0]->marker_name == '') OR (is_null($find_mattress[0]->marker_name))) {
 			
 			$danger = "Mattress doesn't have marker, you can't send request to change width for this mattress!";
-			return view('spreader.other_functions', compact('id','comment_operator','status','mattress', 'danger'));
+			return view('spreader.other_functions', compact('id','comment_operator','status','mattress', 'g_bin', 'danger'));
 		}
 
-		return view('spreader.change_marker_request', compact('id', 'mattress', 'comment_operator','requested_width','marker_width', 'status', 'md_id','width_theor_usable'));
+		return view('spreader.change_marker_request', compact('id', 'mattress', 'g_bin','comment_operator','requested_width','marker_width', 'status', 'md_id','width_theor_usable'));
 	}
 
 	public function change_marker_request_post(Request $request) {
@@ -425,6 +480,7 @@ class spreaderController extends Controller {
 		$id = $input['id'];
 		$status = $input['status'];
 		$mattress = $input['mattress'];
+		$g_bin = $input['g_bin'];
 		$comment_operator = $input['comment_operator'];
 
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT d.[id]
@@ -437,7 +493,7 @@ class spreaderController extends Controller {
 		$table3->save();
 
 		$success = "Saved succesfuly";
-		return view('spreader.other_functions', compact('id','comment_operator','status', 'mattress', 'success'));
+		return view('spreader.other_functions', compact('id','comment_operator','status', 'mattress', 'g_bin','success'));
 	}
 
 	public function mattress_to_spread($id) {
@@ -452,7 +508,7 @@ class spreaderController extends Controller {
 
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			d.[comment_operator], d.[layers_a], 
-			m.[skeda_item_type],
+			m.[skeda_item_type], m.[g_bin],
 			p.[status], p.[mattress], 
 			mf.[layers_after_cs], mf.[layers_before_cs]
 			FROM [mattress_details] as d
@@ -464,6 +520,7 @@ class spreaderController extends Controller {
 
 		$status = $data[0]->status;
 		$mattress = $data[0]->mattress;
+		$g_bin = $data[0]->g_bin;
 		$comment_operator = $data[0]->comment_operator;
 		$layers_a = (float)$data[0]->layers_a;
 		$layers_before_cs = (float)$data[0]->layers_before_cs;
@@ -476,7 +533,7 @@ class spreaderController extends Controller {
 			$already_partialy_spreaded = 0;
 		}
 
-		return view('spreader.spread_mattress', compact('id','comment_operator','status','mattress','layers_a','already_partialy_spreaded'));
+		return view('spreader.spread_mattress', compact('id','comment_operator','status','mattress','g_bin','layers_a','already_partialy_spreaded'));
 	}
 
 	public function spread_mattress_partial($id) {
@@ -484,7 +541,8 @@ class spreaderController extends Controller {
 		// dd($id);
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			d.[comment_operator], d.[layers_a], d.[layers_a_reasons],
-			p.[status], p.[mattress]
+			p.[status], p.[mattress],
+			m.[g_bin]
 			FROM [mattress_details] as d
 			JOIN [mattresses] as m ON m.[id] = d.[mattress_id]
 			INNER JOIN [mattress_phases] as p ON p.[mattress_id] = d.[mattress_id] AND p.[active] = 1
@@ -492,11 +550,12 @@ class spreaderController extends Controller {
 		// dd($take_comment_operator[0]->comment_operator);
 		$status = $data[0]->status;
 		$mattress = $data[0]->mattress;
+		$g_bin = $data[0]->g_bin;
 		$comment_operator = $data[0]->comment_operator;
 		$layers_a = (float)$data[0]->layers_a;
 		// $layers_a_reasons = $data[0]->layers_a_reasons;
 		
-		return view('spreader.spread_mattress_partial', compact('id','comment_operator','status','mattress','layers_a'/*,'layers_a_reasons'*/));
+		return view('spreader.spread_mattress_partial', compact('id','comment_operator','status','mattress','g_bin','layers_a'/*,'layers_a_reasons'*/));
 	}
 
 	public function spread_mattress_partial_post(Request $request) {
@@ -507,6 +566,7 @@ class spreaderController extends Controller {
 
 		$id = $input['id'];
 		$mattress = $input['mattress'];
+		$g_bin = $input['g_bin'];
 		$status = $input['status'];
 		$layers_a = $input['layers_a'];
 		// $layers_a_reasons = $input['layers_a_reasons'];
@@ -523,7 +583,7 @@ class spreaderController extends Controller {
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 				d.[comment_operator], d.[layers_a] ,d.[layers_a_reasons], d.[extra], d.[layers_a], d.[id],
 				p.[status], p.[mattress], 
-				m.[spreading_method], 
+				m.[spreading_method], m.[g_bin],
 				mm.[marker_length]
 			FROM [mattress_details] as d
 			JOIN [mattresses] as m ON m.[id] = d.[mattress_id]
@@ -536,7 +596,7 @@ class spreaderController extends Controller {
 
 			if ($data[0]->layers_a == $input['layers_a']) {
 				$danger = "Partial layers qty should be less then planned layer qty!";
-				return view('spreader.spread_mattress_partial', compact('id','comment_operator','status','mattress','layers_a','layers_a_reasons', 'danger'));
+				return view('spreader.spread_mattress_partial', compact('id','comment_operator','status','mattress','g_bin','layers_a','layers_a_reasons', 'danger'));
 			}
 
 			if ($data[0]->spreading_method == "FACE UP") {
@@ -571,7 +631,7 @@ class spreaderController extends Controller {
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 				d.[comment_operator], d.[layers_a] ,d.[layers_a_reasons], d.[mattress_id], d.[layers_partial],
 				p.[status], p.[mattress],
-				m.[id], m.[skeda_item_type]
+				m.[id], m.[skeda_item_type], m.[g_bin]
 			FROM [mattress_details] as d
 			JOIN [mattresses] as m ON m.[id] = d.[mattress_id]
 			INNER JOIN [mattress_phases] as p ON p.[mattress_id] = d.[mattress_id] AND p.[active] = 1
@@ -579,6 +639,7 @@ class spreaderController extends Controller {
 		// dd($data[0]->comment_operator);
 		$status = $data[0]->status;
 		$mattress = $data[0]->mattress;
+		$g_bin = $data[0]->g_bin;
 		$mattress_id = $data[0]->mattress_id;
 		$skeda_item_type = $data[0]->skeda_item_type;
 		// $id_details = $data[0]->id;
@@ -593,7 +654,7 @@ class spreaderController extends Controller {
 			$layers_partial = 0;
 		}
 
-		return view('spreader.spread_mattress_complete', compact('id','mattress_id','comment_operator','status','mattress','layers_a','layers_a_reasons','skeda_item_type','layers_partial'));
+		return view('spreader.spread_mattress_complete', compact('id','mattress_id','comment_operator','status','mattress','g_bin','layers_a','layers_a_reasons','skeda_item_type','layers_partial'));
 	}
 
 	public function spread_mattress_complete_post(Request $request) {
@@ -604,6 +665,7 @@ class spreaderController extends Controller {
 
 		$id = $input['id'];
 		$mattress = $input['mattress'];
+		$g_bin = $input['g_bin'];
 		$mattress_id = $input['mattress_id'];
 		$status = $input['status'];
 		$layers_a = (float)$input['layers_a'];
@@ -612,7 +674,6 @@ class spreaderController extends Controller {
 		$layers_partial = (float)$input['layers_partial'];	
 		// dd($layers_partial);
 		
-
 		if($layers_a < 1) {
 			$msg ='Layers actual must be > 1';
 			return view('spreader.error',compact('msg'));
@@ -659,12 +720,12 @@ class spreaderController extends Controller {
 		}
 
 		// check if mattress have marker_name
-		$check_if_is_ploce = DB::connection('sqlsrv')->select(DB::raw("SELECT marker_name 
-			FROM [mattress_markers] 
-			WHERE [mattress_id] = '".$mattress_id."' "));
+		$check_if_is_ploce = DB::connection('sqlsrv')->select(DB::raw("SELECT skeda_item_type 
+			FROM [mattresses]
+			WHERE [id] = '".$mattress_id."' "));
 		// dd($check_if_is_ploce[0]->marker_name);
 
-		if ($check_if_is_ploce[0]->marker_name == "") {
+		if (($check_if_is_ploce[0]->skeda_item_type == "MW") OR ($check_if_is_ploce[0]->skeda_item_type == "MB")) {
 			// PLOCE
 			$ploce = 1;
 			$position = $position_join;
@@ -674,12 +735,50 @@ class spreaderController extends Controller {
 			$ploce = 0;
 			$position = $position_cut;
 		}
-		// dd($position);
+		// dd($ploce);
 
+		// find all_pro_for_main_plant ???
+		$data_location = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				m.[g_bin]
+				--,mp.[pro_id]
+				,s.pro
+				,p.location_all
+			FROM [mattresses] as m
+			JOIN [mattress_pros] as mp ON mp.[mattress_id] = m.[id]
+			JOIN [pro_skedas] as s ON s.[pro_id] = mp.[pro_id]
+			LEFT JOIN [posummary].[dbo].[pro] as p ON p.[pro] = s.[pro]
+			WHERE m.[id] = '".$id."'
+			"));
+		// dd($data_location);
+
+		$out_su = 0;
+		if (isset($data_location[0]->location_all)) {
+
+			for ($i=0; $i < count($data_location); $i++) { 
+
+				if ($data_location[$i]->location_all == "Subotica") {
+					$out_su = $out_su + 0; 
+				} else {	
+					$out_su = $out_su + 1;
+				}					
+			}
+			// dd($out_su);
+
+			// print_r("final: ".$out_su."<br>");
+			if ($out_su > 0) {
+				$all_pro_for_main_plant = 0;	
+			} else {
+				$all_pro_for_main_plant = 1; // if is 1 COMPLETED (Subotica), 0 PACK (Kikinda/Senta)
+			}
+		} else {
+			$all_pro_for_main_plant = 0;
+		}
+		// dd($all_pro_for_main_plant);
+		
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 				d.[comment_operator], d.[layers_a] ,d.[layers_a_reasons], d.[extra], d.[id],
 				p.[status], p.[mattress], 
-				m.[spreading_method], 
+				m.[spreading_method], m.[g_bin],
 				mm.[marker_length], 
 				mf.[layers_after_cs], mf.[layers_before_cs], mf.[id] as effid
 			FROM [mattress_details] as d
@@ -724,6 +823,7 @@ class spreaderController extends Controller {
 				$table2_update->layers_a = (float)$layers_a;
 				$table2_update->cons_actual = (float)$layers_a * ((float)$data[0]->marker_length + ((float)$data[0]->extra / 100));
 				$table2_update->position = $position;
+				$table2_update->all_pro_for_main_plant = $all_pro_for_main_plant;
 				$table2_update->comment_operator = $comment_operator;
 				$table2_update->layers_a_reasons = $layers_a_reasons;
 				$table2_update->layers_partial = (float)$layers_partial;
@@ -803,6 +903,7 @@ class spreaderController extends Controller {
 				$table2_update->layers_a = (float)$layers_a;
 				$table2_update->cons_actual = (float)$layers_a * ((float)$data[0]->marker_length + ((float)$data[0]->extra / 100));
 				$table2_update->position = $position;
+				$table2_update->all_pro_for_main_plant = $all_pro_for_main_plant;
 				$table2_update->comment_operator = $comment_operator;
 				$table2_update->layers_a_reasons = $layers_a_reasons;
 				$table2_update->layers_partial = (float)$layers_partial;

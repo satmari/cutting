@@ -26,6 +26,8 @@ class CreateReqExtrabbsTable extends Migration {
 			$table->string('status');
 			$table->string('comment')->nullable();
 
+			$table->string('style')->nullable(); //after
+
 			$table->timestamps();
 		});
 	}

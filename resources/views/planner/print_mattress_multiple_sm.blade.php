@@ -15,25 +15,35 @@
 
 					{!! Form::open(['method'=>'POST', 'url'=>'print_mattress_multiple_sm_post']) !!}
 
-					<table style="width:100%">
+					<div class="input-group"> <span class="input-group-addon">Filter</span>
+	                    <input id="filter" type="text" class="form-control" placeholder="Type here...">
+	                </div>
+
+					<table class="tab le" style="width:100%">
 						<th style="width:100%"></th>
-						
+						<tbody class="searchable">
 						@foreach ($data as $line)
-		  						<tr>
+								<tr>
 		  							<td style="width:80%">
 		  								<div class="checkbox">
 									    	<label style="width: 90%;" type="button" class="btn check btn-default"  data-color="primary">
 									      		<input type="checkbox" class="btn check" name="items[]" value="{{ $line->id }}">  
 									      		<input name="hidden[]" type='hidden' value="{{ $line->id}}"> 
 
-									      		{{ $line->g_bin}} - {{ $line->mattress}}
+									      		{{ $line->g_bin}} - {{ $line->mattress}} - {{ $line->tpa_number}}
 												
 									    	</label>
 									  	</div>
 		  						 	</td>
 		  						</tr>
 		  				@endforeach
+		  				</tbody>
 						</table>
+						<div class="checkbox">
+					    	<label style="width: 30%;" type="button" class="btn check btn-warrning"  data-color="info">
+					      		<input type="checkbox" class="btn check" id="checkAll"><b>Select all</b> <i>(filter doesn't work)</i>
+					    	</label>
+					  	</div>
 					<hr>
 					{!! Form::submit('Next', ['class' => 'btn btn-success center-block']) !!}
 

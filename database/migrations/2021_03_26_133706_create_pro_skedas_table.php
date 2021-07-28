@@ -18,6 +18,7 @@ class CreateProSkedasTable extends Migration {
 
 			$table->string('pro_id')->unique();
 			$table->string('pro');
+			$table->string('skeda');
 			
 			$table->string('padprint_item')->nullable();
 			$table->string('padprint_color')->nullable();
@@ -25,6 +26,8 @@ class CreateProSkedasTable extends Migration {
 			$table->string('style');
 			$table->string('size');
 			$table->string('style_size');
+			$table->string('sku')->nullable();
+			$table->string('multimaterial')->nullable();
 
 			$table->float('bom_cons_per_pcs')->nullable();
 			

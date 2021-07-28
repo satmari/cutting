@@ -5,7 +5,7 @@
 	<div class="row vertical-center-row">
 		<div class="text-center col-md-5 col-md-offset-4">
 			<div class="panel panel-default">
-				<div class="panel-heading"><b>Other (spreader) functions for: {{ $mattress }}</b></div>
+				<div class="panel-heading"><b>Other (spreader) functions for: {{ $g_bin }}</b></div>
 					<br>
 			    	
 			    <div class="panel-body">	
@@ -35,11 +35,12 @@
 				{!! Form::open(['method'=>'POST', 'url'=>'add_operator_comment']) !!}
 					{!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
 					{!! Form::hidden('mattress', $mattress, ['class' => 'form-control']) !!}
+					{!! Form::hidden('g_bin', $g_bin, ['class' => 'form-control']) !!}
 					{!! Form::hidden('status', $status, ['class' => 'form-control']) !!}
-
+					
 				<div class="panel-body">
 	                <p>Comment operator:</p>
-	            	{!! Form::text('comment_operator', $comment_operator , ['class' => 'form-control']) !!}
+	            	{!! Form::textarea('comment_operator', $comment_operator , ['class' => 'form-control', 'rows' => 5]) !!}
 				</div>
 
 				{!! Form::submit('Save comment', ['class' => 'btn  btn-success center-block']) !!}

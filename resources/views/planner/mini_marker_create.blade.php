@@ -45,7 +45,7 @@
   				</tbody>
 				</table>
 			  
-				<br>
+				<hr>
 				{!! Form::submit('Next', ['class' => 'btn btn-success center-block']) !!}
 				
 
@@ -53,10 +53,10 @@
 				{!! Form::close() !!}
 				
 
-				<hr>
-				<div class="panel-body">
+				<!-- <hr> -->
+				<!-- <div class="panel-body">
 					<a href="{{url('/')}}" class="btn btn-default center-blo ck">Back</a>
-				</div>
+				</div> -->
 				</div>
 				
 			</div>

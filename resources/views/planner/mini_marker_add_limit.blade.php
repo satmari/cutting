@@ -5,7 +5,7 @@
 	<div class="row vertical-center-row">
 		<div class="text-center col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
-				<div class="panel-heading">4. Choose marker</div>
+				<div class="panel-heading">5. Insert layer limit</div>
 				
 				@if(isset($warning))
 
@@ -16,9 +16,8 @@
 				@endif
 
 				<div class="panel-body">
-				{!! Form::open(['method'=>'POST', 'url'=>'mini_marker_add_marker']) !!}
+				{!! Form::open(['method'=>'POST', 'url'=>'mini_marker_add_limit']) !!}
 				<meta name="csrf-token" content="{{ csrf_token() }}" />
-
 				
 				{!! Form::hidden('items', $items, ['class' => 'form-control']) !!}
 				{!! Form::hidden('skeda', $skeda, ['class' => 'form-control']) !!}
@@ -27,21 +26,27 @@
 				{!! Form::hidden('po_sum_qty', $po_sum_qty, ['class' => 'form-control']) !!}
 				{!! Form::hidden('before_cut_actual', $before_cut_actual, ['class' => 'form-control']) !!}
 				{!! Form::hidden('already_cut_actual', $already_cut_actual, ['class' => 'form-control']) !!}
+				{!! Form::hidden('marker', $marker, ['class' => 'form-control']) !!}
 				
+				<div class="panel-body" style="width:200px ; margin-left: 36%;">
+                	<p>Order qty: 		{{ $po_sum_qty }}  (test)</p>
+                	<p>Before cut: 		{{ $before_cut_actual }}</p>
+                	<p>After qty: 		{{ $already_cut_actual}}</p>
+                	<p>Required qty: 	{{ $po_sum_qty - ($before_cut_actual + $already_cut_actual)}}</p>
+                	<p>Pcs per size:	{{ $pc_per_layer}} </p>
+                	<p>Calculated layer limit: {{$layer_limit}} </p>
+                    
+                </div>
 				
-                <p>Marker: <span style="color:red;">* </span></p>
-                <select name="marker" class="chosen">
-                    <option value="" selected></option>
-                @foreach ($markers as $line)
-                    <option value="{{ $line->marker_name }}">
-                        {{ $line->marker_name }}
-                    </option>
-                @endforeach
-               	</select>
-        		<br><br>
+				<div class="panel-body" style="width:200px ; margin-left: 36%;">
+                	<p>Layer limit (suggested): <span style="color:red;">*</span></p>
+                    {!! Form::number('layer_limit', $layer_limit, ['class' => 'form-control', 'autofocus' => 'autofocus']) !!}
+                </div>
+                <!-- <br> -->
+                
         		
         		<hr>
-				{!! Form::submit('Next', ['class' => 'btn btn-success center-block']) !!}
+				{!! Form::submit('Confirm', ['class' => 'btn btn-success center-block']) !!}
 				
 
 				@include('errors.list')

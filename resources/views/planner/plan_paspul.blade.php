@@ -82,118 +82,99 @@
 			                -->
 			                    <thead>
 			                       <tr>
-			                    		<th >position</th>
-			                            <th >paspul_roll</th>
-			                            <th >sap_su</th>
-			                            <th >material</th>
-			                            <th >color_desc</th>
-			                            <th >dye_lot</th>
-			                            <th >paspul_type</th>
+			                    		<th >Paspul Roll</th>
+			                            <th >SAP SU</th>
 
-			                            <th >width</th>
-			                            <th >kotur_width</th>
-			                            <!-- <th >kotur_width_without_tension</th> -->
-			                            <th >kotur_planned</th>
-			                            <th >kotur_actual</th>
-			                            <th >rewound_length</th>
-			                            <th >rewound_length_a</th>
-
-			                            <th >pasbin</th>
-			                            <th >skeda_item_type</th>
-			                            <th >skeda</th>
-			                            <!-- <th >skeda_status</th> -->
+			                            <th >Material</th>
+			                            <th >Color Desc</th>
+			                            <th >Dye Lot</th>
 			                            
-			                            <!-- <th >rewound_roll_unit_of_measure</th> -->
+			                            <th >Roll Width [cm]</th>
+			                            <th >Paspul Type</th>
+			                            <th >Meters to Rewind [m]</th>
+			                            <th >Meters Actual [m]</th>
+
+			                            <th >PRO</th>
+			                            <th >SKU</th>
+
+			                            <th >Koturi Width [mm]</th>
+			                            <th >Koturi Width Tension [mm]</th>
+
+			                            <th >Koturi Planned</th>
+			                            <th >Koturi Actual</th>
 			                            
-			                            <th >priority</th>
-			                            <!-- <th >comment_office</th> -->
-			                            <!-- <th >comment_operator</th> -->
-			                            <!-- <th >call_shift_manager</th> -->
-			                            <!-- <th >rewinding_method</th> -->
-			                            <!-- <th >created_at</th> -->
-			                            <!-- <th >updated_at</th> -->
-
-			                            <!-- <th>status</th> -->
-			                            <th>location</th>
-			                            <!-- <th>device</th> -->
-			                            <!-- <th>active</th> -->
-			                            <!-- <th>operator1</th> -->
-			                            <!-- <th>operator2</th> -->
-
-			                            <th></th>
-			                            <th></th>
+			                            <th >Skeda Item Type</th>
+			                            <th >Skeda</th>
+			                            <th >Bin</th>
+			                            <th >TPA Number</th>
+			                            <th >Priority</th>
+			                            
 			                            <th></th>
 			                    	</tr>
 			                    </thead>
 			                    <tbody class="connectedSortable_table searchable" 
-			                    @if ($location != "COMPLETED")
+			                    @if (($location == "PRW") OR ($location == "PCO"))
 			                        id="sortable11"
 			                    @endif
 			                    >
-			                    	<!-- <tr>
-			                    		<th class=""><div><span>position</div></span></th>
-			                            <th class=""><div><span>mattress</div></span></th>
-			                            <th class=""><div><span>material</div></span></th>
-			                            <th class=""><div><span>dye_lot</div></span></th>
-			                            <th></th>
-			                    	</tr> -->
+			                    
 			                    @foreach ($data as $req)
-			                        <tr class="ss" id="item[]={{ $req->id }}">
+			                        <tr class="ss" id="item[]={{ $req->id }}" style="border-top: 3px solid grey;
+		                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
+									box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
 			                            
-			                            <td>{{ $req->position}}</td>
-			                            <td>{{ $req->paspul_roll}}</td>
-			                            <td>{{ $req->sap_su}}</td>
-			                            <td>{{ $req->material}}</td>
-			                            <td>{{ $req->color_desc}}</td>
+			                            <td class="">{{ $req->paspul_roll}}</td>
+			            	    		<td>{{ $req->sap_su}}</td>
+
+			            	    		<td>{{ $req->material}}</td>
+			            	    		<td>{{ $req->color_desc}}</td>
 			                            <td>{{ $req->dye_lot}}</td>
-			                            <td>{{ $req->paspul_type}}</td>
+			                            
+			            	    		<td>{{ round($req->width,3) }}</td>
+			            	    		<td>{{ $req->paspul_type}}</td>
+			            	    		<td>{{ round($req->rewound_length,3) }}</td>
+			            	    		<td>{{ round($req->rewound_length_a,3) }}</td>
 
-			                            <td>{{ round($req->width,3) }}</td>
-			                            <td>{{ round($req->kotur_width,3) }}</td>
-			                            <!-- <td>{{ round($req->kotur_width_without_tension,3) }}</td> -->
-			                            <td>{{ round($req->kotur_planned,3) }}</td>
-			                            <td>{{ round($req->kotur_actual,3) }}</td>
-			                            <td>{{ round($req->rewound_length,3) }}</td>
-			                            <td>{{ round($req->rewound_length_a,3) }}</td>
+			            	    		<td style="width: 75px;">{{ $req->pro}}</td>
+			                            <td style="width: 110px;">{{ $req->sku}}</td>
 
-			                            <td>{{ $req->pasbin }}</td>
+			                            <td>{{ round($req->kotur_width,0) }}</td>
+			                            <td>{{ round($req->kotur_width_without_tension,0) }}</td>
+
+			            	    		<td>{{ round($req->kotur_planned,0) }}</td>
+			            	    		<td>{{ round($req->kotur_actual,0) }}</td>
+			                            
 			                            <td>{{ $req->skeda_item_type }}</td>
 			                            <td>{{ $req->skeda }}</td>
-			                            <!-- <td>{{ $req->skeda_status }}</td> -->
+			                            <td>{{ $req->pasbin }}</td>
 
-			                            <!-- <td>{{ $req->rewound_roll_unit_of_measure }}</td> -->
-			                            
-			                            <td>{{ $req->priority }}</td>
-			                            <!-- <td>{{ $req->comment_office }}</td> -->
-			                            <!-- <td>{{ $req->comment_operator }}</td> -->
+			                            <td>{{ $req->tpa_number }}</td>
+			                         	<td class="
+				                            @if ($req->priority == 3) top_priority
+						        	    	@elseif ($req->priority == 2) high_priority
+						        	    	@endif
+						        	    	">
+						        	    	@if ($req->priority == 3)Top
+						        	    	@elseif ($req->priority == 2)High
+					        	    		@elseif ($req->priority == 1)Normal
+						        	    	@endif
+						        	    </td>
 			                            <!-- <td>{{ $req->call_shift_manager }}</td> -->
 			                            <!-- <td>{{ $req->rewinding_method }}</td> -->
-			                            <!-- <td>{{ $req->created_at }}</td> -->
-			                            <!-- <td>{{ $req->updated_at }}</td> -->
-
-			                            {{--<td>{{ $req->status }}</td>--}}
-			                            <td>{{ $req->location }}</td>
-			                            <!-- <td>{{ $req->device }}</td> -->
-			                            <!-- <td>{{ $req->active }}</td> -->
-			                            <!-- <td>{{ $req->operator1 }}</td> -->
-			                            <!-- <td>{{ $req->operator2 }}</td> -->
-
-										<td>
+			                          	<td>
 											@if ($location == 'NOT_SET')
 											<a href="{{ url('plan_paspul_line/'.$req->id) }}" class="btn btn-info btn-xs center-block">Plan paspul</a>
 											@else
 											<a href="{{ url('plan_paspul_line/'.$req->id) }}" class="btn btn-info btn-xs center-block" disabled>Plan paspul</a>
 											@endif
 										</td>
-
 										<td>
-											@if (($location == 'DELETED') OR ($location == 'COMPLETED'))
+											@if (($location == 'DELETED') OR ($location == 'COMPLETED') OR ($location == 'NOT_SET'))
 												<a href="{{ url('edit_paspul_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block" disabled>Edit paspul</a>
 											@else 
 												<a href="{{ url('edit_paspul_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit paspul</a>
 											@endif
 										</td>
-
 										<td>
 											@if (($location == 'DELETED') OR ($location == 'COMPLETED'))
 												<a href="{{ url('remove_paspul_line/'.$req->id) }}" class="btn btn-danger btn-xs center-block" disabled>Remove</a>
@@ -202,19 +183,41 @@
 											@endif
 										</td>
 			                        </tr>
+
+			                        @if ($location != 'NOT_SET') 
+
+				                        <tr style="border-bottom: 3px solid grey;
+					                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
+											box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
+					                        ">
+					                        <td  colspan="20" style="padding: 1px; text-align: left;">
+					                        	@if ($req->comment_office != '')
+					                        	<b>Comment office:</b>
+					                        	<i>{{ $req->comment_office }}</i><br>
+					                        	@endif
+					                        	@if ($req->comment_operator != '')
+					                        	<b>Comment operator:</b>
+					                        	<i>{{ $req->comment_operator }}</i><br>
+					                        	@endif
+					                        	
+					                        </td>
+					                        <td  colspan="2" style="padding: 1px; text-align: left;">
+					                        	@if ($req->call_shift_manager == 1 )
+					                        		<b><span class="glyphicon glyphicon-earphone"></span>&nbsp; &nbsp;<b>Call shift manager</b></b>
+					                        	@endif
+					                        	
+					                        </td>
+				                    	</tr>
+				                        @endif
+
 			                    @endforeach
 			                    
 			                    </tbody>
 			                  </table>
-
 				</div>
-	
 	        </div>
 	    </div>
 	</div>
-
 </div>
-
-
     
 @endsection

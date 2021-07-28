@@ -23,7 +23,7 @@
 						<div class="panel-body">
                         <p>Choose printer: <span style="color:red;">*</span></p>
                             
-                            {!! Form::select('printer', array('Cutting A4'=>'Cutting A4','Magacin A4'=>'Magacin A4','Workstudy A4'=>'Workstudy A4'), '',array('class' => 'form-control')) !!} 
+                            {!! Form::select('printer', array('Cutting A4'=>'Cutting A4','Magacin A4'=>'Magacin A4','Workstudy A4'=>'Workstudy A4','IT'=>'IT'), '',array('class' => 'form-control')) !!} 
                         </div>
 						<hr>
 						{!! Form::submit('Print nalog', ['class' => 'btn  btn-success center-block']) !!}

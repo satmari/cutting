@@ -15,6 +15,7 @@ use App\mattress_phases;
 use App\mattress_eff;
 use App\mattresses;
 use App\mattress_pro;
+use App\o_roll;
 
 use DB;
 
@@ -69,7 +70,7 @@ class cutterController extends Controller {
 		      --,'|'
 		      ,m2.[layers]
 		      ,m2.[layers_a]
-		      ,m2.[length_usable]
+		      ,m2.[length_mattress]
 		      ,m2.[cons_planned]
 		      ,m2.[extra]
 		      ,m2.[pcs_bundle]
@@ -245,19 +246,26 @@ class cutterController extends Controller {
 
 		$take_comment_operator = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			d.[comment_operator], d.[id],
-			p.[mattress], p.[status]
+			p.[mattress], p.[status], m.[g_bin],
+			mp.[pro_pcs_layer],mp.[pro_pcs_planned],
+			ps.[sku], ps.[pro], ps.[padprint_item], ps.[padprint_color],
+			po.[location_all]
 			FROM [mattress_details] as d
 			JOIN [mattresses] as m ON m.[id] = d.[mattress_id]
+			JOIN [mattress_pros] as mp ON mp.[mattress_id] = m.[id]
+			JOIN [pro_skedas] as ps ON ps.[pro_id] = mp.[pro_id]
 			LEFT JOIN [mattress_phases] as p ON p.[mattress_id] = d.[mattress_id] AND p.[active] = 1
+			LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
 			WHERE m.[id] = '".$id."' "));
+
 		// dd($take_comment_operator[0]->comment_operator);
 		$comment_operator = $take_comment_operator[0]->comment_operator;
 		$status = $take_comment_operator[0]->status;
 		$mattress = $take_comment_operator[0]->mattress;
+		$g_bin = $take_comment_operator[0]->g_bin;
 
 		// $operator = Session::get('operator');
-
-		return view('cutter.other_functions', compact('id','comment_operator','status','mattress'));
+		return view('cutter.other_functions', compact('id','comment_operator','status','mattress','g_bin','take_comment_operator'));
 	}
 
 	public function add_operator_comment(Request $request) {
@@ -269,20 +277,30 @@ class cutterController extends Controller {
 		$id = $input['id'];
 		$status = $input['status'];
 		$mattress = $input['mattress'];
+		$g_bin = $input['g_bin'];
 		$comment_operator = $input['comment_operator'];
 
-		$find_details_id = DB::connection('sqlsrv')->select(DB::raw("SELECT d.[id]
-				FROM [mattress_details] as d
-				JOIN [mattresses] as m ON m.[id] = d.[mattress_id]
-				WHERE m.[id] = '".$id."' "));
+		$take_comment_operator = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			d.[comment_operator], d.[id],
+			p.[mattress], p.[status], m.[g_bin],
+			mp.[pro_pcs_layer],mp.[pro_pcs_planned],
+			ps.[sku], ps.[pro], ps.[padprint_item], ps.[padprint_color],
+			po.[location_all]
+			FROM [mattress_details] as d
+			JOIN [mattresses] as m ON m.[id] = d.[mattress_id]
+			JOIN [mattress_pros] as mp ON mp.[mattress_id] = m.[id]
+			JOIN [pro_skedas] as ps ON ps.[pro_id] = mp.[pro_id]
+			LEFT JOIN [mattress_phases] as p ON p.[mattress_id] = d.[mattress_id] AND p.[active] = 1
+			LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+			WHERE m.[id] = '".$id."' "));
 
-		$table3 = mattress_details::findOrFail($find_details_id[0]->id);
+		$table3 = mattress_details::findOrFail($take_comment_operator[0]->id);
 		$table3->comment_operator = $comment_operator;
 		$table3->save();
 
 		$success = "Saved succesfuly";
 
-		return view('cutter.other_functions', compact('id','comment_operator','status', 'mattress', 'success'));
+		return view('cutter.other_functions', compact('id','comment_operator','status', 'mattress','g_bin' ,'success', 'take_comment_operator'));
 	}
 
 	public function mattress_cut($id) {
@@ -298,7 +316,7 @@ class cutterController extends Controller {
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			d.[comment_operator], d.[layers_a], d.[mattress_id],
 			p.[status], p.[mattress], 
-			mf.[layers_after_cs], mf.[layers_before_cs]
+			mf.[layers_after_cs], mf.[layers_before_cs], m.[g_bin]
 			FROM [mattress_details] as d
 			JOIN [mattresses] as m ON m.[id] = d.[mattress_id]
 			INNER JOIN [mattress_phases] as p ON p.[mattress_id] = d.[mattress_id] AND p.[active] = 1
@@ -307,6 +325,7 @@ class cutterController extends Controller {
 		// dd($data[0]->comment_operator);
 		$status = $data[0]->status;
 		$mattress = $data[0]->mattress;
+		$g_bin = $data[0]->g_bin;
 		$comment_operator = $data[0]->comment_operator;
 		$layers_a = (float)$data[0]->layers_a;
 		$mattress_id = (int)$data[0]->mattress_id;
@@ -317,8 +336,7 @@ class cutterController extends Controller {
 			WHERE [mattress_id] = '".$mattress_id."' "));
 		// dd($data_pro);
 
-		return view('cutter.mattress_cut', compact('data_pro','id','comment_operator','status','mattress','mattress_id','layers_a'));
-
+		return view('cutter.mattress_cut', compact('data_pro','id','comment_operator','status','mattress','g_bin','mattress_id','layers_a'));
 	}
 
 	public function mattress_cut_post(Request $request) {
@@ -329,6 +347,7 @@ class cutterController extends Controller {
 
 		$id = (int)$input['id'];
 		$mattress = $input['mattress'];
+		$g_bin = $input['g_bin'];
 		$mattress_id = (int)$input['mattress_id'];
 		$status = $input['status'];
 		$layers_a = (int)$input['layers_a'];
@@ -398,45 +417,49 @@ class cutterController extends Controller {
 				}
 			}
 
-			// print_r("final: ".$out_su."<br>");
+			print_r("final: ".$out_su."<br>");
 			if ($out_su > 0) {
 				$all_pro_for_main_plant = 0;	
 			} else {
-				$all_pro_for_main_plant = 1;
+				$all_pro_for_main_plant = 1; // if is 1 COMPLETED (Subotica), 0 PACK (Kikinda/Senta)
 			}
 		} else {
 			dd("no pro_id");
 		}
-		// print_r($all_pro_for_main_plant);
+		// dd($all_pro_for_main_plant);
 
-		// position in completed 
-		$find_position_on_location_complited = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT(location) as c
-		 FROM [mattress_phases] 
-		 WHERE location = 'COMPLETED' AND active = '1' "));
-		// dd($find_position_on_location_complited[0]);
-		if (isset($find_position_on_location_complited[0])) {
-			$position_complited = (int)$find_position_on_location_complited[0]->c + 1;
-		} else {
-			$position_complited = 1;
-		}
-
-		// position on PSO location
-		$find_position_on_location_pack = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT(location) as c
-		 FROM [mattress_phases] 
-		 WHERE location = 'PACK' AND active = '1' "));
-		// dd($find_position_on_location_pack[0]);
-		if (isset($find_position_on_location_pack[0])) {
-			$position_pack = (int)$find_position_on_location_pack[0]->c + 1;
-		} else {
-			$position_pack = 1;
-		}
-
+		
 		if ($all_pro_for_main_plant == 1) {
+
+			// position in completed 
+			$find_position_on_location_complited = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT(location) as c
+			 FROM [mattress_phases] 
+			 WHERE location = 'COMPLETED' AND active = '1' "));
+			// dd($find_position_on_location_complited[0]);
+			if (isset($find_position_on_location_complited[0])) {
+				$position_complited = (int)$find_position_on_location_complited[0]->c + 1;
+			} else {
+				$position_complited = 1;
+			}
+
 			$status = "COMPLETED";
 			$active = 1;
 			$location =  "COMPLETED";
 			$position = $position_complited;
+
 		} else {
+
+			// position on PSO location
+			$find_position_on_location_pack = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT(location) as c
+			 FROM [mattress_phases] 
+			 WHERE location = 'PACK' AND active = '1' "));
+			// dd($find_position_on_location_pack[0]);
+			if (isset($find_position_on_location_pack[0])) {
+				$position_pack = (int)$find_position_on_location_pack[0]->c + 1;
+			} else {
+				$position_pack = 1;
+			}
+
 			$status = "TO_PACK";
 			$active = 1;
 			$location =  "PACK";
@@ -472,9 +495,7 @@ class cutterController extends Controller {
 			$tablepro_update = mattress_pro::findOrFail($line_id[$i]);
 			$tablepro_update->pro_pcs_actual = $pro_pcs_actual[$i];
 			$tablepro_update->save();
-
 		}
-
 
 		// save in mattress_phases
 		// all mattress_phases for this mattress set to NOT ACTIVE
@@ -534,6 +555,20 @@ class cutterController extends Controller {
 				$table1->save();
 			}
 		}
+
+		$o_rolls =  DB::connection('sqlsrv')->select(DB::raw("SELECT *
+		  FROM [o_rolls]
+		  WHERE mattress_id_new = '".$mattress_id."' "));
+
+		if (isset($o_rolls[0])) {
+			for ($o=0; $o < count($o_rolls); $o++) { 
+				
+				$table_o = o_roll::findOrFail($o_rolls[$o]->id);
+				$table_o->status = 'CONSUMED';
+				$table_o->save();
+			}
+		}
+
 		return redirect('/cutter');
 	}
 }

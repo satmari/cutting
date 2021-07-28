@@ -91,20 +91,17 @@
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				</div>
 
-				<br>
-				<br>
+				<br><br>
 				<a href="{{ url('plan_mattress/BOARD_TABLE')}}" class="btn btn-default
 				@if ($location == 'BOARD_TABLE') plan_menu_a @endif"
-				><span class="glyphicon  glyphicon-modal-window" aria-hidden="true">&nbsp;Planning board table</span></a>
+				><span class="glyphicon  glyphicon-modal-window" aria-hidden="true"></span>&nbsp;Planning board table</a>
 				<a href="{{ url('plan_mattress/BOARD')}}" class="btn btn-default
 				@if ($location == 'BOARD') plan_menu_a @endif"
-				><span class="glyphicon  glyphicon-blackboard" aria-hidden="true">&nbsp;Planning board</span></a>
+				><span class="glyphicon  glyphicon-blackboard" aria-hidden="true"></span>&nbsp;Planning board</a>
 				<!-- <a href="{{ url('plan_mattress_save/'.$location)}}" class="btn btn-default"
 				><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true">&nbsp;Save</span></a> -->
 				<br>
-
 			</div>
-		
 	</div>
 </div>
 <br>
@@ -151,131 +148,1150 @@
 		                         }
 		                       }'
 		                -->
-		                    <thead>
-		                       <tr>
-		                    		<th >position</th>
-		                            <th >mattress</th>
-		                            @if ($location != 'NOT_SET')
-		                            <th >g_bin</th>
-		                            @endif
-		                            <th >material</th>
-		                            <th >dye_lot</th>
-		                            <th >color_desc</th>
-		                            <th >skeda</th>
-		                            <th >spreading_method</th>
-		                            <th >width_theor_usable</th>
-		                            <th >layers</th>
-		                            <th >layers_a</th>
-		                            <th >cons_planned</th>
-		                            <th >priority</th>
-		                            <th >marker_name</th>
-		                            <th >marker_length</th>
-		                            <th >marker_width</th>
-		                            <th >status</th>
-		                            <th >location</th>
-		                            <th></th>
-		                            
-		                    	</tr>
-		                    </thead>
-		                    <tbody class="connectedSortable_table searchable" 
-		                    @if (($location == 'SP1') OR ($location == 'SP2') OR ($location == 'SP3') OR ($location == 'SP4') OR ($location == 'MS1') OR ($location == 'MS2') OR ($location == 'MS3') OR ($location == 'MM1') OR ($location == 'CUT') OR ($location == 'PSO'))
-		                        id="sortable10"
-		                    @endif
+
+		                @if ($location == 'DELETED')
+
+								<thead>
+			                       <tr>	
+			                       		<!-- <th >Position</th> -->
+			                       		<th >G-bin</th>
+			                            <th >Mattress</th>
+			                            <th >Marker</th>
+			                            <th >Marker Length [m]</th>
+			                            <th >Extra [cm]</th>
+			                            <th >Mattress Width [cm]</th>
+			                            <th >Layers</th>
+			                            <th >PRO</th>
+			                            <th >SKU</th>
+			                            <th >Material</th>
+			                            <th >Dye Lot</th>
+			                            <th >Color Desc</th>
+			                            <th >Skeda</th>
+			                            <th >Planned Cons [m]</th>
+			                           
+			                            <th >Priority</th>
+			                           
+			                            <!-- <th></th> -->
+			                            
+			                    	</tr>
+			                  	</thead>
+			                  	<tbody class="connectedSortable_table searchable" 
+				                    @if (($location == 'SP1') OR ($location == 'SP2') OR ($location == 'SP3') OR ($location == 'SP4') OR ($location == 'MS1') OR ($location == 'MS2') OR ($location == 'MS3') OR ($location == 'MM1') OR ($location == 'CUT') OR ($location == 'PSO') OR ($location == 'DELETED') OR ($location == 'COMPLETED'))
+				                        id="sortable10"
+				                    @endif
+				                    >
+				                    	
+				                    @foreach ($data as $req)
+				                        <tr class="ss" id="item[]={{ $req->id }} " style="border-top: 3px solid grey;
+				                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
+											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
+				                            
+				                            {{--<td>{{ $req->position }}</td>--}}
+				                            <td class=""><span>{{ $req->g_bin}}</span></td>
+						        	    	<td class=""><span>{{ $req->mattress}}</span></td>
+				                            <td>{{ $req->marker_name}}</td>
+				                            <td>{{ round($req->marker_length,3)}}</td>
+				                            <td>{{ round($req->extra,0)}}</td>
+				                            @if (($req->skeda_item_type == 'MB') OR ($req->skeda_item_type == 'MW'))
+				                            	<td>{{ round($req->width_theor_usable,3)}}</td>
+				                            @else
+				                            	@if (($req->skeda_item_type == 'MB') OR ($req->skeda_item_type == 'MW'))
+				                            	<td>{{ round($req->width_theor_usable,3)}}</td>
+				                            @else
+				                            	<td>{{ round($req->marker_width,3)}}</td>
+				                            @endif
+				                            @endif
+				                            <td>{{ round($req->layers,0)}}</td>
+				                            <td style="width: 75px;">{{ $req->pro}}</td>
+				                            <td style="width: 110px;">{{ $req->sku}}</td>
+				                            <td>{{ $req->material}}</td>
+				                            <td>{{ $req->dye_lot}}</td>
+				                            <td>{{ $req->color_desc}}</td>
+				                            <td style="width: 120px;">{{ $req->skeda}}</td>
+				                            <td>{{ round($req->cons_planned,3)}}</td>
+				                            <td class="
+				                            @if ($req->priority == 3) top_priority
+						        	    	@elseif ($req->priority == 2) high_priority
+						        	    	@endif
+						        	    	">
+						        	    	@if ($req->priority == 3)Top
+						        	    	@elseif ($req->priority == 2)High
+					        	    		@elseif ($req->priority == 1)Normal
+						        	    	@endif</td>
+				                            
+				                            @if ($location == 'MM1')
+				                            	<td>{{ $req->layer_limit}}</td>
+				                            @endif
+				                            
+			                            	@if (($location == 'NOT_SET') OR ($location == 'DELETED') OR ($location == 'PLOT'))
+			                            	<!-- <a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" disabled>Print nalog</a> -->
+			                            	@elseif ($location == 'MM1')
+			                            	<td><a href="{{ url('print_mattress_m/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if($req->printed_nalog == NULL) 0
+			                            		@else {{$req->printed_nalog}} @endif
+			                            		)</i></a></td>
+			                            	@else
+			                            	<td><a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if ($req->printed_nalog == NULL) 
+			                            		0
+			                            		@else
+			                            		{{$req->printed_nalog}}
+			                            		@endif
+			                            		)</i></a></td>
+			                            	@endif
+											
+											@if ($location == 'NOT_SET')
+											<td><a href="{{ url('plan_mattress_line/'.$req->id) }}" class="btn btn-success btn-xs center-block">Plan mattress</a></td>
+											<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">Modal</button> -->
+											@elseif ($location  == 'ON_HOLD')
+											<td><a href="{{ url('change_marker/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Change marker</a></td>
+											@elseif ($location != 'DELETED')
+											<td><a href="{{ url('edit_mattress_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit mattress</a></td>
+											@else
+
+											@endif
+											
+											@if (($location == 'NOT_SET') OR (substr($location,0 ,2) == 'SP') OR (substr($location,0 ,2) == 'MS') OR (substr($location,0 ,2) == 'MM') OR (substr($location,0 ,2) == 'CU')  )
+											<td><a href="{{ url('delete_mattress/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Delete</a></td>
+											@endif
+
+				                        </tr>
+				                        @if ($location != 'NOT_SET') 
+
+				                        <tr style="border-bottom: 3px solid grey;
+					                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
+											box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
+					                        ">
+					                        <td  colspan="20" style="padding: 5px; text-align: left;">
+					                        	@if ($req->comment_office != '')
+					                        	<b>Comment office:</b>
+					                        	<i>{{ $req->comment_office }}</i><br>
+					                        	@endif
+					                        	@if ($req->comment_operator != '')
+					                        	<b>Comment operator:</b>
+					                        	<i>{{ $req->comment_operator }}</i><br>
+					                        	@endif
+					                        	
+					                        </td>
+					                        <td  colspan="3" style="padding: 1px; text-align: left;">
+					                        	@if ($req->call_shift_manager == 1 )
+					                        		<b><span class="glyphicon glyphicon-earphone"></span>&nbsp; &nbsp;<b>Call shift manager</b></b>
+					                        	@endif
+					                        	@if ($req->test_marker == 1)
+					                        		<br><b><span class="glyphicon glyphicon-text-size"></span>&nbsp; &nbsp;<b>Test Marker</b></b>
+					                        	@endif
+					                        </td>
+				                    	</tr>
+				                        @endif
+				                    @endforeach
+			                  	</tbody>
+                        @endif
+
+		                @if ($location == 'NOT_SET')
+
+		                        <thead>
+			                       <tr>
+			                       		<th >Mattress</th>
+			                            <th >Marker</th>
+			                            <th >Marker Length [m]</th>
+			                            <th >Mattress Width [cm]</th>
+			                            <th >Layers</th>
+			                            <th >PRO</th>
+			                            <th >SKU</th>
+			                            <th >Material</th>
+			                            <th >Dye Lot</th>
+			                            <th >Color Desc</th>
+			                            <th >Skeda</th>
+			                            <th >Planned Cons [m]</th>
+			                            <th></th>
+			                            
+			                    	</tr>
+			                  	</thead>
+			                  	<tbody class="connectedSortable_table searchable" 
+				                    @if (($location == 'SP1') OR ($location == 'SP2') OR ($location == 'SP3') OR ($location == 'SP4') OR ($location == 'MS1') OR ($location == 'MS2') OR ($location == 'MS3') OR ($location == 'MM1') OR ($location == 'CUT') OR ($location == 'PSO') OR ($location == 'DELETED') OR ($location == 'COMPLETED'))
+				                        id="sortable10"
+				                    @endif
+				                    >
+				                    	
+				                    @foreach ($data as $req)
+				                        <tr class="ss" id="item[]={{ $req->id }} " style="border-top: 3px solid grey;
+				                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
+											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
+				                            
+						        	    	<td class=""><span>{{ $req->mattress}}</span></td>
+				                            <td>{{ $req->marker_name}}</td>
+				                            <td>{{ round($req->marker_length,3)}}</td>
+				                            @if (($req->skeda_item_type == 'MB') OR ($req->skeda_item_type == 'MW'))
+				                            	<td>{{ round($req->width_theor_usable,3)}}</td>
+				                            @else
+				                            	<td>{{ round($req->marker_width,3)}}</td>
+				                            @endif
+				                            <td>{{ round($req->layers,0)}}</td>
+				                            <td style="width: 75px;">{{ $req->pro}}</td>
+				                            <td style="width: 120px;">{{ $req->sku}}</td>
+				                            <td>{{ $req->material}}</td>
+				                            <td>{{ $req->dye_lot}}</td>
+				                            <td>{{ $req->color_desc}}</td>
+				                            <td style="width: 120px;">{{ $req->skeda}}</td>
+				                            <td>{{ round($req->cons_planned,3)}}</td>
+				                            
+				                           @if (($location == 'NOT_SET') OR ($location == 'DELETED') OR ($location == 'PLOT'))
+			                            	<!-- <a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" disabled>Print nalog</a> -->
+			                            	@elseif ($location == 'MM1')
+			                            	<td><a href="{{ url('print_mattress_m/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if($req->printed_nalog == NULL) 0
+			                            		@else {{$req->printed_nalog}} @endif
+			                            		)</i></a></td>
+			                            	@else
+			                            	<td><a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if ($req->printed_nalog == NULL) 
+			                            		0
+			                            		@else
+			                            		{{$req->printed_nalog}}
+			                            		@endif
+			                            		)</i></a></td>
+			                            	@endif
+				                            
+											@if ($location == 'NOT_SET')
+											<td><a href="{{ url('plan_mattress_line/'.$req->id) }}" class="btn btn-success btn-xs center-block">Plan mattress</a></td>
+											<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">Modal</button> -->
+											@elseif ($location  == 'ON_HOLD')
+											<td><a href="{{ url('change_marker/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Change marker</a></td>
+											@elseif ($location != 'DELETED')
+											<td><a href="{{ url('edit_mattress_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit mattress</a></td>
+											@else
+
+											@endif
+											
+											@if (($location == 'NOT_SET') OR (substr($location,0 ,2) == 'SP') OR (substr($location,0 ,2) == 'MS') OR (substr($location,0 ,2) == 'MM') OR (substr($location,0 ,2) == 'CU')  )
+											<td><a href="{{ url('delete_mattress/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Delete</a></td>
+											@endif
+
+				                        </tr>
+				                        @if ($location != 'NOT_SET') 
+
+				                        <tr style="border-bottom: 3px solid grey;
+					                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
+											box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
+					                        ">
+					                        <td  colspan="20" style="padding: 5px; text-align: left;">
+					                        	@if ($req->comment_office != '')
+					                        	<b>Comment office:</b>
+					                        	<i>{{ $req->comment_office }}</i><br>
+					                        	@endif
+					                        	@if ($req->comment_operator != '')
+					                        	<b>Comment operator:</b>
+					                        	<i>{{ $req->comment_operator }}</i><br>
+					                        	@endif
+					                        	
+					                        </td>
+					                        <td  colspan="3" style="padding: 1px; text-align: left;">
+					                        	@if ($req->call_shift_manager == 1 )
+					                        		<b><span class="glyphicon glyphicon-earphone"></span>&nbsp; &nbsp;<b>Call shift manager</b></b>
+					                        	@endif
+					                        	@if ($req->test_marker == 1)
+					                        		<br><b><span class="glyphicon glyphicon-text-size"></span>&nbsp; &nbsp;<b>Test Marker</b></b>
+					                        	@endif
+					                        </td>
+				                    	</tr>
+				                        @endif
+				                    @endforeach
+			                  	</tbody>
+                        @endif
+
+                        @if (($location == 'SP1') OR ($location == 'SP2') OR ($location == 'SP3') OR ($location == 'SP4') OR
+                        	 ($location == 'MS1') OR ($location == 'MS2') OR ($location == 'MS3') OR ($location == 'MM1') OR
+                        	 ($location == 'PSO') OR ($location == 'PACK') OR ($location == 'CUT'))
+
+								<thead>
+			                       <tr>	
+			                       		<th >Position</th>
+			                       		<th >G-bin</th>
+			                            <th >Mattress</th>
+			                            <th >Marker</th>
+			                            <th >Marker Length [m]</th>
+			                            <th >Extra [cm]</th>
+			                            <th >Mattress Width [cm]</th>
+			                            <th >Layers</th>
+			                            <th >PRO</th>
+			                            <th >SKU</th>
+			                            <th >Material</th>
+			                            <th >Dye Lot</th>
+			                            <th >Color Desc</th>
+			                            <th >Skeda</th>
+			                            <th >Planned Cons [m]</th>
+			                            <th >Spreading Method</th>
+			                            <th >Pcs per Bundle</th>
+			                            <th >Bottom Paper</th>
+			                            <th >Priority</th>
+			                            <th >Status</th>
+			                             @if ($location == 'MM1')
+				                            	<td>Layer limit</td>
+										 @endif
+			                            <th></th>
+			                            
+			                    	</tr>
+			                  	</thead>
+			                  	<tbody class="connectedSortable_table searchable" 
+				                    @if (($location == 'SP1') OR ($location == 'SP2') OR ($location == 'SP3') OR ($location == 'SP4') OR ($location == 'MS1') OR ($location == 'MS2') OR ($location == 'MS3') OR ($location == 'MM1') OR ($location == 'CUT') OR ($location == 'PSO') OR ($location == 'DELETED') OR ($location == 'COMPLETED'))
+				                        id="sortable10"
+				                    @endif
+				                    >
+				                    	
+				                    @foreach ($data as $req)
+				                        <tr class="ss" id="item[]={{ $req->id }} " style="border-top: 3px solid grey;
+				                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
+											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
+				                            
+				                            <td>{{ $req->position }}</td>
+				                            <td class=""><span>{{ $req->g_bin}}</span></td>
+						        	    	<td class=""><span>{{ $req->mattress}}</span></td>
+				                            <td>{{ $req->marker_name}}</td>
+				                            <td>{{ round($req->marker_length,3)}}</td>
+				                            <td>{{ round($req->extra,0)}}</td>
+				                            @if (($req->skeda_item_type == 'MB') OR ($req->skeda_item_type == 'MW'))
+				                            	<td>{{ round($req->width_theor_usable,3)}}</td>
+				                            @else
+				                            	<td>{{ round($req->marker_width,3)}}</td>
+				                            @endif
+				                            <td>{{ round($req->layers,0)}}</td>
+				                            <td style="width: 75px;">{{ $req->pro}}</td>
+				                            <td style="width: 110px;">{{ $req->sku}}</td>
+				                            <td>{{ $req->material}}</td>
+				                            <td>{{ $req->dye_lot}}</td>
+				                            <td>{{ $req->color_desc}}</td>
+				                            <td style="width: 120px;">{{ $req->skeda}}</td>
+				                            <td>{{ round($req->cons_planned,3)}}</td>
+				                            <td style="width: 50px;">{{ $req->spreading_method}}</td>
+				                            <td >{{ round($req->pcs_bundle,0)}}</td>
+				                            <td>{{ $req->bottom_paper}}</td>
+
+				                            {{-- <td>{{ $req->location}}</td> --}}
+				                           <td class="
+				                            @if ($req->priority == 3) top_priority
+						        	    	@elseif ($req->priority == 2) high_priority
+						        	    	@endif
+						        	    	">
+						        	    	@if ($req->priority == 3)Top
+						        	    	@elseif ($req->priority == 2)High
+					        	    		@elseif ($req->priority == 1)Normal
+						        	    	@endif</td>
+				                            <td>{{ $req->status}}</td>
+				                            
+				                            @if ($location == 'MM1')
+				                            	<td>{{ $req->layer_limit}}</td>
+				                            @endif
+				                            
+			                            	@if (($location == 'NOT_SET') OR ($location == 'DELETED') OR ($location == 'PLOT'))
+			                            	<!-- <a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" disabled>Print nalog</a> -->
+			                            	@elseif ($location == 'MM1')
+			                            	<td><a href="{{ url('print_mattress_m/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if($req->printed_nalog == NULL) 0
+			                            		@else {{$req->printed_nalog}} @endif
+			                            		)</i></a></td>
+			                            	@else
+			                            	<td><a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if ($req->printed_nalog == NULL) 
+			                            		0
+			                            		@else
+			                            		{{$req->printed_nalog}}
+			                            		@endif
+			                            		)</i></a></td>
+			                            	@endif
+				                            
+											@if ($location == 'NOT_SET')
+											<td><a href="{{ url('plan_mattress_line/'.$req->id) }}" class="btn btn-success btn-xs center-block">Plan mattress</a></td>
+											<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">Modal</button> -->
+											@elseif ($location  == 'ON_HOLD')
+											<td><a href="{{ url('change_marker/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Change marker</a></td>
+											@elseif ($location != 'DELETED')
+											<td><a href="{{ url('edit_mattress_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit mattress</a></td>
+											@else
+
+											@endif
+											
+											@if (($location == 'NOT_SET') OR (substr($location,0 ,2) == 'SP') OR (substr($location,0 ,2) == 'MS') OR (substr($location,0 ,2) == 'MM') OR (substr($location,0 ,2) == 'CU')  )
+											<td><a href="{{ url('delete_mattress/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Delete</a></td>
+											@endif
+
+				                        </tr>
+				                        @if ($location != 'NOT_SET') 
+
+				                        <tr style="border-bottom: 3px solid grey;
+					                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
+											box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
+					                        ">
+					                        @if ($location == 'MM1')
+				                            	<td  colspan="21" style="padding: 5px; text-align: left;">
+				                            @else 
+				                            	<td  colspan="20" style="padding: 5px; text-align: left;">
+				                            @endif
+
+				                            	
+					                        	@if ($req->comment_office != '')
+					                        	<b>Comment office:</b>
+					                        	<i>{{ $req->comment_office }}</i><br>
+					                        	@endif
+					                        	@if ($req->comment_operator != '')
+					                        	<b>Comment operator:</b>
+					                        	<i>{{ $req->comment_operator }}</i><br>
+					                        	@endif
+					                        </td>
+					                        @if ($location == 'MM1')
+						                        <td  colspan="3" style="padding: 1px; text-align: left;">
+					                        @else 
+				                            	<td  colspan="3" style="padding: 1px; text-align: left;">
+				                            @endif
+
+					                        	@if ($req->call_shift_manager == 1 )
+					                        		<b><span class="glyphicon glyphicon-earphone"></span>&nbsp; &nbsp;<b>Call shift manager</b></b>
+					                        	@endif
+					                        	@if ($req->test_marker == 1)
+					                        		<br><b><span class="glyphicon glyphicon-text-size"></span>&nbsp; &nbsp;<b>Test Marker</b></b>
+					                        	@endif
+					                        </td>
+				                    	</tr>
+				                        @endif
+				                    @endforeach
+			                  	</tbody>
+                        @endif
+
+                        @if ($location == 'PLOT')
+		                           
+ 								<thead>
+			                       <tr>	
+			                       		<!-- <th >Position</th> -->
+			                       		<th >G-bin</th>
+			                            <th >Mattress</th>
+			                            <th >Marker</th>
+			                            <th >Marker Length [m]</th>
+			                            <th >Extra [cm]</th>
+			                            <th >Mattress Width [cm]</th>
+			                            <th >Layers</th>
+			                            <th >PRO</th>
+			                            <th >SKU</th>
+			                            <th >Material</th>
+			                            <th >Dye Lot</th>
+			                            <th >Color Desc</th>
+			                            <th >Skeda</th>
+			                            <th >Planned Cons [m]</th>
+			                            <th >Spreading Method</th>
+			                            <th >Pcs per Bundle</th>
+			                            <th >Bottom Paper</th>
+			                            <!-- <th >Shift Manager Needed</th>
+			                            <th ><span class="glyphicon glyphicon-text-size">&nbsp; &nbsp;<b>Test Marker</b></span></th> -->
+			                            <th >Location</th>
+			                            <th >Priority</th>
+			                            <th >Status</th>
+			                            <th><b>Printed</b></th>
+			                            <th></th>
+			                            
+			                    	</tr>
+			                  	</thead>
+			                  	<tbody class="connectedSortable_table searchable" 
+				                    @if (($location == 'SP1') OR ($location == 'SP2') OR ($location == 'SP3') OR ($location == 'SP4') OR ($location == 'MS1') OR ($location == 'MS2') OR ($location == 'MS3') OR ($location == 'MM1') OR ($location == 'CUT') OR ($location == 'PSO') OR ($location == 'DELETED') OR ($location == 'COMPLETED'))
+				                        id="sortable10"
+				                    @endif
+				                    >
+				                    	
+				                    @foreach ($data as $req)
+				                        <tr class="ss" id="item[]={{ $req->id }} " style="border-top: 3px solid grey;
+				                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
+											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
+				                            
+				                            {{--<td>{{ $req->position }}</td>--}}
+				                            <td class=""><span>{{ $req->g_bin}}</span></td>
+						        	    	<td class=""><span>{{ $req->mattress}}</span></td>
+				                            <td>{{ $req->marker_name}}</td>
+				                            <td>{{ round($req->marker_length,3)}}</td>
+				                            <td>{{ round($req->extra,0)}}</td>
+				                            @if (($req->skeda_item_type == 'MB') OR ($req->skeda_item_type == 'MW'))
+				                            	<td>{{ round($req->width_theor_usable,3)}}</td>
+				                            @else
+				                            	<td>{{ round($req->marker_width,3)}}</td>
+				                            @endif
+				                            <td>{{ round($req->layers,0)}}</td>
+				                            <td style="width: 75px;">{{ $req->pro}}</td>
+				                            <td style="width: 110px;">{{ $req->sku}}</td>
+				                            <td>{{ $req->material}}</td>
+				                            <td>{{ $req->dye_lot}}</td>
+				                            <td>{{ $req->color_desc}}</td>
+				                            <td style="width: 120px;">{{ $req->skeda}}</td>
+				                            <td>{{ round($req->cons_planned,3)}}</td>
+				                            <td style="width: 50px;">{{ $req->spreading_method}}</td>
+				                            <td >{{ round($req->pcs_bundle,0)}}</td>
+				                            <td>{{ $req->bottom_paper}}</td>
+
+				                            <td>{{ $req->location}}</td>
+				                            <td class="
+				                            @if ($req->priority == 3) top_priority
+						        	    	@elseif ($req->priority == 2) high_priority
+						        	    	@endif
+						        	    	">
+						        	    	@if ($req->priority == 3)Top
+						        	    	@elseif ($req->priority == 2)High
+					        	    		@elseif ($req->priority == 1)Normal
+						        	    	@endif</td>
+				                            <td>{{ $req->status}}</td>
+				                            <td>{{ $req->printed_marker}}</td>
+				                            
+				                            @if ($location == 'MM1')
+				                            	<td>{{ $req->layer_limit}}</td>
+				                            @endif
+				                            
+				                            
+			                            	@if (($location == 'NOT_SET') OR ($location == 'DELETED') OR ($location == 'PLOT'))
+			                            	<!-- <a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" disabled>Print nalog</a> -->
+			                            	@elseif ($location == 'MM1')
+			                            	<td><a href="{{ url('print_mattress_m/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if($req->printed_nalog == NULL) 0
+			                            		@else {{$req->printed_nalog}} @endif
+			                            		)</i></a></td>
+			                            	@else
+			                            	<td><a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if ($req->printed_nalog == NULL) 
+			                            		0
+			                            		@else
+			                            		{{$req->printed_nalog}}
+			                            		@endif
+			                            		)</i></a></td>
+			                            	@endif
+				                            
+											
+											@if ($location == 'NOT_SET')
+											<td><a href="{{ url('plan_mattress_line/'.$req->id) }}" class="btn btn-success btn-xs center-block">Plan mattress</a></td>
+											<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">Modal</button> -->
+											@elseif ($location  == 'ON_HOLD')
+											<td><a href="{{ url('change_marker/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Change marker</a></td>
+											@elseif ($location != 'DELETED')
+											<td><a href="{{ url('edit_mattress_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit mattress</a></td>
+											@else
+
+											@endif
+											
+											@if (($location == 'NOT_SET') OR (substr($location,0 ,2) == 'SP') OR (substr($location,0 ,2) == 'MS') OR (substr($location,0 ,2) == 'MM') OR (substr($location,0 ,2) == 'CU')  )
+											<td><a href="{{ url('delete_mattress/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Delete</a></td>
+											@endif
+
+				                        </tr>
+				                        @if ($location != 'NOT_SET') 
+
+				                        <tr style="border-bottom: 3px solid grey;
+					                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
+											box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
+					                        ">
+					                        <td  colspan="20" style="padding: 5px; text-align: left;">
+					                        	@if ($req->comment_office != '')
+					                        	<b>Comment office:</b>
+					                        	<i>{{ $req->comment_office }}</i><br>
+					                        	@endif
+					                        	@if ($req->comment_operator != '')
+					                        	<b>Comment operator:</b>
+					                        	<i>{{ $req->comment_operator }}</i><br>
+					                        	@endif
+					                        	
+					                        </td>
+					                        <td  colspan="3" style="padding: 1px; text-align: left;">
+					                        	@if ($req->call_shift_manager == 1 )
+					                        		<b><span class="glyphicon glyphicon-earphone"></span>&nbsp; &nbsp;<b>Call shift manager</b></b>
+					                        	@endif
+					                        	@if ($req->test_marker == 1)
+					                        		<br><b><span class="glyphicon glyphicon-text-size"></span>&nbsp; &nbsp;<b>Test Marker</b></b>
+					                        	@endif
+					                        </td>
+				                    	</tr>
+				                        @endif
+				                    @endforeach
+			                  	</tbody>
+                        @endif
+
+                        @if ($location == 'ON_HOLD')
+		                           
+ 								<thead>
+			                       <tr>	
+			                       		<!-- <th >Position</th> -->
+			                       		<th >G-bin</th>
+			                            <th >Mattress</th>
+			                            <th >Marker</th>
+			                            <th >Marker Length [m]</th>
+			                            <th >Extra [cm]</th>
+			                            <th >Mattress Width [cm]</th>
+			                            <th >Layers</th>
+			                            <th >PRO</th>
+			                            <th >SKU</th>
+			                            <th >Material</th>
+			                            <th >Dye Lot</th>
+			                            <th >Color Desc</th>
+			                            <th >Skeda</th>
+			                            <th >Planned Cons [m]</th>
+			                            <th >Spreading Method</th>
+			                            <th >Pcs per Bundle</th>
+			                            <th >Bottom Paper</th>
+			                            <!-- <th >Shift Manager Needed</th>
+			                            <th ><span class="glyphicon glyphicon-text-size">&nbsp; &nbsp;<b>Test Marker</b></span></th> -->
+			                            <th >Location</th>
+			                            <th >Priority</th>
+			                            <th >Status</th>
+			                            <th></th>
+			                            
+			                    	</tr>
+			                  	</thead>
+			                  	<tbody class="connectedSortable_table searchable" 
+				                    @if (($location == 'SP1') OR ($location == 'SP2') OR ($location == 'SP3') OR ($location == 'SP4') OR ($location == 'MS1') OR ($location == 'MS2') OR ($location == 'MS3') OR ($location == 'MM1') OR ($location == 'CUT') OR ($location == 'PSO') OR ($location == 'DELETED') OR ($location == 'COMPLETED'))
+				                        id="sortable10"
+				                    @endif
+				                    >
+				                    	
+				                    @foreach ($data as $req)
+				                        <tr class="ss" id="item[]={{ $req->id }} " style="border-top: 3px solid grey;
+				                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
+											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
+				                            
+				                            {{--<td>{{ $req->position }}</td>--}}
+				                            <td class=""><span>{{ $req->g_bin}}</span></td>
+						        	    	<td class=""><span>{{ $req->mattress}}</span></td>
+				                            <td>{{ $req->marker_name}}</td>
+				                            <td>{{ round($req->marker_length,3)}}</td>
+				                            <td>{{ round($req->extra,0)}}</td>
+				                            @if (($req->skeda_item_type == 'MB') OR ($req->skeda_item_type == 'MW'))
+				                            	<td>{{ round($req->width_theor_usable,3)}}</td>
+				                            @else
+				                            	<td>{{ round($req->marker_width,3)}}</td>
+				                            @endif
+				                            <td>{{ round($req->layers,0)}}</td>
+				                            <td style="width: 75px;">{{ $req->pro}}</td>
+				                            <td style="width: 110px;">{{ $req->sku}}</td>
+				                            <td>{{ $req->material}}</td>
+				                            <td>{{ $req->dye_lot}}</td>
+				                            <td>{{ $req->color_desc}}</td>
+				                            <td style="width: 120px;">{{ $req->skeda}}</td>
+				                            <td>{{ round($req->cons_planned,3)}}</td>
+				                            <td style="width: 50px;">{{ $req->spreading_method}}</td>
+				                            <td >{{ round($req->pcs_bundle,0)}}</td>
+				                            <td>{{ $req->bottom_paper}}</td>
+
+				                            <td>{{ $req->location}}</td>
+				                            <td class="
+				                            @if ($req->priority == 3) top_priority
+						        	    	@elseif ($req->priority == 2) high_priority
+						        	    	@endif
+						        	    	">
+						        	    	@if ($req->priority == 3)Top
+						        	    	@elseif ($req->priority == 2)High
+					        	    		@elseif ($req->priority == 1)Normal
+						        	    	@endif</td>
+				                            <td>{{ $req->status}}</td>
+				                            
+				                            @if ($location == 'MM1')
+				                            	<td>{{ $req->layer_limit}}</td>
+				                            @endif
+				                            
+				                            
+			                            	@if (($location == 'NOT_SET') OR ($location == 'DELETED') OR ($location == 'PLOT'))
+			                            	<!-- <a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" disabled>Print nalog</a> -->
+			                            	@elseif ($location == 'MM1')
+			                            	<td><a href="{{ url('print_mattress_m/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if($req->printed_nalog == NULL) 0
+			                            		@else {{$req->printed_nalog}} @endif
+			                            		)</i></a></td>
+			                            	@else
+			                            	<td><a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if ($req->printed_nalog == NULL) 
+			                            		0
+			                            		@else
+			                            		{{$req->printed_nalog}}
+			                            		@endif
+			                            		)</i></a></td>
+			                            	@endif
+				                            
+											
+											@if ($location == 'NOT_SET')
+											<td><a href="{{ url('plan_mattress_line/'.$req->id) }}" class="btn btn-success btn-xs center-block">Plan mattress</a></td>
+											<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">Modal</button> -->
+											@elseif ($location  == 'ON_HOLD')
+											<td><a href="{{ url('change_marker/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Change marker</a></td>
+											@elseif ($location != 'DELETED')
+											<td><a href="{{ url('edit_mattress_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit mattress</a></td>
+											@else
+
+											@endif
+											
+											@if (($location == 'NOT_SET') OR (substr($location,0 ,2) == 'SP') OR (substr($location,0 ,2) == 'MS') OR (substr($location,0 ,2) == 'MM') OR (substr($location,0 ,2) == 'CU')  )
+											<td><a href="{{ url('delete_mattress/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Delete</a></td>
+											@endif
+
+				                        </tr>
+				                        @if ($location != 'NOT_SET') 
+
+				                        <tr style="border-bottom: 3px solid grey;
+					                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
+											box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
+					                        ">
+					                        <td  colspan="20" style="padding: 5px; text-align: left;">
+					                        	@if ($req->comment_office != '')
+					                        	<b>Comment office:</b>
+					                        	<i>{{ $req->comment_office }}</i><br>
+					                        	@endif
+					                        	@if ($req->comment_operator != '')
+					                        	<b>Comment operator:</b>
+					                        	<i>{{ $req->comment_operator }}</i><br>
+					                        	@endif
+					                        	
+					                        </td>
+					                        <td  colspan="3" style="padding: 1px; text-align: left;">
+					                        	@if ($req->call_shift_manager == 1 )
+					                        		<b><span class="glyphicon glyphicon-earphone"></span>&nbsp; &nbsp;<b>Call shift manager</b></b>
+					                        	@endif
+					                        	@if ($req->test_marker == 1)
+					                        		<br><b><span class="glyphicon glyphicon-text-size"></span>&nbsp; &nbsp;<b>Test Marker</b></b>
+					                        	@endif
+					                        </td>
+				                    	</tr>
+				                        @endif
+				                    @endforeach
+			                  	</tbody>
+                        @endif
+
+                        @if ($location == 'COMPLETED')
+
+ 								<thead>
+			                       <tr>	
+			                       		<!-- <th >Position</th> -->
+			                       		<th >G-bin</th>
+			                            <th >Mattress</th>
+			                            <th >Marker</th>
+			                            <th >Marker Length [m]</th>
+			                            <th >Extra [cm]</th>
+			                            <th >Mattress Width [cm]</th>
+			                            <th >Layers</th>
+			                            <th >PRO</th>
+			                            <th >SKU</th>
+			                            <th >Material</th>
+			                            <th >Dye Lot</th>
+			                            <th >Color Desc</th>
+			                            <th >Skeda</th>
+			                            <th >Planned Cons [m]</th>
+			                            <th >Spreading Method</th>
+			                            <th >Pcs per Bundle</th>
+			                            <th >Bottom Paper</th>
+			                            <!-- <th >Shift Manager Needed</th>
+			                            <th ><span class="glyphicon glyphicon-text-size">&nbsp; &nbsp;<b>Test Marker</b></span></th> -->
+			                            <th >Location</th>
+			                            <th >Priority</th>
+			                            <th >Status</th>
+			                            <th></th>
+			                            
+			                    	</tr>
+			                  	</thead>
+			                  	<tbody class="connectedSortable_table searchable" 
+				                    @if (($location == 'SP1') OR ($location == 'SP2') OR ($location == 'SP3') OR ($location == 'SP4') OR ($location == 'MS1') OR ($location == 'MS2') OR ($location == 'MS3') OR ($location == 'MM1') OR ($location == 'CUT') OR ($location == 'PSO') OR ($location == 'DELETED') OR ($location == 'COMPLETED'))
+				                        id="sortable10"
+				                    @endif
+				                    >
+				                    	
+				                    @foreach ($data as $req)
+				                        <tr class="ss" id="item[]={{ $req->id }} " style="border-top: 3px solid grey;
+				                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
+											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
+				                            
+				                            {{--<td>{{ $req->position }}</td>--}}
+				                            <td class=""><span>{{ $req->g_bin}}</span></td>
+						        	    	<td class=""><span>{{ $req->mattress}}</span></td>
+				                            <td>{{ $req->marker_name}}</td>
+				                            <td>{{ round($req->marker_length,3)}}</td>
+				                            <td>{{ round($req->extra,0)}}</td>
+				                            @if (($req->skeda_item_type == 'MB') OR ($req->skeda_item_type == 'MW'))
+				                            	<td>{{ round($req->width_theor_usable,3)}}</td>
+				                            @else
+				                            	<td>{{ round($req->marker_width,3)}}</td>
+				                            @endif
+				                            <td>{{ round($req->layers,0)}}</td>
+				                            <td style="width: 75px;">{{ $req->pro}}</td>
+				                            <td style="width: 110px;">{{ $req->sku}}</td>
+				                            <td>{{ $req->material}}</td>
+				                            <td>{{ $req->dye_lot}}</td>
+				                            <td>{{ $req->color_desc}}</td>
+				                            <td style="width: 120px;">{{ $req->skeda}}</td>
+				                            <td>{{ round($req->cons_planned,3)}}</td>
+				                            <td style="width: 50px;">{{ $req->spreading_method}}</td>
+				                            <td >{{ round($req->pcs_bundle,0)}}</td>
+				                            <td>{{ $req->bottom_paper}}</td>
+
+				                            <td>{{ $req->location}}</td>
+				                            <td class="
+				                            @if ($req->priority == 3) top_priority
+						        	    	@elseif ($req->priority == 2) high_priority
+						        	    	@endif
+						        	    	">
+						        	    	@if ($req->priority == 3)Top
+						        	    	@elseif ($req->priority == 2)High
+					        	    		@elseif ($req->priority == 1)Normal
+						        	    	@endif</td>
+				                            <td>{{ $req->status}}</td>
+				                            
+				                            @if ($location == 'MM1')
+				                            	<td>{{ $req->layer_limit}}</td>
+				                            @endif
+				                            
+				                            
+			                            	@if (($location == 'NOT_SET') OR ($location == 'DELETED') OR ($location == 'PLOT'))
+			                            	<!-- <a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" disabled>Print nalog</a> -->
+			                            	@elseif ($location == 'MM1')
+			                            	<td><a href="{{ url('print_mattress_m/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if($req->printed_nalog == NULL) 0
+			                            		@else {{$req->printed_nalog}} @endif
+			                            		)</i></a></td>
+			                            	@else
+			                            	<td><a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if ($req->printed_nalog == NULL) 
+			                            		0
+			                            		@else
+			                            		{{$req->printed_nalog}}
+			                            		@endif
+			                            		)</i></a></td>
+			                            	@endif
+				                            
+											
+											@if ($location == 'NOT_SET')
+											<td><a href="{{ url('plan_mattress_line/'.$req->id) }}" class="btn btn-success btn-xs center-block">Plan mattress</a></td>
+											<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">Modal</button> -->
+											@elseif ($location  == 'ON_HOLD')
+											<td><a href="{{ url('change_marker/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Change marker</a></td>
+											@elseif ($location != 'DELETED')
+											<td><a href="{{ url('edit_mattress_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit mattress</a></td>
+											@else
+
+											@endif
+											
+											@if (($location == 'NOT_SET') OR (substr($location,0 ,2) == 'SP') OR (substr($location,0 ,2) == 'MS') OR (substr($location,0 ,2) == 'MM') OR (substr($location,0 ,2) == 'CU')  )
+											<td><a href="{{ url('delete_mattress/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Delete</a></td>
+											@endif
+
+				                        </tr>
+				                        @if ($location != 'NOT_SET') 
+
+				                        <tr style="border-bottom: 3px solid grey;
+					                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
+											box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
+					                        ">
+					                        <td  colspan="20" style="padding: 5px; text-align: left;">
+					                        	@if ($req->comment_office != '')
+					                        	<b>Comment office:</b>
+					                        	<i>{{ $req->comment_office }}</i><br>
+					                        	@endif
+					                        	@if ($req->comment_operator != '')
+					                        	<b>Comment operator:</b>
+					                        	<i>{{ $req->comment_operator }}</i><br>
+					                        	@endif
+					                        	
+					                        </td>
+					                        <td  colspan="3" style="padding: 1px; text-align: left;">
+					                        	@if ($req->call_shift_manager == 1 )
+					                        		<b><span class="glyphicon glyphicon-earphone"></span>&nbsp; &nbsp;<b>Call shift manager</b></b>
+					                        	@endif
+					                        	@if ($req->test_marker == 1)
+					                        		<br><b><span class="glyphicon glyphicon-text-size"></span>&nbsp; &nbsp;<b>Test Marker</b></b>
+					                        	@endif
+					                        </td>
+				                    	</tr>
+				                        @endif
+				                    @endforeach
+			                  	</tbody>
+                        @endif
+
+                        @if ($location == 'BOARD_TABLE')
+
+ 								<thead>
+			                       <tr>
+			                       		<th >G-bin</th>
+			                            <th >Mattress</th>
+			                            <th >Marker</th>
+			                            <th >Marker Length [m]</th>
+			                            <th >Extra [cm]</th>
+			                            <th >Mattress Width [cm]</th>
+			                            <th >Layers</th>
+			                            <th >PRO</th>
+			                            <th >SKU</th>
+			                            <th >Material</th>
+			                            <th >Dye Lot</th>
+			                            <th >Color Desc</th>
+			                            <th >Skeda</th>
+			                            <th >Planned Cons [m]</th>
+			                            <th >Spreading Method</th>
+			                            <th >Pcs per Bundle</th>
+			                            <th >Bottom Paper</th>
+			                            <!-- <th >Shift Manager Needed</th>
+			                            <th ><span class="glyphicon glyphicon-text-size">&nbsp; &nbsp;<b>Test Marker</b></span></th> -->
+			                            <th >Location</th>
+			                            <th >Priority</th>
+			                            <th >Status</th>
+			                            <th></th>
+			                            
+			                    	</tr>
+			                  	</thead>
+			                  	<tbody class="connectedSortable_table searchable" 
+				                    @if (($location == 'SP1') OR ($location == 'SP2') OR ($location == 'SP3') OR ($location == 'SP4') OR ($location == 'MS1') OR ($location == 'MS2') OR ($location == 'MS3') OR ($location == 'MM1') OR ($location == 'CUT') OR ($location == 'PSO') OR ($location == 'DELETED') OR ($location == 'COMPLETED'))
+				                        id="sortable10"
+				                    @endif
+				                    >
+				                    	
+				                    @foreach ($data as $req)
+				                        <tr class="ss" id="item[]={{ $req->id }} " style="border-top: 3px solid grey;
+				                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
+											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
+				                            
+				                            <td class=""><span>{{ $req->g_bin}}</span></td>
+						        	    	<td class=""><span>{{ $req->mattress}}</span></td>
+				                            <td>{{ $req->marker_name}}</td>
+				                            <td>{{ round($req->marker_length,3)}}</td>
+				                            <td>{{ round($req->extra,0)}}</td>
+				                            @if (($req->skeda_item_type == 'MB') OR ($req->skeda_item_type == 'MW'))
+				                            	<td>{{ round($req->width_theor_usable,3)}}</td>
+				                            @else
+				                            	<td>{{ round($req->marker_width,3)}}</td>
+				                            @endif
+				                            <td>{{ round($req->layers,0)}}</td>
+				                            <td style="width: 75px;">{{ $req->pro}}</td>
+				                            <td style="width: 110px;">{{ $req->sku}}</td>
+				                            <td>{{ $req->material}}</td>
+				                            <td>{{ $req->dye_lot}}</td>
+				                            <td>{{ $req->color_desc}}</td>
+				                            <td style="width: 120px;">{{ $req->skeda}}</td>
+				                            <td>{{ round($req->cons_planned,3)}}</td>
+				                            <td style="width: 50px;">{{ $req->spreading_method}}</td>
+				                            <td >{{ round($req->pcs_bundle,0)}}</td>
+				                            <td>{{ $req->bottom_paper}}</td>
+
+				                            <td>{{ $req->location}}</td>
+				                            <td class="
+				                            @if ($req->priority == 3) top_priority
+						        	    	@elseif ($req->priority == 2) high_priority
+						        	    	@endif
+						        	    	">
+						        	    	@if ($req->priority == 3)Top
+						        	    	@elseif ($req->priority == 2)High
+					        	    		@elseif ($req->priority == 1)Normal
+						        	    	@endif</td>
+				                            <td>{{ $req->status}}</td>
+				                            
+				                            @if ($location == 'MM1')
+				                            	<td>{{ $req->layer_limit}}</td>
+				                            @endif
+				                            
+				                            
+			                            	@if (($location == 'NOT_SET') OR ($location == 'DELETED') OR ($location == 'PLOT'))
+			                            	<!-- <a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" disabled>Print nalog</a> -->
+			                            	@elseif ($location == 'MM1')
+			                            	<td><a href="{{ url('print_mattress_m/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if($req->printed_nalog == NULL) 0
+			                            		@else {{$req->printed_nalog}} @endif
+			                            		)</i></a></td>
+			                            	@else
+			                            	<td><a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if ($req->printed_nalog == NULL) 
+			                            		0
+			                            		@else
+			                            		{{$req->printed_nalog}}
+			                            		@endif
+			                            		)</i></a></td>
+			                            	@endif
+				                            
+											
+											@if ($location == 'NOT_SET')
+											<td><a href="{{ url('plan_mattress_line/'.$req->id) }}" class="btn btn-success btn-xs center-block">Plan mattress</a></td>
+											<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">Modal</button> -->
+											@elseif ($location  == 'ON_HOLD')
+											<td><a href="{{ url('change_marker/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Change marker</a></td>
+											@elseif ($location != 'DELETED')
+											<td><a href="{{ url('edit_mattress_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit mattress</a></td>
+											@else
+
+											@endif
+											
+											@if (($location == 'NOT_SET') OR (substr($location,0 ,2) == 'SP') OR (substr($location,0 ,2) == 'MS') OR (substr($location,0 ,2) == 'MM') OR (substr($location,0 ,2) == 'CU') )
+											<td><a href="{{ url('delete_mattress/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Delete</a></td>
+											@endif
+
+				                        </tr>
+				                        @if ($location != 'NOT_SET') 
+
+				                        <tr style="border-bottom: 3px solid grey;
+					                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
+											box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
+					                        ">
+					                        <td  colspan="20" style="padding: 5px; text-align: left;">
+					                        	@if ($req->comment_office != '')
+					                        	<b>Comment office:</b>
+					                        	<i>{{ $req->comment_office }}</i><br>
+					                        	@endif
+					                        	@if ($req->comment_operator != '')
+					                        	<b>Comment operator:</b>
+					                        	<i>{{ $req->comment_operator }}</i><br>
+					                        	@endif
+					                        	
+					                        </td>
+					                        <td  colspan="3" style="padding: 2px; text-align: left;">
+					                        	@if ($req->call_shift_manager == 1 )
+					                        		<b><span class="glyphicon glyphicon-earphone"></span>&nbsp; &nbsp;<b>Call shift manager</b></b>
+					                        	@endif
+					                        	@if ($req->test_marker == 1)
+					                        		<br><b><span class="glyphicon glyphicon-text-size"></span>&nbsp; &nbsp;<b>Test Marker</b></b>
+					                        	@endif
+					                        </td>
+				                    	</tr>
+				                        @endif
+				                    @endforeach
+			                  	</tbody>
+                        @endif
+
+                        @if ($location == 'TEST')
+		                        <thead>
+			                       <tr>
+			                       		@if (($location != 'BOARD_TABLE') OR ($location != 'PLOT'))
+			                    		<th >position</th>
+			                    		@endif
+			                            <th >mattress</th>
+			                            @if ($location != 'NOT_SET')
+			                            <th >g_bin</th>
+			                            @endif
+			                            <th >material</th>
+			                            <th >dye_lot</th>
+			                            <th >color_desc</th>
+			                            <th >skeda</th>
+			                            <!-- <th >spreading_method</th> -->
+			                            <th >width_theor_usable</th>
+			                            <th >layers</th>
+			                            <th >layers_a</th>
+			                            <th >cons_planned</th>
+			                            <th >priority</th>
+			                            <th >marker_name</th>
+			                            <th >marker_length</th>
+			                            <th >marker_width</th>
+			                            <th >status</th>
+			                            <th >location</th>
+			                            <th style="width: 75px;">pro</th>
+			                            <!-- <th style="width: 100px;">style_size</th> -->
+			                            <th>sku</th>
+			                            @if ($location == 'MM1')
+			                            	<th>layer_limit</th>
+			                            @endif
+			                            <th></th>
+			                            
+			                    	</tr>
+			                  	</thead>
+			                  	<tbody class="connectedSortable_table searchable" 
+				                    @if (($location == 'SP1') OR ($location == 'SP2') OR ($location == 'SP3') OR ($location == 'SP4') OR ($location == 'MS1') OR ($location == 'MS2') OR ($location == 'MS3') OR ($location == 'MM1') OR ($location == 'CUT') OR ($location == 'PSO') OR ($location == 'DELETED') OR ($location == 'COMPLETED'))
+				                        id="sortable10"
+				                    @endif
+				                    >
+				                    	
+				                    @foreach ($data as $req)
+				                        <tr class="ss" id="item[]={{ $req->id }} " style="border-top: 3px solid grey;
+				                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
+											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
+				                            
+				                            @if (($location != 'BOARD_TABLE') OR ($location != 'PLOT'))
+				                            <td>{{ $req->position}}</td>
+				                            @endif
+				                            <td class=""><span>{{ $req->mattress}}</span></td>
+				                            @if ($location != 'NOT_SET')
+				                            <td class=""><span>{{ $req->g_bin}}</span></td>
+						        	    	@endif
+				                            <td>{{ $req->material}}</td>
+				                            <td>{{ $req->dye_lot}}</td>
+				                            <td>{{ $req->color_desc}}</td>
+				                            <td>{{ $req->skeda}}</td>
+				                            {{--<td>{{ $req->spreading_method}}</td>--}}
+				                            <td>{{ round($req->width_theor_usable,3)}}</td>
+				                            <td>{{ $req->layers}}</td>
+				                            <td>{{ $req->layers_a}}</td>
+				                            <td>{{ round($req->cons_planned,3)}}</td>
+				                            <td class="
+				                            @if ($req->priority == 3) top_priority
+						        	    	@elseif ($req->priority == 2) high_priority
+						        	    	@endif
+						        	    	">
+						        	    	@if ($req->priority == 3)Top
+						        	    	@elseif ($req->priority == 2)High
+					        	    		@elseif ($req->priority == 1)Normal
+						        	    	@endif</td>
+				                            <td>
+				                            	@if ($req->marker_name != '') 
+				                            		{{ $req->marker_name }}
+				                            	@else
+				                            		<span>PLOCE</span>
+				                            	@endif
+				                            </td>
+				                            <td>{{ round($req->marker_length,3)}}</td>
+				                            @if (($req->skeda_item_type == 'MB') OR ($req->skeda_item_type == 'MW'))
+				                            	<td>{{ round($req->width_theor_usable,3)}}</td>
+				                            @else
+				                            	<td>{{ round($req->marker_width,3)}}</td>
+				                            @endif
+				                            <td>{{ $req->status}}</td>
+				                            <td>{{ $req->location}}</td>
+				                            <td style="width: 75px;">{{ $req->pro}}</td>
+				                            <!-- <td style="width: 100px;">{{ $req->style_size}}</td> -->
+				                            <td style="width: 110px;">{{ $req->sku}}</td>
+				                            @if ($location == 'MM1')
+				                            	<td>{{ $req->layer_limit}}</td>
+				                            @endif
+				                            
+			                            	@if (($location == 'NOT_SET') OR ($location == 'DELETED') OR ($location == 'PLOT'))
+			                            	<!-- <a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" disabled>Print nalog</a> -->
+			                            	@elseif ($location == 'MM1')
+			                            	<td><a href="{{ url('print_mattress_m/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if($req->printed_nalog == NULL) 0
+			                            		@else {{$req->printed_nalog}} @endif
+			                            		)</i></a></td>
+			                            	@else
+			                            	<td><a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
+			                            		@if ($req->printed_nalog == NULL) 
+			                            		0
+			                            		@else
+			                            		{{$req->printed_nalog}}
+			                            		@endif
+			                            		)</i></a></td>
+			                            	@endif
+				                            
+											
+											@if ($location == 'NOT_SET')
+											<td><a href="{{ url('plan_mattress_line/'.$req->id) }}" class="btn btn-success btn-xs center-block">Plan mattress</a></td>
+											<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">Modal</button> -->
+											@elseif ($location  == 'ON_HOLD')
+											<td><a href="{{ url('change_marker/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Change marker</a></td>
+											@elseif ($location != 'DELETED')
+											<td><a href="{{ url('edit_mattress_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit mattress</a></td>
+											@else
+
+											@endif
+											
+											@if (($location == 'NOT_SET') OR (substr($location,0 ,2) == 'SP') OR (substr($location,0 ,2) == 'MS') OR (substr($location,0 ,2) == 'MM') OR (substr($location,0 ,2) == 'CU')  )
+											<td><a href="{{ url('delete_mattress/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Delete</a></td>
+											@endif
+
+				                        </tr>
+				                        @if ($location != 'NOT_SET') 
+
+				                        <tr style="border-bottom: 3px solid grey;
+					                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
+											box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
+					                        ">
+					                        <td  colspan="3" style="padding: 1px;">
+					                        <span><b>Comment office:</b></span><br>
+					                        <span><b>Comment operator:</b> </span>
+					                        </td>
+					                        <td  colspan="19" style="padding: 1px; text-align: left;"><i>{{ $req->comment_office }}</i><br>
+					                        	<i>{{ $req->comment_operator }}</i>
+					                        </td>
+				                    	</tr>
+				                        @endif
+				                    @endforeach
+			                  	</tbody>
+
+                        @endif
 		                    
-		                    >
-		                    	<!-- <tr>
-		                    		<th class=""><div><span>position</div></span></th>
-		                            <th class=""><div><span>mattress</div></span></th>
-		                            <th class=""><div><span>material</div></span></th>
-		                            <th class=""><div><span>dye_lot</div></span></th>
-		                            <th></th>
-		                    	</tr> -->
-		                    @foreach ($data as $req)
-		                        <tr class="ss" id="item[]={{ $req->id }}">
-		                            
-		                            <td>{{ $req->position}}</td>
-		                            <td class="
-		                            @if ($req->priority == 3)
-				        	    		high_priority
-				        	    	@elseif ($req->priority == 1)
-				        	    		low_priority
-				        	    	@endif
-				        	    	@if (($req->status == 'TO_LOAD') OR ($req->status == 'TO_SPREAD') OR ($req->status == 'ON_CUT') OR ($req->status == 'TO_CUT') OR ($req->status == 'COMPLETED'))
-			            	    		text_black
-			            	    	@elseif ($req->status == 'ON_HOLD')
-			            	    		text_red
-			            	    	@else
-			            	    		text_green
-			            	    	@endif
-				        	    	"><span>{{ $req->mattress}}</span></td>
-		                            @if ($location != 'NOT_SET')
-		                            <td class="
-		                            @if ($req->priority == 3)
-				        	    		high_priority
-				        	    	@elseif ($req->priority == 1)
-				        	    		low_priority
-				        	    	@endif
-				        	    	@if (($req->status == 'TO_LOAD') OR ($req->status == 'TO_SPREAD') OR ($req->status == 'ON_CUT') OR ($req->status == 'TO_CUT') OR ($req->status == 'COMPLETED'))
-			            	    		text_black
-			            	    	@elseif ($req->status == 'ON_HOLD')
-			            	    		text_red
-			            	    	@else
-			            	    		text_green
-			            	    	@endif
-				        	    	"><span>{{ $req->g_bin}}</span></td>
-				        	    	@endif
-		                            <td>{{ $req->material}}</td>
-		                            <td>{{ $req->dye_lot}}</td>
-		                            <td>{{ $req->color_desc}}</td>
-		                            <td>{{ $req->skeda}}</td>
-		                            <td>{{ $req->spreading_method}}</td>
-		                            <td>{{ round($req->width_theor_usable,3)}}</td>
-		                            <td>{{ $req->layers}}</td>
-		                            <td>{{ $req->layers_a}}</td>
-		                            <td>{{ round($req->cons_planned,3)}}</td>
-		                            <td>{{ $req->priority}}</td>
-		                            <td>
-		                            	@if ($req->marker_name != '') 
-		                            		{{ $req->marker_name }}
-		                            	@else
-		                            		<span>PLOCE</span>
-		                            	@endif
-		                            </td>
-		                            <td>{{ round($req->marker_length,3)}}</td>
-		                            <td>{{ round($req->marker_width,3)}}</td>
-		                            <td>{{ $req->status}}</td>
-		                            <td>{{ $req->location}}</td>
-		                            
-	                            	@if (($location == 'NOT_SET') OR ($location == 'DELETED'))
-	                            	<!-- <a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" disabled>Print nalog</a> -->
-	                            	@elseif ($location == 'MM1')
-	                            	<td><a href="{{ url('print_mattress_m/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print mini nalog</a></td>
-	                            	@else
-	                            	<td><a href="{{ url('print_mattress/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog</a></td>
-	                            	@endif
-		                            
-									
-									@if ($location == 'NOT_SET')
-									<td><a href="{{ url('plan_mattress_line/'.$req->id) }}" class="btn btn-success btn-xs center-block">Plan mattress</a></td>
-									<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">Modal</button> -->
-									@elseif ($location  == 'ON_HOLD')
-									<td><a href="{{ url('change_marker/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Change marker</a></td>
-									@elseif (($location != 'COMPLETED') AND ($location != 'DELETED'))
-									<td><a href="{{ url('edit_mattress_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit mattress</a></td>
-									@else
-
-									@endif
-									
-									@if ($location == 'NOT_SET')
-									<td><a href="{{ url('delete_mattress/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Delete</a></td>
-									@endif
-
-
-		                        </tr>
-		                    @endforeach
-		                    
-		                    </tbody>
-		                  </table>
+		                </table>
 					</div>
 			</div>
         </div>
@@ -302,9 +1318,9 @@
             	@foreach ($sp1 as $req1)
             	    <li class="ui-state-default
             	    @if ($req1->priority == 3)
-        	    	high_priority
-        	    	@elseif ($req1->priority == 1)
-        	    	low_priority
+        	    		top_priority
+        	    	@elseif ($req1->priority == 2)
+        	    		high_priority
         	    	@endif
             	    	" id="SP-{{ $req1->id }}" data-html="true" 
             	    	title="{{$req1->mattress}}<br />
@@ -317,22 +1333,19 @@
             	    	Width theor usable: {{round($req1->width_theor_usable,3)}}<br /> 
             	    	Layers: {{$req1->layers}}<br />
             	    	Cons planned: {{round($req1->cons_planned,3)}}<br />
-            	    	Priority: {{$req1->priority}}<br /> 
-            	    	Marker: {{$req1->marker_name}}<br /> 
+            	    	Priority: 
+			        	    	@if ($req1->priority == 3)Top
+			        	    	@elseif ($req1->priority == 2)High
+		        	    		@elseif ($req1->priority == 1)Normal
+			        	    	@endif
+			        	    	<br />
+            	    	Marker: {{$req1->marker_name}}<br />
             	    	Marker length: {{round($req1->marker_length,3)}}<br /> 
             	    	Marker width: {{$req1->marker_width}}<br />
             	    	Comment office: {{$req1->comment_office}}<br />
             	    	<b>Status: {{$req1->status }}<b />
             	    	">
-            	    	<span class="
-            	    	@if ($req1->status == 'TO_LOAD')
-            	    		text_black
-            	    	@elseif ($req1->status == 'ON_HOLD')
-            	    		text_red
-            	    	@else
-            	    		text_green
-            	    	@endif
-            	    	">{{$req1->g_bin}}<br>{{$req1->mattress}}</span>
+            	    	<span class="">{{$req1->g_bin}}<br>{{$req1->mattress}}</span>
 
         	    	</li>
 				@endforeach	  
@@ -345,9 +1358,9 @@
             	@foreach ($sp2 as $req2)
             	    <li class="ui-state-default
             	    @if ($req2->priority == 3)
-        	    	high_priority
-        	    	@elseif ($req2->priority == 1)
-        	    	low_priority
+        	    		top_priority
+        	    	@elseif ($req2->priority == 2)
+        	    		high_priority
         	    	@endif
         	    		" id="SP-{{ $req2->id }}" data-html="true"
             	    	title="{{$req2->mattress}}<br />
@@ -360,7 +1373,12 @@
             	    	Width theor usable: {{round($req2->width_theor_usable,3)}}<br /> 
             	    	Layers: {{$req2->layers}}<br />
             	    	Cons planned: {{round($req2->cons_planned,3)}}<br />
-            	    	Priority: {{$req2->priority}}<br /> 
+            	    	Priority: 
+			        	    	@if ($req2->priority == 3)Top
+			        	    	@elseif ($req2->priority == 2)High
+		        	    		@elseif ($req2->priority == 1)Normal
+			        	    	@endif
+			        	    	<br />
             	    	Marker: {{$req2->marker_name}}<br /> 
             	    	Marker length: {{round($req2->marker_length,3)}}<br /> 
             	    	Marker width: {{$req2->marker_width}}<br /> 
@@ -368,15 +1386,7 @@
             	    	<b>Status: {{$req2->status }}<b />
             	    	">
             	    	
-            	    	<span class="
-            	    	@if ($req2->status == 'TO_LOAD')
-            	    		text_black
-            	    	@elseif ($req2->status == 'ON_HOLD')
-            	    		text_red
-            	    	@else
-            	    		text_green
-            	    	@endif
-            	    	">{{$req2->g_bin}}<br>{{$req2->mattress}}</span>
+            	    	<span class="">{{$req2->g_bin}}<br>{{$req2->mattress}}</span>
 
             	    </li>
 				@endforeach	  
@@ -389,9 +1399,9 @@
             	@foreach ($sp3 as $req3)
             	    <li class="ui-state-default
             	    @if ($req3->priority == 3)
-        	    	high_priority
-        	    	@elseif ($req3->priority == 1)
-        	    	low_priority
+        	    		top_priority
+        	    	@elseif ($req3->priority == 2)
+        	    		high_priority
         	    	@endif
             	    	" id="SP-{{ $req3->id }}" data-html="true"
             	    	title="{{$req3->mattress}}<br />
@@ -404,22 +1414,19 @@
             	    	Width theor usable: {{round($req3->width_theor_usable,3)}}<br /> 
             	    	Layers: {{$req3->layers}}<br />
             	    	Cons planned: {{round($req3->cons_planned,3)}}<br /> 
-            	    	Priority: {{$req3->priority}}<br /> 
+            	    	Priority: 
+			        	    	@if ($req3->priority == 3)Top
+			        	    	@elseif ($req3->priority == 2)High
+		        	    		@elseif ($req3->priority == 1)Normal
+			        	    	@endif
+			        	    	<br />
             	    	Marker: {{$req3->marker_name}}<br /> 
             	    	Marker length: {{round($req3->marker_length,3)}}<br /> 
             	    	Marker width: {{$req3->marker_width}}<br /> 
             	    	Comment office: {{$req3->comment_office}}<br />
             	    	<b>Status: {{$req3->status }}<b />
             	    	">
-            	    	<span class="
-            	    	@if ($req3->status == 'TO_LOAD')
-            	    		text_black
-            	    	@elseif ($req3->status == 'ON_HOLD')
-            	    		text_red
-            	    	@else
-            	    		text_green
-            	    	@endif
-            	    	">{{$req3->g_bin}}<br>{{$req3->mattress}}</span>
+            	    	<span class="">{{$req3->g_bin}}<br>{{$req3->mattress}}</span>
 
             	    </li>
 				@endforeach	  
@@ -432,9 +1439,9 @@
             	@foreach ($sp4 as $req4)
             	    <li class="ui-state-default
             	    @if ($req4->priority == 3)
-        	    	high_priority
-        	    	@elseif ($req4->priority == 1)
-        	    	low_priority
+        	    		top_priority
+        	    	@elseif ($req4->priority == 2)
+        	    		high_priority
         	    	@endif
             	    	" id="SP-{{ $req4->id }}" data-html="true"
             	    	title="{{$req4->mattress}}<br /> 
@@ -447,22 +1454,19 @@
             	    	Width theor usable: {{round($req4->width_theor_usable,3)}}<br /> 
             	    	Layers: {{$req4->layers}}<br />
             	    	Cons planned: {{round($req4->cons_planned,3)}}<br /> 
-            	    	Priority: {{$req4->priority}}<br /> 
+            	    	Priority: 
+			        	    	@if ($req4->priority == 3)Top
+			        	    	@elseif ($req4->priority == 2)High
+		        	    		@elseif ($req4->priority == 1)Normal
+			        	    	@endif
+			        	    	<br />
             	    	Marker: {{$req4->marker_name}}<br /> 
             	    	Marker length: {{round($req4->marker_length,3)}}<br /> 
             	    	Marker width: {{$req4->marker_width}}<br /> 
             	    	Comment office: {{$req4->comment_office}}<br />
             	    	<b>Status: {{$req4->status }}<b />
             	    	">
-            	    	<span class="
-            	    	@if ($req4->status == 'TO_LOAD')
-            	    		text_black
-            	    	@elseif ($req4->status == 'ON_HOLD')
-            	    		text_red
-            	    	@else
-            	    		text_green
-            	    	@endif
-            	    	">{{$req4->g_bin}}<br>{{$req4->mattress}}</span>
+            	    	<span class="">{{$req4->g_bin}}<br>{{$req4->mattress}}</span>
 
             	    </li>
 				@endforeach	  
@@ -475,9 +1479,9 @@
             	@foreach ($ms1 as $req5)
             	    <li class="ui-state-default
             	    @if ($req5->priority == 3)
-        	    	high_priority
-        	    	@elseif ($req5->priority == 1)
-        	    	low_priority
+        	    		top_priority
+        	    	@elseif ($req5->priority == 2)
+        	    		high_priority
         	    	@endif
             	    	" id="SP-{{ $req5->id }}" data-html="true" 
             	    	title="{{$req5->mattress}}<br /> 
@@ -490,22 +1494,19 @@
             	    	Width theor usable: {{round($req5->width_theor_usable,3)}}<br /> 
             	    	Layers: {{$req5->layers}}<br />
             	    	Cons planned: {{round($req5->cons_planned,3)}}<br /> 
-            	    	Priority: {{$req5->priority}}<br /> 
+            	    	Priority: 
+			        	    	@if ($req5->priority == 3)Top
+			        	    	@elseif ($req5->priority == 2)High
+		        	    		@elseif ($req5->priority == 1)Normal
+			        	    	@endif
+			        	    	<br />
             	    	Marker: {{$req5->marker_name}}<br /> 
             	    	Marker length: {{round($req5->marker_length,3)}}<br /> 
             	    	Marker width: {{$req5->marker_width}}<br /> 
             	    	Comment office: {{$req5->comment_office}}<br />
             	    	<b>Status: {{$req5->status }}<b />
             	    	">
-            	    	<span class="
-            	    	@if ($req5->status == 'TO_LOAD')
-            	    		text_black
-            	    	@elseif ($req5->status == 'ON_HOLD')
-            	    		text_red
-            	    	@else
-            	    		text_green
-            	    	@endif
-            	    	">{{$req5->g_bin}}<br>{{$req5->mattress}}</span>
+            	    	<span class="">{{$req5->g_bin}}<br>{{$req5->mattress}}</span>
 
             	    </li>
 				@endforeach	  
@@ -517,10 +1518,10 @@
 			<ul id="sortable7" class="connectedSortable_ul_1">
             	@foreach ($ms2 as $req6)
             	    <li class="ui-state-default
-            	    @if ($req6->priority == 3)
-        	    	high_priority
-        	    	@elseif ($req6->priority == 1)
-        	    	low_priority
+            	   @if ($req6->priority == 3)
+        	    		top_priority
+        	    	@elseif ($req6->priority == 2)
+        	    		high_priority
         	    	@endif
             	    	" id="SP-{{ $req6->id }}" data-html="true"
             	    	title="{{$req6->mattress}}<br /> 
@@ -533,22 +1534,19 @@
             	    	Width theor usable: {{round($req6->width_theor_usable,3)}}<br /> 
             	    	Layers: {{$req6->layers}}<br />
             	    	Cons planned: {{round($req6->cons_planned,3)}}<br />
-            	    	Priority: {{$req6->priority}}<br /> 
+            	    	Priority: 
+			        	    	@if ($req6->priority == 3)Top
+			        	    	@elseif ($req6->priority == 2)High
+		        	    		@elseif ($req6->priority == 1)Normal
+			        	    	@endif
+			        	    	<br />
             	    	Marker: {{$req6->marker_name}}<br /> 
             	    	Marker length: {{round($req6->marker_length,3)}}<br /> 
             	    	Marker width: {{$req6->marker_width}}<br /> 
             	    	Comment office: {{$req6->comment_office}}<br />
             	    	<b>Status: {{$req6->status }}<b />
             	    	">
-            	    	<span class="
-            	    	@if ($req6->status == 'TO_LOAD')
-            	    		text_black
-            	    	@elseif ($req6->status == 'ON_HOLD')
-            	    		text_red
-            	    	@else
-            	    		text_green
-            	    	@endif
-            	    	">{{$req6->g_bin}}<br>{{$req6->mattress}}</span>
+            	    	<span class="">{{$req6->g_bin}}<br>{{$req6->mattress}}</span>
 
             	   	</li>
 				@endforeach	  
@@ -561,9 +1559,9 @@
             	@foreach ($ms3 as $req7)
             	    <li class="ui-state-default
             	    @if ($req7->priority == 3)
-        	    	high_priority
-        	    	@elseif ($req7->priority == 1)
-        	    	low_priority
+        	    		top_priority
+        	    	@elseif ($req7->priority == 2)
+        	    		high_priority
         	    	@endif
             	    	" id="SP-{{ $req7->id }}" data-html="true"
             	    	title="{{$req7->mattress}}<br /> 
@@ -576,22 +1574,19 @@
             	    	Width theor usable: {{round($req7->width_theor_usable,3)}}<br /> 
             	    	Layers: {{$req7->layers}}<br />
             	    	Cons planned: {{round($req7->cons_planned,3)}}<br /> 
-            	    	Priority: {{$req7->priority}}<br /> 
+            	    	Priority: 
+			        	    	@if ($req7->priority == 3)Top
+			        	    	@elseif ($req7->priority == 2)High
+		        	    		@elseif ($req7->priority == 1)Normal
+			        	    	@endif
+			        	    	<br />
             	    	Marker: {{$req7->marker_name}}<br /> 
             	    	Marker length: {{round($req7->marker_length,3)}}<br /> 
             	    	Marker width: {{$req7->marker_width}}<br /> 
             	    	Comment office: {{$req7->comment_office}}<br />
             	    	<b>Status: {{$req7->status }}<b />
             	    	">
-            	    	<span class="
-            	    	@if ($req7->status == 'TO_LOAD')
-            	    		text_black
-            	    	@elseif ($req7->status == 'ON_HOLD')
-            	    		text_red
-            	    	@else
-            	    		text_green
-            	    	@endif
-            	    	">{{$req7->g_bin}}<br>{{$req7->mattress}}</span>
+            	    	<span class="">{{$req7->g_bin}}<br>{{$req7->mattress}}</span>
 
             	    </li>
 				@endforeach	  
@@ -604,9 +1599,9 @@
             	@foreach ($mm1 as $req8)
             	    <li class="ui-state-default
             	    @if ($req8->priority == 3)
-        	    	high_priority
-        	    	@elseif ($req8->priority == 1)
-        	    	low_priority
+        	    		top_priority
+        	    	@elseif ($req8->priority == 2)
+        	    		high_priority
         	    	@endif
             	    	" id="SP-{{ $req8->id }}" data-html="true"
             	    	title="{{$req8->mattress}}<br /> 
@@ -619,22 +1614,19 @@
             	    	Width theor usable: {{round($req8->width_theor_usable,3)}}<br /> 
             	    	Layers: {{$req8->layers}}<br />
             	    	Cons planned: {{round($req8->cons_planned,3)}}<br /> 
-            	    	Priority: {{$req8->priority}}<br /> 
+            	    	Priority: 
+			        	    	@if ($req8->priority == 3)Top
+			        	    	@elseif ($req8->priority == 2)High
+		        	    		@elseif ($req8->priority == 1)Normal
+			        	    	@endif
+			        	    	<br />
             	    	Marker: {{$req8->marker_name}}<br /> 
             	    	Marker length: {{round($req8->marker_length,3)}}<br /> 
             	    	Marker width: {{$req8->marker_width}}<br /> 
             	    	Comment office: {{$req8->comment_office}}<br />
             	    	<b>Status: {{$req8->status }}<b />
             	    	">
-            	    	<span class="
-            	    	@if ($req8->status == 'TO_LOAD')
-            	    		text_black
-            	    	@elseif ($req8->status == 'ON_HOLD')
-            	    		text_red
-            	    	@else
-            	    		text_green
-            	    	@endif
-            	    	">{{$req8->g_bin}}<br>{{$req8->mattress}}</span>
+            	    	<span class="">{{$req8->g_bin}}<br>{{$req8->mattress}}</span>
 
             	    </li>
 				@endforeach	  

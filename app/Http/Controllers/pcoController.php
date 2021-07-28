@@ -78,6 +78,7 @@ class pcoController extends Controller {
 		      ,p1.[rewinding_method]
 		      ,p1.[created_at]
 		      ,p1.[updated_at]
+		      ,p1.[tpa_number]
 
 		      ,p2.[status]
 		      ,p2.[location]

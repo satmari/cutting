@@ -5,13 +5,14 @@
 	<div class="row vertical-center-row">
 		<div class="text-center col-md-5 col-md-offset-4">
 			<div class="panel panel-default">
-				<div class="panel-heading"><b>Spread mattress <big>PARTIALLY</big>: {{ $mattress }}</b></div>
+				<div class="panel-heading"><b>Spread <big>PARTIALLY</big> g_bin: {{ $g_bin }}</b></div>
 				<br>
 			    	
 				{!! Form::open(['url' => 'spread_mattress_partial_post']) !!}
 					
 					{!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
 					{!! Form::hidden('mattress', $mattress, ['class' => 'form-control']) !!}
+					{!! Form::hidden('g_bin', $g_bin, ['class' => 'form-control']) !!}
 					{!! Form::hidden('status', $status, ['class' => 'form-control']) !!}
 
 					<div class="panel-body">
@@ -21,7 +22,7 @@
 
 					<div class="panel-body">
 						<p>Comment operator:<span style="color:red;">*</span></p>
-	               		{!! Form::input('string', 'comment_operator', $comment_operator, ['class' => 'form-control']) !!}
+	               		{!! Form::textarea('comment_operator', $comment_operator , ['class' => 'form-control', 'rows' => 2]) !!}
 					</div>
 					<br>
 					<div class="panel-body">

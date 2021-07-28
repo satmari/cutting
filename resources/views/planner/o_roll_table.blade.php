@@ -50,13 +50,14 @@
 		                       <tr>
 		                    		<th >Leftover roll</th>
 		                            <th >Mattress Orig</th>
+		                            <th >Mattress New</th>
 		                            <th >G bin</th>
 		                            <th >Skeda</th>
 		                            <th >Status</th>
 		                            <th >No of parts</th>
 		                            <th >Operator</th>
 		                            <th >Created</th>
-		                            <!-- <th></th> -->
+		                            <th></th>
 
 		                            @if(Auth::user()->level() == 3)
 		                            <th></th>
@@ -68,12 +69,20 @@
 		                        <tr class="ss">
 		                            <td>{{ $req->o_roll}}</td>
 		                            <td>{{ $req->mattress_name_orig}}</td>
+		                            <td>{{ $req->mattress_name_new}}</td>
 		                            <td>{{ $req->g_bin}}</td>
 		                            <td>{{ $req->skeda}}</td>
 		                            <td>{{ $req->status}}</td>
 		                            <td>{{ $req->no_of_joinings}}</td>
 		                            <td>{{ $req->operator}}</td>
 		                            <td>{{ $req->created_at}}</td>
+
+		                            
+		                            @if ($req->status == 'PLANNED')
+	                            		<th><a href="{{ url('o_roll_return/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Return to stock</a></th>
+	                            	@else
+	                            		<th><a href="{{ url('o_roll_return/'.$req->id) }}" class="btn btn-warning btn-xs center-block" disabled>Return to stock</a></th>
+	                            	@endif
 
 		                            @if(Auth::user()->level() == 3)
 		                            	@if ($req->status != 'CREATED')

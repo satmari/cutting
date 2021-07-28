@@ -9,7 +9,6 @@
 				<div class="panel-heading">Print LR barcodes</div>
 				<!-- <br> -->
 					
-					
 					<div class="alert alert-danger" role="alert">
 					  <p>In selected printer label shoud be with dimension 4x5 in two rows!</p>
 					  <p>From and To => write only last numbers</p><br>

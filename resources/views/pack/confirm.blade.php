@@ -9,7 +9,7 @@
 				
 				
 				<div class="panel-body">
-					<p>Are you sure that this mattress is packed?</p>
+					<p>Are you sure that {{ $g_bin }} mattress is packed?</p>
 					<br>
 				<a href="{{ url('mattress_pack_confirm/'.$id) }}" class="btn btn-danger btn-l cen ter-block">
 					Confirm</a>

@@ -5,7 +5,7 @@
     <div class="row">
         <div class="text-center">
             <div class="panel panel-default col-md-4 col-md-offset-4">
-                <div class="panel-heading">Change marker request for mattress: <big><b>{{ $mattress }}</b></big></div>
+                <div class="panel-heading">Change marker request for g_bin: <big><b>{{ $g_bin }}</b></big></div>
               
                 <div class="panel-body">
                 <br>
@@ -14,6 +14,7 @@
 
                         {!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
                         {!! Form::hidden('mattress', $mattress, ['class' => 'form-control']) !!}
+                        {!! Form::hidden('g_bin', $g_bin, ['class' => 'form-control']) !!}
                         {!! Form::hidden('existing_marker', $existing_marker, ['class' => 'form-control']) !!}
                         {!! Form::hidden('existing_marker_id', $existing_marker_id, ['class' => 'form-control']) !!}
                         {!! Form::hidden('existing_mattress_marker_id', $existing_mattress_marker_id, ['class' => 'form-control']) !!}

@@ -179,7 +179,7 @@ class requestController extends Controller {
 		// WHERE [Status]= '3' and [Prod_ Order No_] like '%".$po."%' and [Variant Code] like '%".$size."%' "));
 		// dd($check_po[0]);
 
-		$check_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT DISTINCT (CASE WHEN po like '%-%' THEN substring(po, 1,6) ELSE substring (po, 4,6) END) as po
+		$check_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT DISTINCT (CASE WHEN po like '%-%' THEN substring(po, 1,6) ELSE substring (po, 4,6) END) as po, fg
 		FROM [trebovanje].[dbo].[sap_coois] WHERE po like '%".$po."%' AND substring(fg,14,5) = '".$size."' "));
 		// dd($check_po);
 
@@ -188,7 +188,9 @@ class requestController extends Controller {
 			$msg = 'Komesa + velicina ne postoji ili nije vise otvorena';
 			return view('requests.error',compact('msg'));	
 		}
-		
+
+		$style = $check_po[0]->fg;
+
     	$module = Session::get('module');
     	$leader = Session::get('leader');
 
@@ -203,16 +205,14 @@ class requestController extends Controller {
 
 		try {
 			$table = new req_extrabb;
-
 			$table->po = $po;
 			$table->size = $size;
 			$table->bagno = $bagno;
 			$table->module = $module;
 			$table->leader = $leader;
 			$table->qty = $qty;
-
+			$table->style = $style;
 			$table->status = "Pending";
-
 			$table->save();
 		}
 		catch (\Illuminate\Database\QueryException $e) {

@@ -90,7 +90,9 @@
 									<li><a href="{{ url('paspul') }}">Paspul (excel)</a></li>
 									<li><a href="{{ url('mattress') }}">Mattress (excel)</a></li>
 									<li role="separator" class="divider"></li>
-									<li><a href="{{ url('paspul_bin') }}">Paspul bin</a></li>
+									<li><a href="{{ url('paspul_bin') }}">Paspul bin (excel)</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('consumption_sap') }}">Consumption SAP (excel)</a></li>
 									
 								</ul>
 							</li>
@@ -150,7 +152,9 @@
 									<li><a href="{{ url('paspul') }}">Paspul (excel)</a></li>
 									<li><a href="{{ url('mattress') }}">Mattress (excel)</a></li>
 									<li role="separator" class="divider"></li>
-									<li><a href="{{ url('paspul_bin') }}">Paspul bin</a></li>
+									<li><a href="{{ url('paspul_bin') }}">Paspul bin (excel)</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('consumption_sap') }}">Consumption SAP (excel)</a></li>
 								</ul>
 							</li>
 							<li><a href="{{ url('plan_mattress/BOARD') }}">Plan mattress</a></li>
@@ -963,7 +967,15 @@ $(function() {
 	    
 	//   })
 	// });
+
+	$("#checkAll").click(function () {
+    	$(".check").prop('checked', $(this).prop('checked'));
+	});
 	
+	$(".sortable2 ul:nth-child(2) li").each(function(index) {
+  		console.log("trdt");
+	});
+
 });
 </script>
 

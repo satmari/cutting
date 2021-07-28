@@ -1,21 +1,20 @@
 @extends('app')
 
 @section('content')
+
+{{ header( "refresh:60;url=/cutting" ) }}
+
 <div class="container-fluid">
     <div class="row">
         <div class="text-center">
         		<div class="text-center">
 		            <div class="panel panel-default">
 
-		            	<!-- <ul id="sortable">
-		            	@foreach ($data as $req)
-		            	    <li class="ui-state-default"><span ></span>{{ $req->position}} - {{$req->mattress}}</li>
-						@endforeach	  
-						</ul> -->
+		            	
 
-		        	 	<!-- <div class="input-group"> <span class="input-group-addon">Filter</span>
+		        	 	<div class="input-group"> <span class="input-group-addon">Filter</span>
 		                    <input id="filter" type="text" class="form-control" placeholder="Type here...">
-		                </div> -->
+		                </div>
 
 		                <table class="table table-striped table-bordered" id="table-draggable2" 
 		                
@@ -45,25 +44,30 @@
 		                -->
 		                    <thead>
 		                       <tr>
-		                    		<th >position</th>
-		                            <th >mattress</th>
-		                            <th >material</th>
-		                            <th >dye_lot</th>
-		                            <th >color_desc</th>
-		                            <th >skeda</th>
-		                            <th >spreading_method</th>
-		                            <th >width_theor_usable</th>
-		                            <th >layers</th>
-		                            <th >layers_a</th>
-		                            <th >cons_planned</th>
-		                            <th >priority</th>
-		                            <th >marker_name</th>
-		                            <th >marker_length</th>
-		                            <th >marker_width</th>
-		                            <th >status</th>
-		                            <th >location</th>
-		                            <th >id</th>
-		                            
+		                    		<!-- <th >Position</th> -->
+		                       		<th >G-bin</th>
+		                            <th >Mattress</th>
+		                            <th >Marker</th>
+		                            <th >Marker Length [m]</th>
+		                            <th >Extra [cm]</th>
+		                            <th >Marker Width [cm]</th>
+		                            <th >Layers</th>
+		                            <th >Layers Actual</th>
+		                            <!-- <th >PRO</th> -->
+		                            <!-- <th >SKU</th> -->
+		                            <th >Material</th>
+		                            <th >Dye Lot</th>
+		                            <th >Color Desc</th>
+		                            <!-- <th >Skeda</th> -->
+		                            <!-- <th >Planned Cons [m]</th> -->
+		                            <!-- <th >Spreading Method</th> -->
+		                            <!-- <th >Pcs per Bundle</th> -->
+		                            <!-- <th >Bottom Paper</th> -->
+		                            <th >All pro for Subotica</th>
+		                            <th >Priority</th>
+		                            <th >Status</th>
+		                            <th >Keep wastage</th>
+			                        
 		                            <th></th>
 		                            <th></th>
 		                            <!-- <th></th> -->
@@ -78,32 +82,48 @@
 		                            <th></th>
 		                    	</tr> -->
 		                    @foreach ($data as $req)
-		                        <tr class="ss" id="item[]={{ $req->id }}">
+		                        <tr class="ss" id="item[]={{ $req->id }}" style="border-top: 3px solid grey;
+				                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
+											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
 		                            
-		                            <td>{{ $req->position}}</td>
-		                            <td>{{ $req->mattress}}</td>
+		                            {{--<td>{{ $req->position }}</td>--}}
+		                            <td class=""><span>{{ $req->g_bin}}</span></td>
+				        	    	<td class=""><span>{{ $req->mattress}}</span></td>
+		                            <td>{{ $req->marker_name}}</td>
+		                            <td>{{ round($req->marker_length,3)}}</td>
+		                            <td>{{ round($req->extra,0)}}</td>
+		                            <td>{{ round($req->marker_width,3)}}</td>
+		                            <td>{{ round($req->layers,0)}}</td>
+		                            <td>{{ round($req->layers_a,0)}}</td>
+		                            {{--<td style="width: 75px;">{{ $req->pro}}</td>--}}
+		                            {{--<td style="width: 110px;">{{ $req->sku}}</td>--}}
 		                            <td>{{ $req->material}}</td>
 		                            <td>{{ $req->dye_lot}}</td>
 		                            <td>{{ $req->color_desc}}</td>
-		                            <td>{{ $req->skeda}}</td>
-		                            <td>{{ $req->spreading_method}}</td>
-		                            <td>{{ round($req->width_theor_usable,3)}}</td>
-		                            <td>{{ $req->layers}}</td>
-		                            <td>{{ $req->layers_a}}</td>
-		                            <td>{{ round($req->cons_planned,3)}}</td>
-		                            <td>{{ $req->priority}}</td>
-		                            <td>
-		                            	@if ($req->marker_name != '')
-		                            		{{ $req->marker_name }}
-		                            	@else
-		                            		<span>PLOCE</span>
-		                            	@endif
-		                            </td>
-		                            <td>{{ round($req->marker_length,3)}}</td>
-		                            <td>{{ round($req->marker_width,3)}}</td>
+
+		                            @if ($req->all_pro_for_main_plant == 1)
+		                            	<td>YES</td>
+		                            @else
+		                            	<td>NO</td>
+		                            @endif
+		                            
+		                           <td class="
+		                            @if ($req->priority == 3) top_priority
+				        	    	@elseif ($req->priority == 2) high_priority
+				        	    	@endif
+				        	    	">
+				        	    	@if ($req->priority == 3)Top
+				        	    	@elseif ($req->priority == 2)High
+			        	    		@elseif ($req->priority == 1)Normal
+				        	    	@endif</td>
 		                            <td>{{ $req->status}}</td>
-		                            <td>{{ $req->location}}</td>
-		                            <td>{{ $req->id}}</td>
+		                            
+		                            @if ($req->tpp_mat_keep_wastage == 1)
+		                            	<td>YES</td>
+		                            @else
+		                            	<td>NO</td>
+		                            @endif
+
 									<td>
 										@if ($req->status == "TO_CUT")
 											<a href="{{ url('mattress_to_cut/'.$req->id) }}" class="btn btn-info btn-xs center-block">On cutter</a>
@@ -130,6 +150,29 @@
 									</td>
 
 		                        </tr>
+		                        <tr style="border-bottom: 3px solid grey;
+					                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
+											box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
+					                        ">
+					                        <td  colspan="15" style="padding: 5px; text-align: left;">
+					                        	@if ($req->comment_office != '')
+					                        	<b>Comment office:</b>
+					                        	<i>{{ $req->comment_office }}</i><br>
+					                        	@endif
+					                        	@if ($req->comment_operator != '')
+					                        	<b>Comment operator:</b>
+					                        	<i>{{ $req->comment_operator }}</i><br>
+					                        	@endif
+					                        </td>
+					                        <td  colspan="2" style="padding: 1px; text-align: left;">
+					                        	@if ($req->call_shift_manager == 1 )
+					                        		<b><span class="glyphicon glyphicon-earphone"></span>&nbsp; &nbsp;<b>Call shift manager</b></b>
+					                        	@endif
+					                        	@if ($req->test_marker == 1)
+					                        		<br><b><span class="glyphicon glyphicon-text-size"></span>&nbsp; &nbsp;<b>Test Marker</b></b>
+					                        	@endif
+					                        </td>
+				                    	</tr>
 		                    @endforeach
 		                    
 		                    </tbody>

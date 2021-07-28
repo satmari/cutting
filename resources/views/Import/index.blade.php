@@ -10,7 +10,7 @@
 
 				@if(Auth::check() && Auth::user()->name == 'cutting') 
 				<div class="panel panel-default">
-					<div class="panel-heading">Import TPP material from Excel file</div>
+					<div class="panel-heading">Import TPP material (Excel file)</div>
 
 					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImportMaterials']]) !!}
 					
@@ -44,7 +44,7 @@
 
 				@if(Auth::check() && (Auth::user()->name == 'admin') OR (Auth::user()->name == 'planner'))
 				<div class="panel panel-default">
-					<div class="panel-heading">Import Marker XML file</div>
+					<div class="panel-heading">Import Marker (XML file)</div>
 					
 					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['postImport_marker']]) !!}
 					
@@ -59,12 +59,42 @@
 				</div>
 				<br>
 				<div class="panel panel-default">
-					<div class="panel-heading">Import Excel file (MAT, PRO, PAS)</div>
+					<div class="panel-heading">Import Skeda file (MAT, PRO, PAS) (Excel file)</div>
 					
 					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImport_skeda']]) !!}
 					
 						<div class="panel-body">
 							{!! Form::file('file4', ['class' => 'center-block']) !!}
+						</div>
+						<div class="panel-body">
+							{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
+						</div>
+						@include('errors.list')
+					{!! Form::close() !!}
+				</div>
+				<br>
+				<div class="panel panel-default">
+					<div class="panel-heading">Import PAS bin (Excel file)</div>
+					
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImport_pas_bin']]) !!}
+					
+						<div class="panel-body">
+							{!! Form::file('file5', ['class' => 'center-block']) !!}
+						</div>
+						<div class="panel-body">
+							{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
+						</div>
+						@include('errors.list')
+					{!! Form::close() !!}
+				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">Import Consumption (Excel file)</div>
+					
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImport_consumption']]) !!}
+					
+						<div class="panel-body">
+							{!! Form::file('file6', ['class' => 'center-block']) !!}
 						</div>
 						<div class="panel-body">
 							{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
