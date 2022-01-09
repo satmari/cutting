@@ -6,27 +6,49 @@
 		<div class="text-center col-md-5 col-md-offset-4">
 			<div class="panel panel-default">
 				<div class="panel-heading"><b>Other (spreader) functions for: {{ $g_bin }}</b></div>
-					<br>
+					
+
+				@if (isset($data2))
+                <table style="width:100%" class="table table-striped table-bordered">
+                    <tr>
+                        <td>Leftover rolls</td>
+                        <td>Number of joinings</td>
+                    </tr>
+                     @foreach ($data2 as $req)
+                     <tr>
+                        <td><b>{{ $req->o_roll}}</b></td>
+                        <td><b>{{ $req->no_of_joinings}}</b></td>
+                     </tr>
+                     @endforeach
+                </table>
+                @endif
+                <br>
 			    	
 			    <div class="panel-body">	
 				@if ($status == 'TO_SPREAD')
-					<a href="{{ url('mattress_to_unload/'.$id) }}" class="btn btn-info center-block" >Unload mattress</a>
+					<a href="{{ url('mattress_to_unload/'.$id) }}" class="btn btn-warning center-block" >Unload mattress</a>
 					<br>
 					<a href="{{ url('change_marker_request/'.$id) }}" class="btn btn-info center-block">Change marker request (width)</a>
+					<br>
+					<a href="{{ url('split_marker_request/'.$id) }}" class="btn btn-primary center-block">Split marker request (width, height)</a>
 					<!-- <br>
 					<a href="{{ url('create_new_mattress_request/'.$id) }}" class="btn btn-info center-block">Create new mattress request</a> -->
 				@elseif ($status == 'TO_LOAD')
 
-					<a href="{{ url('mattress_to_unload/'.$id) }}" class="btn btn-info center-block" disabled>Unload mattress</a>
+					<a href="{{ url('mattress_to_unload/'.$id) }}" class="btn btn-warning center-block" disabled>Unload mattress</a>
 					<br>
 					<a href="{{ url('change_marker_request/'.$id) }}" class="btn btn-info center-block">Change marker request (width)</a>
+					<br>
+					<a href="{{ url('split_marker_request/'.$id) }}" class="btn btn-primary center-block">Split marker request (width, height)</a>
 					<!-- <br>
 					<a href="{{ url('create_new_mattress_request/'.$id) }}" class="btn btn-info center-block">Create new mattress request</a> -->
 				@elseif ($status == 'SUSPENDED')
 
-					<a href="{{ url('mattress_to_unload/'.$id) }}" class="btn btn-info center-block" disabled>Unload mattress</a>
+					<a href="{{ url('mattress_to_unload/'.$id) }}" class="btn btn-warning center-block" disabled>Unload mattress</a>
 					<br>
 					<a href="{{ url('change_marker_request/'.$id) }}" class="btn btn-info center-block" disabled>Change marker request (width)</a>
+					<br>
+					<a href="{{ url('split_marker_request/'.$id) }}" class="btn btn-primary center-block" disabled>Split marker request (width, height)</a>
 					<!-- <br>
 					<a href="{{ url('create_new_mattress_request/'.$id) }}" class="btn btn-info center-block" disabled>Create new mattress request</a> -->
 				@endif	

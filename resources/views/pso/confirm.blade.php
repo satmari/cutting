@@ -9,7 +9,7 @@
 				
 				
 				<div class="panel-body">
-					<p>Are you sure that PLOCE mattress is combined/linked?</p>
+					<p>Confirmation of sewing PLOCE</p>
 					<br>
 				<a href="{{ url('mattress_pso_confirm/'.$id) }}" class="btn btn-danger btn-l cen ter-block">
 					Confirm</a>

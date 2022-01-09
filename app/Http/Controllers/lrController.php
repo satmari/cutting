@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
 use App\mattress_details;
-use App\mattress_phases;
 use App\mattress_markers;
 use App\marker_change;
 use App\o_roll;
@@ -121,7 +120,7 @@ class lrController extends Controller {
 		$input = $request->all(); 
 		// dd($input);
 
-		$gbin = $input['gbin'];
+		$gbin = strtoupper($input['gbin']);
 		// dd($gbin);
 
 		$check_gbin = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -167,7 +166,7 @@ class lrController extends Controller {
 		$input = $request->all(); 
 		// dd($input);
 
-		$o_roll = $input['o_roll'];
+		$o_roll = strtoupper($input['o_roll']);
 		$id = $input['id'];
 		$mattress = $input['mattress'];
 		$g_bin = $input['g_bin'];
@@ -175,7 +174,7 @@ class lrController extends Controller {
 		$material = $input['material'];
 
 		// dd(strlen($o_roll));
-		if ((substr($o_roll , 0,2) != "LR") OR (strlen($o_roll) != 10)){
+		if (((strtoupper(substr($o_roll , 0,2))) != "LR") OR (strlen($o_roll) != 10)){
 			$work_place = "LR";
 			// Session::set('work_place',$work_place);
 
@@ -227,7 +226,7 @@ class lrController extends Controller {
 		$input = $request->all(); 
 		// dd($input);
 
-		$o_roll = $input['o_roll'];
+		$o_roll = strtoupper($input['o_roll']);
 		$id = $input['id'];
 		$mattress = $input['mattress'];
 		$g_bin = $input['g_bin'];
@@ -254,7 +253,7 @@ class lrController extends Controller {
 			return view('lr.index', compact('operators','operator','msg'));
 		}
 
-		// add to mattress_phases
+		
 		$table = new o_roll;
 		$table->o_roll = $o_roll;
 		$table->mattress_id_orig = (int)$id;
@@ -290,7 +289,16 @@ class lrController extends Controller {
 
 	public function o_roll_print() {
 
-		return view('lr.o_roll_print');
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 [o_roll] FROM [o_roll_prints] ORDER BY o_roll desc"));	
+		if (isset($data[0]->o_roll)) {
+				
+			$last_used = $data[0]->o_roll;
+			// dd($lu);
+		} else {
+			$last_used = 'not used';
+		}
+
+		return view('lr.o_roll_print', compact('last_used'));
 	}
 
 	public function o_roll_print_confirm(Request $request) {

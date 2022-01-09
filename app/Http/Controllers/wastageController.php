@@ -35,6 +35,36 @@ class wastageController extends Controller {
 		return view('Wastage.table', compact('data'));
 	}
 
+	public function table_all() {
+		//
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT [no]
+		      ,[skeda]
+		      ,[sap_bin]
+		      ,[container]
+		      ,[location]
+		      ,[material]
+		      ,[weight]
+		      ,[coment]
+		      ,'EXIST' as status
+		FROM [wastages]
+
+		UNION
+
+		SELECT [no]
+		      ,[skeda]
+		      ,[sap_bin]
+		      ,[container]
+		      ,[location]
+		      ,[material]
+		      ,[weight]
+		      ,[coment]
+			  ,'REMOVED' as status
+		FROM [wastage_logs]	"));
+		// dd($data);
+
+		return view('Wastage.table_all', compact('data'));
+	}
+
 	public function index_cut() {
 		//
 		$skeda_data = DB::connection('sqlsrv6')->select(DB::raw("SELECT DISTINCT [skeda] FROM [posummary].[dbo].[pro]"));
@@ -443,7 +473,6 @@ class wastageController extends Controller {
 		// dd($data);
 
 		for ($i=0; $i < count($data); $i++) { 
-
 			// dd($data);
 
 			try {
@@ -479,6 +508,67 @@ class wastageController extends Controller {
 		return Redirect::to('wastage_wh');
 	}
 
+	public function wastage_remove_skeda_partialy($skeda) {
+		// dd($id);
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [wastages] WHERE [skeda] = '".$skeda."' "));
+		// dd($data);
+
+		return view('wastage.wastage_remove_skeda_partialy', compact('data'));
+	}
+
+	public function wastage_remove_skeda_partialy_post(Request $request) {	
+
+		// $this->validate($request, ['location'=>'required', 'container'=>'required']);
+		$forminput = $request->all();
+		// dd($forminput);
+
+		if (!isset($forminput['bag'])) {
+			$msg = 'Please select at least one bag';
+			return view('wastage.wastage_remove_skeda_partialy', compact('msg'));
+		}
+
+		$bag = $forminput['bag'];
+		// dd($bag);
+
+		for ($i=0; $i < count($bag); $i++) { 
+			// dd($bag[$i]);
+
+			try {
+				$table = wastage::findOrFail($bag[$i]);
+				// dd($table);
+
+				try {
+					$table_log = new wastage_log;
+
+					$table_log->no = $table->no;					
+					$table_log->skeda = $table->skeda;					
+					$table_log->sap_bin = $table->sap_bin;					
+					$table_log->weight = $table->weight;					
+					$table_log->coment = $table->coment;					
+					$table_log->container_id = $table->container_id;					
+					$table_log->container = $table->container;					
+					$table_log->location_id = $table->location_id;					
+					$table_log->location = $table->location;
+					$table_log->material = $table->material;
+
+					$table_log->save();
+				}
+				catch (\Illuminate\Database\QueryException $e) {
+					dd("greska pri snimanju u tabelu, zovi IT");
+				}
+
+				$table->delete();
+			}
+			catch (\Illuminate\Database\QueryException $e) {
+				dd("greska pri snimanju u tabelu, zovi IT");
+			}
+		}
+
+		return Redirect::to('wastage_wh');
+
+	}
+
 	public function delete_wastage_line(Request $request) {	
 
 		// $this->validate($request, ['location'=>'required', 'container'=>'required']);
@@ -490,7 +580,6 @@ class wastageController extends Controller {
 		// $table->delete();
 
 		return Redirect::to('/');
-
 	}
 
 	public function wastage_edit($id) {	

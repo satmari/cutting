@@ -20,24 +20,7 @@
 
                         {!! Form::hidden('location', $location, ['class' => 'form-control']) !!}
                             
-                            <!-- <br>
-                            Mattress: <b>{{ $mattress }} </b></b><br>
-                            Material: <b>{{ $material }} </b></b><br>
-                            Dye lot: <b>{{ $dye_lot}} </b><br>
-                            Color desc: <b>{{ $color_desc}} </b><br>
-                            Skeda: <b>{{ $skeda}} </b><br>
-                            Skeda type: <b>{{ $skeda_item_type}} </b><br>
-                            Width usable (theoretical): <b>{{ round($width_theor_usable,3) }} </b><br>
-                            Layers: <b>{{ $layers}} </b><br>
-                            Consumption planned: <b>{{ round($cons_planned,3)}} </b><br>
-                            Marker name: <b>{{ $marker_name}} </b><br>
-                            Marker length: <b>{{ round($marker_length,3)}} </b><br>
-                            Marker width: <b>{{ round($marker_width,3)}} </b><br>
-                            TPP mat. keep wastage: <b>{{ $tpp_mat_keep_wastage }} </b><br>
-                            TPA No: <b>{{ $tpa_number }} </b>
-                            <hr> -->
-
-                            <table style="width:100%" class="table table-striped table-bordered">
+                            <table style="width:100%; font-size: large;" class="table table-striped table-bordered">
                             <tr><td>Mattress</td><td><b>{{ $mattress }} </b></td></tr>
                             <tr><td>Material</td><td><b>{{ $material }} </b></td></tr>
                             <tr><td>Dye lot</td><td><b>{{ $dye_lot }} </b></td></tr>
@@ -45,8 +28,13 @@
                             <tr><td>Skeda</td><td><b>{{ $skeda }} </b></td></tr>
                             <tr><td>Skeda type</td><td><b>{{ $skeda_item_type }} </b></td></tr>
                             <tr><td>Width usable (theoretical)</td><td><b>{{ round($width_theor_usable,3) }} </b></td></tr>
-                            <tr><td>Layers</td><td><b>{{ $layers }} </b></td></tr>
-                            <tr><td>Consumption planned</td><td><b>{{ round($cons_planned,3) }} </b></td></tr>
+                            <tr><td>Layers Planned</td><td><b>{{ round($layers,0) }} </b></td></tr>
+                            <tr><td>Layers Actual</td><td><b>{{ round($layers_a,0) }} </b>
+                                @if (($location == 'CUT' OR $location == 'COMPLETED'))
+                                        &nbsp;&nbsp;&nbsp;<a href="{{ url('edit_layers_a/'.$id) }}" class="btn btn-danger btn-xs">Change</a>
+                                @endif
+                            </td></tr>
+                            <tr><td>Consumption actual</td><td><b>{{ round($cons_actual,3) }} </b></td></tr>
                             <tr><td>Marker name</td><td><b>{{ $marker_name }} </b></td></tr>
                             <tr><td>Marker length</td><td><b>{{ round($marker_length,3) }} </b></td></tr>
                             <tr><td>Marker width</td><td><b>{{ round($marker_width,3) }} </b></td></tr>
@@ -61,14 +49,30 @@
                             <table style="width:100%" class="table table-striped table-bordered">
                                 <tr>
                                     <td>Leftover roll</td>
+                                    <td>G bin</td>
                                     <td>Number of joinings</td>
                                 </tr>
                                  @foreach ($data2 as $req)
                                  <tr>
                                     <td><b>{{ $req->o_roll}}</b></td>
+                                    <td><b>{{ $req->g_bin}}</b></td>
                                     <td><b>{{ $req->no_of_joinings}}</b></td>
                                  </tr>
                                  @endforeach
+                            </table>
+                            @endif
+
+                            @if (isset($sp_operator))
+                            <table style="width:100%" class="table table-striped table-bordered">
+                                <tr><td>Spreader operator:</td><td><b>{{$sp_operator}}</b></td></tr>
+                                <tr><td>Date:</td><td><b>{{$sp_date}}</b></td></tr>
+                            </table>
+                            @endif
+
+                            @if (isset($cut_operator))
+                            <table style="width:100%" class="table table-striped table-bordered">
+                                <tr><td>Cutter operator:</td><td><b>{{$cut_operator}}</b></td></tr>
+                                <tr><td>Date:</td><td><b>{{$cut_date}}</b></td></tr>
                             </table>
                             @endif
                         
@@ -135,7 +139,7 @@
 
                         <div class="panel-body">
                         <p>Pcs per bundle: <span style="color:red;">*</span></p>
-                            {!! Form::number('pcs_bundle', $pcs_bundle, ['class' => 'form-control']) !!}
+                            {!! Form::number('pcs_bundle', round($pcs_bundle,0), ['class' => 'form-control']) !!}
                         </div>
 
                         <div class="panel-body">

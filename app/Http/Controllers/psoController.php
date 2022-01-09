@@ -219,48 +219,63 @@ class psoController extends Controller {
 		$table2_update->save();
 
 		// all mattress_phases for this mattress set to NOT ACTIVE
-		$find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				id, mattress 
-			FROM [mattress_phases] WHERE mattress_id = '".$id."' AND active = 1"));
+		// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+		// 		id, mattress 
+		// 	FROM [mattress_phases] WHERE mattress_id = '".$id."' AND active = 1"));
 		
-		if (isset($find_all_mattress_phasses[0])) {
-			$mattress = $find_all_mattress_phasses[0]->mattress;
+		// if (isset($find_all_mattress_phasses[0])) {
+		// 	$mattress = $find_all_mattress_phasses[0]->mattress;
 
-			// dd($find_all_mattress_phasses);
-			for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
-				// try {
-					$table3 = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
-					$table3->active = 0;
-					$table3->save();
-				// }
-				// catch (\Illuminate\Database\QueryException $e) {
-				// 	dd("Problem to save in mattress_phases, set all to not active");
-				// }
-			}	
-		}
+		// 	// dd($find_all_mattress_phasses);
+		// 	for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
+		// 		// try {
+		// 			$table3 = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
+		// 			$table3->active = 0;
+		// 			$table3->save();
+		// 		// }
+		// 		// catch (\Illuminate\Database\QueryException $e) {
+		// 		// 	dd("Problem to save in mattress_phases, set all to not active");
+		// 		// }
+		// 	}	
+		// }
+
+		$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
+			SET NOCOUNT ON;
+			UPDATE [mattress_phases]
+			SET active = 0
+			WHERE mattress_id = '".$id."' AND active = 1;
+			SELECT TOP 1 mattress FROM [mattress_phases] WHERE mattress_id = '".$id."';
+		"));
+		$mattress = $mattress_phases_not_active[0]->mattress;
 
 		// save new mattress_phases
 		$status = "COMPLETED";
 		$location_new = "COMPLETED";
 		$active = 1;
 
-		// save mattress_phases
-		// try {
-			$table3_new = new mattress_phases;
-			$table3_new->mattress_id = $id;
-			$table3_new->mattress = $mattress;
-			$table3_new->status = $status;
-			$table3_new->location = $location_new;
-			$table3_new->device = $device;
-			$table3_new->active = $active;
-			$table3_new->operator1 = $operator;
-			$table3_new->operator2;
-			$table3_new->save();
-		// }
-		// catch (\Illuminate\Database\QueryException $e) {
-		// 	dd("Problem to save in mattress_phases");
-		// }
+		if ((date('H') >= 0) AND (date('H') < 6)) {
+		   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
+		} else {
+			$date = date('Y-m-d H:i:s');
+		}
 
+		// save mattress_phases
+	
+		// $table3_new = new mattress_phases;
+		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
+		$table3_new->mattress_id = $id;
+		$table3_new->mattress = $mattress;
+		$table3_new->status = $status;
+		$table3_new->location = $location_new;
+		$table3_new->device = $device;
+		$table3_new->active = $active;
+		$table3_new->operator1 = $operator;
+		$table3_new->operator2;
+		$table3_new->date = $date;
+		$table3_new->id_status = $id.'-'.$status;
+		$table3_new->save();
+		
+		
 		$reorder_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 				md.[id], md.[mattress_id], md.[mattress], md.[position], mp.[location], mp.[active]
 			 FROM [mattress_details] as md

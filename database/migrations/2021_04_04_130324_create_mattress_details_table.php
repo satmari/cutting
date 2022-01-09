@@ -47,7 +47,7 @@ class CreateMattressDetailsTable extends Migration {
 			$table->string('overlapping')->nullable();
 			$table->integer('printed_nalog')->nullable();
 			$table->integer('layer_limit')->nullable();
-			
+
 			$table->timestamps();
 		});
 	}

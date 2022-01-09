@@ -23,7 +23,7 @@
                         <p>
                             Mattress <b>{{ $mattress }}</b> (g bin <b>{{ $g_bin }}</b>) <br> 
                             have marker width of <b>{{ (int)$marker_width }} cm</b><br>
-                            Theoretical usable width: <b>{{ round($width_theor_usable*100,2) }} cm</b>
+                            Theoretical usable width: <b>{{ round($width_theor_usable,2) }} cm</b>
                             <br><br>
                         </p>
                         

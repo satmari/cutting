@@ -5,7 +5,13 @@
 	<div class="row vertical-center-row">
 		<div class="text-center col-md-5 col-md-offset-4">
 			<div class="panel panel-default">
-				<div class="panel-heading"><b>Spread g bin<!--  <big>COMPLETELY</big> -->: {{ $g_bin }}</b></div>
+				<div class="panel-heading"><b>Spread g bin<!--  <big>COMPLETELY</big> -->: 
+					@if (isset($g_bin))
+						{{ $g_bin }}
+					@else
+						{{ $mattress }}
+					@endif
+					</b></div>
 				<br>
 			    	
 				{!! Form::open(['url' => 'spread_mattress_complete_post']) !!}

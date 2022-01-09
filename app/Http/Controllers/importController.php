@@ -39,8 +39,7 @@ use DB;
 
 class importController extends Controller {
 
-	public function index()
-	{
+	public function index() {
 		//
 
 		// $work_place = "PLANNER";
@@ -385,6 +384,8 @@ class importController extends Controller {
    		// print_r($phpArray['Marker']['@attributes']['Name']);
 
    		$marker_name = $phpArray['Marker']['@attributes']['Name'];
+   		$marker_name = strtoupper($marker_name);
+   		// dd($marker_name);
 
    		function get_string_between($string, $start, $end){
 		    $string = ' ' . $string;
@@ -398,6 +399,7 @@ class importController extends Controller {
 		$start = "PLX\\";
 		$end = ".PLX";
    		$marker_name = get_string_between($marker_name, $start, $end);
+   		// dd($marker_name);
    		// print_r('marker_name: '.$marker_name);
    		// print_r('<br>');
 		// print_r('<br>');
@@ -582,16 +584,21 @@ class importController extends Controller {
    		// $l[] = '';
    		$a[] = '';
    		$mv[] = '';
-   		for ($i=0; $i < count($phpArray['Tolerances']['MarkerContent']['NewVariant']); $i++) { 
-   			# code...
-   			// print_r($i);
-   			// print_r('<br>');
 
+   		// dd("Stop");
 
-   			$model = $phpArray['Tolerances']['MarkerContent']['NewVariant'][$i]['Model']['@attributes']['Value'];
-   			$variant = $phpArray['Tolerances']['MarkerContent']['NewVariant'][$i]['Variant']['@attributes']['Value'];
-   			$size = $phpArray['Tolerances']['MarkerContent']['NewVariant'][$i]['Size']['@attributes']['Value'];
-   			$qty = $phpArray['Tolerances']['MarkerContent']['NewVariant'][$i]['Quantity']['@attributes']['Value'];
+   		// dd($phpArray['Tolerances']['MarkerContent']['NewVariant']['Group']);
+   		// dd(count($phpArray['Tolerances']['MarkerContent']['NewVariant']));
+
+   		if (isset($phpArray['Tolerances']['MarkerContent']['NewVariant']['Group'])) {
+   			// $loop = 1;
+
+   			$model = $phpArray['Tolerances']['MarkerContent']['NewVariant']['Model']['@attributes']['Value'];
+   			$variant = $phpArray['Tolerances']['MarkerContent']['NewVariant']['Variant']['@attributes']['Value'];
+   			$size = $phpArray['Tolerances']['MarkerContent']['NewVariant']['Size']['@attributes']['Value'];
+   			$qty = $phpArray['Tolerances']['MarkerContent']['NewVariant']['Quantity']['@attributes']['Value'];
+
+   			// dd($model);
 
    			$exist = strpos($variant, "_");
    			// dd($exist);
@@ -607,7 +614,7 @@ class importController extends Controller {
 			// print_r('<br>');
 
 			$si = explode('_', $size);
-			// dd(count($si));
+			// dd($si);
 			// dd(substr($style, 0, 4));
 
 			if(count($si) > 1) {
@@ -620,13 +627,18 @@ class importController extends Controller {
 				}
 			}
 
+			// dd($size);
+			$s = explode('::', $size);
+			$size = $s[0];
+			
 			$size = str_replace(":" , "" , $size);
 			// print_r("Size: ".$size);
-
+			// dd($size);
    			// print_r('style:'.$style.' size: '.$size.' qty: '.$qty.' model: '.$model.' variant: '.$variant);
    			// print_r('<br>');
 
    			$style_size = $style.' '.$size;
+   			// dd($style_size);
    			$model_variant = $model."#".$variant;
 
    			// $line = $style_size.'|'.$qty;
@@ -636,8 +648,75 @@ class importController extends Controller {
 	   		array_push( $a , $line );
 	   		array_push( $mv , $line_mv );
 
-   			
-   		}	
+
+   		} else {
+
+   			for ($i=0; $i < count($phpArray['Tolerances']['MarkerContent']['NewVariant']); $i++) { 
+	   			// for ($i=0; $i < $loop ; $i++) { 
+	   			# code...
+	   			// print_r($i);
+	   			// print_r('<br>');
+
+	   			$model = $phpArray['Tolerances']['MarkerContent']['NewVariant'][$i]['Model']['@attributes']['Value'];
+	   			$variant = $phpArray['Tolerances']['MarkerContent']['NewVariant'][$i]['Variant']['@attributes']['Value'];
+	   			$size = $phpArray['Tolerances']['MarkerContent']['NewVariant'][$i]['Size']['@attributes']['Value'];
+	   			$qty = $phpArray['Tolerances']['MarkerContent']['NewVariant'][$i]['Quantity']['@attributes']['Value'];
+
+	   			// dd($model);
+
+	   			$exist = strpos($variant, "_");
+	   			// dd($exist);
+
+	   			$st = explode('_', $model);
+				// dd($ex[1]);
+				$style = $st[1];
+
+				if ($style == 'F') {
+					$style = $st[2];
+				}
+				// print_r("Style: ".$style);
+				// print_r('<br>');
+
+				$si = explode('_', $size);
+				// dd($si);
+				// dd(count($si));
+				// dd(substr($style, 0, 4));
+
+				if(count($si) > 1) {
+					if ($si[0] == '1' AND $si[1] == '2') {
+						$size = $si[0].'/'.$si[1];
+					} else if ($si[0] == '3' AND $si[1] == '4' AND substr($style, 0, 4) == "MODC" ){
+						$size = $si[0].'/'.$si[1];
+					} else {
+						$size = $si[0].'-'.$si[1];
+					}
+				}
+
+				// dd($size);
+				$s = explode('::', $size);
+				$size = $s[0];
+				
+				$size = str_replace(":" , "" , $size);
+				// print_r("Size: ".$size);
+				// dd($size);
+
+	   			// print_r('style:'.$style.' size: '.$size.' qty: '.$qty.' model: '.$model.' variant: '.$variant);
+	   			// print_r('<br>');
+
+	   			$style_size = $style.' '.$size;
+	   			// dd($style_size);
+	   			$model_variant = $model."#".$variant;
+
+	   			// $line = $style_size.'|'.$qty;
+	   			$line = ['style_size'=>$style_size,'qty'=>$qty, 'model'=>$model ,'variant' => $variant];
+	   			$line_mv = ['model_variant'=>$model_variant];
+	   			// $line = [$style_size =>$qty];
+		   		array_push( $a , $line );
+		   		array_push( $mv , $line_mv );
+	   			
+	   		}
+   		}
+
 
    		$a = array_filter($a);
    		$mv = array_filter($mv);
@@ -786,7 +865,7 @@ class importController extends Controller {
 
 				   			$pro = $row['pro'];
 							$skeda = $row['skeda'];
-							$sku = $row['sku'];
+							$sku = trim($row['sku']);
 
 							if ($check_pro_id[0]->skeda != $skeda ) {
 				   				dd('For pro_id: '.$pro_id.' ,new skeda is different from old skeda!');
@@ -803,15 +882,15 @@ class importController extends Controller {
 							$sku = trim(strtoupper($row['sku']));
 							$multimaterial = trim(strtoupper($row['multimaterial']));
 							$s = explode(" ", $style_size);
-							$style = $s[0];
-							$size = $s[1];
+							$style = trim($s[0]);
+							$size = trim($s[1]);
 
 							if ($check_pro_id[0]->style_size != $style_size ) {
 				   				dd('For pro_id: '.$pro_id.' ,new style_size is different from old style_size!');
 				   			}
 
 				   			$bom_cons_per_pcs = round((float)$row['bom_cons_per_pcs'],3);
-
+				   			
 							try {
 								$table_pro = pro_skeda::findOrFail($check_pro_id[0]->id);
 								
@@ -858,10 +937,10 @@ class importController extends Controller {
 							$padprint_item = strtoupper($row['padprint_item']);
 							$padprint_color = strtoupper($row['padprint_color']);
 							
-							$style_size = strtoupper($row['style_size']);
+							$style_size = trim(strtoupper($row['style_size']));
 							$s = explode(" ", $style_size);
-							$style = $s[0];
-							$size = $s[1];
+							$style = trim($s[0]);
+							$size = trim($s[1]);
 
 							$bom_cons_per_pcs = (float)$row['bom_cons_per_pcs'];
 							$bom_cons_per_pcs_a;
@@ -953,7 +1032,11 @@ class importController extends Controller {
 				  				$sap_su = $row['sap_su'];
 								$material = $row['material'];
 								$color_desc = strtoupper($row['color_desc']);
-								$dye_lot = $row['dye_lot'];
+								if ($row['dye_lot'] == NULL OR $row['dye_lot'] == '') {
+									$dye_lot = '';
+								} else {
+									$dye_lot = $row['dye_lot'];	
+								}
 								$paspul_type = $row['paspul_type'];
 
 								$kotur_width = (float)$row['kotur_width'];
@@ -1149,6 +1232,8 @@ class importController extends Controller {
 								$table1->operator1 = Session::get('operator');
 								$table1->operator2;
 
+								$table1->date = date('Y-m-d H:i:s');
+
 								$table1->save();
 
 								$pa_success = $pa_success + 1;
@@ -1200,7 +1285,6 @@ class importController extends Controller {
 						// print_r('MAT');
 						// dd($row);
 
-
 						// +++++++++++++ mattresses
 						$mattress = $row['mattress']; 
 						// $find_in_mattresses = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM mattresses WHERE mattress = '".$mattress."' "));
@@ -1228,7 +1312,7 @@ class importController extends Controller {
 							// $err = $err.'#'.$err0;
 							// Session::set('err', $err);
 
-							if (($find_in_mattresses[0]->status = 'NOT_SET') OR ($find_in_mattresses[0]->status = 'TO_LOAD') OR ($find_in_mattresses[0]->status = 'TO_SPREAD')) {
+							if (($find_in_mattresses[0]->status == 'NOT_SET') OR ($find_in_mattresses[0]->status == 'TO_LOAD') OR ($find_in_mattresses[0]->status == 'TO_SPREAD')) {
 																
 								$update_mattress = mattress::findOrFail($find_in_mattresses[0]->id);
 								// dd($update_mattress);
@@ -1247,43 +1331,58 @@ class importController extends Controller {
 										} else {
 											$marker_name = $row['marker_name'];
 										}
+										//dd($marker_name);
 
-										if ($update_mattress_markers->marker_name == $marker_name) {
+										// if ($update_mattress_markers->marker_name == $marker_name) {
+										if ($update_mattress_markers->marker_name_orig == $marker_name) {
 											// dd('go go update');
 											// dD($update_mattress->id);
 
 											$update_mattress->material = $row['material'];
 											$update_mattress->dye_lot = $row['dye_lot'];
-											$update_mattress->color_desc = $row['color_desc'];
+											$update_mattress->color_desc = preg_replace('/[^A-Za-z0-9\-]/', '', $row['color_desc']);
+											
 											$update_mattress->width_theor_usable = round((float)$row['width_theor_usable'],2);
 											$update_mattress->spreading_method = strtoupper($row['spreading_method']);
 											$update_mattress->save();
 
 											$update_mattress_details = mattress_details::where('mattress_id', $update_mattress->id)->firstOrFail();
-											$update_mattress_details->layers = (float)$row['extra'];
+											$update_mattress_details->layers = (float)$row['layers'];
 											$update_mattress_details->layers_a = $update_mattress_details->layers;
-											$update_mattress_details->length_mattress = round((float)$row['length_mattress'],2);
-											$update_mattress_details->cons_planned = round((float)$row['cons_planned'],2);
+											$update_mattress_details->length_mattress = round((float)$row['length_mattress'],3);
+
+											$length_mattress_new = mattress_markers::where('mattress_id', $update_mattress->id)->firstOrFail();
+											$length_mattress_new = $length_mattress_new->marker_length;
+
+											$cons_planned_new = (round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * (float)$row['layers'];
+											// dd($cons_planned_new);
+
+											$update_mattress_details->cons_planned = round((float)$cons_planned_new,2);
+											$update_mattress_details->cons_actual = round((float)$cons_planned_new,2);
+
 											$update_mattress_details->extra = (floaT)$row['extra'];
 											$update_mattress_details->overlapping = $row['overlapping'];
 											$update_mattress_details->tpa_number = trim($row['tpa_number']);
+											if (isset($row['pcs_bundle'])) {
+												$update_mattress_details->pcs_bundle = round($row['pcs_bundle'],0);
+											}
+											
 											if (trim($row['tpa_number']) == '')  {
-												$tpp_mat_keep_wastage = 0;  
+												$tpp_mat_keep_wastage = 0;
 											} else {
-												$tpp_mat_keep_wastage = 1;  
+												$tpp_mat_keep_wastage = 1;
 											}
 											$update_mattress_details->tpp_mat_keep_wastage = $tpp_mat_keep_wastage;
 											$update_mattress_details->save();
 
-
 										} else {
+											// dd($marker_name);
+											dd($update_mattress_markers->marker_name_orig);
 											dd('For mattress '.$update_mattress->mattress.' , marker_name is different than existing');
 										}
-
 									} else {
 										dd('For mattress '.$update_mattress->mattress.' , skeda_item_type is different than existing');
 									}
-
 								} else {
 									dd('For mattress '.$update_mattress->mattress.' , skeda is different than existing');
 								}
@@ -1310,16 +1409,51 @@ class importController extends Controller {
 							// mattress_details
 							$layers = (float)$row['layers'];
 							$layers_a = $layers; 
-							$length_mattress = round((float)$row['length_mattress'],2);
+							$length_mattress = round((float)$row['length_mattress'],3);
 							// dd($length_mattress);
-							$cons_planned = round((float)$row['cons_planned'],2);
-							$cons_actual = round((float)$row['cons_planned'],2);
+							
+							// $length_mattress_new = mattress_markers::where('mattress_id', $update_mattress->id)->firstOrFail();
+							// $length_mattress_new = $length_mattress_new->marker_length;
+
+							// dd(strval($row['marker_name']));
+							// $length_mattress_new = marker_header::where('marker_name', strval($row['marker_name']))->firstOrFail();
+							
+
+							$length_mattress_new = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 marker_length 
+							FROM marker_headers
+							WHERE marker_name = '".strval($row['marker_name'])."'"));
+
+							// dd($length_mattress_new);
+							if (isset($length_mattress_new[0])) {
+
+								$length_mattress_new = $length_mattress_new[0]->marker_length;
+								$cons_planned_new = (round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * $layers;
+								$cons_planned = round((float)$cons_planned_new,2);
+								$cons_actual = round((float)$cons_planned_new,2);
+
+							} else {
+								$length_mattress_new = $length_mattress;
+								$cons_planned_new = (round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * $layers;
+								$cons_planned = round((float)$cons_planned_new,2);
+								$cons_actual = round((float)$cons_planned_new,2);
+
+							}
+							// dd($length_mattress_new);
+							// $cons_planned_new = (round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * $layers;
+							// $cons_planned = round((float)$cons_planned_new,2);
+							// $cons_actual = round((float)$cons_planned_new,2);
+
 							$extra = (floaT)$row['extra'];
-							$pcs_bundle;	//manualy
+							// $pcs_bundle;	//manualy
 							$layers_partial = 0; // MM => manualy
 							$position = 1; // check last position with NOT_SET status and loc   ??????
 							$overlapping = $row['overlapping'];
 							$tpa_number = trim($row['tpa_number']);
+							if (isset($row['pcs_bundle'])) {
+								$pcs_bundle = round($row['pcs_bundle'],0);	
+							} else {
+								$pcs_bundle = 30;	
+							}
 
 							if ($tpa_number == '')  {
 								$tpp_mat_keep_wastage = 0;  
@@ -1362,7 +1496,7 @@ class importController extends Controller {
 							// mattress_markers
 							$marker_name = trim($row['marker_name']);
 
-							$find_in_marker_headers = DB::connection('sqlsrv')->select(DB::raw("SELECT id,marker_length,marker_width,min_length FROM marker_headers WHERE marker_name = '".$marker_name."' "));
+							$find_in_marker_headers = DB::connection('sqlsrv')->select(DB::raw("SELECT id,marker_length,marker_width,min_length FROM marker_headers WHERE marker_name = '".$marker_name."' AND status = 'ACTIVE' "));
 					   		if (!isset($find_in_marker_headers[0])) {
 
 					   			if (($skeda_item_type == 'MW') OR ($skeda_item_type == 'MB')){
@@ -1370,7 +1504,7 @@ class importController extends Controller {
 					   				$marker_id = 0;
 					   				$marker_name = 'PLOCE_PASTYPE_'.$marker_name;
 					   				$marker_name_orig = '';
-									$marker_length = round((float)$row['length_mattress'],2);
+									$marker_length = round((float)$row['length_mattress'],3);
 									$marker_width = 0;
 									$min_length = 0;
 		
@@ -1417,6 +1551,7 @@ class importController extends Controller {
 
 							// mattress_pros
 							$find_in_marker_lines = DB::connection('sqlsrv')->select(DB::raw("SELECT style_size, pcs_on_layer FROM marker_lines WHERE marker_name = '".$marker_name."' "));
+							// dd($find_in_marker_lines);
 							if (!isset($find_in_marker_lines[0])) {
 
 								if (($skeda_item_type == 'MW') OR ($skeda_item_type == 'MB')) {
@@ -1447,7 +1582,9 @@ class importController extends Controller {
 
 					   		} else {
 
+					   			// dd($mattress);
 								$find_in_mattress_pro = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM mattress_pros WHERE mattress = '".$mattress."' "));
+								// dd($find_in_mattress_pro);
 								if (isset($find_in_mattress_pro[0])) {				   			
 									
 									// $err = Session::get('err');
@@ -1457,22 +1594,26 @@ class importController extends Controller {
 									// Session::set('err', $err);
 
 								} else {
-
+									// dd('Stop');
 						   			$mattress_pro_array[] = '';
+
 							   		foreach ($find_in_marker_lines as $line) {
 							   			$style_size = $line->style_size;
 							   			$pro_pcs_layer = $line->pcs_on_layer;
 							   			// dd($style_size);
 							   			// print_r($style_size."<br>");
 							   			// dd($skeda);
-
 							   			// $skeda;
 										// find by $style_size;
 										// $pro_id;
+								   		// var_dump($style_size);
+								   		// var_dump($skeda);
 
-								   				
 							   			$find_in_pro_skedas = DB::connection('sqlsrv')->select(DB::raw("SELECT pro_id FROM pro_skedas WHERE skeda = '".$skeda."' AND style_size = '".$style_size."' "));
+							   			// dd($find_in_pro_skedas);
 							   			if (!isset($find_in_pro_skedas[0])) {
+							   				// dd($style_size);
+							   				// dd($skeda);
 							   				// dd("Pro id not found in pro skeda");
 							   				// print_r("Pro id not found in pro skeda table, skeda: ".$skeda." and style_size: ".$style_size."<br>");
 							   				// dd("Skeda ".$skeda." not exist in pro_skedas table");
@@ -1576,7 +1717,7 @@ class importController extends Controller {
 									$table1->cons_planned = $cons_planned;
 									$table1->cons_actual = $cons_actual;
 									$table1->extra = $extra;
-									$table1->pcs_bundle;
+									$table1->pcs_bundle = $pcs_bundle;
 									$table1->layers_partial = $layers_partial;
 									$table1->position = $position;
 									$table1->priority = $priority;
@@ -1617,14 +1758,12 @@ class importController extends Controller {
 
 									$table2->mattress_id = $table0->id;
 									$table2->mattress = $table0->mattress;
-
 									$table2->marker_id = $marker_id;
 									$table2->marker_name = $marker_name;
-									$table2->marker_name_orig = $marker_name_orig;
+									$table2->marker_name_orig = $marker_name;
 									$table2->marker_length = $marker_length;
 									$table2->marker_width = $marker_width;
 									$table2->min_length = $min_length;
-
 									$table2->save();
 								}
 								catch (\Illuminate\Database\QueryException $e) {
@@ -1647,17 +1786,16 @@ class importController extends Controller {
 
 								try {
 									$table3 = new mattress_phases;
-
 									$table3->mattress_id = $table0->id;
 									$table3->mattress = $table0->mattress;
-
 									$table3->status = $status;
 									$table3->location = $location;
 									$table3->device;
 									$table3->active = $active;
 									$table3->operator1 = Session::get('operator');
 									$table3->operator2;
-
+									$table3->id_status = $table0->id.'-'.$status;
+									$table3->date = date('Y-m-d H:i:s');
 									$table3->save();
 								}
 								catch (\Illuminate\Database\QueryException $e) {
@@ -1728,13 +1866,11 @@ class importController extends Controller {
 									$table0->material = $material;
 									$table0->dye_lot = $dye_lot;
 									$table0->color_desc = $color_desc;
-									
 									$table0->skeda = $skeda;
 									$table0->skeda_item_type = $skeda_item_type;
 									$table0->skeda_status = $skeda_status;
 									$table0->width_theor_usable = $width_theor_usable;
 									$table0->spreading_method = $spreading_method;
-
 									$table0->save();
 								}
 								catch (\Illuminate\Database\QueryException $e) {
@@ -1757,25 +1893,22 @@ class importController extends Controller {
 
 									$table1->mattress_id = $table0->id;
 									$table1->mattress = $table0->mattress;
-
 									$table1->layers = $layers;
 									$table1->layers_a = $layers_a;
 									$table1->length_mattress = $length_mattress;
 									$table1->cons_planned = $cons_planned;
 									$table1->cons_actual = $cons_actual;
 									$table1->extra = $extra;
-									$table1->pcs_bundle;
+									$table1->pcs_bundle = $pcs_bundle;
 									$table1->layers_partial = $layers_partial;
 									$table1->position = $position;
 									$table1->priority = $priority;
-
 									$table1->call_shift_manager = $call_shift_manager;
 									$table1->test_marker = $test_marker;
 									$table1->tpp_mat_keep_wastage = $tpp_mat_keep_wastage;
 									$table1->printed_marker = $printed_marker;
 									$table1->mattress_packed = $mattress_packed;
 									$table1->all_pro_for_main_plant = $all_pro_for_main_plant;
-
 									$table1->bottom_paper;
 									$table1->layers_a_reasons;
 									$table1->comment_office;
@@ -1783,7 +1916,6 @@ class importController extends Controller {
 									$table1->minimattress_code;
 									$table1->overlapping = $overlapping;
 									$table1->tpa_number = $tpa_number;
-									
 									$table1->save();
 								}
 								catch (\Illuminate\Database\QueryException $e) {
@@ -1808,14 +1940,12 @@ class importController extends Controller {
 
 									$table2->mattress_id = $table0->id;
 									$table2->mattress = $table0->mattress;
-
 									$table2->marker_id = $marker_id;
 									$table2->marker_name = $marker_name;
 									$table2->marker_name_orig = $marker_name_orig;
 									$table2->marker_length = $marker_length;
 									$table2->marker_width = $marker_width;
 									$table2->min_length = $min_length;
-
 									$table2->save();
 								}
 								catch (\Illuminate\Database\QueryException $e) {
@@ -1838,17 +1968,16 @@ class importController extends Controller {
 
 								try {
 									$table3 = new mattress_phases;
-
 									$table3->mattress_id = $table0->id;
 									$table3->mattress = $table0->mattress;
-
 									$table3->status = $status;
 									$table3->location = $location;
 									$table3->device;
 									$table3->active = $active;
 									$table3->operator1 = Session::get('operator');
 									$table3->operator2;
-
+									$table3->id_status = $table0->id.'-'.$status;
+									$table3->date = date('Y-m-d H:i:s');
 									$table3->save();
 								}
 								catch (\Illuminate\Database\QueryException $e) {
@@ -1889,17 +2018,13 @@ class importController extends Controller {
 
 									try {
 										$table4 = new mattress_pro;
-
 										$table4->mattress_id = $table0->id;
 										$table4->mattress = $table0->mattress;
-
 										$table4->style_size = $info[1];
-
 										$table4->pro_id = $info[0];
 										$table4->pro_pcs_layer = (float)$info[2];
 										$table4->pro_pcs_planned = $table4->pro_pcs_layer * (float)$layers_a;
 										$table4->pro_pcs_actual = $table4->pro_pcs_layer * (float)$layers_a;
-
 										$table4->save();
 									}
 									catch (\Illuminate\Database\QueryException $e) {
@@ -1923,7 +2048,6 @@ class importController extends Controller {
 									}
 								}
 								$mattress_pro_array = '';
-
 								$m_success = $m_success + 1;
 
 							}
@@ -2040,7 +2164,7 @@ class importController extends Controller {
 		    print_r('<br>');
 		    
 		    foreach (array_filter($m_err_1) as $line_1) {
-		    	print_r("Error1: For Mattress '".$line_1."', marker name not exist in marker_headers table <br>");
+		    	print_r("Error1: For Mattress '".$line_1."', marker name not exist in marker_headers table or marker status is NOT ACTIVE! <br>");
 		    }	
 	    }
 
@@ -2130,7 +2254,8 @@ class importController extends Controller {
 	}
 
 	public function postImport_consumption(Request $request) {
-		 $getSheetName = Excel::load(Request::file('file6'))->getSheetNames();
+
+		$getSheetName = Excel::load(Request::file('file6'))->getSheetNames();
 	    
 	    foreach($getSheetName as $sheetName)    {	
 
@@ -2166,5 +2291,77 @@ class importController extends Controller {
 	        });
 	    }
 	    return redirect('/consumption_sap');
+	}
+
+	public function postImport_marker_status(Request $request) {
+		 $getSheetName = Excel::load(Request::file('file7'))->getSheetNames();
+	    
+	    foreach($getSheetName as $sheetName)    {	
+
+	    	Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file7'))->chunk(5000, function ($reader) 
+	        {
+	                $readerarray = $reader->toArray();
+	                // var_dump($readerarray);
+
+	                $msg = '';
+	                $mattress='';
+	                foreach($readerarray as $row) {
+
+	                	// dd($row);
+	                	$marker_name = strtoupper(trim($row['marker_name']));
+	                	$status = strtoupper(trim($row['status']));
+	                	// dd($status);
+
+
+	                	
+						if ($status == 'NOT ACTIVE') {
+								
+							$check_if_is_in_use = DB::connection('sqlsrv')->select(DB::raw("SELECT	mp.mattress_id
+								,mp.mattress
+								,mp.status
+								,mm.marker_name
+							FROM [cutting].[dbo].[mattress_phases] as mp
+							JOIN [cutting].[dbo].[mattress_markers] as mm ON mp.mattress_id = mm.mattress_id
+							WHERE mp.active = 'True' AND 
+							(mp.status = 'NOT_SET' OR mp.status = 'TO_LOAD' OR mp.status = 'TO_SEPREAD' OR mp.status = 'TO_CUT' OR mp.status = 'ON_CUT' OR mp.status = 'ON_HOLD') AND 
+							mm.marker_name = '".$marker_name."' "));
+							// dd($check_if_is_in_use);
+
+							if (!empty($check_if_is_in_use)) {
+								for ($i=0; $i < count($check_if_is_in_use) ; $i++) { 
+
+									// dd($check_if_is_in_use[$i]->marker_name);
+									$mattress = $mattress.' | Mattress: '.$check_if_is_in_use[$i]->mattress.' , marker: '.$check_if_is_in_use[$i]->marker_name;
+								}
+								// dd('Marker/s have mattresses that are in use: '.$mattress);
+								
+							} else {
+								$sql2 = DB::connection('sqlsrv')->select(DB::raw("
+										SET NOCOUNT ON;
+										UPDATE [marker_headers]
+										SET status = '".$status."'
+										WHERE marker_name = '".$marker_name."';
+										SELECT TOP 1 [id] FROM [marker_headers]
+								"));
+							}
+
+						} else {
+							$sql2 = DB::connection('sqlsrv')->select(DB::raw("
+									SET NOCOUNT ON;
+									UPDATE [marker_headers]
+									SET status = '".$status."'
+									WHERE marker_name = '".$marker_name."';
+									SELECT TOP 1 [id] FROM [marker_headers]
+							"));
+						}
+	                }
+
+	                if (!$mattress == '') {
+						dd('Folowing Mattress/markers are in use: '.$mattress);
+					}
+
+	        });
+	    }
+	    return redirect('/marker');
 	}
 }

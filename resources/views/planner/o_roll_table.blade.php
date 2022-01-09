@@ -7,12 +7,15 @@
         		<div class="text-center">
 		            <div class="panel panel-default">
 		            	<div class="panel-heading">
-		            		<a href="{{url('/o_roll_table_all')}}" class="btn btn-success btn-xs center-blo ck">Complete table</a>
+		            		<a href="{{url('/o_roll_table')}}" class="btn btn-warning btn-xs center-blo ck">Table</a>
+		            		&nbsp;&nbsp;&nbsp;&nbsp;
+		            		<a href="{{url('/o_roll_table_all')}}" class="btn btn-success btn-xs center-blo ck">Log table</a>
+		            		
+		            		 
 
 		            		&nbsp;&nbsp;&nbsp;&nbsp; Leftover Roll table  &nbsp;&nbsp;&nbsp;&nbsp;
 		            		<!-- <br> -->
-		            		
-		            		<a href="{{url('/o_roll_table')}}" class="btn btn-danger btn-xs center-blo ck">Back</a>
+		            		<a href="{{url('/')}}" class="btn btn-danger btn-xs center-blo ck">Back to Main page</a>
 		            	</div>
 
 		              
@@ -21,7 +24,7 @@
 		                    <input id="filter" type="text" class="form-control" placeholder="Type here...">
 		                </div>
 
-		                <table class="table table-striped table-bordered" id="table-draggable2" 
+		                <table class="table table-striped table-bordered tableFixHead" id="table-draggable2" id="sort" 
 		                >
 		                <!--
 		                data-export-types="['excel']"
@@ -48,15 +51,15 @@
 		                -->
 		                    <thead>
 		                       <tr>
-		                    		<th >Leftover roll</th>
-		                            <th >Mattress Orig</th>
-		                            <th >Mattress New</th>
-		                            <th >G bin</th>
-		                            <th >Skeda</th>
-		                            <th >Status</th>
-		                            <th >No of parts</th>
-		                            <th >Operator</th>
-		                            <th >Created</th>
+		                    		<th data-sortable="true">Leftover roll</th>
+		                            <th data-sortable="true">Mattress Orig</th>
+		                            <th data-sortable="true">Mattress New</th>
+		                            <th data-sortable="true">G bin</th>
+		                            <th data-sortable="true">Skeda</th>
+		                            <th data-sortable="true">Status</th>
+		                            <th data-sortable="true">No of parts</th>
+		                            <th data-sortable="true">Operator</th>
+		                            <th data-sortable="true">Created</th>
 		                            <th></th>
 
 		                            @if(Auth::user()->level() == 3)
@@ -95,7 +98,6 @@
 		                    @endforeach
 		                    </tbody>
 		                  </table>
-
 					</div>
 			</div>
         </div>

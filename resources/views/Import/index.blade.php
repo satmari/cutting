@@ -103,6 +103,21 @@
 					{!! Form::close() !!}
 				</div>
 
+				<div class="panel panel-default">
+					<div class="panel-heading">Marker - change status (Excel file)</div>
+					
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImport_marker_status']]) !!}
+					
+						<div class="panel-body">
+							{!! Form::file('file7', ['class' => 'center-block']) !!}
+						</div>
+						<div class="panel-body">
+							{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
+						</div>
+						@include('errors.list')
+					{!! Form::close() !!}
+				</div>
+
 				@endif
 			@endif
 

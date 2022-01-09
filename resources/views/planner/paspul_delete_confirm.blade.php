@@ -10,9 +10,7 @@
 				<!-- <br> -->
 					
 					<div class="alert alert-warning" role="alert">
-					 
 					 	Are you sure to delete paspul roll?
-					  
 					</div>
 					
 					{!! Form::open(['method'=>'POST', 'url'=>'/paspul_delete_confirm']) !!}
@@ -20,17 +18,13 @@
 
 						{!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
 						
-						
 						{!! Form::submit('Confirm', ['class' => 'btn  btn-success center-block']) !!}
 						@include('errors.list')
 
 					{!! Form::close() !!}
 					<!-- <hr> -->
 					<br>
-
-					
 				<!-- <hr> -->
-				
 			</div>
 		</div>
 	</div>

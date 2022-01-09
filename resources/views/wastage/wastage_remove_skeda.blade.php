@@ -43,6 +43,7 @@
                            
                            <th>Skeda</th>
                            <th></th>
+                           <th></th>
 
                         </tr>
                     </thead>
@@ -58,6 +59,11 @@
                             <td>
                             @if(Auth::check())
                                 <a href="{{ url('wastage_remove_skeda/'.$d->skeda) }}" class="btn btn-danger btn-xs center-block">Remove all bags</a>
+                            @endif
+                            </td>
+                            <td>
+                            @if(Auth::check())
+                                <a href="{{ url('wastage_remove_skeda_partialy/'.$d->skeda) }}" class="btn btn-warning btn-xs center-block">Remove bags partialy</a>
                             @endif
                             </td>
                         </tr>

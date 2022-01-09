@@ -20,7 +20,6 @@
 
 						{!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
 						
-						
 						{!! Form::submit('Confirm', ['class' => 'btn  btn-warning center-block']) !!}
 						@include('errors.list')
 

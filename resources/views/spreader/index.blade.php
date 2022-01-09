@@ -2,7 +2,7 @@
 
 @section('content')
 
-{{ header( "refresh:10;url=/cutting/spreader" ) }}
+{{ header( "refresh:60;url=/cutting/spreader" ) }}
 
 <div class="container-fluid">
     <div class="row">
@@ -10,14 +10,34 @@
         		<div class="text-center">
 		            <div class="panel panel-default">
 
-		            	<div class="input-group"> <span class="input-group-addon">Efficiency: &nbsp; &nbsp; &nbsp;<big><b>100</b> m</big></span>
+		            	@if ((Auth::user()->name == 'MM11') OR (Auth::user()->name == 'MM12') OR (Auth::user()->name == 'MM13')
+		            	OR (Auth::user()->name == 'MS11') OR (Auth::user()->name == 'MS12') OR (Auth::user()->name == 'MS13')
+		            	OR (Auth::user()->name == 'MS21') OR (Auth::user()->name == 'MS22') OR (Auth::user()->name == 'MS23')
+		            	OR (Auth::user()->name == 'MS31') OR (Auth::user()->name == 'MS32') OR (Auth::user()->name == 'MS33')
+		            	)
+		            	<div class="input-group">
+		            		<span class="input-group-addon" style="">
+		            			Efficiency1: &nbsp; <big><b>{{ $eff}} </b></big>
+		            		
+		            			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+		            			Efficiency2: &nbsp; <big><b>{{ $eff2}} </b></big>
+		            		
+		            		</span>
 		                </div>
+		                @else
+		                <div class="input-group">
+		            		<span class="input-group-addon">
+		            			Efficiency: &nbsp; &nbsp; <big><b>{{ $eff}} </b></big>
+		            		</span>
+		                </div>
+
+		                @endif
 
 		        	 	<div class="input-group"> <span class="input-group-addon">Filter</span>
 		                    <input id="filter" type="text" class="form-control" placeholder="Type here...">
 		                </div>
 
-		                <table class="table table-striped table-bordered" id="table-draggable2" 
+		                <table class="table table-striped table-bordered tableFixHead" id="table-draggable2" 
 		                >
 		                <!--
 		                data-export-types="['excel']"
@@ -44,9 +64,16 @@
 		                -->	
 		                    <thead>
 		                       <tr>
-		                    		<th >Position</th>
-		                       		<th >G-bin</th>
-		                            <th >Mattress</th>
+		                    		
+		                       		<!-- <th >G-bin</th> -->
+		                            <!-- <th >Mattress</th> -->
+		                            @if ((Auth::user()->name == 'MM11') OR (Auth::user()->name == 'MM12') OR (Auth::user()->name == 'MM13'))
+		                            	<th >Created_at</th>
+		                            	<th >Mattress</th>
+		                            @else 
+		                            	<th >Pos</th>
+			                            <th >G-bin</th>
+		                            @endif
 		                            <th >Marker</th>
 		                            <th >Marker Length [m]</th>
 		                            <th >Extra [cm]</th>
@@ -54,6 +81,7 @@
 		                            <th >Layers</th>
 		                            <!-- <th >Layers in last shift</th> -->
 		                            <th >PRO</th>
+		                            <th >Destination</th>
 		                            <th >SKU</th>
 		                            <th >Material</th>
 		                            <th >Dye Lot</th>
@@ -62,9 +90,13 @@
 		                            <th >Spreading Method</th>
 		                            <th >Pcs per Bundle</th>
 		                            <th >Bottom Paper</th>
+		                            <th >Overlapping</th>
 		                            <th >Priority</th>
 		                            <th >Status</th>
 		                            <th >Keep wastage</th>
+		                            @if (Auth::user()->name == 'MM11')
+		                            <th >Layer limit</th>
+		                            @endif
 		                            <th></th>
 		                            
 		                            <th></th>
@@ -85,9 +117,18 @@
 				                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
 											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
 		                            
-		                            <td>{{ $req->position}}</td>
-		                            <td class=""><span>{{ $req->g_bin}}</span></td>
-				        	    	<td class=""><span>{{ $req->mattress}}</span></td>
+		                            <!-- <td class=""><span>{{ $req->g_bin}}</span></td> -->
+				        	    	<!-- <td class=""><span>{{ $req->mattress}}</span></td> -->
+
+				        	    	@if ((Auth::user()->name == 'MM11') OR (Auth::user()->name == 'MM12') OR (Auth::user()->name == 'MM13'))
+				        	    		<td class=""><span>{{ substr($req->created_at,0,16)}}</span></td>
+		                            	<td class=""><span>{{ $req->mattress}}</span></td>
+		                            	
+		                            @else
+		                            	<td>{{ $req->position}}</td>
+		                            	<td class=""><span>{{ $req->g_bin}}</span></td>
+		                            @endif
+
 		                            <td>{{ $req->marker_name}}</td>
 		                            <td>{{ round($req->marker_length,3)}}</td>
 		                            <td>{{ round($req->extra,0)}}</td>
@@ -96,10 +137,11 @@
 		                            @else
 		                            	<td>{{ round($req->marker_width,3)}}</td>
 		                            @endif
-		                            <td>{{ round($req->layers,0)}}</td>
+		                            <td>{{ round($req->layers_a,0)}}</td>
 		                            <!-- <td></td> -->
 		                            <td style="width: 75px;">{{ $req->pro}}</td>
-		                            <td style="width: 110px;">{{ $req->sku}}</td>
+		                            <td style="width: 60px;">{{ $req->location_all}}</td>
+		                            <td style="min-width: 138px; max-width: 140px;">{{ $req->sku}}</td>
 		                            <td>{{ $req->material}}</td>
 		                            <td>{{ $req->dye_lot}}</td>
 		                            <td>{{ $req->color_desc}}</td>
@@ -107,6 +149,7 @@
 		                            <td style="width: 50px;">{{ $req->spreading_method}}</td>
 		                            <td >{{ round($req->pcs_bundle,0)}}</td>
 			                        <td>{{ $req->bottom_paper}}</td>
+			                        <td>{{ $req->overlapping}}</td>
 		                            <td class="
 				                            @if ($req->priority == 3) top_priority
 						        	    	@elseif ($req->priority == 2) high_priority
@@ -123,7 +166,12 @@
 		                            @else
 		                            	<td>NO</td>
 		                            @endif
+
+		                            @if ( Auth::user()->name == 'MM11')
+		                            <td>{{$req->layer_limit}}</td>
 		                            
+		                            @endif
+
 									<td>
 										@if ($req->status == 'TO_LOAD')
 											<a href="{{ url('mattress_to_load/'.$req->id) }}" class="btn btn-info btn-xs center-block"
@@ -156,7 +204,22 @@
 			                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
 									box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
 			                        ">
+			                        <td></td>
+			                        @if (Auth::user()->name == 'MM11')
+			                        	<td class="">
+			                        	@if ($req->g_bin_orig != '')
+			                        		<span>F gbin: {{ $req->g_bin_orig}}</span>
+			                        	@endif
+			                        	</td>
 			                        <td  colspan="20" style="padding: 5px; text-align: left;">
+			                        @else 
+			                        	<td class="">
+			                        	@if ($req->g_bin_orig != '')
+			                        		<span>F gbin: {{ $req->g_bin_orig}}</span>
+			                        	@endif
+			                        	</td>
+			                        <td  colspan="19" style="padding: 5px; text-align: left;">
+			                        @endif
 			                        	@if ($req->comment_office != '')
 			                        	<b>Comment office:</b>
 			                        	<i>{{ $req->comment_office }}</i><br>

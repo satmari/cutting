@@ -19,7 +19,7 @@
 		                    <input id="filter" type="text" class="form-control" placeholder="Type here...">
 		                </div>
 
-		                <table class="table table-striped table-bordered" id="table-draggable2" 
+		                <table class="table table-striped table-bordered tableFixHead" id="table-draggable2" 
 		                
 		                >
 		                <!--
@@ -80,10 +80,18 @@
 			        	    		@elseif ($req->priority == 1)Normal
 				        	    	@endif</td>
 		                            
+		                            @if (isset($req->g_bin))
 									<td>
 										<a href="{{ url('mattress_pack/'.$req->id.'/'.$req->g_bin) }}" class="btn btn-danger btn-xs center-block">
 										Pack mattress</a>
 									</td>
+									@else
+									<td>
+										<a href="{{ url('mattress_pack_m/'.$req->id) }}" class="btn btn-danger btn-xs center-block">
+										Pack mini mattress</a>
+									</td> 
+									@endif
+
 									<td>
 										<a href="{{ url('other_functions_pack/'.$req->id) }}" class="btn btn-info btn-xs center-block">
 										Details</a>

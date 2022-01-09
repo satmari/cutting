@@ -29,12 +29,12 @@
 				{!! Form::hidden('marker', $marker, ['class' => 'form-control']) !!}
 				
 				<div class="panel-body" style="width:200px ; margin-left: 36%;">
-                	<p>Order qty: 		{{ $po_sum_qty }}  (test)</p>
-                	<p>Before cut: 		{{ $before_cut_actual }}</p>
-                	<p>After qty: 		{{ $already_cut_actual}}</p>
-                	<p>Required qty: 	{{ $po_sum_qty - ($before_cut_actual + $already_cut_actual)}}</p>
-                	<p>Pcs per size:	{{ $pc_per_layer}} </p>
-                	<p>Calculated layer limit: {{$layer_limit}} </p>
+                	<p>Order qty: 		<b>{{ $po_sum_qty }} </b></p>
+                	<p>Before cut: 		<b>{{ $before_cut_actual }}</b></p>
+                	<p>After qty: 		<b>{{ $already_cut_actual}}</b></p>
+                	<p>Required qty: 	<b>{{ $po_sum_qty - ($before_cut_actual + $already_cut_actual)}}</b></p>
+                	<p>Pcs per size:	<b>{{ $pc_per_layer}} </b></p>
+                	<p>Calculated layer limit: <b>{{$layer_limit}} </b></p>
                     
                 </div>
 				
@@ -44,10 +44,8 @@
                 </div>
                 <!-- <br> -->
                 
-        		
-        		<hr>
+        		<br><br>
 				{!! Form::submit('Confirm', ['class' => 'btn btn-success center-block']) !!}
-				
 
 				@include('errors.list')
 				{!! Form::close() !!}

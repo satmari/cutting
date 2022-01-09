@@ -21,12 +21,20 @@ class CreateMattressEffsTable extends Migration {
 
 			$table->float('layers_after_cs');
 			$table->string('operator_after');
+			$table->string('operator2_after')->nullable();
+			$table->dateTime('date_after')->nullable();
+			$table->string('location_after')->nullable();
+			$table->float('stimulation_after')->nullable();
+
 			$table->float('layers_before_cs')->nullable();
 			$table->string('operator_before')->nullable();
-
-			$table->float('stimulation_after');
+			$table->string('operator2_before')->nullable();
+			$table->dateTime('date_before')->nullable();
+			$table->string('location_before')->nullable();
 			$table->float('stimulation_before')->nullable();
 
+   		
+			
 			$table->timestamps();
 		});
 	}

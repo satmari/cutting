@@ -43,15 +43,14 @@
                             <tr><td>Skeda</td><td><b>{{ $skeda }} </b></td></tr>
                             <tr><td>Skeda type</td><td><b>{{ $skeda_item_type }} </b></td></tr>
                             <tr><td>Width usable (theoretical)</td><td><b>{{ round($width_theor_usable,3) }} </b></td></tr>
-                            <tr><td>Layers</td><td><b>{{ $layers }} </b></td></tr>
-                            <tr><td>Consumption planned</td><td><b>{{ round($cons_planned,3) }} </b></td></tr>
+                            <tr><td>Layers Planned</td><td><b>{{ round($layers,0) }} </b></td></tr>
+                            <tr><td>Consumption actual</td><td><b>{{ round($cons_actual,3) }} </b></td></tr>
                             <tr><td>Marker name</td><td><b>{{ $marker_name }} </b></td></tr>
                             <tr><td>Marker length</td><td><b>{{ round($marker_length,3) }} </b></td></tr>
                             <tr><td>Marker width</td><td><b>{{ round($marker_width,3) }} </b></td></tr>
                             <tr><td>TPP mat. keep wastage</td><td><b>@if ($tpp_mat_keep_wastage == 0) NO @else YES @endif</b></td></tr>
                             <tr><td>TPA number</td><td><b>{{ $tpa_number }} </b></td></tr>
                             </table>
-
                             
                         <div class="panel-body">
                         <p>Priority: <span style="color:red;">*</span></p>
@@ -61,7 +60,7 @@
 
                         <div class="panel-body">
                         <p>Pcs per bundle: <span style="color:red;">*</span></p>
-                            {!! Form::number('pcs_bundle', 30, ['class' => 'form-control', 'autofocus' => 'autofocus']) !!}
+                            {!! Form::number('pcs_bundle', round($pcs_bundle,0), ['class' => 'form-control', 'autofocus' => 'autofocus', 'step' => '0']) !!}
                         </div>
 
                         <div class="panel-body">

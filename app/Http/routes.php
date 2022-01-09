@@ -18,6 +18,8 @@ Route::controllers([
 	'password' => 'Auth\PasswordController',
 ]);
 
+Route::get('test', 'HomeController@test');
+
 // Reservations
 Route::get('reservation', 'reservationController@index');
 Route::get('hu_list', 'reservationController@hu_list');
@@ -129,6 +131,7 @@ Route::get('/wastage_wh_scan','wastageController@wastage_wh_scan');
 Route::post('req_wastage_wh', 'wastageController@req_wastage_wh');
 Route::post('req_wastage_wh_insert', 'wastageController@req_wastage_wh_insert');
 Route::get('wastage_table','wastageController@table');
+Route::get('wastage_table_all','wastageController@table_all');
 
 Route::get('move_sapbin_container','wastageController@move_sapbin_container');
 Route::post('move_sapbin_container_post','wastageController@move_sapbin_container_post');
@@ -142,6 +145,9 @@ Route::post('move_container_location_post_1','wastageController@move_container_l
 
 Route::get('wastage_remove_skeda','wastageController@wastage_remove_skeda');
 Route::get('wastage_remove_skeda/{id}','wastageController@wastage_remove_skeda_post');
+
+Route::get('wastage_remove_skeda_partialy/{skeda}','wastageController@wastage_remove_skeda_partialy');
+Route::post('wastage_remove_skeda_partialy_post','wastageController@wastage_remove_skeda_partialy_post');
 
 Route::post('delete_wastage_line','wastageController@delete_wastage_line');
 
@@ -169,6 +175,7 @@ Route::get('import', 'importController@index');
 Route::post('postImportConsPo', 'importController@postImportConsPo');
 Route::get('postImportUpdatePass', 'importController@postImportUpdatePass');
 Route::post('postImportMaterials', 'importController@postImportMaterials');
+Route::post('postImport_marker_status', 'importController@postImport_marker_status');
 
 Route::get('wastage_table_import','importController@index');
 Route::post('postImportWastage_report','importController@postImportWastage_report');
@@ -192,6 +199,11 @@ Route::post('operator_edit_post', 'operatorsController@operator_edit_post');
 Route::get('marker', 'markerController@index');
 Route::get('marker_details/{id}', 'markerController@index_line');
 Route::post('marker_line_confirm', 'markerController@marker_line_confirm');
+Route::get('marker_delete/{id}', 'markerController@marker_delete');
+Route::post('marker_delete_confirm', 'markerController@marker_delete_confirm');
+Route::get('marker_edit/{id}', 'markerController@marker_edit');
+Route::post('marker_edit_confirm', 'markerController@marker_edit_confirm');
+
 
 // Pro Skeda
 Route::get('pro_skeda', 'pro_skedaController@index');
@@ -230,10 +242,18 @@ Route::get('plan_mattress_line/{id}', 'plannerController@plan_mattress_line');
 Route::post('plan_mattress_line_confirm', 'plannerController@plan_mattress_line_confirm');
 Route::get('change_marker/{id}', 'plannerController@change_marker');
 Route::post('change_marker_post', 'plannerController@change_marker_post');
+Route::get('split_mattress/{id}', 'plannerController@split_mattress');
+Route::post('split_mattress_post', 'plannerController@split_mattress_post');
+Route::get('split_mattress_delete/{id}', 'plannerController@split_mattress_delete');
+Route::post('split_mattress_delete_confirm', 'plannerController@split_mattress_delete_confirm');
 Route::get('delete_mattress/{id}', 'plannerController@delete_mattress');
 Route::post('delete_mattress_confirm', 'plannerController@delete_mattress_confirm');
 Route::get('edit_mattress_line/{id}', 'plannerController@edit_mattress');
 Route::post('edit_mattress_line_confirm', 'plannerController@edit_mattress_confirm');
+Route::get('edit_layers_a/{id}', 'plannerController@edit_layers_a');
+Route::post('edit_layers_a_confirm', 'plannerController@edit_layers_a_confirm');
+
+Route::get('update_all_pro_actual', 'plannerController@update_all_pro_actual');
 
 Route::get('plan_mini_marker', 'plannerController@plan_mini_marker');
 Route::get('mini_marker_create', 'plannerController@mini_marker_create');
@@ -278,6 +298,8 @@ Route::post('print_mattress_multiple_mm_complete', 'plannerController@print_matt
 Route::get('spreader', 'spreaderController@index');
 Route::get('operator_login', 'spreaderController@operator_login');
 Route::get('operator_logout', 'spreaderController@operator_logout');
+Route::get('operator_login2', 'spreaderController@operator_login2');
+Route::get('operator_logout2', 'spreaderController@operator_logout2');
 Route::get('other_functions/{id}', 'spreaderController@other_functions');
 Route::get('mattress_to_load/{id}', 'spreaderController@mattress_to_load');
 Route::get('mattress_to_unload/{id}', 'spreaderController@mattress_to_unload');
@@ -286,6 +308,8 @@ Route::get('other_functions/{id}', 'spreaderController@other_functions');
 Route::post('add_operator_comment', 'spreaderController@add_operator_comment');
 Route::get('change_marker_request/{id}', 'spreaderController@change_marker_request');
 Route::post('change_marker_request_post', 'spreaderController@change_marker_request_post');
+Route::get('split_marker_request/{id}', 'spreaderController@split_marker_request');
+Route::post('split_marker_request_post', 'spreaderController@split_marker_request_post');
 // Route::get('create_new_mattress_request/{id}', 'spreaderController@create_new_mattress_request');
 Route::get('spread_mattress_partial/{id}', 'spreaderController@spread_mattress_partial');
 Route::post('spread_mattress_partial_post', 'spreaderController@spread_mattress_partial_post');
@@ -307,6 +331,7 @@ Route::get('pack', 'packController@index');
 Route::get('operator_login_pack', 'packController@operator_login');
 Route::get('operator_logout_pack', 'packController@operator_logout');
 Route::get('mattress_pack/{id}/{g_bin}', 'packController@mattress_pack');
+Route::get('mattress_pack_m/{id}', 'packController@mattress_pack_m');
 Route::get('mattress_pack_confirm/{id}', 'packController@mattress_pack_confirm');
 Route::get('other_functions_pack/{id}', 'packController@other_functions');
 
@@ -354,7 +379,11 @@ Route::get('o_roll_print', 'lrController@o_roll_print');
 Route::post('o_roll_print_confirm', 'lrController@o_roll_print_confirm');
 Route::post('o_roll_print_confirm_print', 'lrController@o_roll_print_confirm_print');
 
-
+// Search
+Route::get('recap_by_skeda_mattress', 'plannerController@recap_by_skeda_mattress');
+Route::post('recap_by_skeda_mattress_post', 'plannerController@recap_by_skeda_mattress_post');
+Route::get('recap_by_skeda_paspul', 'plannerController@recap_by_skeda_paspul');
+Route::post('recap_by_skeda_paspul_post', 'plannerController@recap_by_skeda_paspul_post');
 
 Route::get('/', 'HomeController@index');
 Route::get('home', 'HomeController@index');

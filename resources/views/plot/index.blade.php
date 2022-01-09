@@ -19,7 +19,7 @@
 		                    <input id="filter" type="text" class="form-control" placeholder="Type here...">
 		                </div>
 
-		                <table class="table table-striped table-bordered" id="table-draggable2" 
+		                <table class="table table-striped table-bordered tableFixHead" id="table-draggable2" 
 		                
 		                >
 		                <!--
@@ -59,7 +59,7 @@
 		                            <th></th>
 		                            <!-- <th></th> -->
 		                    	</tr>
-		                    </thead> 
+		                    </thead>
 		                    <tbody class="connectedSortable_t able searchable" id="sortable 10" >
 		                    	<!-- <tr>
 		                    		<th class=""><div><span>position</div></span></th>

@@ -1,11 +1,12 @@
 @extends('app')
 
 @section('content')
-<div class="container container-table">
-	<div class="row vertical-center-row">
-		<div class="text-center col-md-8 col-md-offset-2">
-			<div class="panel panel-default">
-				<div class="panel-heading"><b>Cut g bin: {{ $g_bin }}</b></div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="text-center">
+        	<div class="text-center">
+		        <div class="panel panel-default">
+				<div class="panel-heading"><b>Cut g bin: <span style="font-size:20px">{{ $g_bin }}</span></b></div>
 				<br>
 			    	
 				<div class="panel-body">	
@@ -14,9 +15,11 @@
 					{!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
 					{!! Form::hidden('mattress', $mattress, ['class' => 'form-control']) !!}
 					{!! Form::hidden('g_bin', $g_bin, ['class' => 'form-control']) !!}
+					{!! Form::hidden('skeda', $skeda, ['class' => 'form-control']) !!}
 					{!! Form::hidden('mattress_id', $mattress_id, ['class' => 'form-control']) !!}
 					{!! Form::hidden('status', $status, ['class' => 'form-control']) !!}
 					{!! Form::hidden('layers_a', $layers_a, ['class' => 'form-control']) !!}
+					
 					
 					@foreach($data_pro as $req0)
 						<input type="hidden" name="style_size[]" value="{{$req0->style_size}}">
@@ -38,10 +41,16 @@
                          <thead>
                          	<th>Style size</th>
                          	<th>Pro id</th>
+                         	<th>Marker</th>
+                         	<th>Marker Width</th>
+                         	<th>Marker Length</th>
+                         	<th>Layers planned</th>
                          	<th>Layers actual</th>
+                         	<th>Partial Layers</th>
                          	<th>Pcs per layer</th>
                          	<th>Planned Qty</th>
                          	<th>Actual Qty</th>
+                         	<th>Demaged Qty</th>
                          </thead>
                         <tbody class="search able">
                         <br>
@@ -49,11 +58,19 @@
                             <tr>
                                 <td>{{$line->style_size}}</td>
                                 <td>{{$line->pro_id}}</td>
+                                <td>{{$marker_name}}</td>
+                                <td>{{$marker_width}}</td>
+                                <td>{{$marker_length}}</td>
+                                <td>{{$layers}}</td>
                                 <td>{{$layers_a}}</td>
-                                <td>{{$line->pro_pcs_layer}}</td>
-                            	<td>{{$line->pro_pcs_planned}}</td>
+                                <td>{{$layers_partial}}</td>
+                                <td>{{round($line->pro_pcs_layer, 0)}}</td>
+                            	<!-- <td>{{$line->pro_pcs_planned}}</td> -->
+                            	<td>{{ round($line->pro_pcs_actual,0)}}</td>
+                            	<td>{{ ($layers_a * $line->pro_pcs_layer) + $layers_partial }}</td>
                                 <td>
-                                	<input type="number" style="width:130px" class="bt n c heck" name="pro_pcs_actual[]" value="{{$layers_a * $line->pro_pcs_layer}}">  
+                                	<input type="number" style="width:50px" class="bt n c heck" name="damaged_pcs[]" value="0">  
+                                	<input type="hidden" style="width:50px" class="bt n c heck" name="pro_pcs_actual[]" value="{{($layers_a * $line->pro_pcs_layer) + $layers_partial}}">  
                             	</td>
                             </tr>
                         @endforeach
@@ -82,7 +99,7 @@
 	            <a href="{{ url('cutter') }}" class="btn btn-default center-bl ock">Back</a>
 	            <br> -->
 	            <br>
-
+	            </div>
 			</div>
 		</div>
 	</div>

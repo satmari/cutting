@@ -16,7 +16,7 @@
                 <div class="input-group"> <span class="input-group-addon">Filter</span>
                     <input id="filter" type="text" class="form-control" placeholder="Type here...">
                 </div>
-                <table class="table table-striped table-bordered" id="sort" 
+                <table class="table table-striped table-bordered tableFixHead" id="sort" 
                 data-show-export="true"
                 data-export-types="['excel']"
                 >

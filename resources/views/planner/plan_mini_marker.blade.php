@@ -18,14 +18,11 @@
 						<div class="">
 							<a href="{{url('/o_roll_print')}}" class="btn btn-success center-block">Print Leftover Roll (LR label)</a>
 						</div>
-						
 						<hr>
 						<div class="">
 							<a href="{{url('/o_roll_table')}}" class="btn btn-default center-block">Table of leftover rolls</a>
 						</div>
-
 					</div>
-		              
 				</div>
         </div>
     </div>

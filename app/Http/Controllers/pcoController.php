@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
 use App\mattress_details;
-use App\mattress_phases;
 use App\mattress_markers;
 use App\marker_change;
 use App\paspul;
@@ -92,6 +91,50 @@ class pcoController extends Controller {
 		  WHERE p2.[location] = '".$location."' AND p2.[active] = '1' 
 		  ORDER BY p1.[position] asc"));
 		// dd($data);
+
+		$pros= '';
+		$skus= '';
+		$sku_s= '';
+		$location_all= '';
+		
+		for ($i=0; $i < count($data) ; $i++) { 
+			
+			$id = $data[$i]->id;
+			
+			$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				ps.pro
+				,ps.style_size
+				,ps.sku
+				,po.[location_all]
+				--,*
+			  FROM  [pro_skedas] as ps 
+			  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+			WHERE ps.[skeda] = '".$data[$i]->skeda."' "));
+			// dd($prom);
+
+			for ($x=0; $x < count($prom); $x++) { 
+
+				$pros .= $prom[$x]->pro." ";
+				$skus .= $prom[$x]->style_size." ";
+				$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+				$sku_s .= $test." ";
+				// $sku_s .= $prom[$x]->sku." ";
+				if ($prom[$x]->location_all == 'Valy') {
+					$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+				} else {
+					$location_all .= $prom[$x]->location_all." ";
+				}
+			}
+
+			$data[$i]->pro = trim($pros);
+			$data[$i]->style_size = trim($skus);
+			$data[$i]->sku = trim($sku_s);
+			$data[$i]->location_all = trim($location_all);
+			$pros = '';
+			$skus = '';
+			$sku_s = '';
+			$location_all = '';
+		}
 
 		// $work_place = substr($device, 0,2);
 		$work_place = "PCO";
@@ -262,8 +305,8 @@ class pcoController extends Controller {
 		FROM 
 		(
 		SELECT position 
-		FROM [cutting].[dbo].[paspuls] as p
-		JOIN [cutting].[dbo].[paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND active = '1'
+		FROM [paspuls] as p
+		JOIN [paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND active = '1'
 		WHERE pl.[location] = '".$location."'
 		) SQ
 		ORDER BY position desc"));
@@ -289,9 +332,8 @@ class pcoController extends Controller {
 		$operator1 = Session::get('operator');
 		$operator2;
 		//-----
-		// dd("Stop");
+		
 		// try {
-
 			$find_all_papul_lines = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 				[id], [paspul_roll], [paspul_roll_id]
 			FROM [paspul_lines] WHERE [paspul_roll_id] = '".$id."' AND active = 1"));
@@ -356,6 +398,12 @@ class pcoController extends Controller {
 				}
 			}
 
+			if ((date('H') >= 0) AND (date('H') < 6)) {
+			   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
+			} else {
+				$date = date('Y-m-d H:i:s');
+			}
+
 			$table_p = new paspul_line;
 
 			$table_p->paspul_roll_id = $table->id;
@@ -366,6 +414,7 @@ class pcoController extends Controller {
 			$table_p->active = $active;
 			$table_p->operator1 = Session::get('operator');
 			$table_p->operator2;
+			$table_p->date = $date;
 			$table_p->save();
 
 		// }

@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
 use App\mattress_details;
-use App\mattress_phases;
 use App\mattress_markers;
 use App\marker_change;
 
@@ -109,8 +108,8 @@ class plotController extends Controller {
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
 		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
 		  WHERE m4.[active] = '1' AND m2.[printed_marker] = '0' AND m3.[marker_name] != '' 
-		  		AND (m4.[status] != 'DELETED' AND m4.[status] != 'COMPLETED') 
-		  		AND (m1.[skeda_item_type] = 'MS' OR m1.[skeda_item_type] = 'MM')
+		  		AND (m4.[status] != 'DELETED' AND m4.[status] != 'COMPLETED' AND m4.[status] != 'NOT_SET' AND m4.[status] != 'ON_HOLD') 
+		  		AND (m1.[skeda_item_type] = 'MS' OR m1.[skeda_item_type] = 'MM' )
 		  ORDER BY m2.[position] asc"));
 		// dd($data);
 

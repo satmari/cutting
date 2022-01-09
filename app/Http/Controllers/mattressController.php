@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Redirect;
 use App\mattresses;
 use App\mattress_details;
 use App\mattress_markers;
-use App\mattress_phases;
 use App\mattress_pros;
 
 use DB;

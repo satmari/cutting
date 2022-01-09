@@ -28,6 +28,15 @@ class markerController extends Controller {
 	public function index()
 	{
 		//
+
+		// if ((date('H') >= 0) AND (date('H') < 6)) {
+		//    	$date_before = date('Y-m-d H:i:s', strtotime(' -1 day'));
+		// } else {
+		// 	$date_before = date('Y-m-d H:i:s');
+		// }
+		// // $date_before = date('Y-m-d H:i:s', strtotime(' -1 day'));
+		// dd($date_before);
+
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM marker_headers"));
 		return view('marker.table',compact('data'));
 	}
@@ -157,7 +166,117 @@ class markerController extends Controller {
 		return Redirect::to('marker');
 		// dd("stop");
 		
+	}
+
+	public function marker_delete($id) {
+
+		// dd($id);
+		return view('marker.marker_delete',compact('id'));
+
+	}
+
+	public function marker_delete_confirm(Request $request)
+	{	
+		$this->validate($request, ['id'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+
+		$id =  $input['id'];
+		// dd($id);
+
+		$marker_data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM marker_headers WHERE id = '".$id."' "));
+		// dd($data);
+		if(isset($marker_data[0]->marker_name)) {
+			$marker_name = $marker_data[0]->marker_name;
+		} else {
+			dd('No marker with that id');
+		}
+
+		$mattress_data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM mattress_markers WHERE marker_name= '".$marker_name."' "));
+		// dd($mattress_data);
+
+		if (isset($mattress_data[0]->id)) {
+			
+			// dd('This marker is already used! You can not delete it!');	
+			$msg ='This marker is already used! You can not delete it!';
+			return view('marker.error',compact('msg'));
+		}
+
+		$marker_line = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM marker_lines WHERE marker_header_id = '".$marker_data[0]->id."' "));
+		// dd($marker_line);
+
+		if (isset($marker_line[0]->id)) {
+			
+			for ($i=0; $i < count($marker_line) ; $i++) { 
+			
+				$table_line = marker_line::findOrFail($marker_line[$i]->id);
+				$table_line->delete();
+			}	
+		}
 		
+		$table_header = marker_header::findOrFail($marker_data[0]->id);
+		$table_header->delete();
+
+		return Redirect::to('marker');
+
+	}
+
+	public function marker_edit ($id) {
+		
+		$data = marker_header::findOrFail($id);
+		// dd($data);
+
+		return view('marker.marker_edit', compact('data'));
+	}
+
+	public function marker_edit_confirm (Request $request) {	
+		$this->validate($request, ['id'=>'required', 'status' => 'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+
+		$id =  $input['id'];
+		$status =  $input['status'];
+
+		// dd($status);
+		$marker='';
+		if ($status == 'NOT ACTIVE') {
+				
+			$check_if_is_in_use = DB::connection('sqlsrv')->select(DB::raw("SELECT	mp.mattress_id
+				,mp.mattress
+				,mp.status
+				,mm.marker_name
+			FROM [cutting].[dbo].[mattress_phases] as mp
+			JOIN [cutting].[dbo].[mattress_markers] as mm ON mp.mattress_id = mm.mattress_id
+			WHERE mp.active = 'True' AND 
+			(mp.status = 'NOT_SET' OR mp.status = 'TO_LOAD' OR mp.status = 'TO_SEPREAD' OR mp.status = 'TO_CUT' OR mp.status = 'ON_CUT' OR mp.status = 'ON_HOLD') AND 
+			marker_id = '".$id."' "));
+			// dd($check_if_is_in_use);
+
+			if (!empty($check_if_is_in_use)) {
+				for ($i=0; $i < count($check_if_is_in_use) ; $i++) { 
+
+					// dd($check_if_is_in_use[$i]->marker_name);
+					$marker = $marker.$check_if_is_in_use[$i]->mattress.' , ';
+				}
+				// dd('Marker/s have mattresses that are in use: '.$marker);
+
+			} else {
+				$data = marker_header::findOrFail($id);
+				$data->status = strtoupper($status);
+				$data->save();
+			}
+
+		} else {
+			$data = marker_header::findOrFail($id);
+			$data->status = strtoupper($status);
+			$data->save();
+		}
+
+		if (!$marker == '') {
+			dd('Marker have mattress that is in use: '.$marker);
+		}
+		
+		return Redirect::to('marker');
 	}
 	
 

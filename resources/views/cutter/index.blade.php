@@ -16,7 +16,7 @@
 		                    <input id="filter" type="text" class="form-control" placeholder="Type here...">
 		                </div>
 
-		                <table class="table table-striped table-bordered" id="table-draggable2" 
+		                <table class="table table-striped table-bordered tableFixHead" id="table-draggable2" 
 		                
 		                >
 		                <!--
@@ -67,6 +67,7 @@
 		                            <th >Priority</th>
 		                            <th >Status</th>
 		                            <th >Keep wastage</th>
+		                            <th >Layers partial</th>
 			                        
 		                            <th></th>
 		                            <th></th>
@@ -96,7 +97,7 @@
 		                            <td>{{ round($req->layers,0)}}</td>
 		                            <td>{{ round($req->layers_a,0)}}</td>
 		                            {{--<td style="width: 75px;">{{ $req->pro}}</td>--}}
-		                            {{--<td style="width: 110px;">{{ $req->sku}}</td>--}}
+		                            {{--<td style="width: 120px;">{{ $req->sku}}</td>--}}
 		                            <td>{{ $req->material}}</td>
 		                            <td>{{ $req->dye_lot}}</td>
 		                            <td>{{ $req->color_desc}}</td>
@@ -123,6 +124,8 @@
 		                            @else
 		                            	<td>NO</td>
 		                            @endif
+
+		                            <td>{{ round($req->layers_partial,0) }}</td>
 
 									<td>
 										@if ($req->status == "TO_CUT")
@@ -154,7 +157,7 @@
 					                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
 											box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
 					                        ">
-					                        <td  colspan="15" style="padding: 5px; text-align: left;">
+					                        <td  colspan="16" style="padding: 5px; text-align: left;">
 					                        	@if ($req->comment_office != '')
 					                        	<b>Comment office:</b>
 					                        	<i>{{ $req->comment_office }}</i><br>

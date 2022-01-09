@@ -23,7 +23,16 @@
                             Skeda: <b>{{ $skeda}} </b><br>
                             Skeda type: <b>{{ $skeda_item_type}} </b><br>
                             Rewinding method: <b>{{ $rewinding_method}} </b><br>
-                            Priority: <b>{{ $priority}} </b><br>
+                            Priority: <b>
+                            @if ($priority == 3)Top
+                            @elseif ($priority == 2)High
+                            @elseif ($priority == 1)Normal
+                            @endif
+                            </b><br>
+
+
+                                            
+                           
                             
                             @if($call_shift_manager == 1)
                              Call shift manager: <b>Yes</b> 

@@ -1,5 +1,25 @@
 <?php namespace App\Http\Controllers;
 
+use App\Http\Requests;
+use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\ModelNotFoundException as ModelNotFoundException;
+use Illuminate\Database\QueryException as QueryException;
+use App\Exceptions\Handler;
+
+use Illuminate\Http\Request;
+//use Gbrock\Table\Facades\Table;
+use Illuminate\Support\Facades\Redirect;
+
+use App\mattress_details;
+use App\mattress_phases;
+use App\mattress_eff;
+use App\mattress_pro;
+use App\mattresses;
+use App\mattress_split_request;
+use App\po;
+
+use DB;
+
 use App\User;
 use Bican\Roles\Models\Role;
 use Bican\Roles\Models\Permission;
@@ -16,8 +36,8 @@ class HomeController extends Controller {
 		$this->middleware('auth');
 	}
 
-	public function index()
-	{	
+	public function index() {	
+
 		$user = User::find(Auth::id());
 
 		// if ($user->is('admin')) { 
@@ -57,7 +77,7 @@ class HomeController extends Controller {
 				//       ,[operator]
 				//       ,[device]
 				//       ,[device_array]
-				//   FROM [cutting].[dbo].[operators]
+				//   FROM [operators]
 				//   WHERE device like '%".$work_place."%' AND status = 'ACTIVE' "));
 				// dd($operators);
 				
@@ -133,6 +153,82 @@ class HomeController extends Controller {
 		}
 
 		return view('home');
+	}
+
+	public function test() {
+		// dd("test");
+
+		/*
+		$find_mattress_id = DB::connection('sqlsrv')->select(DB::raw("SELECT mattress_id, status, COUNT(*) as lines
+			FROM [cutting].[dbo].[mattress_phases]
+			--WHERE status != 'TO_LOAD' AND status != 'ON_HOLD' AND status != 'TO_SPREAD'
+			GROUP BY mattress_id, status
+			HAVING COUNT(*) > 1
+			ORDER BY mattress_id
+		"));
+		// dd($find_mattress_id);
+
+		for ($i=0; $i < count($find_mattress_id); $i++) { 
+			// dd($find_mattress_id[$i]->mattress_id);
+
+			$find_to_load = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP (1) *
+				FROM mattress_phases
+				WHERE (mattress_id = '".$find_mattress_id[$i]->mattress_id."') AND (status = 'TO_LOAD')
+			"));
+
+			// dd($find_to_load[0]->id);
+			// $l = mattress_phases::findOrFail($find_to_load[0]->id);
+	    	// $l->delete();
+
+		}
+		
+
+		$mattress_phases_not_active = DB::connection('sqlsrv')->update(DB::raw("
+				UPDATE [mattress_phases_old]
+				SET active = 0
+				WHERE mattress_id = '1';
+		"));
+		*/
+		
+		// $id = 2832;
+
+		// $mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
+		// 	SET NOCOUNT ON;
+		// 	UPDATE [mattress_phases]
+		// 	SET active = 0
+		// 	WHERE mattress_id = '".$id."' AND active = 1;
+		// 	SELECT TOP 1 mattress FROM [mattress_phases] WHERE mattress_id = '".$id."';
+		// "));
+		// $mattress = $mattress_phases_not_active[0]->mattress;
+		// dd($mattress);
+
+
+		
+		
+
+		// firstOrNew;
+		// $table3_new = new po;
+		// $table3_new->po = '112293';
+		// $table3_new->status = '112233';
+		// $table3_new->save();
+	
+		// firstOrNew;
+		// $table3_new = po::firstOrNew(['status' => 'ssnew1', 'po' => '112295']);
+		// $table3_new->po = '112295';
+		// $table3_new->status = 'ssnew';
+		// $table3_new->save();
+
+		// $table3_new = mattress_phases::firstOrNew(['id_status' => 'ssnew1']);
+		// $table3_new->po = '112295';
+		// $table3_new->status = 'ssnew';
+		// $table3_new->save();
+
+
+		$jedan = 1;
+		$dva = 'dva';
+
+		$final = $jedan.'-'.$dva;
+		dd($final);
 	}
 
 }

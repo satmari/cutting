@@ -16,9 +16,11 @@ use App\mattress_markers;
 use App\mattress_pro;
 use App\marker_change;
 use App\mattress;
+use App\mattress_eff;
 use App\o_roll;
 use App\paspul;
 use App\paspul_line;
+use App\mattress_split_request;
 
 use App\print_standard_mattress;
 use App\print_mini_mattress;
@@ -36,6 +38,7 @@ use Validator;
 
 class plannerController extends Controller {
 
+//DEFAULT
 	public function plan_mattress($location) {
 		
 		$operator = Session::get('operator');
@@ -62,7 +65,7 @@ class plannerController extends Controller {
 				$msg ='Operator must be logged!';
 				return view('planner.error',compact('msg', 'operator', 'operators'));	
 			}
-			dd('stop');
+			return redirect('/');
 		}
 
 		if (($location == 'LEC1') OR ($location == 'LEC2')) {
@@ -89,6 +92,7 @@ class plannerController extends Controller {
 		      ,m2.[layers_a]
 		      ,m2.[length_mattress]
 		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
 		      ,m2.[extra]
 		      ,m2.[pcs_bundle]
 		      ,m2.[layers_partial]
@@ -107,6 +111,7 @@ class plannerController extends Controller {
 		      ,m2.[minimattress_code]
 		      ,m2.[printed_nalog]
 		      ,m2.[layer_limit]
+		      ,m2.[overlapping]
 		      --,'|'
 		      ,m3.[marker_id]
 		      ,m3.[marker_name]
@@ -127,19 +132,23 @@ class plannerController extends Controller {
 		      -- ,m5.[pro_pcs_layer]
 		      -- ,m5.[pro_pcs_planned]
 		      -- ,m5.[pro_pcs_actual]
+		      ,ms.[g_bin_orig]
 		      
 		  FROM [mattresses] as m1
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
 		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
-		  WHERE m4.[location] = '".$location."' AND m4.active = '1' 
-		  ORDER BY m2.position asc"));
+		  LEFT JOIN [mattress_split_requests] as ms ON ms.[mattress_id_new] = m1.[id]
+		  WHERE m4.[location] = '".$location."' AND m4.[active] = '1' 
+		  ORDER BY m2.[position] asc"));
 		// dd($data);
 	
 		$pros= '';
 		$skus= '';
 		$sku_s= '';
+		$location_all= '';
+
 		for ($i=0; $i < count($data) ; $i++) { 
 			
 			$id = $data[$i]->id;
@@ -148,27 +157,39 @@ class plannerController extends Controller {
 			if (($data[$i]->skeda_item_type == 'MS') OR ($data[$i]->skeda_item_type == 'MM')) {
 				
 				$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-					ps.pro
-					,ps.style_size
-					,ps.sku
+					ps.[pro]
+					,ps.[style_size]
+					,ps.[sku]
+					,po.[location_all]
 					--,*
 				  FROM [mattress_pros] as mp
-				  JOIN [pro_skedas] as ps ON ps.pro_id = mp.pro_id
-				WHERE mp.mattress_id = '".$id."' "));
+				  JOIN [pro_skedas] as ps ON ps.[pro_id] = mp.[pro_id]
+				  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+				WHERE mp.[mattress_id] = '".$id."' "));
+				// dd($prom);
 				
 				for ($x=0; $x < count($prom); $x++) { 
 
 					$pros .= $prom[$x]->pro." ";
 					$skus .= $prom[$x]->style_size." ";
-					$sku_s .= $prom[$x]->sku." ";
+					$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+					$sku_s .= $test." ";
+					// $sku_s .= $prom[$x]->sku." ";
+					if ($prom[$x]->location_all == 'Valy') {
+						$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+					} else {
+						$location_all .= $prom[$x]->location_all." ";
+					}
 				}
 
 				$data[$i]->pro = trim($pros);
 				$data[$i]->style_size = trim($skus);
 				$data[$i]->sku = trim($sku_s);
+				$data[$i]->location_all = trim($location_all);
 				$pros = '';
 				$skus = '';
 				$sku_s = '';
+				$location_all = '';
 
 			} else {
 
@@ -176,8 +197,10 @@ class plannerController extends Controller {
 					ps.pro
 					,ps.style_size
 					,ps.sku
+					,po.[location_all]
 					--,*
 				  FROM  [pro_skedas] as ps 
+				  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
 				WHERE ps.[skeda] = '".$data[$i]->skeda."' "));
 				// dd($prom);
 
@@ -185,20 +208,27 @@ class plannerController extends Controller {
 
 					$pros .= $prom[$x]->pro." ";
 					$skus .= $prom[$x]->style_size." ";
-					$sku_s .= $prom[$x]->sku." ";
+					$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+					$sku_s .= $test." ";
+					// $sku_s .= $prom[$x]->sku." ";
+					if ($prom[$x]->location_all == 'Valy') {
+						$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+					} else {
+						$location_all .= $prom[$x]->location_all." ";
+					}
 				}
 
 				$data[$i]->pro = trim($pros);
 				$data[$i]->style_size = trim($skus);
 				$data[$i]->sku = trim($sku_s);
+				$data[$i]->location_all = trim($location_all);
 				$pros = '';
 				$skus = '';
 				$sku_s = '';
+				$location_all = '';
 			}
-			
 		}
 
-	
 		if ($location == 'ON_HOLD') {
 			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 				   m2.[position]
@@ -220,6 +250,7 @@ class plannerController extends Controller {
 			      ,m2.[layers_a]
 			      ,m2.[length_mattress]
 			      ,m2.[cons_planned]
+			      ,m2.[cons_actual]
 			      ,m2.[extra]
 			      ,m2.[pcs_bundle]
 			      ,m2.[layers_partial]
@@ -238,6 +269,7 @@ class plannerController extends Controller {
 			      ,m2.[minimattress_code]
 			      ,m2.[printed_nalog]
 			      ,m2.[layer_limit]
+			      ,m2.[overlapping]
 			      --,'|'
 			      ,m3.[marker_id]
 			      ,m3.[marker_name]
@@ -258,17 +290,21 @@ class plannerController extends Controller {
 			      -- ,m5.[pro_pcs_layer]
 			      -- ,m5.[pro_pcs_planned]
 			      -- ,m5.[pro_pcs_actual]
+			      ,ms.[g_bin_orig]
+
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
 			  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
-			  WHERE m4.[status] = '".$location."' AND m4.active = '1' 
-			  ORDER BY m2.position asc"));
+			  LEFT JOIN [mattress_split_requests] as ms ON ms.[mattress_id_new] = m1.[id]
+			  WHERE m4.[status] = '".$location."' AND m4.[active] = '1' 
+			  ORDER BY m2.[position] asc"));
 
 			$pros= '';
 			$skus= '';
 			$sku_s= '';
+			$location_all= '';
 			for ($i=0; $i < count($data) ; $i++) { 
 			
 				$id = $data[$i]->id;
@@ -277,36 +313,49 @@ class plannerController extends Controller {
 				if (($data[$i]->skeda_item_type == 'MS') OR ($data[$i]->skeda_item_type == 'MM')) {
 					
 					$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-						ps.pro
-						,ps.style_size
-						,ps.sku
+						ps.[pro]
+						,ps.[style_size]
+						,ps.[sku]
+						,po.[location_all]
 						--,*
 					  FROM [mattress_pros] as mp
-					  JOIN [pro_skedas] as ps ON ps.pro_id = mp.pro_id
-					WHERE mp.mattress_id = '".$id."' "));
+					  JOIN [pro_skedas] as ps ON ps.[pro_id] = mp.[pro_id]
+					  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+					WHERE mp.[mattress_id] = '".$id."' "));
 					
 					for ($x=0; $x < count($prom); $x++) { 
 
 						$pros .= $prom[$x]->pro." ";
 						$skus .= $prom[$x]->style_size." ";
-						$sku_s .= $prom[$x]->sku." ";
+						$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+						$sku_s .= $test." ";
+						// $sku_s .= $prom[$x]->sku." ";
+						if ($prom[$x]->location_all == 'Valy') {
+							$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+						} else {
+							$location_all .= $prom[$x]->location_all." ";
+						}
 					}
 
 					$data[$i]->pro = trim($pros);
 					$data[$i]->style_size = trim($skus);
 					$data[$i]->sku = trim($sku_s);
+					$data[$i]->location_all = trim($location_all);
 					$pros = '';
 					$skus = '';
 					$sku_s = '';
+					$location_all = '';
 
 				} else {
 
 					$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-						ps.pro
-						,ps.style_size
-						,ps.sku
+						ps.[pro]
+						,ps.[style_size]
+						,ps.[sku]
+						,po.[location_all]
 						--,*
 					  FROM  [pro_skedas] as ps 
+					  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
 					WHERE ps.[skeda] = '".$data[$i]->skeda."' "));
 					// dd($prom);
 
@@ -314,18 +363,31 @@ class plannerController extends Controller {
 
 						$pros .= $prom[$x]->pro." ";
 						$skus .= $prom[$x]->style_size." ";
-						$sku_s .= $prom[$x]->sku." ";
+						$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+						$sku_s .= $test." ";
+						// $sku_s .= $prom[$x]->sku." ";
+						if ($prom[$x]->location_all == 'Valy') {
+							$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+						} else {
+							$location_all .= $prom[$x]->location_all." ";
+						}
 					}
 
 					$data[$i]->pro = trim($pros);
 					$data[$i]->style_size = trim($skus);
 					$data[$i]->sku = trim($sku_s);
+					$data[$i]->location_all = trim($location_all);
 					$pros = '';
 					$skus = '';
 					$sku_s = '';
+					$location_all = '';
 				}
-				
 			}
+		}
+
+		if ($location == 'TO_SPLIT') {
+			
+			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [mattress_split_requests] WHERE status = 'TO_SPLIT'"));	
 		}
 
 		if ($location == 'PLOT') {
@@ -349,6 +411,7 @@ class plannerController extends Controller {
 			      ,m2.[layers_a]
 			      ,m2.[length_mattress]
 			      ,m2.[cons_planned]
+			      ,m2.[cons_actual]
 			      ,m2.[extra]
 			      ,m2.[pcs_bundle]
 			      ,m2.[layers_partial]
@@ -367,6 +430,7 @@ class plannerController extends Controller {
 			      ,m2.[minimattress_code]
 			      ,m2.[printed_nalog]
 			      ,m2.[layer_limit]
+			      ,m2.[overlapping]
 			      --,'|'
 			      ,m3.[marker_id]
 			      ,m3.[marker_name]
@@ -387,18 +451,24 @@ class plannerController extends Controller {
 			      -- ,m5.[pro_pcs_layer]
 			      -- ,m5.[pro_pcs_planned]
 			      -- ,m5.[pro_pcs_actual]
+			      ,ms.[g_bin_orig]
+
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
 			  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
-			  WHERE m4.[active] = '1' AND m2.[printed_marker] = 0 AND m3.[marker_name] != '' AND (m4.[status] != 'DELETED' AND m4.[status] != 'COMPLETED')
+			  LEFT JOIN [mattress_split_requests] as ms ON ms.[mattress_id_new] = m1.[id]
+			  WHERE m4.[active] = '1' AND m2.[printed_marker] = 0 AND m3.[marker_name] != '' AND 
+			  	(m4.[status] != 'DELETED' AND m4.[status] != 'COMPLETED' AND 
+			  	m4.[status] != 'NOT_SET' AND m4.[status] != 'ON_HOLD')
 			  ORDER BY m2.position asc"));
 			
 			$pros= '';
 			$skus= '';
 			$sku_s= '';
-			for ($i=0; $i < count($data) ; $i++) { 
+			$location_all= '';
+			for ($i=0; $i < count($data) ; $i++) {
 			
 				$id = $data[$i]->id;
 				// dd($id);
@@ -406,36 +476,49 @@ class plannerController extends Controller {
 				if (($data[$i]->skeda_item_type == 'MS') OR ($data[$i]->skeda_item_type == 'MM')) {
 					
 					$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-						ps.pro
-						,ps.style_size
+						ps.[pro]
+						,ps.[style_size]
 						,ps.sku
+						,po.[location_all]
 						--,*
 					  FROM [mattress_pros] as mp
-					  JOIN [pro_skedas] as ps ON ps.pro_id = mp.pro_id
+					  JOIN [pro_skedas] as ps ON ps.[pro_id] = mp.[pro_id]
+					  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
 					WHERE mp.mattress_id = '".$id."' "));
 					
 					for ($x=0; $x < count($prom); $x++) { 
 
 						$pros .= $prom[$x]->pro." ";
 						$skus .= $prom[$x]->style_size." ";
-						$sku_s .= $prom[$x]->sku." ";
+						$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+						$sku_s .= $test." ";
+						// $sku_s .= $prom[$x]->sku." ";
+						if ($prom[$x]->location_all == 'Valy') {
+							$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+						} else {
+							$location_all .= $prom[$x]->location_all." ";
+						}
 					}
 
 					$data[$i]->pro = trim($pros);
 					$data[$i]->style_size = trim($skus);
 					$data[$i]->sku = trim($sku_s);
+					$data[$i]->location_all = trim($location_all);
 					$pros = '';
 					$skus = '';
 					$sku_s = '';
+					$location_all = '';
 
 				} else {
 
 					$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-						ps.pro
-						,ps.style_size
-						,ps.sku
+						ps.[pro]
+						,ps.[style_size]
+						,ps.[sku]
+						,po.[location_all]
 						--,*
 					  FROM  [pro_skedas] as ps 
+					  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
 					WHERE ps.[skeda] = '".$data[$i]->skeda."' "));
 					// dd($prom);
 
@@ -443,17 +526,25 @@ class plannerController extends Controller {
 
 						$pros .= $prom[$x]->pro." ";
 						$skus .= $prom[$x]->style_size." ";
-						$sku_s .= $prom[$x]->sku." ";
+						$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+						$sku_s .= $test." ";
+						// $sku_s .= $prom[$x]->sku." ";
+						if ($prom[$x]->location_all == 'Valy') {
+							$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+						} else {
+							$location_all .= $prom[$x]->location_all." ";
+						}
 					}
 
 					$data[$i]->pro = trim($pros);
 					$data[$i]->style_size = trim($skus);
 					$data[$i]->sku = trim($sku_s);
+					$data[$i]->location_all = trim($location_all);
 					$pros = '';
 					$skus = '';
 					$sku_s = '';
+					$location_all = '';
 				}
-				
 			}
 		}
 
@@ -471,10 +562,13 @@ class plannerController extends Controller {
 		      ,m1.[width_theor_usable]
 		      ,m2.[position]
 		      ,m2.[layers]
+		      ,m2.[layers_a]
 		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
 		      ,m2.[priority]
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
+		      ,m2.[overlapping]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -484,7 +578,7 @@ class plannerController extends Controller {
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
 		  WHERE m4.[location] = 'NOT_SET' AND m4.[active] = 1 
-		  ORDER BY m2.position asc"));
+		  ORDER BY m2.[position] asc"));
 			
 			$sp1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			   m1.[id]
@@ -498,10 +592,13 @@ class plannerController extends Controller {
 		      ,m1.[width_theor_usable]
 		      ,m2.[position]
 		      ,m2.[layers]
+		      ,m2.[layers_a]
 		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
 		      ,m2.[priority]
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
+		      ,m2.[overlapping]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -510,18 +607,18 @@ class plannerController extends Controller {
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'SP1' AND m4.active = 1 
-		  ORDER BY m2.position asc"));
+		  WHERE m4.[location] = 'SP1' AND m4.[active] = 1 
+		  ORDER BY m2.[position] asc"));
 
 			$sp1_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.layers_a) as sum_m_layers,
-					SUM(m2.cons_actual) as sum_m_cons
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
 			FROM [mattresses] as m1
 			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			WHERE m4.[location] = 'SP1' AND m4.active = 1"));
+			WHERE m4.[location] = 'SP1' AND m4.[active] = 1"));
 			$sp1_m = $sp1_m[0]->sum_m_cons;
 			// dd($sp1_m);
 
@@ -537,10 +634,13 @@ class plannerController extends Controller {
 		      ,m1.[width_theor_usable]
 		      ,m2.[position]
 		      ,m2.[layers]
+		      ,m2.[layers_a]
 		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
 		      ,m2.[priority]
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
+		      ,m2.[overlapping]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -549,18 +649,18 @@ class plannerController extends Controller {
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'SP2' AND m4.active = 1 
-		  ORDER BY m2.position asc"));
+		  WHERE m4.[location] = 'SP2' AND m4.[active] = 1 
+		  ORDER BY m2.[position] asc"));
 
 			$sp2_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.layers_a) as sum_m_layers,
-					SUM(m2.cons_actual) as sum_m_cons
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
 			FROM [mattresses] as m1
 			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			WHERE m4.[location] = 'SP2' AND m4.active = 1"));
+			WHERE m4.[location] = 'SP2' AND m4.[active] = 1"));
 			$sp2_m = $sp2_m[0]->sum_m_cons;
 
 			$sp3 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -575,10 +675,13 @@ class plannerController extends Controller {
 		      ,m1.[width_theor_usable]
 		      ,m2.[position]
 		      ,m2.[layers]
+		      ,m2.[layers_a]
 		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
 		      ,m2.[priority]
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
+		      ,m2.[overlapping]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -587,19 +690,19 @@ class plannerController extends Controller {
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'SP3' AND m4.active = 1 
-		  ORDER BY m2.position asc"));
+		  WHERE m4.[location] = 'SP3' AND m4.[active] = 1 
+		  ORDER BY m2.[position] asc"));
 			// dd($sp3);
 
 			$sp3_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.layers_a) as sum_m_layers,
-					SUM(m2.cons_actual) as sum_m_cons
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
 			FROM [mattresses] as m1
 			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			WHERE m4.[location] = 'SP3' AND m4.active = 1"));
+			WHERE m4.[location] = 'SP3' AND m4.[active] = 1"));
 			$sp3_m = $sp3_m[0]->sum_m_cons;
 
 			$sp4 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -614,10 +717,13 @@ class plannerController extends Controller {
 		      ,m1.[width_theor_usable]
 		      ,m2.[position]
 		      ,m2.[layers]
+		      ,m2.[layers_a]
 		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
 		      ,m2.[priority]
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
+		      ,m2.[overlapping]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -626,18 +732,18 @@ class plannerController extends Controller {
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'SP4' AND m4.active = 1 
-		  ORDER BY m2.position asc"));
+		  WHERE m4.[location] = 'SP4' AND m4.[active] = 1 
+		  ORDER BY m2.[position] asc"));
 
 			$sp4_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.layers_a) as sum_m_layers,
-					SUM(m2.cons_actual) as sum_m_cons
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
 			FROM [mattresses] as m1
 			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			WHERE m4.[location] = 'SP4' AND m4.active = 1"));
+			WHERE m4.[location] = 'SP4' AND m4.[active] = 1"));
 			$sp4_m = $sp4_m[0]->sum_m_cons;
 
 			$ms1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -652,10 +758,13 @@ class plannerController extends Controller {
 		      ,m1.[width_theor_usable]
 		      ,m2.[position]
 		      ,m2.[layers]
+		      ,m2.[layers_a]
 		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
 		      ,m2.[priority]
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
+		      ,m2.[overlapping]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -664,18 +773,18 @@ class plannerController extends Controller {
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'MS1' AND m4.active = 1 
-		  ORDER BY m2.position asc"));
+		  WHERE m4.[location] = 'MS1' AND m4.[active] = 1 
+		  ORDER BY m2.[position] asc"));
 
 			$ms1_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.layers_a) as sum_m_layers,
-					SUM(m2.cons_actual) as sum_m_cons
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
 			FROM [mattresses] as m1
 			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			WHERE m4.[location] = 'MS1' AND m4.active = 1"));
+			WHERE m4.[location] = 'MS1' AND m4.[active] = 1"));
 			$ms1_m = $ms1_m[0]->sum_m_cons;
 
 			$ms2 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -690,10 +799,13 @@ class plannerController extends Controller {
 		      ,m1.[width_theor_usable]
 		      ,m2.[position]
 		      ,m2.[layers]
+		      ,m2.[layers_a]
 		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
 		      ,m2.[priority]
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
+		      ,m2.[overlapping]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -702,18 +814,18 @@ class plannerController extends Controller {
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'MS2' AND m4.active = 1 
-		  ORDER BY m2.position asc"));
+		  WHERE m4.[location] = 'MS2' AND m4.[active] = 1 
+		  ORDER BY m2.[position] asc"));
 
 			$ms2_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.layers_a) as sum_m_layers,
-					SUM(m2.cons_actual) as sum_m_cons
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
 			FROM [mattresses] as m1
 			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			WHERE m4.[location] = 'MS2' AND m4.active = 1"));
+			WHERE m4.[location] = 'MS2' AND m4.[active] = 1"));
 			$ms2_m = $ms2_m[0]->sum_m_cons;
 
 			$ms3 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -728,10 +840,13 @@ class plannerController extends Controller {
 		      ,m1.[width_theor_usable]
 		      ,m2.[position]
 		      ,m2.[layers]
+		      ,m2.[layers_a]
 		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
 		      ,m2.[priority]
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
+		      ,m2.[overlapping]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -740,19 +855,19 @@ class plannerController extends Controller {
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'MS3' AND m4.active = 1 
-		  ORDER BY m2.position asc"));
+		  WHERE m4.[location] = 'MS3' AND m4.[active] = 1 
+		  ORDER BY m2.[position] asc"));
 			// dd($sp3);
 
 			$ms3_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.layers_a) as sum_m_layers,
-					SUM(m2.cons_actual) as sum_m_cons
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
 			FROM [mattresses] as m1
 			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			WHERE m4.[location] = 'MS3' AND m4.active = 1"));
+			WHERE m4.[location] = 'MS3' AND m4.[active] = 1"));
 			$ms3_m = $ms3_m[0]->sum_m_cons;
 
 			$mm1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -767,10 +882,13 @@ class plannerController extends Controller {
 		      ,m1.[width_theor_usable]
 		      ,m2.[position]
 		      ,m2.[layers]
+		      ,m2.[layers_a]
 		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
 		      ,m2.[priority]
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
+		      ,m2.[overlapping]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -784,9 +902,9 @@ class plannerController extends Controller {
 
 			$mm1_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.layers_a) as sum_m_layers,
-					SUM(m2.cons_actual) as sum_m_cons,
-					SUM(o.no_of_joinings) as o_sum
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons,
+					SUM(o.[no_of_joinings]) as o_sum
 			FROM [mattresses] as m1
 			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -820,6 +938,7 @@ class plannerController extends Controller {
 		      ,m2.[layers_a]
 		      ,m2.[length_mattress]
 		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
 		      ,m2.[extra]
 		      ,m2.[pcs_bundle]
 		      ,m2.[layers_partial]
@@ -837,6 +956,7 @@ class plannerController extends Controller {
 		      ,m2.[comment_operator]
 		      ,m2.[minimattress_code]
 		      ,m2.[printed_nalog]
+		      ,m2.[overlapping]
 		      --,'|'
 		      ,m3.[marker_id]
 		      ,m3.[marker_name]
@@ -857,12 +977,14 @@ class plannerController extends Controller {
 		      -- ,m5.[pro_pcs_layer]
 		      -- ,m5.[pro_pcs_planned]
 		      -- ,m5.[pro_pcs_actual]
+		      ,ms.[g_bin_orig]
 		      
 		  FROM [mattresses] as m1
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
 		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
+		  LEFT JOIN [mattress_split_requests] as ms ON ms.[mattress_id_new] = m1.[id]
 		  WHERE (m4.[location] IN ('SP1','SP2','SP3','SP4','MS1','MS2','MS3','MM1')) AND m4.[active] = '1' 
 		  ORDER BY m2.[position] asc"));
 			// dd($data);
@@ -870,9 +992,8 @@ class plannerController extends Controller {
 			$pros= '';
 			$skus= '';
 			$sku_s= '';
-			$pros= '';
-			$skus= '';
-			$sku_s= '';
+			$location_all= '';
+
 			for ($i=0; $i < count($data) ; $i++) { 
 			
 				$id = $data[$i]->id;
@@ -881,36 +1002,49 @@ class plannerController extends Controller {
 				if (($data[$i]->skeda_item_type == 'MS') OR ($data[$i]->skeda_item_type == 'MM')) {
 					
 					$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-						ps.pro
-						,ps.style_size
-						,ps.sku
+						ps.[pro]
+						,ps.[style_size]
+						,ps.[sku]
+						,po.[location_all]
 						--,*
 					  FROM [mattress_pros] as mp
-					  JOIN [pro_skedas] as ps ON ps.pro_id = mp.pro_id
-					WHERE mp.mattress_id = '".$id."' "));
+					  JOIN [pro_skedas] as ps ON ps.[pro_id] = mp.[pro_id]
+					  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+					WHERE mp.[mattress_id] = '".$id."' "));
 					
 					for ($x=0; $x < count($prom); $x++) { 
 
 						$pros .= $prom[$x]->pro." ";
 						$skus .= $prom[$x]->style_size." ";
-						$sku_s .= $prom[$x]->sku." ";
+						$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+						$sku_s .= $test." ";
+						// $sku_s .= $prom[$x]->sku." ";
+						if ($prom[$x]->location_all == 'Valy') {
+							$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+						} else {
+							$location_all .= $prom[$x]->location_all." ";
+						}
 					}
 
 					$data[$i]->pro = trim($pros);
 					$data[$i]->style_size = trim($skus);
 					$data[$i]->sku = trim($sku_s);
+					$data[$i]->location_all = trim($location_all);
 					$pros = '';
 					$skus = '';
 					$sku_s = '';
+					$location_all = '';
 
 				} else {
 
 					$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-						ps.pro
-						,ps.style_size
-						,ps.sku
+						ps.[pro]
+						,ps.[style_size]
+						,ps.[sku]
+						,po.[location_all]
 						--,*
 					  FROM  [pro_skedas] as ps 
+					  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
 					WHERE ps.[skeda] = '".$data[$i]->skeda."' "));
 					// dd($prom);
 
@@ -918,21 +1052,30 @@ class plannerController extends Controller {
 
 						$pros .= $prom[$x]->pro." ";
 						$skus .= $prom[$x]->style_size." ";
-						$sku_s .= $prom[$x]->sku." ";
+						$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+						$sku_s .= $test." ";
+						// $sku_s .= $prom[$x]->sku." ";
+						if ($prom[$x]->location_all == 'Valy') {
+							$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+						} else {
+							$location_all .= $prom[$x]->location_all." ";
+						}
 					}
 
 					$data[$i]->pro = trim($pros);
 					$data[$i]->style_size = trim($skus);
 					$data[$i]->sku = trim($sku_s);
+					$data[$i]->location_all = trim($location_all);
 					$pros = '';
 					$skus = '';
 					$sku_s = '';
+					$location_all = '';
 				}
-				
 			}
 		
 			return view('planner.plan_mattress', compact('data','location','operator','operators'));
 		}
+
 		return view('planner.plan_mattress', compact('data','location','operator','operators'));
 	}
 
@@ -957,11 +1100,13 @@ class plannerController extends Controller {
 			return redirect('/plan_mattress/BOARD');
 		}
 	}
+
 	public function operator_logout () {
 		
 		$operator = Session::set('operator', NULL);
 		return redirect('/plan_mattress/BOARD');
 	}
+
 	public function reposition() {
         $i = 0;
 
@@ -974,6 +1119,7 @@ class plannerController extends Controller {
         	}	
         }
     }
+
 	public function reposition2() {
 	        $i = 0;
 	        foreach ($_POST['SP'] as $value) {
@@ -984,65 +1130,73 @@ class plannerController extends Controller {
 	            // ->join('mattresses as m', 'm.id', '=', 'd.mattress_id')
 	            // ->where('m.id', '=', $value)->update(['d.position' =>  DB::raw($i) ]);
 	            
-	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'SP1', 'operator1' => Session::get('operator')]);
+	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'SP1'/*, 'operator1' => Session::get('operator')*/]);
 	        }	
 	}
+
 	public function reposition3() {
 	        $i = 0;
 	        foreach ($_POST['SP'] as $value) {
 	            $i++;
 	            DB::table('mattress_details')->where('mattress_id', '=', $value)->update([ 'position' => $i ]);
-	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'SP2', 'operator1' => Session::get('operator') ]);
+	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'SP2'/*, 'operator1' => Session::get('operator') */]);
 	        }		
 	}
+
 	public function reposition4() {
 	        $i = 0;
 	        foreach ($_POST['SP'] as $value) {
 	            $i++;
 	            DB::table('mattress_details')->where('mattress_id', '=', $value)->update([ 'position' => $i ]);
-	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'SP3', 'operator1' => Session::get('operator') ]);
+	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'SP3'/*, 'operator1' => Session::get('operator') */]);
 	        }	
 	}
+
 	public function reposition5() {
 	        $i = 0;
 	        foreach ($_POST['SP'] as $value) {
 	            $i++;
 	            DB::table('mattress_details')->where('mattress_id', '=', $value)->update([ 'position' => $i ]);
-	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'SP4', 'operator1' => Session::get('operator') ]);
+	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'SP4'/*, 'operator1' => Session::get('operator') */]);
 	        }	
 	}
+
 	public function reposition6() {
 	        $i = 0;
 	        foreach ($_POST['SP'] as $value) {
 	            $i++;
 	            DB::table('mattress_details')->where('mattress_id', '=', $value)->update([ 'position' => $i ]);
-	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'MS1', 'operator1' => Session::get('operator') ]);
+	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'MS1'/*, 'operator1' => Session::get('operator') */]);
 	        }	
 	}
+
 	public function reposition7() {
 	        $i = 0;
 	        foreach ($_POST['SP'] as $value) {
 	            $i++;
 	            DB::table('mattress_details')->where('mattress_id', '=', $value)->update([ 'position' => $i ]);
-	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'MS2', 'operator1' => Session::get('operator') ]);
+	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'MS2'/*, 'operator1' => Session::get('operator') */]);
 	        }		
 	}
+
 	public function reposition8() {
 	        $i = 0;
 	        foreach ($_POST['SP'] as $value) {
 	            $i++;
 	            DB::table('mattress_details')->where('mattress_id', '=', $value)->update([ 'position' => $i ]);
-	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',TRUE)->update(['location' => 'MS3', 'operator1' => Session::get('operator') ]);
+	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'MS3'/*, 'operator1' => Session::get('operator') */]);
 	        }	
 	}
+
 	public function reposition9() {
 	        $i = 0;
 	        foreach ($_POST['SP'] as $value) {
 	            $i++;
 	            DB::table('mattress_details')->where('mattress_id', '=', $value)->update([ 'position' => $i ]);
-	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'MM1', 'operator1' => Session::get('operator') ]);
+	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'MM1'/*, 'operator1' => Session::get('operator') */]);
 	        }	
 	}
+	
 	public function reposition_pas() {
         $i = 0;
 
@@ -1056,7 +1210,7 @@ class plannerController extends Controller {
         }
     }
 
-// mattress
+//MATTRESS
 	public function plan_mattress_line ($id) {
 
 		// dd($id);
@@ -1080,6 +1234,7 @@ class plannerController extends Controller {
 		      ,m2.[layers_a]
 		      ,m2.[length_mattress]
 		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
 		      ,m2.[extra]
 		      ,m2.[pcs_bundle]
 		      ,m2.[layers_partial]
@@ -1117,14 +1272,16 @@ class plannerController extends Controller {
 		      -- ,m5.[pro_pcs_layer]
 		      -- ,m5.[pro_pcs_planned]
 		      -- ,m5.[pro_pcs_actual]
+		      ,ms.[g_bin_orig]
 		      
 		  FROM [mattresses] as m1
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
 		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
-		  WHERE m1.[id] = '".$id."' AND m4.active = '1' 
-		  ORDER BY m2.position asc"));
+		  LEFT JOIN [mattress_split_requests] as ms ON ms.[mattress_id_new] = m1.[id]
+		  WHERE m1.[id] = '".$id."' AND m4.[active] = '1' 
+		  ORDER BY m2.[position] asc"));
 		// dd($data);
 
 		$mattress = $data[0]->mattress;
@@ -1138,7 +1295,9 @@ class plannerController extends Controller {
 		$spreading_method = $data[0]->spreading_method;
 		$width_theor_usable = $data[0]->width_theor_usable;
 		$layers = $data[0]->layers;
+		$layers_a = $data[0]->layers_a;
 		$cons_planned = $data[0]->cons_planned;
+		$cons_actual = $data[0]->cons_actual;
 		$marker_name = $data[0]->marker_name;
 		$marker_length = $data[0]->marker_length;
 		$marker_width = $data[0]->marker_width;
@@ -1152,7 +1311,7 @@ class plannerController extends Controller {
 		$comment_office = $data[0]->comment_office;
 		$tpa_number = $data[0]->tpa_number;
 
-		return view('planner.plan_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','cons_planned','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office'));
+		return view('planner.plan_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office'));
 	}
 
 	public function plan_mattress_line_confirm(Request $request) {
@@ -1199,13 +1358,43 @@ class plannerController extends Controller {
 					TOP 1 g_bin
 				FROM [mattresses] ORDER BY g_bin desc"));
 			// dd($find_g_bin);
-			$bin = (int)substr($find_g_bin[0]->g_bin, -8);
+			if (isset($find_g_bin[0])) {
+				if ($find_g_bin[0]->g_bin == NULL) {
+					$bin = 29999;			
+				} else {
+					$bin = (int)substr($find_g_bin[0]->g_bin, -8);	
+				}
+			}
+			
 			// dd($bin);
 			$num = str_pad($bin+1, 9, 0, STR_PAD_LEFT);
 			// dd("G".$num);
 
 			$g_bin = "G".$num;
 			// dd($g_bin);
+		}
+
+		// verify userId
+		if (Auth::check())
+		{
+		    $userId = Auth::user()->id;
+		    $device = Auth::user()->name;
+		} else {
+			$msg = 'User is not autenticated';
+			return view('planner.error',compact('msg'));
+		}
+
+		$operator = Session::get('operator');
+		if (!isset($operator) OR $operator == '') {
+			// return redirect('/spreader');
+			if ($user->is('admin')) {
+				
+				$operator = 'admin';
+				Session::set('operator', $operator);
+			} else {
+				$msg ='Operator must be logged!';
+				return view('planner.error',compact('msg', 'operator', 'operators'));	
+			}
 		}
 
 		// Position check
@@ -1247,53 +1436,52 @@ class plannerController extends Controller {
 		}
 		// dd("STOP");
 		// all mattress_phases for this mattress set to NOT ACTIVE
-
-		$find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT [id] FROM [mattress_phases] WHERE [mattress_id] = '".$id."' "));
+		// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT [id] FROM [mattress_phases] 
+		// WHERE [mattress_id] = '".$id."' "));
 		
-		if (isset($find_all_mattress_phasses[0])) {
-			// dd($find_all_mattress_phasses);
-			for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
-				try {
-					$table3 = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
-					$table3->active = 0;
-					$table3->save();
-				}
-				catch (\Illuminate\Database\QueryException $e) {
-					dd("Problem to save in mattress_phases, set all to not active");
-				}
-			}	
-		}
+		// if (isset($find_all_mattress_phasses[0])) {
+		// 	// dd($find_all_mattress_phasses);
+		// 	for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
+
+		// 			$table3 = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
+		// 			$table3->active = 0;
+		// 			$table3->save();
+		// 	}	
+		// }
+
+		$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
+			SET NOCOUNT ON;
+			UPDATE [mattress_phases]
+			SET active = 0, id_status = ''+cast([mattress_id] as varchar )+'-'+[status]
+			WHERE mattress_id = '".$id."' AND active = 1;
+			SELECT TOP 1 mattress FROM [mattress_phases] WHERE mattress_id = '".$id."';
+		"));
+		$mattress = $mattress_phases_not_active[0]->mattress;
 
 		// save new mattress_phases
 		$status = "TO_LOAD";
 		$active = 1;
-		// $operator1;
 
-		// verify userId
-		if (Auth::check())
-		{
-		    $userId = Auth::user()->id;
-		    $operator1 = Auth::user()->name;
+		if ((date('H') >= 0) AND (date('H') < 6)) {
+		   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
 		} else {
-			$msg = 'User is not autenticated';
-			return view('planner.error',compact('msg'));
+			$date = date('Y-m-d H:i:s');
 		}
-
-		try {
-			$table3_new = new mattress_phases;
-			$table3_new->mattress_id = $id;
-			$table3_new->mattress = $mattress;
-			$table3_new->status = $status;
-			$table3_new->location = $location;
-			$table3_new->device;
-			$table3_new->active = $active;
-			$table3_new->operator1 = Session::get('operator');
-			$table3_new->operator2;
-			$table3_new->save();
-		}
-		catch (\Illuminate\Database\QueryException $e) {
-			dd("Problem to save in mattress_phases");
-		}
+	
+		// $table3_new = new mattress_phases;
+		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
+		$table3_new->mattress_id = $id;
+		$table3_new->mattress = $mattress;
+		$table3_new->status = $status;
+		$table3_new->location = $location;
+		$table3_new->device;
+		$table3_new->active = $active;
+		$table3_new->operator1 = $operator;
+		$table3_new->operator2;
+		$table3_new->date = $date;
+		$table3_new->id_status = $id.'-'.$status;
+		$table3_new->save();
+	
 
 		// reorder position of NOT_SET
 		$reorder_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -1341,24 +1529,7 @@ class plannerController extends Controller {
 			$mattress = $find_marker[0]->mattress;
 			$g_bin = $find_marker[0]->g_bin;
 			// dd($existing_marker);
-			/*
-			$style = substr($mattress, 0,6);
-			// dd($style);
-
-			$markers = DB::connection('sqlsrv')->select(DB::raw("SELECT
-					marker_name
-				FROM [marker_headers] 
-				WHERE [marker_name] like '%".$style."%'
-				ORDER BY id"));
-			*/
-	
-			// $existing_marker_style_size = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-			// 	ml.[style_size],
-			// 	ml.[pcs_on_layer]
-			//   FROM [marker_headers] as mh
-			//   JOIN [marker_lines] as ml ON ml.[marker_header_id] = mh.[id]
-			//   WHERE mh.[marker_name] = 'CLD858-4S-4M-2L-171-R16' "));
-
+		
 			$existing_marker_style_size = DB::connection('sqlsrv')->select(DB::raw("SELECT mh.marker_name,
 				   size = STUFF(
 						(SELECT DISTINCT ' ' +CAST(ml.style_size as VARCHAR(MAX) 
@@ -1375,10 +1546,12 @@ class plannerController extends Controller {
 					(SELECT DISTINCT ' ' +CAST(ml.style_size as VARCHAR(MAX) 
 					)+ CAST (ml.pcs_on_layer as VARCHAR(MAX))
 					FROM [marker_lines] as ml
-					WHERE ml.marker_header_id = mh.id
+					WHERE ml.marker_header_id = mh.id 
 					FOR XML PATH('')),1,1,' '
 				)
-			FROM [marker_headers] as mh"));
+			FROM [marker_headers] as mh
+			WHERE mh.[status] = 'ACTIVE' "));
+			// dd($find_marker_style_size);
 
 			$markers[] = '';
 			for ($t=0; $t < count($find_marker_style_size); $t++) { 
@@ -1386,7 +1559,6 @@ class plannerController extends Controller {
 
 				if (trim($find_marker_style_size[$t]->size) == trim($existing_marker_style_size[0]->size)) {
 					// print_r($find_marker_style_size[$t]->marker_name."<br>");
-
 					array_push($markers, $find_marker_style_size[$t]->marker_name);
 				}
 			}
@@ -1442,7 +1614,7 @@ class plannerController extends Controller {
 		$markers = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 					id, marker_name, marker_width, marker_length, min_length
 				FROM [marker_headers] 
-				WHERE marker_name = '".$selected_marker."' "));
+				WHERE marker_name = '".$selected_marker."'  "));
 		// dd($markers);
 
 		$table4 = mattress_markers::findOrFail($existing_mattress_marker_id);
@@ -1460,6 +1632,7 @@ class plannerController extends Controller {
 
 		$table2 = mattress_details::findOrFail($find_details_id[0]->id);
 		$table2->cons_actual = $table2->layers_a * ((float)$markers[0]->marker_length + ($table2->extra/100));
+		$table2->printed_marker = 0;
 		$table2->save();
 
 		// add to marker log
@@ -1489,43 +1662,526 @@ class plannerController extends Controller {
 		}
 
 		// change mattress_phases
-		$find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT
-		 	id, mattress, status 
-		 	FROM [mattress_phases] WHERE mattress_id = '".$id."' AND active = 1 "));
-		// dd($find_all_mattress_phasses);
+		// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT
+		//  	id, mattress, status 
+		//  	FROM [mattress_phases] WHERE mattress_id = '".$id."' AND active = 1 "));
+		// // dd($find_all_mattress_phasses);
 
-		if (isset($find_all_mattress_phasses[0])) {
-			$mattress = $find_all_mattress_phasses[0]->mattress;
+		// if (isset($find_all_mattress_phasses[0])) {
+		// 	$mattress = $find_all_mattress_phasses[0]->mattress;
 
-			// dd($find_all_mattress_phasses);
-			for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
+		// 	// dd($find_all_mattress_phasses);
+		// 	for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
 
-				// if (($find_all_mattress_phasses[$i]->active == 'TO_LOAD') OR ($find_all_mattress_phasses[$i]->status == 'TO_SPREAD')){
-					$table3_update = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
-					$table3_update->active = 0;
-					$table3_update->save();
-				// }
-			}
+		// 		$table3_update = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
+		// 		$table3_update->active = 0;
+		// 		$table3_update->save();
+		// 	}
+		// }
+
+		$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
+			SET NOCOUNT ON;
+			UPDATE [mattress_phases]
+			SET active = 0, id_status = ''+cast([mattress_id] as varchar )+'-'+[status]
+			WHERE mattress_id = '".$id."' AND active = 1;
+			SELECT TOP 1 mattress,location,device  FROM [mattress_phases] WHERE mattress_id = '".$id."' ORDER BY id desc;
+		"));
+		$mattress = $mattress_phases_not_active[0]->mattress;
+		$device = $mattress_phases_not_active[0]->device;
+		$location = $mattress_phases_not_active[0]->location;
+
+		if ((date('H') >= 0) AND (date('H') < 6)) {
+		   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
+		} else {
+			$date = date('Y-m-d H:i:s');
 		}
 
+		$status = "TO_LOAD";
+
 		// add to mattress_phases
-		$table3_new = new mattress_phases;
+		// $table3_new = new mattress_phases;
+		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 		$table3_new->mattress_id = $id;
 		$table3_new->mattress = $mattress;
-		$table3_new->status = "TO_LOAD";
-		$table3_new->location = $table3_update->location;
-		$table3_new->device = $table3_update->device;
+		$table3_new->status = $status;
+		$table3_new->location = $location;
+		$table3_new->device = $device;
 		$table3_new->active = 1;
-		$table3_new->operator1 = Session::get('operator');
+		$table3_new->operator1 = $operator;
 		$table3_new->operator2;
+		$table3_new->date = $date;
+		$table3_new->id_status = $id.'-'.$status;
 		$table3_new->save();
 
 		return Redirect::to('/plan_mattress/BOARD');
 	}
 
+	public function split_mattress($id) {
+		// dd($id);
+
+		$find_marker = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				msr.[requested_width] ,msr.[requested_length], msr.[mattress_id_orig], msr.[mattress_orig], msr.[g_bin_orig], msr.[marker_name_orig], msr.[marker_id_orig], msr.[comment_operator]
+				,msr.[marker_width], msr.[marker_length]
+				/*,mm.[marker_name], mm.[marker_id], mm.[mattress], mm.[id], mm.[marker_length], mm.[marker_width], mm.[min_length]*/
+				,m.[width_theor_usable], m.[g_bin]
+			FROM [mattress_split_requests] as msr
+			JOIN [mattress_markers] as mm ON mm.[mattress_id] = msr.[mattress_id_orig]
+			JOIN [mattresses] as m ON m.[id] = mm.[mattress_id]
+			WHERE msr.[id] = '".(int)$id."' "));
+		// dd($find_marker);
+
+		if (!isset($find_marker[0])) {
+			dd('Marker does not exist');
+		}
+
+		$mattress_id_orig = $find_marker[0]->mattress_id_orig;
+		$mattress_orig = $find_marker[0]->mattress_orig;
+		$g_bin_orig = $find_marker[0]->g_bin_orig;
+
+		$marker_name_orig = $find_marker[0]->marker_name_orig;
+		$marker_id_orig = $find_marker[0]->marker_id_orig;
+		$marker_width = $find_marker[0]->marker_width;
+		$marker_length = $find_marker[0]->marker_length;
+
+		$requested_width = $find_marker[0]->requested_width;
+		$requested_length = $find_marker[0]->requested_length;
+
+		$comment_operator = $find_marker[0]->comment_operator;
+
+		$markers = DB::connection('sqlsrv')->select(DB::raw("SELECT [id],[marker_name]
+  			FROM [marker_headers]
+  			WHERE [status] = 'ACTIVE' "));
+
+
+		return view('planner.split_mattress',compact('id','mattress_id_orig','mattress_orig','g_bin_orig','marker_name_orig', 
+				'marker_id_orig','marker_width','marker_length','requested_width','requested_length','comment_operator'
+				,'markers'));
+	}
+
+	public function split_mattress_post(Request $request) {
+
+		$this->validate($request, ['selected_marker'=>'required']);
+
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+
+		$id = $input['id'];
+		$layers_insert = (int)$input['layers'];
+		$selected_marker = (int)$input['selected_marker'];
+
+		$split_request = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				msr.[requested_width] ,msr.[requested_length], msr.[mattress_id_orig], msr.[mattress_orig], msr.[g_bin_orig], msr.[marker_name_orig], msr.[marker_id_orig], msr.[comment_operator]
+				,msr.[marker_width], msr.[marker_length]
+				/*,mm.[marker_name], mm.[marker_id], mm.[mattress], mm.[id], mm.[marker_length], mm.[marker_width], mm.[min_length]*/
+				,m.[width_theor_usable], m.[g_bin]
+			FROM [mattress_split_requests] as msr
+			JOIN [mattress_markers] as mm ON mm.[mattress_id] = msr.[mattress_id_orig]
+			JOIN [mattresses] as m ON m.[id] = mm.[mattress_id]
+			WHERE msr.[id] = '".(int)$id."' "));
+		// dd($split_request);
+
+		$mattress_id_orig = $split_request[0]->mattress_id_orig;
+		// dd($mattress_id_orig);
+		$mattress_orig = $split_request[0]->mattress_orig;
+		$g_bin_orig = $split_request[0]->g_bin_orig;
+
+		$marker_name_orig = $split_request[0]->marker_name_orig;
+		$marker_id_orig = $split_request[0]->marker_id_orig;
+		$marker_width = $split_request[0]->marker_width;
+		$marker_length = $split_request[0]->marker_length;
+
+		$requested_width = $split_request[0]->requested_width;
+		$requested_length = $split_request[0]->requested_length;
+
+		$comment_operator = $split_request[0]->comment_operator;
+
+		$orig_mattress =  DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			   m2.[position]
+			  ,m1.[id]
+		      ,m1.[mattress]
+		      ,m1.[g_bin]
+		      ,m1.[material]
+		      ,m1.[dye_lot]
+		      ,m1.[color_desc]
+		      ,m1.[width_theor_usable]
+		      ,m1.[skeda]
+		      ,m1.[skeda_item_type]
+		      ,m1.[skeda_status]
+		      ,m1.[spreading_method]
+		      ,m1.[created_at]
+		      ,m1.[updated_at]
+		      --,'|'
+		      ,m2.[layers]
+		      ,m2.[layers_a]
+		      ,m2.[length_mattress]
+		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
+		      ,m2.[extra]
+		      ,m2.[pcs_bundle]
+		      ,m2.[layers_partial]
+		      ,m2.[position]
+		      ,m2.[priority]
+		      ,m2.[call_shift_manager]
+		      ,m2.[test_marker]
+		      ,m2.[tpp_mat_keep_wastage]
+		      ,m2.[printed_marker]
+		      ,m2.[mattress_packed]
+		      ,m2.[all_pro_for_main_plant]
+		      ,m2.[bottom_paper]
+		      ,m2.[layers_a_reasons]
+		      ,m2.[comment_office]
+		      ,m2.[comment_operator]
+		      ,m2.[minimattress_code]
+		      ,m2.[layer_limit]
+		      ,m2.[tpa_number]
+		      ,m2.[overlapping]
+		      --,'|'
+		      ,m3.[marker_id]
+		      ,m3.[marker_name]
+		      ,m3.[marker_name_orig]
+		      ,m3.[marker_length]
+		      ,m3.[marker_width]
+		      ,m3.[min_length]
+		      --,'|'
+		      ,m4.[status]
+		      ,m4.[location]
+		      ,m4.[device]
+		      ,m4.[active]
+		      ,m4.[operator1]
+		      ,m4.[operator2]
+		      --,'|'
+		      -- ,m5.[style_size]
+		      -- ,m5.[pro_id]
+		      -- ,m5.[pro_pcs_layer]
+		      -- ,m5.[pro_pcs_planned]
+		      -- ,m5.[pro_pcs_actual]
+		      -- ,ms.[g_bin_orig]
+		      
+		  FROM [mattresses] as m1
+		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
+		  --JOIN [o_rolls] as o ON o.[mattress_id_orig] = m1.[id]
+		  WHERE m1.[id] = '".$mattress_id_orig."' AND m4.active = '1'
+		  ORDER BY m2.position asc"));
+		// dd($orig_mattress);
+
+		$test = explode("-", $orig_mattress[0]->mattress);
+		// dd($test);
+		$mattress_to_search = $test[0]."-".$test[1]."-".$test[2]."-E";
+		// dd($mattress_to_search);
+
+		$last_e_used =  DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 mattress FROM  [mattresses]
+  				WHERE mattress like '".$mattress_to_search."%'
+  				ORDER BY id desc"));
+		// dd($last_e_used);
+
+		if (!isset($last_e_used[0])) {
+			$last_e_used = 0;
+		} else {
+			$last_e_used = (int)substr($last_e_used[0]->mattress, -2);
+		}
+		$last_e_used = str_pad($last_e_used+1, 2, 0, STR_PAD_LEFT);
+
+		$mattress_new = $mattress_to_search."".$last_e_used;
+		// dd($mattress_new);
+
+		$marker_new = DB::connection('sqlsrv')->select(DB::raw("SELECT id, marker_name, marker_length, marker_width, min_length
+			FROM marker_headers
+			WHERE id = '".$selected_marker."' "));
+		// dd($marker_new);
+
+		// ----
+		$marker_id = $marker_new[0]->id;
+		$marker_name = $marker_new[0]->marker_name;
+		$marker_length = $marker_new[0]->marker_length;
+		$marker_width = $marker_new[0]->marker_width;
+		$min_length = $marker_new[0]->min_length;
+		// ----
+
+		$g_bin = "";
+		$material = $orig_mattress[0]->material;
+		$dye_lot = $orig_mattress[0]->dye_lot;
+		$color_desc = $orig_mattress[0]->color_desc;
+		$width_theor_usable = round((float)$orig_mattress[0]->width_theor_usable,2);
+		$skeda = $orig_mattress[0]->skeda;
+		$skeda_item_type = $orig_mattress[0]->skeda_item_type;
+		$skeda_status = $orig_mattress[0]->skeda_status;
+		$spreading_method = $orig_mattress[0]->spreading_method;
+		
+		$layers = (float)$layers_insert;
+		$layers_a = $layers;
+		$length_mattress = (int)$orig_mattress[0]->length_mattress;
+		$cons_planned = $layers_a * ($marker_length + ((int)$orig_mattress[0]->extra/100));
+		$cons_actual = $cons_planned;
+		// dd($cons_actual);
+
+		$extra = $orig_mattress[0]->extra;
+		$pcs_bundle = $orig_mattress[0]->pcs_bundle; 
+		$layers_partial; 
+		$priority = 1;
+		$call_shift_manager = 0;
+		$test_marker = 0;
+		$tpp_mat_keep_wastage = $orig_mattress[0]->tpp_mat_keep_wastage;
+		$printed_marker = 0;
+		$mattress_packed = 0;
+		$all_pro_for_main_plant = 0; 
+		$tpa_number = $orig_mattress[0]->tpa_number;
+
+		$bottom_paper = $orig_mattress[0]->bottom_paper;
+		$overlapping = $orig_mattress[0]->overlapping;
+
+		//-----
+		$status = 'NOT_SET';
+		$location = 'NOT_SET'; 
+		$device = ''; 
+		$active = 1;
+		$operator1 = Session::get('operator');
+		$operator2;
+		//-----
+
+		// find position
+		$find_position_on_location = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					COUNT(location) as c 
+				FROM [mattress_phases] WHERE location = 'NOT_SET' AND active = '1' "));
+		// dd($find_position_on_location[0]);
+		if (isset($find_position_on_location[0])) {
+			$position = $find_position_on_location[0]->c + 1;
+		} else {
+			$position = 1;
+		}
+
+		$find_in_mattress_pro = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM mattress_pros WHERE mattress = '".$mattress_new."' "));
+		if (isset($find_in_mattress_pro[0])) {
+				
+   			$msg = "Mattress '".$mattress."' already exist in mattress_pros!";
+   			dd($msg);
+		} else {
+
+			$find_in_marker_lines = DB::connection('sqlsrv')->select(DB::raw("SELECT style_size, pcs_on_layer FROM marker_lines WHERE marker_name = '".$marker_new[0]->marker_name."' "));
+			// dd($find_in_marker_lines);
+			
+   			$mattress_pro_array[] = '';
+
+	   		foreach ($find_in_marker_lines as $line) {
+	   			$style_size = $line->style_size;
+	   			$pro_pcs_layer = $line->pcs_on_layer;
+
+	   			if (isset($skeda)) {
+		   				
+		   			$find_in_pro_skedas = DB::connection('sqlsrv')->select(DB::raw("SELECT pro_id FROM pro_skedas WHERE skeda = '".$skeda."' AND style_size = '".$style_size."' "));
+		   			if (!isset($find_in_pro_skedas[0])) {
+		   				$msg = "Skeda '".$skeda."' with style '".$style_size."' not exist in pro_skedas table";
+		   				dd($msg);
+
+		   			} else {
+		   				// dd($find_in_pro_skedas);
+			   			$pro_id = $find_in_pro_skedas[0]->pro_id;
+			   			// print_r('insert:'.$pro_id.'#'.$style_size.'#'.$pro_pcs_layer);
+			   			// print_r('<br>');
+			   			array_push($mattress_pro_array, $pro_id.'#'.$style_size.'#'.$pro_pcs_layer);
+		   			}
+		   		} else {
+		   			$msg = "Skeda not exist";
+	   				dd($msg);
+	   			}
+	   		}
+		}
+
+		$m_error = 0;
+
+		try {
+			$table0 = new mattress;
+			$table0->mattress = $mattress_new;
+			$table0->g_bin;
+			$table0->material = $material;
+			$table0->dye_lot = $dye_lot;
+			$table0->color_desc = $color_desc;
+			$table0->width_theor_usable = $width_theor_usable;			
+			$table0->skeda = $skeda;
+			$table0->skeda_item_type = $skeda_item_type;
+			$table0->skeda_status = $skeda_status;
+			$table0->spreading_method = $spreading_method;
+			$table0->save();
+		}
+		catch (\Illuminate\Database\QueryException $e) {
+			
+			//error
+			$m_error = $m_error + 1;
+
+			dd("Problem to save in mattresses");
+			continue;
+		}
+
+		try {
+			$table1 = new mattress_details;
+			$table1->mattress_id = $table0->id;
+			$table1->mattress = $table0->mattress;
+			$table1->layers = $layers;
+			$table1->layers_a = $layers_a;
+			$table1->length_mattress = $length_mattress;
+			$table1->cons_planned = $cons_planned;
+			$table1->cons_actual = $cons_actual;
+			$table1->extra = $extra;
+			$table1->pcs_bundle = $pcs_bundle;
+			$table1->layers_partial;
+			$table1->position = $position;
+			$table1->priority = $priority;
+			$table1->call_shift_manager = $call_shift_manager;
+			$table1->test_marker = $test_marker;
+			$table1->tpp_mat_keep_wastage = $tpp_mat_keep_wastage;
+			$table1->printed_marker = $printed_marker;
+			$table1->mattress_packed = $mattress_packed;
+			$table1->all_pro_for_main_plant = $all_pro_for_main_plant;
+			$table1->bottom_paper = $bottom_paper;
+			$table1->layers_a_reasons;
+			$table1->comment_office;
+			$table1->comment_operator;
+			$table1->minimattress_code;
+			$table1->overlapping = $overlapping;
+			$table1->layer_limit;
+			$table1->tpa_number = $tpa_number;
+			$table1->save();
+
+		}
+		catch (\Illuminate\Database\QueryException $e) {
+			//error
+			$m_error = $m_error + 1;
+			$delete = mattress::where('id', $table0->id)->delete();
+
+			dd("Problem to save in mattress_details");
+			continue;
+		}
+
+		try {
+			$table2 = new mattress_markers;
+			$table2->mattress_id = $table0->id;
+			$table2->mattress = $table0->mattress;
+			$table2->marker_id = $marker_id;
+			$table2->marker_name = $marker_name;
+			$table2->marker_name_orig = $marker_name_orig;
+			$table2->marker_length = $marker_length;
+			$table2->marker_width = $marker_width;
+			$table2->min_length = $min_length;
+			$table2->save();
+			
+		}
+		catch (\Illuminate\Database\QueryException $e) {
+			//error
+			$m_error = $m_error + 1;
+
+			$delete = mattress::where('id', $table0->id)->delete();
+			$delete = mattress_details::where('mattress_id', $table0->id)->delete();
+
+			dd("Problem to save in mattress_markers");
+			continue;
+		}
+
+		try {
+			$table3 = new mattress_phases;
+			$table3->mattress_id = $table0->id;
+			$table3->mattress = $table0->mattress;
+			$table3->status = $status;
+			$table3->location = $location;
+			$table3->device;
+			$table3->active = $active;
+			$table3->operator1 = Session::get('operator');
+			$table3->operator2;
+			$table3->date = date('Y-m-d H:i:s');
+			$table3->id_status = $table0->id.'-'.$status;
+			$table3->save();
+		}
+		catch (\Illuminate\Database\QueryException $e) {
+
+			//error
+			$m_error = $m_error + 1;
+
+			$delete = mattress::where('id', $table0->id)->delete();
+			$delete = mattress_details::where('mattress_id', $table0->id)->delete();
+			$delete = mattress_markers::where('mattress_id', $table0->id)->delete();
+
+			dd("Problem to save in mattress_phases");
+			continue;
+		}
+
+		$mattress_pro_array = array_filter($mattress_pro_array);
+		// dd($mattress_pro_array);
+
+		for ($i=1; $i <= count($mattress_pro_array) ; $i++) {
+			// print_r('i: '.$i);
+			// print_r('<br>');
+			// print_r($mattress_pro_array[$i]);
+			// print_r('<br>');
+
+			$info = explode("#", $mattress_pro_array[$i]);
+			// dd($info[0]);
+
+			try {
+				$table4 = new mattress_pro;
+				$table4->mattress_id = $table0->id;
+				$table4->mattress = $table0->mattress;
+				$table4->style_size = $info[1];
+				$table4->pro_id = $info[0];
+				$table4->pro_pcs_layer = (float)$info[2];
+				$table4->pro_pcs_planned = $table4->pro_pcs_layer * (float)$layers_a;
+				$table4->pro_pcs_actual = $table4->pro_pcs_layer * (float)$layers_a;
+				$table4->damaged_pcs = 0;
+				$table4->save();
+
+			}
+			catch (\Illuminate\Database\QueryException $e) {
+				
+				//error
+				$m_error = $m_error + 1;
+
+				$delete = mattress::where('id', $table0->id)->delete();
+				$delete = mattress_details::where('mattress_id', $table0->id)->delete();
+				$delete = mattress_markers::where('mattress_id', $table0->id)->delete();
+				$delete = mattress_phases::where('mattress_id', $table0->id)->delete();
+
+				dd("Problem to save in mattress_pros");
+				continue;
+			}
+		}
+
+		if ($m_error == 0) {
+
+			$table_update = mattress_split_request::findOrFail($input['id']);
+			$table_update->mattress_id_new = $table0->id;
+			$table_update->mattress_new = $table0->mattress;
+			$table_update->layers = (float)$layers_insert;
+			$table_update->status = "SPLITTED";
+			$table_update->save();
+
+		} else {
+			dd("Error");
+		}
+
+		return Redirect::to('/plan_mattress/TO_SPLIT');
+	}
+
+	public function split_mattress_delete($id) {
+
+		return view('planner.split_mattress_delete_confirm', compact('id'));
+	}
+
+	public function split_mattress_delete_confirm(Request $request) {
+
+		$this->validate($request, ['id'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+		
+		$table_update = mattress_split_request::findOrFail($input['id']);
+		$table_update->status = "DELETED";
+		$table_update->save();
+
+		return Redirect::to('/plan_mattress/TO_SPLIT');
+
+	}
+
 	public function edit_mattress($id) {
-		// dd($id);
-		// dd($id);
+		
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			   m2.[position]
 			  ,m1.[id]
@@ -1546,6 +2202,7 @@ class plannerController extends Controller {
 		      ,m2.[layers_a]
 		      ,m2.[length_mattress]
 		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
 		      ,m2.[extra]
 		      ,m2.[pcs_bundle]
 		      ,m2.[layers_partial]
@@ -1584,16 +2241,70 @@ class plannerController extends Controller {
 		      -- ,m5.[pro_pcs_layer]
 		      -- ,m5.[pro_pcs_planned]
 		      -- ,m5.[pro_pcs_actual]
+		      ,ms.[g_bin_orig]
 		      
 		  FROM [mattresses] as m1
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
 		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
+		  LEFT JOIN [mattress_split_requests] as ms ON ms.[mattress_id_new] = m1.[id]
 		  WHERE m1.[id] = '".$id."' AND m4.active = '1' 
 		  ORDER BY m2.position asc"));
 		// dd($data);
+		
+		$data_sp = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+		      m4.[status]
+		      ,m4.[location]
+		      ,m4.[device]
+		      ,m4.[active]
+		      ,m4.[operator1]
+		      ,m4.[operator2]
+		      ,m4.[updated_at]
 
+		  FROM [mattresses] as m1
+		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
+		  WHERE m1.[id] = '".$id."' AND status = 'TO_CUT'
+		  ORDER BY m4.updated_at desc"));
+		// dd($data_sp);
+
+		if (isset($data_sp[0])) {
+			$sp_operator = $data_sp[0]->operator1;
+			$sp_date = substr($data_sp[0]->updated_at,0,16);	
+		} else {
+			$sp_operator = NULL;
+			$sp_date = NULL;
+		}
+
+		$data_cut = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+		      m4.[status]
+		      ,m4.[location]
+		      ,m4.[device]
+		      ,m4.[active]
+		      ,m4.[operator1]
+		      ,m4.[operator2]
+		      ,m4.[updated_at]
+
+		  FROM [mattresses] as m1
+		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
+		  WHERE m1.[id] = '".$id."' AND (status = 'COMPLETED' OR status = 'TO_PACK')
+		  ORDER BY m4.updated_at asc"));
+		// dd($data_cut);
+
+		if (isset($data_cut[0])) {
+			$cut_operator = $data_cut[0]->operator1;
+			$cut_date = substr($data_cut[0]->updated_at,0,16);	
+		} else {
+			$cut_operator = NULL;
+			$cut_date = NULL;
+		}
+		
 		$mattress = $data[0]->mattress;
 		$g_bin = $data[0]->g_bin;
 		$id = $data[0]->id;
@@ -1605,7 +2316,9 @@ class plannerController extends Controller {
 		$spreading_method = $data[0]->spreading_method;
 		$width_theor_usable = $data[0]->width_theor_usable;
 		$layers = $data[0]->layers;
+		$layers_a = $data[0]->layers_a;
 		$cons_planned = $data[0]->cons_planned;
+		$cons_actual = $data[0]->cons_actual;
 		$marker_name = $data[0]->marker_name;
 		$marker_length = $data[0]->marker_length;
 		$marker_width = $data[0]->marker_width;
@@ -1618,21 +2331,20 @@ class plannerController extends Controller {
 		$bottom_paper = $data[0]->bottom_paper;
 		$comment_office = $data[0]->comment_office;
 		$tpa_number = $data[0]->tpa_number;
-
 		$location = $data[0]->location;
-		
-		if ($location == 'MM1') {
+
+		if ($skeda_item_type == 'MM') {
 
 			$layer_limit = $data[0]->layer_limit;
-			$data2 = DB::connection('sqlsrv')->select(DB::raw("SELECT [o_roll],[no_of_joinings]
+			$data2 = DB::connection('sqlsrv')->select(DB::raw("SELECT [o_roll],[no_of_joinings],[g_bin]
 				FROM  [o_rolls]
 				WHERE mattress_id_new = '".$id."' "));
-			// dd($data2);
-			return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','cons_planned','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','data2','layer_limit'));
+			return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','data2','layer_limit','cut_operator','cut_date','sp_operator','sp_date'));
 		}
 
-		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','cons_planned','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location'));
+		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','cut_operator','cut_date','sp_operator','sp_date'));
 	}
+
 	public function edit_mattress_confirm(Request $request) {
 
 		$this->validate($request, ['id'=>'required']);
@@ -1707,98 +2419,234 @@ class plannerController extends Controller {
 		$find_details_id = DB::connection('sqlsrv')->select(DB::raw("SELECT [id] FROM [mattress_details] WHERE [mattress_id] = '".$id."' "));
 		// dd($find_details_id[0]->id);
 
-		// try {
-			$table1 = mattress_details::findOrFail($find_details_id[0]->id);
-			$table1->pcs_bundle = $pcs_bundle;
-			// $table1->position = $position;
-			$table1->priority = $priority;
-			$table1->call_shift_manager = $call_shift_manager;
-			$table1->test_marker = $test_marker;
-			// $table1->tpp_mat_keep_wastage = $tpp_mat_keep_wastage;
-			$table1->bottom_paper = $bottom_paper;
-			$table1->comment_office = $comment_office;
-			$table1->save();
-
-
-
-		// }
-		// catch (\Illuminate\Database\QueryException $e) {
-		// 	dd("Problem to save in mattress_details");
-		// }
-		// dd("STOP");
-		// all mattress_phases for this mattress set to NOT ACTIVE
-
-		// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT [id] FROM [mattress_phases] WHERE [mattress_id] = '".$id."' "));
 		
-		// if (isset($find_all_mattress_phasses[0])) {
-		// 	// dd($find_all_mattress_phasses);
-		// 	for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
-		// 		try {
-		// 			$table3 = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
-		// 			$table3->active = 0;
-		// 			$table3->save();
-		// 		}
-		// 		catch (\Illuminate\Database\QueryException $e) {
-		// 			dd("Problem to save in mattress_phases, set all to not active");
-		// 		}
-		// 	}	
-		// }
+		$table1 = mattress_details::findOrFail($find_details_id[0]->id);
+		$table1->pcs_bundle = $pcs_bundle;
+		// $table1->position = $position;
+		$table1->priority = $priority;
+		$table1->call_shift_manager = $call_shift_manager;
+		$table1->test_marker = $test_marker;
+		// $table1->tpp_mat_keep_wastage = $tpp_mat_keep_wastage;
+		$table1->bottom_paper = $bottom_paper;
+		$table1->comment_office = $comment_office;
+		$table1->save();
 
-		// save new mattress_phases
-		// $status = "TO_LOAD";
-		// $active = 1;
-		// $operator1;
+		return Redirect::to('/plan_mattress/'.$location);
+	}
 
-		// verify userId
-		// if (Auth::check())
-		// {
-		//     $userId = Auth::user()->id;
-		//     $operator1 = Auth::user()->name;
-		// } else {
-		// 	$msg = 'User is not autenticated';
+	public function edit_layers_a($id) {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			   m2.[position]
+			  ,m1.[id]
+		      ,m1.[mattress]
+		      ,m1.[g_bin]
+		      --,'|'
+		      ,m2.[layers]
+		      ,m2.[layers_a]
+		      ,m2.[length_mattress]
+		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
+		      ,m2.[extra]
+		      ,m2.[pcs_bundle]
+		      ,m2.[layers_partial]
+		      ,m2.[position]
+		      --,'|'
+		      ,m3.[marker_id]
+		      ,m3.[marker_name]
+		      ,m3.[marker_name_orig]
+		      ,m3.[marker_length]
+		      ,m3.[marker_width]
+		      ,m3.[min_length]
+		      --,'|'
+		      ,m4.[status]
+		      ,m4.[location]
+		      ,m4.[device]
+		      ,m4.[active]
+		      ,m4.[operator1]
+		      ,m4.[operator2]
+		      --,'|'
+		      -- ,m5.[style_size]
+		      -- ,m5.[pro_id]
+		      -- ,m5.[pro_pcs_layer]
+		      -- ,m5.[pro_pcs_planned]
+		      -- ,m5.[pro_pcs_actual]
+		      
+		  FROM [mattresses] as m1
+		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
+		  WHERE m1.[id] = '".$id."' AND m4.active = '1' 
+		  ORDER BY m2.position asc"));
+		// dd($data);
+
+		$layers_a = $data[0]->layers_a;
+		$mattress = $data[0]->mattress;
+		$g_bin = $data[0]->g_bin;
+
+		$data_sp = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+		     m4.[status]
+		      ,m4.[location]
+		      ,m4.[device]
+		      ,m4.[active]
+		      --,m4.[operator1]
+		      --,m4.[operator2]
+		      ,m4.[updated_at]
+		      ,m5.[operator_after]
+		      ,m5.[operator2_after]
+		      ,m5.[layers_after_cs]
+		      ,m5.[operator_before]
+		      ,m5.[operator2_before]
+		      ,m5.[layers_before_cs]
+
+		  FROM [mattresses] as m1
+		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+		  LEFT JOIN [mattress_effs]	   as m5 ON m5.[mattress_id] = m1.[id]
+		  WHERE m1.[id] = '".$id."' AND status = 'TO_CUT'
+		  ORDER BY m4.updated_at desc"));
+		// dd($data_sp);
+
+		if (isset($data_sp[0])) {
+
+			$operator_after = $data_sp[0]->operator_after;
+			$operator2_after = $data_sp[0]->operator2_after;
+			$layers_after_cs = $data_sp[0]->layers_after_cs;
+
+			$operator_before = $data_sp[0]->operator_before;
+			$operator2_before = $data_sp[0]->operator2_before;
+			$layers_before_cs = $data_sp[0]->layers_before_cs;
+		} else {
+			$operator_after = '';
+			$operator2_after = '';
+			$layers_after_cs = '';
+
+			$operator_before = '';
+			$operator2_before = '';
+			$layers_before_cs = '';
+		}
+
+		return view('planner.edit_layers_a', compact( 'id','mattress','g_bin','layers_a','operator_after','operator2_after','layers_after_cs','operator_before','operator2_before','layers_before_cs'));
+	}
+
+	public function edit_layers_a_confirm(Request $request){
+			
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+
+		$layers_a_new = (int)$input['layers_a_new'];
+		$id = $input['id'];
+		$mattress = $input['mattress'];
+		$g_bin = $input['g_bin'];
+
+		// if ($layers_a_new != ($layers_before_cs_new+$layers_after_cs_new)) {
+		// 	$msg = "Error, layers actual must be sum of layers before and after!";
 		// 	return view('planner.error',compact('msg'));
 		// }
 
-		// try {
-		// 	$table3_new = new mattress_phases;
-		// 	$table3_new->mattress_id = $id;
-		// 	$table3_new->mattress = $mattress;
-		// 	$table3_new->status = $status;
-		// 	$table3_new->location = $location;
-		// 	$table3_new->device;
-		// 	$table3_new->active = $active;
-		// 	$table3_new->operator1 = Session::get('operator');
-		// 	$table3_new->operator2;
-		// 	$table3_new->save();
-		// }
-		// catch (\Illuminate\Database\QueryException $e) {
-		// 	dd("Problem to save in mattress_phases");
-		// }
+		$data_pro = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				mp.[id], mp.[style_size], mp.[pro_id], mp.[pro_pcs_layer], mp.[pro_pcs_planned], mp.[pro_pcs_actual]
+				,md.[layers_partial]
+			FROM [mattress_pros] as mp
+			JOIN [mattress_details] as md ON md.[mattress_id] = mp.[mattress_id]
+			WHERE mp.[mattress_id] = '".$id."' "));
+		// dd($data_pro);
 
-		// reorder position of NOT_SET
-		// $reorder_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-		// 		md.[id], md.[mattress_id], md.[mattress], md.[position], 
-		// 		mp.[location], mp.[active]
-		// 	 FROM [mattress_details] as md
-		// 	 INNER JOIN [mattress_phases] as mp ON mp.[mattress_id] = md.[mattress_id] AND mp.[active] = 1
-		// 	 WHERE location = 'NOT_SET' 
-		// 	 ORDER BY position asc"));
+		for ($i=0; $i < count($data_pro); $i++) { 
 
-		// if (isset($reorder_position[0])) {
-		// 	for ($i=0; $i < count($reorder_position); $i++) { 
+			$table = mattress_pro::findOrFail($data_pro[$i]->id);
+			// dd($table);
+			
+			$pro_pcs_actual = (int)$table->pro_pcs_layer * (int)$layers_a_new + (int)$table->layers_partial - (int)$table->damaged_pcs;
+			// dd($pro_pcs_actual);
+			$table->pro_pcs_actual = $pro_pcs_actual;
+			$table->save();
+		}
 
-		// 		$table1 = mattress_details::findOrFail($reorder_position[$i]->id);
-		// 		$table1->position = $i+1;
-		// 		$table1->save();
-		// 	}
-		// }
-		return Redirect::to('/plan_mattress/'.$location);
+		$find_details_id = DB::connection('sqlsrv')->select(DB::raw("SELECT d.[id]
+					,mm.[marker_length]
+					,d.[extra]
+				FROM [mattress_details] as d
+				JOIN [mattresses] as m ON m.[id] = d.[mattress_id]
+				JOIN [mattress_markers] as mm ON mm.mattress_id = m.id
+				WHERE m.[id] = '".$id."' "));
+		// dd($find_details_id);
+
+		// save in mattress_details (operator comment)
+		$table2_update = mattress_details::findOrFail($find_details_id[0]->id);
+		$table2_update->layers_a = $layers_a_new;
+		$table2_update->cons_actual = $layers_a_new * ((float)$find_details_id[0]->marker_length + ($find_details_id[0]->extra/100));
+		// dd($table2_update->cons_actual);
+		$table2_update->save();
+
+		// Eff
+		$find_eff = DB::connection('sqlsrv')->select(DB::raw("SELECT e.[id]
+				FROM [mattress_effs] as e
+				WHERE e.[mattress_id] = '".$id."' "));
+		// dd($find_eff);
+
+		$table3_update = mattress_eff::findOrFail($find_eff[0]->id);
+		
+		if (isset($input['layers_before_cs_new'])) {
+			
+			$table3_update->layers_before_cs = (int)$input['layers_before_cs_new'];
+			$stimulation_before = (float)$input['layers_before_cs_new'] * ((float)$find_details_id[0]->marker_length +($find_details_id[0]->extra / 100)) * 1.00 ;
+			// dd('b: '. $stimulation_before);
+			$table3_update->stimulation_before = $stimulation_before;	
+		} 
+
+		if (isset($input['layers_after_cs_new'])) {
+
+			$table3_update->layers_after_cs = (int)$input['layers_after_cs_new'];
+			$stimulation_after = (float)$input['layers_after_cs_new'] * ((float)$find_details_id[0]->marker_length +($find_details_id[0]->extra / 100)) * 1.00 ;
+			// dd('a: '. $stimulation_after);
+			$table3_update->stimulation_after = $stimulation_after;
+
+		}
+
+		$table3_update->save();
+		
+		return Redirect::to('/edit_mattress_line/'.$id);
+	}
+
+	public function update_all_pro_actual() {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM mattresses WHERE (skeda_item_type = 'MM' OR skeda_item_type = 'MS' ) "));
+		// dd($data);
+
+		for ($x=0; $x < count($data); $x++) { 
+			
+			// dd($data[$x]->mattress_id);
+
+			$data_pro = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					mp.[id], mp.[style_size], mp.[pro_id], mp.[pro_pcs_layer], mp.[pro_pcs_planned], mp.[pro_pcs_actual]
+					,md.[layers_partial], md.[layers_a]
+				FROM [mattress_pros] as mp
+				JOIN [mattress_details] as md ON md.[mattress_id] = mp.[mattress_id]
+				WHERE mp.[mattress_id] = '".$data[$x]->id."' "));
+			// dd($data_pro);
+
+			for ($i=0; $i < count($data_pro); $i++) { 
+				// dd((int)$data_pro[$i]->layers_a);
+
+				$table = mattress_pro::findOrFail($data_pro[$i]->id);
+				// dd($table);
+				
+				$pro_pcs_actual = (int)$table->pro_pcs_layer * (int)$data_pro[$i]->layers_a + (int)$data_pro[$i]->layers_partial - (int)$table->damaged_pcs;
+				// dd($pro_pcs_actual);
+				$table->pro_pcs_actual = $pro_pcs_actual;
+				// $table->save();
+			}
+		}
 	}
 
 	public function delete_mattress ($id) {
 
 		return view('planner.mattress_delete_confirm', compact('id'));
 	}
+
 	public function delete_mattress_confirm(Request $request) {
 
 		$this->validate($request, ['id'=>'required']);
@@ -1817,7 +2665,6 @@ class plannerController extends Controller {
 			$msg = 'User is not autenticated';
 			return view('planner.error',compact('msg'));
 		}
-
 
 		$operator = Session::get('operator');
 		if (!isset($operator) OR $operator == '') {
@@ -1856,6 +2703,7 @@ class plannerController extends Controller {
 			$table1 = mattress_details::findOrFail($find_details_id[0]->id);
 			$table1->position = $position;
 			$table1->layers_a = 0;
+			$table1->cons_actual = 0;
 			$table1->save();
 		}
 		catch (\Illuminate\Database\QueryException $e) {
@@ -1864,21 +2712,27 @@ class plannerController extends Controller {
 		// dd("STOP");
 		// all mattress_phases for this mattress set to NOT ACTIVE
 		
-		$find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT [id] FROM [mattress_phases] WHERE [mattress_id] = '".$id."' "));
+		// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT [id] FROM [mattress_phases] 
+		// 	WHERE [mattress_id] = '".$id."' "));
 		
-		if (isset($find_all_mattress_phasses[0])) {
-			// dd($find_all_mattress_phasses);
-			for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
-				try {
-					$table3 = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
-					$table3->active = 0;
-					$table3->save();
-				}
-				catch (\Illuminate\Database\QueryException $e) {
-					dd("Problem to save in mattress_phases, set all to not active");
-				}
-			}	
-		}
+		// if (isset($find_all_mattress_phasses[0])) {
+		// 	// dd($find_all_mattress_phasses);
+		// 	for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
+				
+		// 			$table3 = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
+		// 			$table3->active = 0;
+		// 			$table3->save();
+		// 	}	
+		// }
+
+		$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
+			SET NOCOUNT ON;
+			UPDATE [mattress_phases]
+			SET active = 0, id_status = ''+cast([mattress_id] as varchar )+'-'+[status]
+			WHERE mattress_id = '".$id."' AND active = 1;
+			SELECT TOP 1 mattress FROM [mattress_phases] WHERE mattress_id = '".$id."';
+		"));
+		$mattress = $mattress_phases_not_active[0]->mattress;
 
 		// save new mattress_phases
 		$status = "DELETED";
@@ -1887,22 +2741,26 @@ class plannerController extends Controller {
 		$location = 'DELETED';
 		$mattress = $table1->mattress;
 
-		try {
-			$table3_new = new mattress_phases;
-			$table3_new->mattress_id = $id;
-			$table3_new->mattress = $mattress;
-			$table3_new->status = $status;
-			$table3_new->location = $location;
-			$table3_new->device;
-			$table3_new->active = $active;
-			$table3_new->operator1 = Session::get('operator');
-			$table3_new->operator2;
-			$table3_new->save();
-		}
-		catch (\Illuminate\Database\QueryException $e) {
-			dd("Problem to save in mattress_phases");
+		if ((date('H') >= 0) AND (date('H') < 6)) {
+		   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
+		} else {
+			$date = date('Y-m-d H:i:s');
 		}
 
+		// $table3_new = new mattress_phases;
+		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
+		$table3_new->mattress_id = $id;
+		$table3_new->mattress = $mattress;
+		$table3_new->status = $status;
+		$table3_new->location = $location;
+		$table3_new->device;
+		$table3_new->active = $active;
+		$table3_new->operator1 = Session::get('operator');
+		$table3_new->operator2;
+		$table3_new->date = $date;
+		$table3_new->id_status = $id.'-'.$status;
+		$table3_new->save();
+	
 		// reorder position of NOT_SET
 		$reorder_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 				md.[id], md.[mattress_id], md.[mattress], md.[position], 
@@ -1923,7 +2781,7 @@ class plannerController extends Controller {
 		return Redirect::to('/plan_mattress/NOT_SET');
 	}
 
-// o_roll
+//LR ROLL
 	public function o_roll_table() {
 
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -2009,7 +2867,7 @@ class plannerController extends Controller {
 
 	}
 
-// mini_mattress
+//MINI MATTRESS
 	public function plan_mini_marker() {
 
 		$work_place = "PLANNER";
@@ -2027,9 +2885,21 @@ class plannerController extends Controller {
 
 	public function mini_marker_create() {
 
-		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
-		 FROM o_rolls WHERE status = 'CREATED' order by g_bin asc"));
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			o.[id],
+			o.[material],
+			o.[o_roll],
+			o.[g_bin],
+			o.[mattress_name_orig],
+			o.[skeda],
+			o.[no_of_joinings],
+			mm.[marker_width]
+
+			FROM o_rolls as o
+			JOIN mattress_markers as mm ON mm.[mattress_id] = o.[mattress_id_orig] 
+		WHERE [status] = 'CREATED' order by g_bin asc"));
 		// dd($data);
+
 		return view('planner.mini_marker_create', compact('data'));
 	}
 
@@ -2041,9 +2911,20 @@ class plannerController extends Controller {
 
 		if (!isset($input['items'])) {
 			$warning = 'Choose LR roll';
-			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
-				 FROM o_rolls WHERE status = 'CREATED' order by g_bin asc"));
-				// dd($data);
+			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				o.[id],
+				o.[material],
+				o.[o_roll],
+				o.[g_bin],
+				o.[mattress_name_orig],
+				o.[skeda],
+				o.[no_of_joinings],
+				mm.[marker_width]
+
+				FROM o_rolls as o
+				JOIN mattress_markers as mm ON mm.mattress_id = o.mattress_id_orig 
+			WHERE status = 'CREATED' order by g_bin asc"));
+					// dd($data);
 			return view('planner.mini_marker_create', compact('data','warning'));
 		}
 		$items[] = $input['items'];
@@ -2055,8 +2936,19 @@ class plannerController extends Controller {
 		$selected_o_roll = $info[0];
 		$skeda = $info[1];
 
-		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
-		FROM o_rolls WHERE status = 'CREATED' AND skeda = '".$skeda."' order by g_bin asc"));
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				o.[id],
+				o.[material],
+				o.[o_roll],
+				o.[g_bin],
+				o.[mattress_name_orig],
+				o.[skeda],
+				o.[no_of_joinings],
+				mm.[marker_width]
+
+				FROM o_rolls as o
+				JOIN mattress_markers as mm ON mm.mattress_id = o.mattress_id_orig 
+		WHERE o.status = 'CREATED' AND o.skeda = '".$skeda."' order by o.g_bin asc"));
 
 		return view('planner.mini_marker_create_list', compact('data', 'selected_o_roll', 'skeda'));
 	}
@@ -2087,7 +2979,9 @@ class plannerController extends Controller {
 		$recap_table = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			distinct y.pro
 			,y.style_size
+			,y.test
 			,y.po_sum_qty
+			,y.po_sum_qty2
 			--,y.status
 			,y.before_cut_planned
 			,y.before_cut_actual
@@ -2099,7 +2993,9 @@ class plannerController extends Controller {
 			SELECT 
 			distinct x.pro
 			,x.style_size
+			,x.test
 			,x.po_sum_qty
+			,x.po_sum_qty2
 			--,x.location
 			--,x.status
 			,SUM (x.before_cut_planned) as before_cut_planned
@@ -2116,9 +3012,11 @@ class plannerController extends Controller {
 			      --,m.mattress
 			      --,mpr.pro_id
 			      ,mpr.style_size
-			      
-			      ,(SELECT SUM(qty) FROM [posummary].[dbo].[pro] as posum WHERE posum.skeda = LEFT(p.skeda,12) AND posum.pro = p.pro) as po_sum_qty
-			      
+			      ,(SELECT TOP 1 mh.[marker_name]	FROM [marker_headers] as mh JOIN [marker_lines] as ml ON ml.[marker_header_id] = mh.[id] WHERE mh.[marker_name] like 'MM%' AND ml.[style_size] = mpr.style_size) as test
+
+			      ,(SELECT SUM(qty) FROM [posummary].[dbo].[pro] as posum WHERE posum.skeda = LEFT(p.skeda,12) AND posum.pro = p.pro) as po_sum_qty2
+			      ,(SELECT SUM(qty) FROM [posummary].[dbo].[pro] as posum WHERE posum.pro = p.pro) as po_sum_qty
+
 			      --,(SELECT location FROM  [mattress_phases] as mp WHERE active = 1 AND mp.mattress_id = m.id) as location
 			      --,(SELECT status FROM  [mattress_phases] as mp WHERE active = 1 AND mp.mattress_id = m.id) as status
 			      
@@ -2130,7 +3028,7 @@ class plannerController extends Controller {
 					JOIN  [mattress_phases] as mp ON mp.active = 1 AND mp.mattress_id = m.id AND ((mp.status = 'NOT_SET') OR (mp.status = 'TO_LOAD') OR (mp.status = 'TO_SPREAD') OR (mp.status = 'TO_CUT') OR (mp.status = 'ON_HOLD') OR ( mp.status = 'ON_CUT') )
 					WHERE mpp.mattress_id = m.id AND mpp.pro_id = p.pro_id) as before_cut_actual
 					
-					,(SELECT SUM(pro_pcs_planned) FROM  [mattress_pros] as mpp 
+				  ,(SELECT SUM(pro_pcs_planned) FROM  [mattress_pros] as mpp 
 					JOIN  [mattress_phases] as mp ON mp.active = 1 AND mp.mattress_id = m.id AND ((mp.status = 'COMPLETED') OR (mp.status = 'TO_PACK') )
 					WHERE mpp.mattress_id = m.id AND mpp.pro_id = p.pro_id) as already_cut_planned
 				  
@@ -2148,10 +3046,48 @@ class plannerController extends Controller {
 			  WHERE p.[skeda] = '".$skeda."'
 			) as x 
 
-			GROUP BY x.pro, x.po_sum_qty, x.style_size, pro_pcs_planned_all, pro_pcs_actual_all
+			GROUP BY x.pro, x.po_sum_qty, x.po_sum_qty2, x.style_size, x.test, pro_pcs_planned_all, pro_pcs_actual_all
 
 			) as y  "));
 		// dd($recap_table);
+
+		$mm_name= '';
+		$marker_width= '';
+		$marker_length= '';
+		$efficiency= '';
+		$average_consumption= '';
+
+		for ($x=0; $x < count($recap_table) ; $x++) { 
+			$mm_style_size = $recap_table[$x]->style_size;
+
+			$find_markers = DB::connection('sqlsrv')->select(DB::raw("SELECT mh.[marker_name],mh.[marker_width],mh.[marker_length],mh.[efficiency],mh.[average_consumption]
+				 FROM [marker_headers] as mh
+				 JOIN [marker_lines] as ml ON ml.[marker_header_id] = mh.[id]
+				 WHERE mh.[status] = 'ACTIVE' AND mh.[marker_name] like 'MM%' AND ml.[style_size] = '".$mm_style_size."'  "));
+
+			for ($t=0; $t < count($find_markers); $t++) { 
+
+				$mm_name .= $find_markers[$t]->marker_name." ";
+				$marker_width .= round($find_markers[$t]->marker_width,0)." ";
+				$marker_length .= round($find_markers[$t]->marker_length,2)." ";
+				$efficiency .= round($find_markers[$t]->efficiency,2)." ";
+				$average_consumption .= round($find_markers[$t]->average_consumption,2)." ";
+			}
+
+			$recap_table[$x]->mm_name = trim($mm_name);
+			$recap_table[$x]->marker_width = trim($marker_width);
+			$recap_table[$x]->marker_length = trim($marker_length);
+			$recap_table[$x]->efficiency = trim($efficiency);
+			$recap_table[$x]->average_consumption = trim($average_consumption);
+			$mm_name= '';
+			$marker_width= '';
+			$marker_length= '';
+			$efficiency= '';
+			$average_consumption= '';
+
+		}
+		// dd($recap_table);
+
 		return view('planner.mini_marker_add_pro', compact('items','skeda','recap_table'));
 	}
 
@@ -2235,6 +3171,44 @@ class plannerController extends Controller {
 
 				) as y  "));
 			// dd($recap_table);
+
+			$mm_name= '';
+			$marker_width= '';
+			$marker_length= '';
+			$efficiency= '';
+			$average_consumption= '';
+
+			for ($x=0; $x < count($recap_table) ; $x++) { 
+				$mm_style_size = $recap_table[$x]->style_size;
+
+				$find_markers = DB::connection('sqlsrv')->select(DB::raw("SELECT mh.[marker_name],mh.[marker_width],mh.[marker_length],mh.[efficiency],mh.[average_consumption]
+					 FROM [marker_headers] as mh
+					 JOIN [marker_lines] as ml ON ml.[marker_header_id] = mh.[id]
+					 WHERE mh.[status] = 'ACTIVE' AND mh.[marker_name] like 'MM%' AND ml.[style_size] = '".$mm_style_size."' "));
+
+				for ($t=0; $t < count($find_markers); $t++) { 
+
+					$mm_name .= $find_markers[$t]->marker_name." ";
+					$marker_width .= round($find_markers[$t]->marker_width,0)." ";
+					$marker_length .= round($find_markers[$t]->marker_length,2)." ";
+					$efficiency .= round($find_markers[$t]->efficiency,2)." ";
+					$average_consumption .= round($find_markers[$t]->average_consumption,2)." ";
+				}
+
+				$recap_table[$x]->mm_name = trim($mm_name);
+				$recap_table[$x]->marker_width = trim($marker_width);
+				$recap_table[$x]->marker_length = trim($marker_length);
+				$recap_table[$x]->efficiency = trim($efficiency);
+				$recap_table[$x]->average_consumption = trim($average_consumption);
+				$mm_name= '';
+				$marker_width= '';
+				$marker_length= '';
+				$efficiency= '';
+				$average_consumption= '';
+
+			}
+			// dd($recap_table);
+
 			$warning = 'Please choose PRO';
 			return view('planner.mini_marker_add_pro', compact('items','skeda','recap_table','warning'));
 
@@ -2263,9 +3237,42 @@ class plannerController extends Controller {
 		$markers = DB::connection('sqlsrv')->select(DB::raw("SELECT mh.[marker_name]
 		 FROM [marker_headers] as mh
 		 JOIN [marker_lines] as ml ON ml.[marker_header_id] = mh.[id]
-		 WHERE mh.[marker_name] like 'MM%' AND ml.[style_size] = '".$style_size."' "));
+		 WHERE mh.[status] = 'ACTIVE' AND mh.[marker_name] like 'MM%' AND ml.[style_size] = '".$style_size."' "));
 
-		return view('planner.mini_marker_add_marker', compact('items','skeda','pro','style_size','markers','po_sum_qty','before_cut_actual','already_cut_actual'));
+		$items_new = unserialize($input['items']);
+		// dd($items);
+
+		$gg[]='';
+		foreach ($items_new as $value) {
+			// dd($value);
+
+			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				o.id,
+				o.material,
+				o.o_roll,
+				o.g_bin,
+				o.mattress_name_orig,
+				o.skeda,
+				o.no_of_joinings,
+				mm.marker_width,
+				mm.marker_length,
+				mm.marker_name,
+				mh.efficiency,
+				mh.average_consumption
+					FROM o_rolls as o
+					JOIN mattress_markers as mm ON mm.mattress_id = o.mattress_id_orig 
+					JOIN marker_headers as mh ON mm.marker_name = mh.marker_name
+			WHERE o.status = 'CREATED' AND o.o_roll = '".$value."' order by o.g_bin asc"));
+			// dd($data);
+
+			array_push($gg, $data[0]->o_roll, $data[0]->g_bin, $data[0]->mattress_name_orig, $data[0]->marker_name, round($data[0]->marker_width,0), round($data[0]->marker_length,2), round($data[0]->efficiency,2), round($data[0]->average_consumption,2) );
+
+		}
+
+		$selected_info = array_chunk(array_filter($gg), 8);
+		// dd($selected_info);
+
+		return view('planner.mini_marker_add_marker', compact('items','skeda','pro','style_size','markers','po_sum_qty','before_cut_actual','already_cut_actual','selected_info'));
 	}
 
 	public function mini_marker_add_marker(Request $request) {
@@ -2279,8 +3286,8 @@ class plannerController extends Controller {
 		// dd($skeda);
 		$pro = $input['pro'];
 		$style_size = $input['style_size'];
-		// $po_sum_qty = (int)$input['po_sum_qty'];
-		$po_sum_qty = 5000;
+		$po_sum_qty = (int)$input['po_sum_qty'];
+		// $po_sum_qty = 9510;
 		$before_cut_actual = (int)$input['before_cut_actual'];
 		$already_cut_actual = (int)$input['already_cut_actual'];
 		
@@ -2290,7 +3297,7 @@ class plannerController extends Controller {
 			$markers = DB::connection('sqlsrv')->select(DB::raw("SELECT mh.[marker_name]
 			 FROM [marker_headers] as mh
 			 JOIN [marker_lines] as ml ON ml.[marker_header_id] = mh.[id]
-			 WHERE mh.[marker_name] like 'MM%' AND ml.[style_size] = '".$style_size."' "));
+			 WHERE mh.[marker_name] like 'MM%' AND ml.[style_size] = '".$style_size."' AND mh.status = 'ACTIVE' "));
 
 			$warning = 'Please select marker';
 			return view('planner.mini_marker_add_marker', compact('items','skeda','pro','style_size','markers','po_sum_qty','before_cut_actual','already_cut_actual','warning'));
@@ -2347,8 +3354,6 @@ class plannerController extends Controller {
 		// dd("ne fali");
 
 		$layer_limit = (int)$input['layer_limit'];
-
-		
 		$items = unserialize($input['items']);
 		// dd($items);
 
@@ -2391,6 +3396,7 @@ class plannerController extends Controller {
 		      ,m2.[comment_operator]
 		      ,m2.[minimattress_code]
 		      ,m2.[layer_limit]
+		      ,m2.[tpa_number]
 		      --,'|'
 		      ,m3.[marker_id]
 		      ,m3.[marker_name]
@@ -2420,11 +3426,12 @@ class plannerController extends Controller {
 		  JOIN [o_rolls] as o ON o.[mattress_id_orig] = m1.[id]
 		  WHERE o.[o_roll] = '".end($items)."' AND m4.active = '1' 
 		  ORDER BY m2.position asc"));
-		// dd($mattress_last);
+		// dd($mattress_last[0]->skeda);
 
 		$last_mm_used = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 mattress FROM  [mattresses]
-  				WHERE skeda_item_type = 'MM' 
+  				WHERE skeda_item_type = 'MM' and mattress like '".$mattress_last[0]->skeda."%' and mattress not like '".$mattress_last[0]->skeda."-MM-E%'
   				ORDER BY id desc"));
+		// dd($last_mm_used);
 		
 		if (!isset($last_mm_used[0])) {
 			$last_mm_used = 0;
@@ -2459,16 +3466,17 @@ class plannerController extends Controller {
 		$length_mattress = 0;
 		$cons_planned = 0;
 		$cons_actual = 0;
-		$extra = 0.01;
-		$pcs_bundle = 0;
+		$extra = 1;
+		$pcs_bundle = $mattress_last[0]->pcs_bundle;
 		$layers_partial;
 		$priority = 1;
 		$call_shift_manager = 0;
 		$test_marker = 0;
-		$tpp_mat_keep_wastage = 0;
+		$tpp_mat_keep_wastage = $mattress_last[0]->tpp_mat_keep_wastage;
 		$printed_marker = 0;
 		$mattress_packed = 0;
-		$all_pro_for_main_plant = 0; //????????????
+		$all_pro_for_main_plant = 0; 
+		$tpa_number = $mattress_last[0]->tpa_number;
 
 		// Position check
 		// $position = 1;
@@ -2497,40 +3505,39 @@ class plannerController extends Controller {
 		$min_length = $marker_new[0]->min_length;
 
 		$find_in_mattress_pro = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM mattress_pros WHERE mattress = '".$mattress."' "));
-		if (isset($find_in_mattress_pro[0])) {				   			
+		if (isset($find_in_mattress_pro[0])) {
 				
-   				$msg = "Mattress '".$mattress."' already exist in mattress_pros!";
-   				dd($msg);
-				
-			} else {
+   			$msg = "Mattress '".$mattress."' already exist in mattress_pros!";
+   			dd($msg);
+		} else {
 
-				$find_in_marker_lines = DB::connection('sqlsrv')->select(DB::raw("SELECT style_size, pcs_on_layer FROM marker_lines WHERE marker_name = '".$marker_name."' "));
-				
-	   			$mattress_pro_array[] = '';
-		   		foreach ($find_in_marker_lines as $line) {
-		   			$style_size = $line->style_size;
-		   			$pro_pcs_layer = $line->pcs_on_layer;
+			$find_in_marker_lines = DB::connection('sqlsrv')->select(DB::raw("SELECT style_size, pcs_on_layer FROM marker_lines WHERE marker_name = '".$marker_name."' "));
+			
+   			$mattress_pro_array[] = '';
+	   		foreach ($find_in_marker_lines as $line) {
+	   			$style_size = $line->style_size;
+	   			$pro_pcs_layer = $line->pcs_on_layer;
 
-		   			if (isset($skeda)) {
-			   				
-			   			$find_in_pro_skedas = DB::connection('sqlsrv')->select(DB::raw("SELECT pro_id FROM pro_skedas WHERE skeda = '".$skeda."' AND style_size = '".$style_size."' "));
-			   			if (!isset($find_in_pro_skedas[0])) {
-			   				$msg = "Skeda '".$skeda."' with style '".$style_size."' not exist in pro_skedas table";
-			   				dd($msg);
-
-			   			} else {
-			   				// dd($find_in_pro_skedas);
-				   			$pro_id = $find_in_pro_skedas[0]->pro_id;
-				   			// print_r('insert:'.$pro_id.'#'.$style_size.'#'.$pro_pcs_layer);
-				   			// print_r('<br>');
-				   			array_push($mattress_pro_array, $pro_id.'#'.$style_size.'#'.$pro_pcs_layer);
-			   			}
-			   		} else {
-			   			$msg = "Skeda not exist";
+	   			if (isset($skeda)) {
+		   				
+		   			$find_in_pro_skedas = DB::connection('sqlsrv')->select(DB::raw("SELECT pro_id FROM pro_skedas WHERE skeda = '".$skeda."' AND style_size = '".$style_size."' "));
+		   			if (!isset($find_in_pro_skedas[0])) {
+		   				$msg = "Skeda '".$skeda."' with style '".$style_size."' not exist in pro_skedas table";
 		   				dd($msg);
+
+		   			} else {
+		   				// dd($find_in_pro_skedas);
+			   			$pro_id = $find_in_pro_skedas[0]->pro_id;
+			   			// print_r('insert:'.$pro_id.'#'.$style_size.'#'.$pro_pcs_layer);
+			   			// print_r('<br>');
+			   			array_push($mattress_pro_array, $pro_id.'#'.$style_size.'#'.$pro_pcs_layer);
 		   			}
-		   		}
+		   		} else {
+		   			$msg = "Skeda not exist";
+	   				dd($msg);
+	   			}
 	   		}
+   		}
 
 		// try {
 			$table0 = new mattress;
@@ -2575,9 +3582,10 @@ class plannerController extends Controller {
 			$table1->comment_office;
 			$table1->comment_operator;
 			$table1->minimattress_code; // ????????????????????????
+			$table1->overlapping;
 			$table1->layer_limit = $layer_limit; // new
+			$table1->tpa_number;
 			$table1->save();
-
 		// }
 		// catch (\Illuminate\Database\QueryException $e) {
 		// 	dd("Problem to save in mattress_details");
@@ -2604,44 +3612,43 @@ class plannerController extends Controller {
 		$device = '';
 		$active = 1;
 
-		// try {
-			$table3 = new mattress_phases;
-			$table3->mattress_id = $table0->id;
-			$table3->mattress = $table0->mattress;
-			$table3->status = $status;
-			$table3->location = $location;
-			$table3->device;
-			$table3->active = $active;
-			$table3->operator1 = Session::get('operator');
-			$table3->operator2;
-			$table3->save();
-		// }
-		// 	catch (\Illuminate\Database\QueryException $e) {
-		// 	dd("Problem to save in mattress_phases");
-		// }
-		// 
+		if ((date('H') >= 0) AND (date('H') < 6)) {
+		   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
+		} else {
+			$date = date('Y-m-d H:i:s');
+		}
 
+		// $table3 = new mattress_phases;
+		$table3 = mattress_phases::firstOrNew(['id_status' => $table0->id.'-'.$status]);
+		$table3->mattress_id = $table0->id;
+		$table3->mattress = $table0->mattress;
+		$table3->status = $status;
+		$table3->location = $location;
+		$table3->device;
+		$table3->active = $active;
+		$table3->operator1 = Session::get('operator');
+		$table3->operator2;
+		$table3->date = $date;
+		$table3->id_status = $table0->id.'-'.$status;
+		$table3->save();
+	
    		// dd($mattress_pro_array);
    		$mattress_pro_array = array_filter($mattress_pro_array);
 		for ($i=1; $i <= count($mattress_pro_array) ; $i++) {
 	
 			$info = explode("#", $mattress_pro_array[$i]);
 			// dd($info[0]);
-
-			// try {
-				$table4 = new mattress_pro;
-				$table4->mattress_id = $table0->id;
-				$table4->mattress = $table0->mattress;
-				$table4->style_size = $info[1];
-				$table4->pro_id = $info[0];
-				$table4->pro_pcs_layer   = (float)$info[2];
-				$table4->pro_pcs_planned = 0;
-				$table4->pro_pcs_actual  = 0;
-				$table4->save();
-			// }
-			// catch (\Illuminate\Database\QueryException $e) {
-			// 	dd("Problem to save in mattress_pros");
-			// }
+			
+			$table4 = new mattress_pro;
+			$table4->mattress_id = $table0->id;
+			$table4->mattress = $table0->mattress;
+			$table4->style_size = $info[1];
+			$table4->pro_id = $info[0];
+			$table4->pro_pcs_layer   = (float)$info[2];
+			$table4->pro_pcs_planned = 0;
+			$table4->pro_pcs_actual  = 0;
+			$table4->save();
+			
 		}
 		$mattress_pro_array = '';
 
@@ -2669,7 +3676,7 @@ class plannerController extends Controller {
 		return redirect('/');
 	}
 
-// paspul
+//PASPUL
 	public function plan_paspul($location) {
 		
 		$operator = Session::get('operator');
@@ -2748,16 +3755,19 @@ class plannerController extends Controller {
 		$pros= '';
 		$skus= '';
 		$sku_s= '';
+		$location_all= '';
 		for ($i=0; $i < count($data) ; $i++) { 
 			
 			$id = $data[$i]->id;
 			
 			$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				ps.pro
-				,ps.style_size
-				,ps.sku
+				ps.[pro]
+				,ps.[style_size]
+				,ps.[sku]
+				,po.[location_all]
 				--,*
 			  FROM  [pro_skedas] as ps 
+			  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
 			WHERE ps.[skeda] = '".$data[$i]->skeda."' "));
 			// dd($prom);
 
@@ -2765,15 +3775,24 @@ class plannerController extends Controller {
 
 				$pros .= $prom[$x]->pro." ";
 				$skus .= $prom[$x]->style_size." ";
-				$sku_s .= $prom[$x]->sku." ";
+				$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+				$sku_s .= $test." ";
+				// $sku_s .= $prom[$x]->sku." ";
+				if ($prom[$x]->location_all == 'Valy') {
+					$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+				} else {
+					$location_all .= $prom[$x]->location_all." ";
+				}
 			}
 
 			$data[$i]->pro = trim($pros);
 			$data[$i]->style_size = trim($skus);
 			$data[$i]->sku = trim($sku_s);
+			$data[$i]->location_all = trim($location_all);
 			$pros = '';
 			$skus = '';
 			$sku_s = '';
+			$location_all = '';
 		}
 
 		return view('planner.plan_paspul', compact('data','location','operator','operators'));
@@ -3065,8 +4084,13 @@ class plannerController extends Controller {
 				}
 			}
 
-			$table_p = new paspul_line;
+			if ((date('H') >= 0) AND (date('H') < 6)) {
+			   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
+			} else {
+				$date = date('Y-m-d H:i:s');
+			}
 
+			$table_p = new paspul_line;
 			$table_p->paspul_roll_id = $table->id;
 			$table_p->paspul_roll = $table->paspul_roll;
 			$table_p->status = $status;
@@ -3075,6 +4099,7 @@ class plannerController extends Controller {
 			$table_p->active = $active;
 			$table_p->operator1 = Session::get('operator');
 			$table_p->operator2;
+			$table_p->date = $date;
 			$table_p->save();
 
 		// }
@@ -3199,8 +4224,13 @@ class plannerController extends Controller {
 			$location = "DELETED";
 			$active = 1;
 
-			$table_p = new paspul_line;
+			if ((date('H') >= 0) AND (date('H') < 6)) {
+			   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
+			} else {
+				$date = date('Y-m-d H:i:s');
+			}
 
+			$table_p = new paspul_line;
 			$table_p->paspul_roll_id = $table->id;
 			$table_p->paspul_roll = $table->paspul_roll;
 			$table_p->status = $status;
@@ -3209,6 +4239,7 @@ class plannerController extends Controller {
 			$table_p->active = $active;
 			$table_p->operator1 = Session::get('operator');
 			$table_p->operator2;
+			$table_p->date = $date;
 			$table_p->save();
 	
 		return redirect('/plan_paspul/NOT_SET');
@@ -3270,7 +4301,6 @@ class plannerController extends Controller {
 		$comment_office = $data[0]->comment_office;
 		$call_shift_manager = $data[0]->call_shift_manager;
 		$rewinding_method = $data[0]->rewinding_method;
-
 		$material = $data[0]->material;
 		$dye_lot = $data[0]->dye_lot;
 		$color_desc = $data[0]->color_desc;
@@ -3280,8 +4310,42 @@ class plannerController extends Controller {
 		$tpa_number = $data[0]->tpa_number;
 		$location = $data[0]->location;
 
+		$data_sp = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			pl.[operator1],
+			pl.[updated_at]
+		  FROM [paspuls] as p
+		  JOIN [paspul_lines] as pl ON p.[id] = pl.[paspul_roll_id] AND pl.[status] = 'TO_CUT'
+		  WHERE p.[id] = '".$id."'
+		  ORDER BY pl.[updated_at] desc"));
+		// dd($data_sp);
+
+		if (isset($data_sp[0])) {
+			$sp_operator = $data_sp[0]->operator1;
+			$sp_date = substr($data_sp[0]->updated_at,0,16);	
+		} else {
+			$sp_operator = NULL;
+			$sp_date = NULL;
+		}
+
+		$data_cut = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			pl.[operator1],
+			pl.[updated_at]
+		  FROM [paspuls] as p
+		  JOIN [paspul_lines] as pl ON p.[id] = pl.[paspul_roll_id] AND pl.[status] = 'COMPLETED'
+		  WHERE p.[id] = '".$id."'
+		  ORDER BY pl.[updated_at] desc"));
+		// dd($data_cut);
+
+		if (isset($data_cut[0])) {
+			$cut_operator = $data_cut[0]->operator1;
+			$cut_date = substr($data_cut[0]->updated_at,0,16);	
+		} else {
+			$cut_operator = NULL;
+			$cut_date = NULL;
+		}
+
 		return view('planner.edit_paspul_line', compact( 'id','paspul_roll','pasbin','skeda_item_type','priority','comment_office','call_shift_manager','rewinding_method',
-			'material','dye_lot','color_desc','skeda', 'skeda_item_type','tpa_number','paspul_roll_id','location'));
+			'material','dye_lot','color_desc','skeda', 'skeda_item_type','tpa_number','paspul_roll_id','location', 'sp_operator', 'sp_date', 'cut_operator', 'cut_date'));
 	}	
 
 	public function edit_paspul_confirm(Request $request) {
@@ -3351,11 +4415,12 @@ class plannerController extends Controller {
 		return redirect('/plan_paspul/'.$location);
 	}
 
-// printing
+//PRINTING
 	public function print_mattress ($id) {
 
 		return view('planner.print_mattress_confirm', compact( 'id'));
 	}
+
 	public function print_mattress_confirm (Request $request) {
 
 		$this->validate($request, ['id'=>'required', 'printer' => 'required']);
@@ -3504,7 +4569,6 @@ class plannerController extends Controller {
 						${"destination_{$i}"}='';
 						${"multimaterial_{$i}"}='';
 					}	
-					// var_dump(${"pro_{$i}"});
 				}
 		} else {
 		// MB or MW
@@ -3583,7 +4647,6 @@ class plannerController extends Controller {
 					${"destination_{$i}"}='';
 					${"multimaterial_{$i}"}='';
 				}	
-				// var_dump(${"pro_{$i}"});
 			}
 		}
 
@@ -3725,9 +4788,14 @@ class plannerController extends Controller {
 
 		$table->save();
 
-		$table1 = mattress_details::findOrFail($id);
-		$table1->printed_nalog = (int)$table1->printed_nalog + 1;
-		$table1->save();
+		// dd($input['id']);
+		$m_details = DB::connection('sqlsrv')->select(DB::raw("SELECT id
+			FROM  [mattress_details]
+			WHERE mattress_id = '".$id."' "));
+		// dd($m_details[0]->id);
+		$t = mattress_details::findOrFail($m_details[0]->id);
+		$t->printed_nalog = (int)$t->printed_nalog + 1;
+		$t->save();
 
 		return redirect('/');
 	}
@@ -3844,7 +4912,7 @@ class plannerController extends Controller {
 			$pro_pcs_layer = round($data1[0]->pro_pcs_layer);
 			$multimaterial = $data1[0]->multimaterial;
 
-			$data2 = DB::connection('sqlsrv')->select(DB::raw("SELECT [o_roll]
+			$data2 = DB::connection('sqlsrv')->select(DB::raw("SELECT [o_roll],[g_bin]
 				FROM  [o_rolls]
 				WHERE mattress_id_new = '".$id."' "));
 			// dd($data2);
@@ -3854,36 +4922,22 @@ class plannerController extends Controller {
 				// $id = $i + 1;
 				// $pro."_".$i = $data1[$i]->pro;
 				if (isset($data2[$i]->o_roll)) {
-					${"o_roll_{$i}"}=$data2[$i]->o_roll;
+					${"o_roll_{$i}"}= $data2[$i]->o_roll.' - '.$data2[$i]->g_bin;
 				} else {
 					${"o_roll{$i}"}='';
 				}
 			}
 
-			for ($i=0; $i <= 9; $i++) { 
-				if (!isset(${"o_roll_{$i}"})) {
-					${"o_roll_{$i}"}='';
+			for ($g=0; $g <= 9; $g++) { 
+				if (!isset(${"o_roll_{$g}"})) {
+					${"o_roll_{$g}"}='';
 				}	
-				// var_dump(${"pro_{$i}"});
 			}
 
 		} else {
 
 			dd('MB or MW not ready');
-			$padprint_item = '';
-			$padprint_color = '';
-			$pro = '';
-			$style_size = '';
-			$destination = '';
-			$pro_pcs_layer = '';
-			$multimaterial = '';
-
-			for ($i=0; $i <= 9; $i++) { 
-				if (!isset(${"o_roll_{$i}"})) {
-					${"o_roll_{$i}"}='';
-				}	
-				// var_dump(${"pro_{$i}"});
-			}
+			
 		}
 
 		$table = new print_mini_mattress;
@@ -3933,14 +4987,18 @@ class plannerController extends Controller {
 		$table->printer = $printer;
 		$table->save();
 
-		$table1 = mattress_details::findOrFail($id);
-		$table1->printed_nalog = (int)$table1->printed_nalog + 1;
-		$table1->save();
+		// dd($input['id']);
+		$m_details = DB::connection('sqlsrv')->select(DB::raw("SELECT id
+			FROM  [mattress_details]
+			WHERE mattress_id = '".$id."' "));
+		// dd($m_details[0]->id);
+		$t = mattress_details::findOrFail($m_details[0]->id);
+		$t->printed_nalog = (int)$t->printed_nalog + 1;
+		$t->save();
 
 		return redirect('/');
 
 	}
-
 	public function print_mattress_multiple () {
 
 		return view('planner.print_mattress_multiple');
@@ -4142,18 +5200,15 @@ class plannerController extends Controller {
 						}
 					}
 
-					for ($y=0; $y <= 14; $y++) { 
-						
-						if (!isset(${"pro_{$y}"})) {
-							
-							${"pro_{$y}"}='';
-							${"style_size_{$y}"}='';
-							${"pro_pcs_actual_{$y}"}='';
-							${"pro_pcs_layer_{$y}"}='';
-							${"destination_{$y}"}='';
-							${"multimaterial_{$y}"}='';
+					for ($g=0; $g <= 14; $g++) { 
+						if (!isset(${"pro_{$g}"})) {
+							${"pro_{$g}"}='';
+							${"style_size_{$g}"}='';
+							${"pro_pcs_actual_{$g}"}='';
+							${"pro_pcs_layer_{$g}"}='';
+							${"destination_{$g}"}='';
+							${"multimaterial_{$g}"}='';
 						}	
-						// var_dump(${"pro_{$y}"});
 					}
 
 				} else {
@@ -4223,17 +5278,18 @@ class plannerController extends Controller {
 						}
 					}
 
-					for ($i=0; $i <= 14; $i++) { 
-						if (!isset(${"pro_{$i}"})) {
-							${"pro_{$i}"}='';
-							${"style_size_{$i}"}='';
-							${"pro_pcs_actual_{$i}"}='';
-							${"pro_pcs_layer_{$i}"}='';
-							${"destination_{$i}"}='';
-							${"multimaterial_{$i}"}='';
+					for ($g=0; $g <= 14; $g++) { 
+						if (!isset(${"pro_{$g}"})) {
+							${"pro_{$g}"}='';
+							${"style_size_{$g}"}='';
+							${"pro_pcs_actual_{$g}"}='';
+							${"pro_pcs_layer_{$g}"}='';
+							${"destination_{$g}"}='';
+							${"multimaterial_{$g}"}='';
 						}	
-						// var_dump(${"pro_{$i}"});
+						// var_dump(${"pro_{$g}"});
 					}
+
 				}
 
 				$table = new print_standard_mattress;
@@ -4375,9 +5431,23 @@ class plannerController extends Controller {
 
 				$table->save();
 
-				$table1 = mattress_details::findOrFail($id);
-				$table1->printed_nalog = (int)$table1->printed_nalog + 1;
-				$table1->save();
+				// dd($input['id']);
+				$m_details = DB::connection('sqlsrv')->select(DB::raw("SELECT id
+					FROM  [mattress_details]
+					WHERE mattress_id = '".$id."' "));
+				// dd($m_details[0]->id);
+				$t = mattress_details::findOrFail($m_details[0]->id);
+				$t->printed_nalog = (int)$t->printed_nalog + 1;
+				$t->save();
+
+				for ($g=0; $g <= 14; $g++) { 
+					${"pro_{$g}"}='';
+					${"style_size_{$g}"}='';
+					${"pro_pcs_actual_{$g}"}='';
+					${"pro_pcs_layer_{$g}"}='';
+					${"destination_{$g}"}='';
+					${"multimaterial_{$g}"}='';
+				}
 		}
 		return redirect('/');		
 	}
@@ -4417,7 +5487,7 @@ class plannerController extends Controller {
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id] AND m4.[active] = '1'
-		  WHERE (m4.[status] = 'TO_LOAD' OR m4.[status] = 'TO_LOAD') AND m1.[skeda_item_type] = 'MM' AND m2.[printed_nalog] IS NULL"));
+		  WHERE (m4.[status] = 'TO_LOAD' OR m4.[status] = 'COMPLETED') AND m1.[skeda_item_type] = 'MM' AND (m2.[printed_nalog] IS NULL OR m2.[printed_nalog] = 0)"));
 		// dd($data);
 
 		return view('planner.print_mattress_multiple_mm', compact('data'));
@@ -4446,7 +5516,7 @@ class plannerController extends Controller {
 		// dd($items);
 
 		$array = array_chunk($items,2);
-		// print_r($array);
+		// dd($array);
 		$uk = count($items);
 
 
@@ -4456,7 +5526,7 @@ class plannerController extends Controller {
 			if ($uk > 1) {
 				
 				for ($x=0; $x < 2 ; $x++) { 
-					var_dump($array[$i][$x]);
+					// var_dump($array[$i][$x]);
 
 					$id = $array[$i][$x];
 
@@ -4488,6 +5558,7 @@ class plannerController extends Controller {
 				      ,m3.[min_length]
 				      --,'|'
 				      ,m4.[location]
+				      ,m2.[id] as detail_id
 				      
 					  FROM [mattresses] as m1
 					  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
@@ -4550,7 +5621,7 @@ class plannerController extends Controller {
 					${"pro_pcs_layer_{$x}"} = round($data1[0]->pro_pcs_layer,0);
 					${"multimaterial_{$x}"} = $data1[0]->multimaterial;
 
-					$data2 = DB::connection('sqlsrv')->select(DB::raw("SELECT [o_roll]
+					$data2 = DB::connection('sqlsrv')->select(DB::raw("SELECT [o_roll],[g_bin]
 						FROM  [o_rolls]
 						WHERE mattress_id_new = '".$id."' "));
 					// dd($data2);
@@ -4560,18 +5631,25 @@ class plannerController extends Controller {
 						// $id = $i + 1;
 						// $pro."_".$i = $data1[$i]->pro;
 						if (isset($data2[$y]->o_roll)) {
-							${"o_roll_{$y}_{$x}"}=$data2[$y]->o_roll;
+							${"o_roll_{$y}_{$x}"}= $data2[$y]->o_roll.' - '.$data2[$y]->g_bin;
 						} else {
 							${"o_roll{$y}_{$x}"}='';
 						}
 					}
 
-					for ($y=0; $y <= 9; $y++) { 
-						if (!isset(${"o_roll_{$y}_{$x}"})) {
-							${"o_roll_{$y}_{$x}"}='';
+					for ($g=0; $g <= 9; $g++) {
+						// if (!isset(${"o_roll_{$g}_{$x}"})) {
+						// 	${"o_roll_{$g}_{$x}"}='';
+						// }	
+					
+						if (!isset(${"o_roll_{$g}_0"})) {
+							${"o_roll_{$g}_0"}='';
 						}	
-						// var_dump(${"pro_{$y}_{$x}"});
+						if (!isset(${"o_roll_{$g}_1"})) {
+							${"o_roll_{$g}_1"}='';
+						}
 					}
+
 				}	
 
 				$table = new print_mini_mattress;
@@ -4581,7 +5659,6 @@ class plannerController extends Controller {
 				$table->marker_name_0 = $marker_name_0;
 				$table->location_0 = $location_0;
 				$table->skeda_0 = $skeda_0;
-
 				$table->width_theor_usable_0 = $width_theor_usable_0;
 				$table->marker_length_0 = $marker_length_0;
 				if ($marker_width_0 == 0) {
@@ -4596,7 +5673,6 @@ class plannerController extends Controller {
 				$table->pcs_bundle_0 = $pcs_bundle_0;
 				$table->bottom_paper_0 = $bottom_paper_0;
 				$table->layer_limit_0 = $layer_limit_0;
-
 				if ($tpp_mat_keep_wastage_0 == 1) {
 					$table->tpp_mat_keep_wastage_0 = "YES";
 				} else {
@@ -4612,7 +5688,7 @@ class plannerController extends Controller {
 				$table->pro_0 = $pro_0;
 				$table->style_size_0 = $style_size_0;
 				$table->destination_0 = $destination_0;
-				$table->pro_pcs_layer_0 = $pro_pcs_layer_0;
+				$table->pro_pcs_layer_0 = round($pro_pcs_layer_0,0);
 				$table->multimaterial_0 = $multimaterial_0;
 
 				$table->o_roll_0_0 = $o_roll_0_0;
@@ -4662,7 +5738,7 @@ class plannerController extends Controller {
 				$table->pro_1 = $pro_1;
 				$table->style_size_1 = $style_size_1;
 				$table->destination_1 = $destination_1;
-				$table->pro_pcs_layer_1 = $pro_pcs_layer_1;
+				$table->pro_pcs_layer_1 = round($pro_pcs_layer_1,0);
 				$table->multimaterial_1 = $multimaterial_1;
 
 				$table->o_roll_0_1 = $o_roll_0_1;
@@ -4679,13 +5755,27 @@ class plannerController extends Controller {
 				$table->printer = $printer;
 				$table->save();
 
-				$table0 = mattress_details::findOrFail($id_0);
-				$table0->printed_nalog = (int)$table0->printed_nalog + 1;
-				$table0->save();
+				// dd($input['id']);
+				$m_details1 = DB::connection('sqlsrv')->select(DB::raw("SELECT id
+					FROM  [mattress_details]
+					WHERE mattress = '".$table->mattress_0."' "));
+				// dd($m_details[0]->id);
+				$t1 = mattress_details::findOrFail($m_details1[0]->id);
+				$t1->printed_nalog = (int)$t1->printed_nalog + 1;
+				$t1->save();
 
-				$table1 = mattress_details::findOrFail($id_1);
-				$table1->printed_nalog = (int)$table1->printed_nalog + 1;
-				$table1->save();
+				$m_details2 = DB::connection('sqlsrv')->select(DB::raw("SELECT id
+					FROM  [mattress_details]
+					WHERE mattress = '".$table->mattress_1."' "));
+				// dd($m_details[0]->id);
+				$t2 = mattress_details::findOrFail($m_details2[0]->id);
+				$t2->printed_nalog = (int)$t2->printed_nalog + 1;
+				$t2->save();
+				
+				for ($g=0; $g <= 9; $g++) { 
+					${"o_roll_{$g}_0"}='';
+					${"o_roll_{$g}_1"}='';
+				}
 
 			} else {
 				// var_dump($array[$i][0]);
@@ -4732,81 +5822,79 @@ class plannerController extends Controller {
 				// var_dump("<br>");
 				
 				$x = 0;
-					${"id_{$x}"} = $data[0]->id;
-					${"mattress_{$x}"} = $data[0]->mattress;
-					${"material_{$x}"} = $data[0]->material;
-					${"dye_lot_{$x}"} = '0-O';
-					${"color_desc_{$x}"} = $data[0]->color_desc;
-					${"width_theor_usable_{$x}"} = round($data[0]->width_theor_usable,3);
-					${"skeda_{$x}"} = $data[0]->skeda;
-					${"skeda_item_type_{$x}"} = $data[0]->skeda_item_type;
-					${"spreading_method_{$x}"} = $data[0]->spreading_method;
-					
-					${"pcs_bundle_{$x}"} = round($data[0]->pcs_bundle,0);
-					${"bottom_paper_{$x}"} = $data[0]->bottom_paper;
-					${"tpp_mat_keep_wastage_{$x}"} = $data[0]->tpp_mat_keep_wastage;
-					${"layer_limit_{$x}"} = $data[0]->layer_limit;
+				${"id_{$x}"} = $data[0]->id;
+				${"mattress_{$x}"} = $data[0]->mattress;
+				${"material_{$x}"} = $data[0]->material;
+				${"dye_lot_{$x}"} = '0-O';
+				${"color_desc_{$x}"} = $data[0]->color_desc;
+				${"width_theor_usable_{$x}"} = round($data[0]->width_theor_usable,3);
+				${"skeda_{$x}"} = $data[0]->skeda;
+				${"skeda_item_type_{$x}"} = $data[0]->skeda_item_type;
+				${"spreading_method_{$x}"} = $data[0]->spreading_method;
+				
+				${"pcs_bundle_{$x}"} = round($data[0]->pcs_bundle,0);
+				${"bottom_paper_{$x}"} = $data[0]->bottom_paper;
+				${"tpp_mat_keep_wastage_{$x}"} = $data[0]->tpp_mat_keep_wastage;
+				${"layer_limit_{$x}"} = $data[0]->layer_limit;
 
-					${"comment_office_{$x}"} = $data[0]->comment_office;
+				${"comment_office_{$x}"} = $data[0]->comment_office;
 
-					${"marker_name_{$x}"} = $data[0]->marker_name;
-					${"marker_length_{$x}"} = round($data[0]->marker_length,3);
-					${"marker_width_{$x}"} = round($data[0]->marker_width,3);
-					${"min_length_{$x}"} = round($data[0]->min_length,3);
+				${"marker_name_{$x}"} = $data[0]->marker_name;
+				${"marker_length_{$x}"} = round($data[0]->marker_length,3);
+				${"marker_width_{$x}"} = round($data[0]->marker_width,3);
+				${"min_length_{$x}"} = round($data[0]->min_length,3);
 
-					${"location_{$x}"} = $data[0]->location;
-					${"overlapping_{$x}"} = $data[0]->overlapping;
-					
-					$data1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-					      mp.[mattress]
-					      ,mp.[style_size]
-					      --,mp.[pro_id]
-					      ,mp.[pro_pcs_layer]
-					      --,mp.[pro_pcs_planned]
-					      ,mp.[pro_pcs_actual]
-					      ,s.[padprint_item]
-					      ,s.[padprint_color]
-					      ,s.[pro]
-					      ,s.[sku]
-					      ,s.[multimaterial]
-					      ,po.[location_all]
-					      
-					FROM  [mattress_pros] as mp
-					JOIN  [pro_skedas] as s ON s.[pro_id] = mp.[pro_id]
-					LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = s.[pro]
-					WHERE mp.[mattress_id] = '".$id."' "));
-					// dd($data1);
+				${"location_{$x}"} = $data[0]->location;
+				${"overlapping_{$x}"} = $data[0]->overlapping;
+				
+				$data1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				      mp.[mattress]
+				      ,mp.[style_size]
+				      --,mp.[pro_id]
+				      ,mp.[pro_pcs_layer]
+				      --,mp.[pro_pcs_planned]
+				      ,mp.[pro_pcs_actual]
+				      ,s.[padprint_item]
+				      ,s.[padprint_color]
+				      ,s.[pro]
+				      ,s.[sku]
+				      ,s.[multimaterial]
+				      ,po.[location_all]
+				      
+				FROM  [mattress_pros] as mp
+				JOIN  [pro_skedas] as s ON s.[pro_id] = mp.[pro_id]
+				LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = s.[pro]
+				WHERE mp.[mattress_id] = '".$id."' "));
+				// dd($data1);
 
-					${"padprint_item_{$x}"} = $data1[0]->padprint_item;
-					${"padprint_color_{$x}"} = $data1[0]->padprint_color;
-					${"pro_{$x}"} = $data1[0]->pro;
-					${"style_size_{$x}"} = $data1[0]->sku;
-					${"destination_{$x}"} = $data1[0]->location_all;
-					${"pro_pcs_layer_{$x}"} = $data1[0]->pro_pcs_layer;
-					${"multimaterial_{$x}"} = $data1[0]->multimaterial;
+				${"padprint_item_{$x}"} = $data1[0]->padprint_item;
+				${"padprint_color_{$x}"} = $data1[0]->padprint_color;
+				${"pro_{$x}"} = $data1[0]->pro;
+				${"style_size_{$x}"} = $data1[0]->sku;
+				${"destination_{$x}"} = $data1[0]->location_all;
+				${"pro_pcs_layer_{$x}"} = round($data1[0]->pro_pcs_layer,0);
+				${"multimaterial_{$x}"} = $data1[0]->multimaterial;
 
-					$data2 = DB::connection('sqlsrv')->select(DB::raw("SELECT [o_roll]
-						FROM  [o_rolls]
-						WHERE mattress_id_new = '".$id."' "));
-					// dd($data2);
+				$data2 = DB::connection('sqlsrv')->select(DB::raw("SELECT [o_roll],[g_bin]
+					FROM  [o_rolls]
+					WHERE mattress_id_new = '".$id."' "));
+				// dd($data2);
 
-					for ($y=0; $y < count($data2); $y++) { 
-							
-						// $id = $i + 1;
-						// $pro."_".$i = $data1[$i]->pro;
-						if (isset($data2[$y]->o_roll)) {
-							${"o_roll_{$y}_{$x}"}=$data2[$y]->o_roll;
-						} else {
-							${"o_roll{$y}_{$x}"}='';
-						}
+				for ($y=0; $y < count($data2); $y++) { 
+					// $id = $i + 1;
+					// $pro."_".$i = $data1[$i]->pro;
+					if (isset($data2[$y]->o_roll)) {
+						${"o_roll_{$y}_{$x}"}= $data2[$y]->o_roll.' - '.$data2[$y]->g_bin;
+					} else {
+						${"o_roll{$y}_{$x}"}='';
 					}
+				}
 
-					for ($y=0; $y <= 9; $y++) { 
-						if (!isset(${"o_roll_{$y}_{$x}"})) {
-							${"o_roll_{$y}_{$x}"}='';
-						}	
-						// var_dump(${"pro_{$y}_{$x}"});
-					}
+				for ($g=0; $g <= 9; $g++) { 
+					if (!isset(${"o_roll_{$g}_0"})) {
+						${"o_roll_{$g}_0"}='';
+					}	
+				}
 
 				$table1 = new print_mini_mattress;
 
@@ -4845,7 +5933,7 @@ class plannerController extends Controller {
 				$table1->pro_0 = $pro_0;
 				$table1->style_size_0 = $style_size_0;
 				$table1->destination_0 = $destination_0;
-				$table1->pro_pcs_layer_0 = $pro_pcs_layer_0;
+				$table1->pro_pcs_layer_0 = round($pro_pcs_layer_0,0);
 				$table1->multimaterial_0 = $multimaterial_0;
 
 				$table1->o_roll_0_0 = $o_roll_0_0;
@@ -4862,13 +5950,305 @@ class plannerController extends Controller {
 				$table1->printer = $printer;
 				$table1->save();
 
-				$table2 = mattress_details::findOrFail($id_0);
-				$table2->printed_nalog = (int)$table2->printed_nalog + 1;
-				$table2->save();
+				// dd($input['id']);
+				$m_details = DB::connection('sqlsrv')->select(DB::raw("SELECT id
+					FROM  [mattress_details]
+					WHERE mattress_id = '".$id."' "));
+				// dd($m_details[0]->id);
+				$t = mattress_details::findOrFail($m_details[0]->id);
+				$t->printed_nalog = (int)$t->printed_nalog + 1;
+				$t->save();
 
+				for ($g=0; $g <= 9; $g++) { 
+					${"o_roll_{$g}_0"}='';
+					
+				}
 			}
 			$uk = $uk - 2;
 		}
+
 		return redirect('/');
 	}
+
+//SEARCH
+	public function recap_by_skeda_mattress(){
+
+		return view('planner.recap_by_skeda_mattress');
+	}
+
+	public function recap_by_skeda_mattress_post(Request $request) {
+
+		$this->validate($request, ['skeda'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+		
+		$skeda = trim($input['skeda']);
+		// dd($skeda);
+
+		$data = DB::connection('sqlsrv')->select(DB::raw(" SELECT 
+			   m2.[position]
+			  ,m1.[id]
+		      ,m1.[mattress]
+		      ,m1.[g_bin]
+		      ,m1.[material]
+		      ,m1.[dye_lot]
+		      ,m1.[color_desc]
+		      ,m1.[width_theor_usable]
+		      ,m1.[skeda]
+		      ,m1.[skeda_item_type]
+		      ,m1.[skeda_status]
+		      ,m1.[spreading_method]
+		      ,m1.[created_at]
+		      ,m1.[updated_at]
+		      --,'|'
+		      ,m2.[layers]
+		      ,m2.[layers_a]
+		      ,m2.[length_mattress]
+		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
+		      ,m2.[extra]
+		      ,m2.[pcs_bundle]
+		      ,m2.[layers_partial]
+		      ,m2.[position]
+		      ,m2.[priority]
+		      ,m2.[call_shift_manager]
+		      ,m2.[test_marker]
+		      ,m2.[tpp_mat_keep_wastage]
+		      ,m2.[printed_marker]
+		      ,m2.[mattress_packed]
+		      ,m2.[all_pro_for_main_plant]
+		      ,m2.[bottom_paper]
+		      ,m2.[layers_a_reasons]
+		      ,m2.[comment_office]
+		      ,m2.[comment_operator]
+		      ,m2.[minimattress_code]
+		      ,m2.[printed_nalog]
+		      ,m2.[layer_limit]
+		      ,m2.[overlapping]
+		      --,'|'
+		      ,m3.[marker_id]
+		      ,m3.[marker_name]
+		      ,m3.[marker_name_orig]
+		      ,m3.[marker_length]
+		      ,m3.[marker_width]
+		      ,m3.[min_length]
+		      --,'|'
+		      ,m4.[status]
+		      ,m4.[location]
+		      ,m4.[device]
+		      ,m4.[active]
+		      ,m4.[operator1]
+		      ,m4.[operator2]
+		      --,'|'
+		      -- ,m5.[style_size]
+		      -- ,m5.[pro_id]
+		      -- ,m5.[pro_pcs_layer]
+		      -- ,m5.[pro_pcs_planned]
+		      -- ,m5.[pro_pcs_actual]
+		      ,ms.[g_bin_orig]
+		      
+		  FROM [mattresses] as m1
+		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
+		  LEFT JOIN [mattress_split_requests] as ms ON ms.[mattress_id_new] = m1.[id]
+		  WHERE m1.[skeda] like '".$skeda."%' AND m4.active = '1' 
+		  ORDER BY m1.id asc"));
+		// dd($data);
+		
+	
+		$pros= '';
+		$skus= '';
+		$sku_s= '';
+		$location_all= '';
+		for ($i=0; $i < count($data) ; $i++) { 
+		
+			$id = $data[$i]->id;
+			// dd($id);
+
+			if (($data[$i]->skeda_item_type == 'MS') OR ($data[$i]->skeda_item_type == 'MM')) {
+				
+				$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					ps.pro
+					,ps.style_size
+					,ps.sku
+					,po.[location_all]
+					--,*
+				  FROM [mattress_pros] as mp
+				  JOIN [pro_skedas] as ps ON ps.[pro_id] = mp.[pro_id]
+				  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+				WHERE mp.[mattress_id] = '".$id."' "));
+				
+				for ($x=0; $x < count($prom); $x++) { 
+
+					$pros .= $prom[$x]->pro." ";
+					$skus .= $prom[$x]->style_size." ";
+					$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+					$sku_s .= $test." ";
+					// $sku_s .= $prom[$x]->sku." ";
+					if ($prom[$x]->location_all == 'Valy') {
+						$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+					} else {
+						$location_all .= $prom[$x]->location_all." ";
+					}
+				}
+
+				$data[$i]->pro = trim($pros);
+				$data[$i]->style_size = trim($skus);
+				$data[$i]->sku = trim($sku_s);
+				$data[$i]->location_all = trim($location_all);
+				$pros = '';
+				$skus = '';
+				$sku_s = '';
+				$location_all = '';
+
+			} else {
+
+				$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					ps.pro
+					,ps.style_size
+					,ps.sku
+					,po.[location_all]
+					--,*
+				  FROM  [pro_skedas] as ps 
+				  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+				WHERE ps.[skeda] = '".$data[$i]->skeda."' "));
+				// dd($prom);
+
+				for ($x=0; $x < count($prom); $x++) { 
+
+					$pros .= $prom[$x]->pro." ";
+					$skus .= $prom[$x]->style_size." ";
+					$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+					$sku_s .= $test." ";
+					// $sku_s .= $prom[$x]->sku." ";
+					if ($prom[$x]->location_all == 'Valy') {
+						$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+					} else {
+						$location_all .= $prom[$x]->location_all." ";
+					}
+				}
+
+				$data[$i]->pro = trim($pros);
+				$data[$i]->style_size = trim($skus);
+				$data[$i]->sku = trim($sku_s);
+				$data[$i]->location_all = trim($location_all);
+				$pros = '';
+				$skus = '';
+				$sku_s = '';
+				$location_all = '';
+			}
+		}
+
+		return view('planner.recap_by_skeda_mattress_post', compact('data','skeda'));
+	}
+
+	public function recap_by_skeda_paspul(){
+		
+		return view('planner.recap_by_skeda_paspul');
+	}
+
+	public function recap_by_skeda_paspul_post(Request $request) {
+
+		$this->validate($request, ['skeda'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+		
+		$skeda = $input['skeda'];
+		// dd($skeda);
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+
+			  p1.[id]
+		      ,p1.[paspul_roll]
+		      ,p1.[sap_su]
+		      ,p1.[material]
+		      ,p1.[color_desc]
+		      ,p1.[dye_lot]
+		      ,p1.[paspul_type]
+
+		      ,p1.[width]
+		      ,p1.[kotur_width]
+		      ,p1.[kotur_width_without_tension]
+		      ,p1.[kotur_planned]
+		      ,p1.[kotur_actual]
+		      ,p1.[rewound_length]
+		      ,p1.[rewound_length_a]
+
+		      ,p1.[pasbin]
+		      ,p1.[skeda_item_type]
+		      ,p1.[skeda]
+		      ,p1.[skeda_status]
+
+		      ,p1.[rewound_roll_unit_of_measure]
+		      ,p1.[position]
+		      ,p1.[priority]
+		      ,p1.[comment_office]
+		      ,p1.[comment_operator]
+		      ,p1.[call_shift_manager]
+		      ,p1.[rewinding_method]
+		      ,p1.[tpa_number]
+		      ,p1.[created_at]
+		      ,p1.[updated_at]
+
+		      ,p2.[status]
+		      ,p2.[location]
+		      ,p2.[device]
+		      ,p2.[active]
+		      ,p2.[operator1]
+		      ,p2.[operator2]
+
+		  FROM [paspuls] as p1
+		  LEFT JOIN [paspul_lines] as p2 ON p2.[paspul_roll_id] = p1.[id]
+		  WHERE p1.[skeda] like '".$skeda."%' AND p2.active = '1' 
+		  ORDER BY p1.[id] asc"));
+
+		$pros= '';
+		$skus= '';
+		$sku_s= '';
+		$location_all= '';
+		for ($i=0; $i < count($data) ; $i++) { 
+			
+			$id = $data[$i]->id;
+			
+			$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				ps.[pro]
+				,ps.[style_size]
+				,ps.[sku]
+				,po.[location_all]
+				--,*
+			  FROM  [pro_skedas] as ps 
+			  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+			WHERE ps.[skeda] = '".$data[$i]->skeda."' "));
+			// dd($prom);
+
+			for ($x=0; $x < count($prom); $x++) { 
+
+				$pros .= $prom[$x]->pro." ";
+				$skus .= $prom[$x]->style_size." ";
+				$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+				$sku_s .= $test." ";
+				// $sku_s .= $prom[$x]->sku." ";
+				if ($prom[$x]->location_all == 'Valy') {
+					$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+				} else {
+					$location_all .= $prom[$x]->location_all." ";
+				}
+			}
+
+			$data[$i]->pro = trim($pros);
+			$data[$i]->style_size = trim($skus);
+			$data[$i]->sku = trim($sku_s);
+			$data[$i]->location_all = trim($location_all);
+			
+			$pros = '';
+			$skus = '';
+			$sku_s = '';
+			$location_all = '';
+		}
+
+		return view('planner.recap_by_skeda_paspul_post', compact('data','skeda'));	
+	}
+
 }

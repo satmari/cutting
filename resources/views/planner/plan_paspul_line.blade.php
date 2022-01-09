@@ -38,8 +38,6 @@
                             <tr><td>Rewinding method</td><td><b>{{ $rewinding_method }} </b></td></tr>
                             </table>
 
-
-
                         @if(isset($bin) AND count($bin) > 1 )
                         <p>Bin: <span style="color:red;">*</span></p>
                         <table style="width:100%">

@@ -13,7 +13,7 @@
 		                    <input id="filter" type="text" class="form-control" placeholder="Type here...">
 		                </div>
 
-		                <table class="table table-striped table-bordered" id="table-draggable2" 
+		                <table class="table table-striped table-bordered tableFixHead" id="table-draggable2" 
 		                
 		                >
 		                <!--
@@ -44,17 +44,26 @@
 			                    		<th >Position</th>
 			                            <th >Paspul roll</th>
 			                            <th >SAP SU</th>
-			                            <th >Paspul type</th>
-			                            <th >Roll width (cm)</th>
-			                            <th >Rewinding method</th>
 			                            <th >Rewound length</th>
+			                            <th >Unit of measure</th>
+
+			                            <th >PRO</th>
+			                            <th >Destination</th>
+			                            <th >SKU</th>
+
+			                            <th >Paspul type</th>
+			                            <th >Roll min width (cm)</th>
+			                            <th >Kotur width [mm]</th>
+			                            
 			                            <th >Material</th>
 			                            <th >Color desc</th>
 			                            <th >Dye lot</th>
-			                            <th >Unit of measure</th>
+			                            
 			                            <th >Skeda</th>
 			                            <th >Bin</th>
 			                            <th >Priority</th>
+			                            <th >Rewinding method</th>
+			                            
 			                            <th></th>
 			                            
 			                    	</tr>
@@ -73,14 +82,21 @@
 			                            <td>{{ $req->position}}</td>
 			                            <td>{{ $req->paspul_roll}}</td>
 			                            <td>{{ $req->sap_su}}</td>
+			                            <td>{{ round($req->rewound_length_a,3) }}</td>
+			                            <td>{{ $req->rewound_roll_unit_of_measure}}</td>
+
+			                            <td style="width: 75px;">{{ $req->pro}}</td>
+			                            <td style="width: 60px;">{{ $req->location_all}}</td>
+			                            <td style="width: 120px;">{{ $req->sku}}</td>
+
 			                            <td>{{ $req->paspul_type}}</td>
 			                            <td>{{ round($req->width,3) }}</td>
-			                            <td>{{ $req->rewinding_method}}</td>
-			                            <td>{{ round($req->rewound_length_a,3) }}</td>
+			                            <td>{{ round($req->kotur_width,3) }}</td>
+			                            
 			                            <td>{{ $req->material}}</td>
 			                            <td>{{ $req->color_desc}}</td>
 			                            <td>{{ $req->dye_lot}}</td>
-			                            <td>{{ $req->rewound_roll_unit_of_measure}}</td>
+			                            
 			                            <td>{{ $req->skeda }}</td>
 			                            <td>{{ $req->pasbin }}</td>
 			                            <td class="
@@ -91,11 +107,14 @@
 						        	    	@if ($req->priority == 3)Top
 						        	    	@elseif ($req->priority == 2)High
 					        	    		@elseif ($req->priority == 1)Normal
-						        	    	@endif</td>
+						        	    	@endif
+						        	    </td>
+						        	    <td>{{ $req->rewinding_method}}</td>
 										<td>
 											<a href="{{ url('paspul_prw/'.$req->id) }}" class="btn btn-danger btn-xs center-block">
 											Rewound paspul roll</a>
 										</td>
+										
 
 		                        </tr>
 		                        <tr style="border-bottom: 3px solid grey;

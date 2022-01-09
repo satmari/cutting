@@ -41,7 +41,6 @@
                     <thead>
                         <tr>
                             <th>Id</th>
-                            
                             <th><b>Marker name</b></th>
                             <th><b>Width</b></th>
                             <th><b>Lenght</b></th>
@@ -70,55 +69,48 @@
                             <th><b>Min Len</b></th>
                             <th><b>Status</b></th>
                             <th></th>
+                            <th></th>
+                            <th></th>
                             
                         </tr>
                     </thead>
                     <tbody class="searchable">
-                    @foreach ($data as $req)
-                        <tr>
-                           
-                            <td>{{ $req->id}}</td>
-                            <td><b>{{ $req->marker_name}}</b></td>
-                            
-                            <td>{{ round($req->marker_width,3) }}</td>
-                            <td>{{ round($req->marker_length,3)  }}</td>
-
-                            <td>{{ $req->marker_type }}</td>
-                            <td>{{ $req->marker_code }}</td>
-                            <td>{{ $req->fabric_type }}</td>
-                            <td>{{ $req->constraint }}</td>
-
-                            <td>{{ $req->spacing_around_pieces }}</td>
-                            <td>{{ $req->spacing_around_pieces_top }}</td>
-                            <td>{{ $req->spacing_around_pieces_bottom }}</td>
-                            <td>{{ $req->spacing_around_pieces_right }}</td>
-                            <td>{{ $req->spacing_around_pieces_left }}</td>
-
-                            <td>{{ substr($req->processing_date, 0, 10) }}</td>
-
-                            <td>{{ round($req->efficiency,2) }}</td>
-                            <td>{{ round($req->cutting_perimeter,2) }}</td>
-                            <td>{{ round($req->perimeter,2) }}</td>
-                            <td>{{ round($req->average_consumption,2) }}</td>
-                            <td>{{ round($req->lines,2)}}</td>
-                            <td>{{ round($req->curves,2)}}</td>
-                            <td>{{ round($req->areas,2)}}</td>
-                            <td>{{ round($req->angles,2)}}</td>
-                            <td>{{ round($req->notches,2)}}</td>
-                            <td>{{ round($req->total_pcs,2)}}</td>
-                            
-                            <!-- <td>{{ $req->variant_model }}</td> -->
-                            <td>{{ $req->key }}</td>
-
-                            <td>{{ round($req->min_length,2) }}</td>
-                            <td>{{ $req->status }}</td>
-                            <td>
-                                <a href="{{ url('marker_details/'.$req->id) }}" class="btn btn-info btn-xs center-block">Details</a>
-                            </td>
-                        </tr>
-                    @endforeach
-                    
-                    </tbody>                
+                        @foreach ($data as $req)
+                            <tr>
+                                <td>{{ $req->id}}</td>
+                                <td>{{ $req->marker_name}}</td>
+                                <td>{{ round($req->marker_width,3) }}</td>
+                                <td>{{ round($req->marker_length,3)  }}</td>
+                                <td>{{ $req->marker_type }}</td>
+                                <td>{{ $req->marker_code }}</td>
+                                <td>{{ $req->fabric_type }}</td>
+                                <td>{{ $req->constraint }}</td>
+                                <td>{{ $req->spacing_around_pieces }}</td>
+                                <td>{{ $req->spacing_around_pieces_top }}</td>
+                                <td>{{ $req->spacing_around_pieces_bottom }}</td>
+                                <td>{{ $req->spacing_around_pieces_right }}</td>
+                                <td>{{ $req->spacing_around_pieces_left }}</td>
+                                <td>{{ substr($req->processing_date, 0, 10) }}</td>
+                                <td>{{ round($req->efficiency,2) }}</td>
+                                <td>{{ round($req->cutting_perimeter,2) }}</td>
+                                <td>{{ round($req->perimeter,2) }}</td>
+                                <td>{{ round($req->average_consumption,2) }}</td>
+                                <td>{{ round($req->lines,2)}}</td>
+                                <td>{{ round($req->curves,2)}}</td>
+                                <td>{{ round($req->areas,2)}}</td>
+                                <td>{{ round($req->angles,2)}}</td>
+                                <td>{{ round($req->notches,2)}}</td>
+                                <td>{{ round($req->total_pcs,2)}}</td>
+                                <td>{{ $req->key }}</td>
+                                <td>{{ round($req->min_length,2) }}</td>
+                                <td>{{ $req->status }}</td>
+                                <td><a href="{{ url('marker_edit/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit</a></td>
+                                <td><a href="{{ url('marker_details/'.$req->id) }}" class="btn btn-info btn-xs center-block">Details</a></td>
+                                <td><a href="{{ url('marker_delete/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Delete</a></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>        
             </div>
         </div>
     </div>

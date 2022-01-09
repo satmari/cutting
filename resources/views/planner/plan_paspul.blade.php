@@ -54,7 +54,7 @@
 			                    <input id="filter" type="text" class="form-control" placeholder="Type here...">
 			                </div>
 
-			                <table class="table table-striped table-bordered" id="table-draggable2" 
+			                <table class="table table-striped table-bordered tableFixHead" id="table-draggable2" 
 			                
 			                >
 			                <!--
@@ -89,12 +89,14 @@
 			                            <th >Color Desc</th>
 			                            <th >Dye Lot</th>
 			                            
-			                            <th >Roll Width [cm]</th>
+			                            <th >Roll min Width [cm]</th>
 			                            <th >Paspul Type</th>
 			                            <th >Meters to Rewind [m]</th>
-			                            <th >Meters Actual [m]</th>
+			                            <th >Meters Actual</th>
+			                            <th >Uom</th>
 
 			                            <th >PRO</th>
+			                            <th >Destination</th>
 			                            <th >SKU</th>
 
 			                            <th >Koturi Width [mm]</th>
@@ -109,6 +111,8 @@
 			                            <th >TPA Number</th>
 			                            <th >Priority</th>
 			                            
+			                            <th></th>
+			                            <th></th>
 			                            <th></th>
 			                    	</tr>
 			                    </thead>
@@ -134,9 +138,11 @@
 			            	    		<td>{{ $req->paspul_type}}</td>
 			            	    		<td>{{ round($req->rewound_length,3) }}</td>
 			            	    		<td>{{ round($req->rewound_length_a,3) }}</td>
+			            	    		<td>{{ $req->rewound_roll_unit_of_measure }}</td>
 
 			            	    		<td style="width: 75px;">{{ $req->pro}}</td>
-			                            <td style="width: 110px;">{{ $req->sku}}</td>
+			            	    		<td style="width: 60px;">{{ $req->location_all}}</td>
+			                            <td style="width: 120px;">{{ $req->sku}}</td>
 
 			                            <td>{{ round($req->kotur_width,0) }}</td>
 			                            <td>{{ round($req->kotur_width_without_tension,0) }}</td>
@@ -169,7 +175,7 @@
 											@endif
 										</td>
 										<td>
-											@if (($location == 'DELETED') OR ($location == 'COMPLETED') OR ($location == 'NOT_SET'))
+											@if (($location == 'DELETED') OR ($location == 'NOT_SET'))
 												<a href="{{ url('edit_paspul_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block" disabled>Edit paspul</a>
 											@else 
 												<a href="{{ url('edit_paspul_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit paspul</a>
@@ -177,7 +183,7 @@
 										</td>
 										<td>
 											@if (($location == 'DELETED') OR ($location == 'COMPLETED'))
-												<a href="{{ url('remove_paspul_line/'.$req->id) }}" class="btn btn-danger btn-xs center-block" disabled>Remove</a>
+												
 											@else 
 												<a href="{{ url('remove_paspul_line/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Delete</a>
 											@endif

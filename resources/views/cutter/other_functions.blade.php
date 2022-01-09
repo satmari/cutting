@@ -26,7 +26,7 @@
 							<td>{{ $req->pro }} </td>
                         	<td>{{ $req->sku }} </td>
                         	<td>{{ round($req->pro_pcs_layer,0) }} </td>
-                        	<td>{{ round($req->pro_pcs_planned,0) }} </td>
+                        	<td>{{ round($req->pro_pcs_actual,0) }} </td>
                         	<td>{{ $req->location_all }} </td>
                         	<td>{{ $req->padprint_item }} </td>
 	                       	<td>{{ $req->padprint_color }} </td>
@@ -36,7 +36,7 @@
 				@endif
 
 				<!-- <hr> -->
-				{!! Form::open(['method'=>'POST', 'url'=>'add_operator_comment_cut']) !!}
+					{!! Form::open(['method'=>'POST', 'url'=>'add_operator_comment_cut']) !!}
 					{!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
 					{!! Form::hidden('mattress', $mattress, ['class' => 'form-control']) !!}
 					{!! Form::hidden('g_bin', $g_bin, ['class' => 'form-control']) !!}

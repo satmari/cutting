@@ -20,15 +20,6 @@
                         {!! Form::hidden('skeda_item_type', $skeda_item_type, ['class' => 'form-control']) !!}
                         {!! Form::hidden('location', $location, ['class' => 'form-control']) !!}
                         
-                            <!-- <br>
-                            Material: <b>{{ $material }} </b><br>
-                            Dye lot: <b>{{ $dye_lot}} </b><br>
-                            Color desc: <b>{{ $color_desc}} </b><br>
-                            Skeda: <b>{{ $skeda}} </b><br>
-                            Skeda type: <b>{{ $skeda_item_type}} </b><br>
-                            Rewinding method: <b>{{ $rewinding_method}} </b><br>
-                            <hr> -->
-                        
                         <table style="width:100%" class="table table-striped table-bordered">
                             <tr><td>Material</td><td><b>{{ $material }} </b></td></tr>
                             <tr><td>Dye lot</td><td><b>{{ $dye_lot }} </b></td></tr>
@@ -39,33 +30,24 @@
                             <tr><td>Rewinding method</td><td><b>{{ $rewinding_method }} </b></td></tr>
                         </table>
 
-
-                        @if(isset($bin) AND count($bin) > 1 )
-                        <p>Bin: <span style="color:red;">*</span></p>
-                        <table style="width:100%">
-                        <tbody class="searchable">
-                        
-                            @foreach ($bin as $req1)
-                            <tr>
-                                <div class="checkbox">
-                                <label style="width: 95%;" type="button" class="btn check btn-default"  data-color="primary">
-                                    <input type="radio" class="btn check" name="bins[]" value="{{ $req1 }}"
-                                    >
-                                       {{ $req1 }}
-                                </label>
-                                </div>
-                            </tr>
-                            @endforeach
-
-                        </tbody>
+                        @if (isset($sp_operator))
+                        <table style="width:100%" class="table table-striped table-bordered">
+                            <tr><td>PRW operator:</td><td><b>{{$sp_operator}}</b></td></tr>
+                            <tr><td>Date:</td><td><b>{{$sp_date}}</b></td></tr>
                         </table>
                         @endif
 
-                        @if(isset($bin) AND count($bin) == 1 AND $bin[0] !='')
-                            {!! Form::hidden('bin', $bin[0], ['class' => 'form-control']) !!}
-                            <p>Bin: <b><big>{{ $bin[0] }}</big></b></p>
+                        @if (isset($cut_operator))
+                        <table style="width:100%" class="table table-striped table-bordered">
+                            <tr><td>PCO operator:</td><td><b>{{$cut_operator}}</b></td></tr>
+                            <tr><td>Date:</td><td><b>{{$cut_date}}</b></td></tr>
+                        </table>
                         @endif
 
+                    
+                    @if ($location != 'COMPLETED' )
+
+                        
                         <div class="panel-body">
                         <p>Priority: <span style="color:red;">*</span></p>
                             <!-- {!! Form::number('priority', $priority, ['class' => 'form-control']) !!} -->
@@ -88,11 +70,43 @@
                 
                         </tr>
                         </table>
-
                         <hr>
                         {!! Form::submit('Save', ['class' => 'btn  btn-success center-block']) !!}
                         <br>
                         @include('errors.list')
+
+
+                    @else
+
+                        <div class="panel-body">
+                        <p>Priority: <span style="color:red;">*</span></p>
+                            <!-- {!! Form::number('priority', $priority, ['class' => 'form-control']) !!} -->
+                            {!! Form::select('priority', array('1'=>'Normal','2'=>'High','3'=>'Top'), $priority, array('class' => 'form-control', 'disabled')) !!} 
+                        </div>
+
+                        <div class="panel-body">
+                        <p>Comment office: <!-- <span style="color:red;">*</span> --></p>
+                            {!! Form::textarea('comment_office', $comment_office, ['class' => 'form-control', 'rows' => 2, 'disabled']) !!}
+                        </div>
+
+                        <table style="width:100%">
+                        <tr>
+                            <td style="width:32%">
+                                <div class="panel-body">
+                                <p>Call shift manager: <!-- <span style="color:red;">*</span> --></p>
+                                    {!! Form::checkbox('call_shift_manager', '1' , $call_shift_manager , ['class' => 'form-control', 'disabled']) !!}
+                                </div>
+                            </td>
+                
+                        </tr>
+                        </table>
+
+                        <hr>
+                        {!! Form::submit('Save', ['class' => 'btn  btn-success center-block','disabled']) !!}
+                        <br>
+                        @include('errors.list')
+
+                    @endif
 
                 {!! Form::close() !!}
             </div>

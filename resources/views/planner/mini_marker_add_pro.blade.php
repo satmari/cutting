@@ -3,7 +3,7 @@
 @section('content')
 <div class="container container-table">
 	<div class="row vertical-center-row">
-		<div class="text-center col-md-8 col-md-offset-2">
+		<div class="text-center col-md-12 col-md-offset-1">
 			<div class="panel panel-default">
 				<div class="panel-heading">3. Choose PRO</div>
 				
@@ -21,15 +21,21 @@
 
 				@if (!empty($recap_table))
 
-				<table style="width:100%" class="table">
+				<table style="width:100%" class="table table-striped">
 				<thead>
-					<th>pro</th>
-					<th>style_size</th>
-					<th>order qty (posummary)</th>
+					<th>PRO</th>
+					<th>Style_Size</th>
+					<th>Order Qty</th>
 					<th>before cut {{-- actual (planned)--}}</th>
 					<th>already cut {{-- actual (planned)--}}</th>
 					<th>% order qty</th>
 					<th>Choose PRO</th>
+					<th style="color:orange">Marker</th>
+					<th style="color:orange">Width</th>
+					<th style="color:orange">Len</th>
+					<th style="color:orange">Eff</th>
+					<th style="color:orange">Cons</th>
+					
 				</thead>
 				<tbody class="searchable">
 				@foreach ($recap_table as $l)
@@ -45,12 +51,23 @@
 				    @else 
 				    <td>{{ round((round($l->before_cut_actual,0) + round($l->already_cut_actual,0)) / round($l->po_sum_qty,0) *100 , 0) }}%</td>
 				    @endif
+
 				    <td>
 				    	<input type="radio" id="pro" name="pro" value="{{ $l->pro.'#'.round($l->po_sum_qty,0).'#'.round($l->before_cut_actual,0).'#'.round($l->already_cut_actual,0) }}" class="form-control">
 				    </td>
 
+				    <td style="width: 180px; color:orange">{{ $l->mm_name }}</td>
+					<td style="width: 20px; color:orange">{{ $l->marker_width }}</td>
+					<td style="width: 20px; color:orange">{{ $l->marker_length}}</td>
+					<td style="width: 20px; color:orange">{{ $l->efficiency}}</td>
+					<td style="width: 20px; color:orange">{{ $l->average_consumption}}</td>
+				   
 				    
 				</tr>
+				<tr>
+					
+				</tr>
+
 				@endforeach
 
   				</tbody>
@@ -62,7 +79,7 @@
 				{!! Form::hidden('items', $items, ['class' => 'form-control']) !!}
 				{!! Form::hidden('skeda', $skeda, ['class' => 'form-control']) !!}
 			
-        		<hr>
+        		<br><br>
 				{!! Form::submit('Next', ['class' => 'btn btn-success center-block']) !!}
 				
 

@@ -16,7 +16,7 @@ class CreateOperatorsTable extends Migration {
 		{
 			$table->increments('id');
 
-			$table->string('operator');
+			$table->string('operator')->unique();
 			$table->string('device');
 			$table->json('device_array');
 			$table->string('status');

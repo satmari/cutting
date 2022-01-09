@@ -10,7 +10,7 @@
 				{!! Form::open(['url' => 'operator_create_post']) !!}
 				
 				<div class="panel-body">
-				<p>Operator name: </p>
+				<p>Operator name: <span style="color: red">(can not be changed after)</span></p>
 					{!! Form::text('operator', null, ['class' => 'form-control', 'autofocus' => 'autofocus']) !!}
 				</div>
 
@@ -20,7 +20,7 @@
 				</div> -->
 
 				<div class="panel-body">
-				<span>Device:</span> 
+				<span>Device/ Location :</span> 
 
 					<table style="width:100%">
 						<th style="width:100%"></th>

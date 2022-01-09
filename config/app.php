@@ -152,7 +152,7 @@ return [
 		'Collective\Html\HtmlServiceProvider',
 		'Bican\Roles\RolesServiceProvider',	
 		'Maatwebsite\Excel\ExcelServiceProvider',
-		//'Gbrock\Table\Providers\TableServiceProvider',
+		'Gbrock\Table\Providers\TableServiceProvider',
 		
 	],
 
@@ -202,11 +202,11 @@ return [
 		'Validator' => 'Illuminate\Support\Facades\Validator',
 		'View'      => 'Illuminate\Support\Facades\View',
 
-		
 		'Form'      => 'Illuminate\Html\FormFacade',
         'Html'      => 'Illuminate\Html\HtmlFacade',
-        'Excel' 	=> 'Maatwebsite\Excel\Facades\Excel',
 
+        'Excel' 	=> 'Maatwebsite\Excel\Facades\Excel',
+        'Table'     => 'Gbrock\Table\Facades\Table',      	
 	],
 
 ];

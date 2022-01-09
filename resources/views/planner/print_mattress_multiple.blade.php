@@ -22,7 +22,6 @@
 						<a href="{{url('/print_mattress_multiple_mm')}}" class="btn btn-success center-block">Mini mattress</a>
 					</div>
 
-
 					<hr>
 					<div class="">
 						<a href="{{url('/')}}" class="btn btn-default center-block">Back</a>

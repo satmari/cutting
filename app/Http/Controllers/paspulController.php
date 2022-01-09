@@ -64,8 +64,8 @@ class paspulController extends Controller {
 		      ,pl.[operator1]
 		      ,pl.[operator2]
 		      
-		  FROM [cutting].[dbo].[paspuls] as p
-		  LEFT JOIN [cutting].[dbo].[paspul_lines] as pl ON pl.[paspul_roll_id]= p.[id]"));
+		  FROM [paspuls] as p
+		  LEFT JOIN [paspul_lines] as pl ON pl.[paspul_roll_id]= p.[id]"));
 		// dd($data);
 
 		return view('paspul.table',compact('data'));

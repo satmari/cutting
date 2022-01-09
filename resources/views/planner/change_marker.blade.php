@@ -9,7 +9,6 @@
               
                 <div class="panel-body">
                 <br>
-             
                     {!! Form::open(['method'=>'POST', 'url'=>'/change_marker_post']) !!}
 
                         {!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
@@ -21,12 +20,12 @@
                         {!! Form::hidden('existing_marker_length', $existing_marker_length, ['class' => 'form-control']) !!}
                         {!! Form::hidden('existing_marker_width', $existing_marker_width, ['class' => 'form-control']) !!}
                         {!! Form::hidden('existing_min_length', $existing_min_length, ['class' => 'form-control']) !!}
-                        
+
                         <br>
                         Existing marker: <br>
                         <b>{{ $existing_marker }} </b></b><br>
                         <p>Length: {{ round((float)$existing_marker_length,2) }}, Width: <b>{{ round((float)$existing_marker_width,2) }}</b> cm</p>
-                        <p>Theoretical usable width: <b>{{ round($width_theor_usable*100, 2) }}</b> cm</p>
+                        <p>Theoretical usable width: <b>{{ round($width_theor_usable, 2) }}</b> cm</p>
                         <br>
                         <p>New marker: </p>
                         <select name="selected_marker" class="select form-control select-form chosen">

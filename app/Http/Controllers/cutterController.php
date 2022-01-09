@@ -189,48 +189,57 @@ class cutterController extends Controller {
 		
 		// mattress_phasess
 		// all mattress_phases for this mattress set to NOT ACTIVE
-		$find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				id, mattress 
-			FROM [mattress_phases] WHERE mattress_id = '".$id."' AND active = 1"));
+		// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+		// 		id, mattress 
+		// 	FROM [mattress_phases] WHERE mattress_id = '".$id."' AND active = 1"));
 		
-		if (isset($find_all_mattress_phasses[0])) {
-			$mattress = $find_all_mattress_phasses[0]->mattress;
+		// if (isset($find_all_mattress_phasses[0])) {
+		// 	$mattress = $find_all_mattress_phasses[0]->mattress;
 
-			// dd($find_all_mattress_phasses);
-			for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
-				// try {
-					$table3 = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
+		// 	// dd($find_all_mattress_phasses);
+		// 	// for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
+				
+		// 	// 		$table3 = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
+		// 	// 		$table3->active = 0;
+		// 	// 		$table3->save();
+		// 	// }	
+		// }
 
-					$table3->active = 0;
-					$table3->save();
-				// }
-				// catch (\Illuminate\Database\QueryException $e) {
-				// 	dd("Problem to save in mattress_phases, set all to not active");
-				// }
-			}	
-		}
+		$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
+			SET NOCOUNT ON;
+			UPDATE [mattress_phases]
+			SET active = 0, id_status = ''+cast([mattress_id] as varchar )+'-'+[status]
+			WHERE mattress_id = '".$id."' AND active = 1;
+			SELECT TOP 1 mattress FROM [mattress_phases] WHERE mattress_id = '".$id."';
+		"));
+		$mattress = $mattress_phases_not_active[0]->mattress;
+
+
 		// save new mattress_phases
 		$status = "ON_CUT";
 		$active = 1;
 		// $operator1;
 
-		// try {
-			$table3_new = new mattress_phases;
+		if ((date('H') >= 0) AND (date('H') < 6)) {
+		   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
+		} else {
+			$date = date('Y-m-d H:i:s');
+		}
 
-			$table3_new->mattress_id = $id;
-			$table3_new->mattress = $mattress;
-			$table3_new->status = $status;
-			$table3_new->location = $location;
-			$table3_new->device = $device;
-			$table3_new->active = $active;
-			$table3_new->operator1 = $operator;
-			$table3_new->operator2;
-
-			$table3_new->save();
-		// }
-		// catch (\Illuminate\Database\QueryException $e) {
-		// 	dd("Problem to save in mattress_phases");
-		// }
+		// save new mattress_phases
+		// $table3_new = new mattress_phases;
+		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
+		$table3_new->mattress_id = $id;
+		$table3_new->mattress = $mattress;
+		$table3_new->status = $status;
+		$table3_new->location = $location;
+		$table3_new->device = $device;
+		$table3_new->active = $active;
+		$table3_new->operator1 = $operator;
+		$table3_new->operator2;
+		$table3_new->date = $date;
+		$table3_new->id_status = $id.'-'.$status;
+		$table3_new->save();
 
 		return redirect('/cutter');
 	}
@@ -247,7 +256,7 @@ class cutterController extends Controller {
 		$take_comment_operator = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			d.[comment_operator], d.[id],
 			p.[mattress], p.[status], m.[g_bin],
-			mp.[pro_pcs_layer],mp.[pro_pcs_planned],
+			mp.[pro_pcs_layer],mp.[pro_pcs_planned],mp.[pro_pcs_actual],
 			ps.[sku], ps.[pro], ps.[padprint_item], ps.[padprint_color],
 			po.[location_all]
 			FROM [mattress_details] as d
@@ -283,7 +292,7 @@ class cutterController extends Controller {
 		$take_comment_operator = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			d.[comment_operator], d.[id],
 			p.[mattress], p.[status], m.[g_bin],
-			mp.[pro_pcs_layer],mp.[pro_pcs_planned],
+			mp.[pro_pcs_layer],mp.[pro_pcs_planned],mp.[pro_pcs_actual],
 			ps.[sku], ps.[pro], ps.[padprint_item], ps.[padprint_color],
 			po.[location_all]
 			FROM [mattress_details] as d
@@ -314,21 +323,31 @@ class cutterController extends Controller {
 		}
 
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-			d.[comment_operator], d.[layers_a], d.[mattress_id],
+			d.[comment_operator], d.[layers_a], d.[layers], d.[mattress_id],d.[layers_partial],
 			p.[status], p.[mattress], 
-			mf.[layers_after_cs], mf.[layers_before_cs], m.[g_bin]
+			mf.[layers_after_cs], mf.[layers_before_cs],
+			m.[g_bin],m.[skeda],
+			mm.[marker_name], mm.[marker_length], mm.[marker_width]
 			FROM [mattress_details] as d
 			JOIN [mattresses] as m ON m.[id] = d.[mattress_id]
 			INNER JOIN [mattress_phases] as p ON p.[mattress_id] = d.[mattress_id] AND p.[active] = 1
 			LEFT JOIN [mattress_effs] as mf ON mf.[mattress_id] = d.[mattress_id]
+			LEFT JOIN [mattress_markers] as mm ON mm.[mattress_id] = d.[mattress_id]
 			WHERE m.[id] = '".$id."' "));
-		// dd($data[0]->comment_operator);
+		// dd($data);
+
 		$status = $data[0]->status;
 		$mattress = $data[0]->mattress;
 		$g_bin = $data[0]->g_bin;
+		$skeda = $data[0]->skeda;
 		$comment_operator = $data[0]->comment_operator;
 		$layers_a = (float)$data[0]->layers_a;
+		$layers = (float)$data[0]->layers;
+		$layers_partial = (float)$data[0]->layers_partial;
 		$mattress_id = (int)$data[0]->mattress_id;
+		$marker_name = $data[0]->marker_name;
+		$marker_width = (float)$data[0]->marker_width;
+		$marker_length = (float)$data[0]->marker_length;
 		
 		$data_pro = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 				[id], [style_size], [pro_id], [pro_pcs_layer], [pro_pcs_planned], [pro_pcs_actual]
@@ -336,7 +355,7 @@ class cutterController extends Controller {
 			WHERE [mattress_id] = '".$mattress_id."' "));
 		// dd($data_pro);
 
-		return view('cutter.mattress_cut', compact('data_pro','id','comment_operator','status','mattress','g_bin','mattress_id','layers_a'));
+		return view('cutter.mattress_cut', compact('data_pro','id','comment_operator','status','mattress','g_bin','skeda','mattress_id','layers_a','layers','layers_partial','marker_name','marker_width','marker_length'));
 	}
 
 	public function mattress_cut_post(Request $request) {
@@ -348,6 +367,7 @@ class cutterController extends Controller {
 		$id = (int)$input['id'];
 		$mattress = $input['mattress'];
 		$g_bin = $input['g_bin'];
+		$skeda = $input['skeda'];
 		$mattress_id = (int)$input['mattress_id'];
 		$status = $input['status'];
 		$layers_a = (int)$input['layers_a'];
@@ -358,15 +378,18 @@ class cutterController extends Controller {
 			$pro_pcs_layer = $input['pro_pcs_layer'];
 			$pro_id = $input['pro_id'];
 			$pro_pcs_actual = $input['pro_pcs_actual'];
+			$damaged_pcs = $input['damaged_pcs'];
 			$line_id = $input['line_id'];
-			// var_dump($pro_pcs_actual);
+			
 		} else {
 			$style_size = NULL;
 			$pro_pcs_layer = NULL;
 			$pro_id = NULL;
 			$pro_pcs_actual = NULL;
+			$damaged_pcs = NULL;
 			$line_id = NULL;
 		}
+		// dd($damaged_pcs);
 
 		$operator = Session::get('operator');
 		if (!isset($operator) OR $operator == '') {
@@ -386,13 +409,12 @@ class cutterController extends Controller {
 		}
 		// $location = substr($device, 0,3);
 		$location = "CUT";
-		
 
 		// find all_pro_for_main_plant ???
 		if (isset($pro_id[0])) {
 
 			$out_su = 0;
-			for ($i=0; $i < count($pro_id); $i++) { 
+			for ($i=0; $i < count($pro_id); $i++) {
 				// print_r($pro_id[$i]."<br>");
 
 				$check_pro_skeda = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -408,7 +430,7 @@ class cutterController extends Controller {
 				WHERE pro = '".$check_pro_skeda[0]->pro."' "));
 
 				// print_r($check_pro_in_posummarry[0]->location_all."<br>");
-			 	// dd($check_pro_in_posummarry[$n]->location_all);
+			 	// dd($check_pro_in_posummarry);
 
 				if ($check_pro_in_posummarry[0]->location_all == "Subotica") {
 					$out_su = $out_su + 0; 
@@ -417,19 +439,22 @@ class cutterController extends Controller {
 				}
 			}
 
-			print_r("final: ".$out_su."<br>");
+			// print_r("final: ".$out_su."<br>");
 			if ($out_su > 0) {
 				$all_pro_for_main_plant = 0;	
 			} else {
 				$all_pro_for_main_plant = 1; // if is 1 COMPLETED (Subotica), 0 PACK (Kikinda/Senta)
 			}
 		} else {
-			dd("no pro_id");
+			dd("missing pro_id");
 		}
 		// dd($all_pro_for_main_plant);
+		// $all_pro_for_main_plant = 0;
 
-		
-		if ($all_pro_for_main_plant == 1) {
+		// dd(substr($skeda, -2));
+		$skeda_last = substr($skeda, -2);
+
+		if ($skeda_last == '-B') {
 
 			// position in completed 
 			$find_position_on_location_complited = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT(location) as c
@@ -449,24 +474,46 @@ class cutterController extends Controller {
 
 		} else {
 
-			// position on PSO location
-			$find_position_on_location_pack = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT(location) as c
-			 FROM [mattress_phases] 
-			 WHERE location = 'PACK' AND active = '1' "));
-			// dd($find_position_on_location_pack[0]);
-			if (isset($find_position_on_location_pack[0])) {
-				$position_pack = (int)$find_position_on_location_pack[0]->c + 1;
-			} else {
-				$position_pack = 1;
-			}
+			if ($all_pro_for_main_plant == 1) {
 
-			$status = "TO_PACK";
-			$active = 1;
-			$location =  "PACK";
-			$position = $position_pack;
+				// position in completed 
+				$find_position_on_location_complited = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT(location) as c
+				 FROM [mattress_phases] 
+				 WHERE location = 'COMPLETED' AND active = '1' "));
+				// dd($find_position_on_location_complited[0]);
+				if (isset($find_position_on_location_complited[0])) {
+					$position_complited = (int)$find_position_on_location_complited[0]->c + 1;
+				} else {
+					$position_complited = 1;
+				}
+
+				$status = "COMPLETED";
+				$active = 1;
+				$location =  "COMPLETED";
+				$position = $position_complited;
+
+			} else {
+				// position on PSO location
+				$find_position_on_location_pack = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT(location) as c
+				 FROM [mattress_phases] 
+				 WHERE location = 'PACK' AND active = '1' "));
+				// dd($find_position_on_location_pack[0]);
+				if (isset($find_position_on_location_pack[0])) {
+					$position_pack = (int)$find_position_on_location_pack[0]->c + 1;
+				} else {
+					$position_pack = 1;
+				}
+
+				$status = "TO_PACK";
+				$active = 1;
+				$location =  "PACK";
+				$position = $position_pack;
+			}
 		}
+		
 		// dd($status);
 		// dd($position);
+		// dd('Stop');
 
 		$find_details_id = DB::connection('sqlsrv')->select(DB::raw("SELECT d.[id]
 				FROM [mattress_details] as d
@@ -481,62 +528,65 @@ class cutterController extends Controller {
 		$table2_update->save();
 
 		// save in mattress_pro
-		for ($i=0; $i < count($line_id); $i++) { 
-						
-			// print_r($i);
-			// print_r(" ");
-			// print_r($line_id[$i]);
-			// print_r(" ");
-			// print_r($style_size[$i]);
-			// print_r(" ");
-			// print_r($pro_pcs_actual[$i]);
-			// print_r("<br>");
+		for ($x=0; $x < count($line_id); $x++) { 
+			// dd($pro_pcs_actual[$i]);
+			// dd($damaged_pcs[$i]);
 
-			$tablepro_update = mattress_pro::findOrFail($line_id[$i]);
-			$tablepro_update->pro_pcs_actual = $pro_pcs_actual[$i];
+			$tablepro_update = mattress_pro::findOrFail($line_id[$x]);
+			$tablepro_update->pro_pcs_actual = (int)$pro_pcs_actual[$x] - (int)$damaged_pcs[$x];
+			$tablepro_update->damaged_pcs = (int)$damaged_pcs[$x];
 			$tablepro_update->save();
 		}
 
 		// save in mattress_phases
 		// all mattress_phases for this mattress set to NOT ACTIVE
-		$find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				id, mattress 
-			FROM [mattress_phases] WHERE mattress_id = '".$mattress_id."' AND active = 1"));
-		
-		if (isset($find_all_mattress_phasses[0])) {
-			$mattress = $find_all_mattress_phasses[0]->mattress;
+		// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+		// 		id, mattress 
+		// 	FROM [mattress_phases] WHERE mattress_id = '".$mattress_id."' AND active = 1"));
 
-			// dd($find_all_mattress_phasses);
-			for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
-				// try {
-					$table3 = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
-					$table3->active = 0;
-					$table3->save();
-				// }
-				// catch (\Illuminate\Database\QueryException $e) {
-				// 	dd("Problem to save in mattress_phases, set all to not active");
-				// }
-			}	
+		// if (isset($find_all_mattress_phasses[0])) {
+		// 	$mattress = $find_all_mattress_phasses[0]->mattress;
+
+		// 	// dd($find_all_mattress_phasses);
+		// 	// for ($y=0; $y < count($find_all_mattress_phasses); $y++) { 
+				
+		// 	// 		$table3 = mattress_phases::findOrFail($find_all_mattress_phasses[$y]->id);
+		// 	// 		$table3->active = 0;
+		// 	// 		$table3->save();
+		// 	// }	
+		// }
+
+		$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
+				SET NOCOUNT ON;
+				UPDATE [mattress_phases]
+				SET active = 0, id_status = ''+cast([mattress_id] as varchar )+'-'+[status]
+				WHERE mattress_id = '".$mattress_id."' AND active = 1;
+				SELECT TOP 1 mattress FROM [mattress_phases] WHERE mattress_id = '".$mattress_id."' ;
+		"));
+		$mattress = $mattress_phases_not_active[0]->mattress;
+		
+		if ((date('H') >= 0) AND (date('H') < 6)) {
+		   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
+		} else {
+			$date = date('Y-m-d H:i:s');
 		}
 
-		// save new mattress_phases
-		// $operator1;	
-		// try {
-			$table3_new = new mattress_phases;
-			$table3_new->mattress_id = $mattress_id;
-			$table3_new->mattress = $mattress;
-			$table3_new->status = $status;
-			$table3_new->location = $location;
-			$table3_new->device = $device;
-			$table3_new->active = $active;
-			$table3_new->operator1 = $operator;
-			$table3_new->operator2;
-			$table3_new->save();
-		// }
-		// catch (\Illuminate\Database\QueryException $e) {
-		// 	dd("Problem to save in mattress_phases");
-		// }
+		$date_now = date('Y-m-d H:i:s');
 
+		// save new mattress_phases
+		// $table3_new = new mattress_phases;
+		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
+		$table3_new->mattress_id = $id;
+		$table3_new->mattress = $mattress;
+		$table3_new->status = $status;
+		$table3_new->location = $location;
+		$table3_new->device = $device;
+		$table3_new->active = $active;
+		$table3_new->operator1 = $operator;
+		$table3_new->operator2;
+		$table3_new->date = $date;
+		$table3_new->id_status = $id.'-'.$status;
+		$table3_new->save();
 
 		// reorder position of CUT
 		$reorder_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -548,27 +598,34 @@ class cutterController extends Controller {
 			 ORDER BY md.[position] asc"));
 
 		if (isset($reorder_position[0])) {
-			for ($i=0; $i < count($reorder_position); $i++) { 
+			for ($o=0; $o < count($reorder_position); $o++) { 
 
-				$table1 = mattress_details::findOrFail($reorder_position[$i]->id);
-				$table1->position = $i+1;
+				$table1 = mattress_details::findOrFail($reorder_position[$o]->id);
+				$table1->position = $o+1;
 				$table1->save();
 			}
 		}
 
-		$o_rolls =  DB::connection('sqlsrv')->select(DB::raw("SELECT *
-		  FROM [o_rolls]
-		  WHERE mattress_id_new = '".$mattress_id."' "));
+		// $o_rolls =  DB::connection('sqlsrv')->select(DB::raw("SELECT *
+		//   FROM [o_rolls]
+		//   WHERE mattress_id_new = '".$mattress_id."' "));
 
-		if (isset($o_rolls[0])) {
-			for ($o=0; $o < count($o_rolls); $o++) { 
+		// if (isset($o_rolls[0])) {
+		// 	for ($p=0; $p < count($o_rolls); $p++) { 
 				
-				$table_o = o_roll::findOrFail($o_rolls[$o]->id);
-				$table_o->status = 'CONSUMED';
-				$table_o->save();
-			}
-		}
+		// 		$table_o = o_roll::findOrFail($o_rolls[$p]->id);
+		// 		$table_o->status = 'CONSUMED';
+		// 		$table_o->save();
+		// 	}
+		// }
+
+		$update_o_rolls = DB::connection('sqlsrv')->update(DB::raw("
+				UPDATE [o_rolls]
+				SET status = 'CONSUMED'
+				WHERE mattress_id_new = '".$mattress_id."' 
+		"));
 
 		return redirect('/cutter');
 	}
+
 }

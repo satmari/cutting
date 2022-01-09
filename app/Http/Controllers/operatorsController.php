@@ -89,7 +89,8 @@ class operatorsController extends Controller {
 			$table->save();
 		}
 		catch (\Illuminate\Database\QueryException $e) {
-			return view('operator.error');
+			$msg = 'Operator already exist';
+			return view('Operators.error', compact('msg'));
 		}
 
 		return Redirect::to('operators');

@@ -8,7 +8,7 @@
 				<div class="panel-heading"></div>
 				<h3 style="color:red;">Error!</h3>
 
-				<p style="color:red;">{{-- $msg --}}</p>
+				<p style="color:red;">{{ $msg }}</p>
 
 				<div class="panel-body">
 					<div class="">

@@ -52,6 +52,12 @@
                             Wastage Table</a>
                     </div>
                 </div>
+                <div class="panel-body">
+                    <div class="">
+                        <a href="{{url('/wastage_table_all')}}" class="btn btn-success center-block">
+                            Wastage Table ALL</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

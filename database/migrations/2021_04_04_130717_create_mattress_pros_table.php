@@ -25,6 +25,8 @@ class CreateMattressProsTable extends Migration {
 			$table->float('pro_pcs_layer');
 			$table->float('pro_pcs_planned');
 			$table->float('pro_pcs_actual');
+
+			$table->integer('damaged_pcs')->nullable(); //added later
 			
 			$table->timestamps();
 		});
