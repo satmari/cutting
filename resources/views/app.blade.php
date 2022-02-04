@@ -388,6 +388,44 @@
 						</ul>
 					@endif
 
+					@if(Auth::user()->level() == 21)
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">SP test</a></li> -->
+
+						@if (isset($operators))
+						<li>
+							<form class="form-inline" style="width:400px; padding: 8px;" 
+							action="{{ url('operator_login_tub') }}" method="get" >
+							@if (!isset($operator))
+							<select name="selected_operator" class="select form-control select-form" 
+							style="width:150px !important">
+                                <option value="" selected></option>
+                        	    @foreach ($operators as $line)
+                                <option value="{{ $line->operator }}">
+                                    {{ $line->operator }}
+                            	</option>
+                            	@endforeach
+                            </select>
+                            <input type="submit" value="Login" class="btn btn-success">
+                            </form>
+                            @else
+                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="{{ url('operator_logout_tub')}}" class="btn btn-danger">Logout</a>
+                            @endif
+                        </li>
+						@else
+							@if(Session::has('operator'))
+							<li>
+							<div style="width:400px; padding: 8px;">
+	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
+		                        <a href="{{ url('operator_logout_tub')}}" class="btn btn-danger">Logout</a>
+	                        </div>
+	                        </li>
+	                        @endif
+	                    @endif
+						</ul>
+					@endif
+
 					@if(Auth::user()->level() == 13)
 						<ul class="nav navbar-nav">
 							<!-- <li><a href="{{ url('#') }}">LR test</a></li> -->
@@ -827,7 +865,7 @@ $(function() {
 <script>
   $(document).ready(function() {
 
-  	$("#sortable1 , #sortable2 , #sortable3 , #sortable4 , #sortable5, #sortable6, #sortable7, #sortable8, #sort_able9" ).sortable({
+  	$("#sortable1 , #sortable2 , #sortable3 , #sortable4 , #sortable5, #sortable6, #sortable7, #sort_able8, #sort_able9" ).sortable({
     	connectWith: ".connectedSortable_ul_1",
     	dropOnEmpty: true
     }).disableSelection();
@@ -942,13 +980,13 @@ $(function() {
         // axis: 'y',
         update: function (event, ui) {
             var data = $(this).sortable('serialize');
-            console.log("position changed 8");
-            console.log(data);
+            // console.log("position changed 8");
+            // console.log(data);
             // POST to server using $.post or $.ajax
           	  $.ajax({
-          	      data: data,
-          	      type: 'POST',
-          	      url: '{{ route('posts.reposition8') }}'
+          	      // data: data,
+          	      // type: 'POST',
+          	      // url: '{{ route('posts.reposition8') }}'
          	});
     	}
     });

@@ -870,6 +870,48 @@ class plannerController extends Controller {
 			WHERE m4.[location] = 'MS3' AND m4.[active] = 1"));
 			$ms3_m = $ms3_m[0]->sum_m_cons;
 
+			$tub = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			 m1.[id]
+		      ,m1.[mattress]
+		      ,m1.[material]
+		      ,m1.[g_bin]
+		      ,m1.[dye_lot]
+		      ,m1.[color_desc]
+		      ,m1.[skeda]
+		      ,m1.[spreading_method]
+		      ,m1.[width_theor_usable]
+		      ,m2.[position]
+		      ,m2.[layers]
+		      ,m2.[layers_a]
+		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
+		      ,m2.[priority]
+		      ,m2.[printed_marker]
+		      ,m2.[comment_office]
+		      ,m2.[overlapping]
+		      ,m3.[marker_name]
+		      ,m3.[marker_length]
+		      ,m3.[marker_width]
+		      ,m4.[status]
+		  FROM [mattresses] as m1
+		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+		  WHERE m4.[location] = 'TUB' AND m4.[active] = 1 
+		  ORDER BY m2.[position] asc"));
+			// dd($tub);
+
+			$tub_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					SUM(m3.[marker_length]) as sum_m_length,
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
+			FROM [mattresses] as m1
+			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+			WHERE m4.[location] = 'TUB' AND m4.[active] = 1"));
+			$tub_m = $tub_m[0]->sum_m_cons;
+
 			$mm1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			  m1.[id]
 		      ,m1.[mattress]
@@ -914,7 +956,7 @@ class plannerController extends Controller {
 			// $mm1_m = $mm1_m[0]->sum_m_cons;
 			$mm1_m = $mm1_m[0]->o_sum;
 
-			return view('planner.plan_mattress', compact('data','location','sp1','sp2','sp3','sp4','ms1','ms2','ms3','mm1','operator','operators','sp1_m','sp2_m','sp3_m','sp4_m','ms1_m','ms2_m','ms3_m','mm1_m'));
+			return view('planner.plan_mattress', compact('data','location','sp1','sp2','sp3','sp4','ms1','ms2','ms3','tub','mm1','operator','operators','sp1_m','sp2_m','sp3_m','sp4_m','ms1_m','ms2_m','ms3_m','tub_m','mm1_m'));
 		}
 
 		if ($location == 'BOARD_TABLE') {
@@ -985,7 +1027,7 @@ class plannerController extends Controller {
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
 		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
 		  LEFT JOIN [mattress_split_requests] as ms ON ms.[mattress_id_new] = m1.[id]
-		  WHERE (m4.[location] IN ('SP1','SP2','SP3','SP4','MS1','MS2','MS3','MM1')) AND m4.[active] = '1' 
+		  WHERE (m4.[location] IN ('SP1','SP2','SP3','SP4','MS1','MS2','MS3','MM1','TUB')) AND m4.[active] = '1' 
 		  ORDER BY m2.[position] asc"));
 			// dd($data);
 

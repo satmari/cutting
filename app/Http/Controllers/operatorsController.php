@@ -54,6 +54,7 @@ class operatorsController extends Controller {
 					'PACK' => 'Packing operator',
 					'PLOT' => 'Ploter operator',
 					'CUT' => 'Cutting operator',
+					'TUB' => 'Tubolare operator',
 					'PLANNER' => 'Planner'
 				];
 		// dd($data);
@@ -108,6 +109,7 @@ class operatorsController extends Controller {
 					'PACK' => 'Packing operator',
 					'PLOT' => 'Ploter operator',
 					'CUT' => 'Cutting operator',
+					'TUB' => 'Tubolare operator',
 					'PLANNER' => 'Planner'
 				];
 

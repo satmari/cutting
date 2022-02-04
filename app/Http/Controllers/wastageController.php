@@ -113,7 +113,7 @@ class wastageController extends Controller {
 			dd("Maksimalna kolicina je 10 nalepnica, verovatno ste skenirali barkod umesto da ste uneli kolicinu. Pokusajte ponovo");
 		}
 		
-		$mattress_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT [skeda], [sap_bin] FROM [wastages] WHERE skeda= '".$skeda."' AND  sap_bin = '".$sap_bin."' "));
+		$mattress_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT [skeda], [sap_bin] FROM [wastages] WHERE skeda = '".$skeda."' AND  sap_bin = '".$sap_bin."' "));
 		
 		// dd($skeda);
 		// dd($sap_bin);
@@ -214,55 +214,107 @@ class wastageController extends Controller {
 		// Find Mini marker barcode
 		// dd("zovi IT, radimo na ovome");
 		// $sap_bin_data = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT(sap_bin) as c_mm FROM wastages WHERE sap_bin not like 'G%' "));
-		$sap_bin_data = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 sap_bin as c_mm FROM wastages WHERE sap_bin like 'M%' ORDER BY sap_bin desc"));
+		// $sap_bin_data = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 sap_bin as c_mm FROM wastages WHERE skeda = '".$skeda."' AND sap_bin like 'M%' ORDER BY sap_bin desc"));
+		$sap_bin_data = DB::connection('sqlsrv')->select(DB::raw("SELECT sap_bin as c_mm FROM wastages WHERE skeda = '".$skeda."' AND sap_bin like 'M%' ORDER BY sap_bin desc"));
 		// dd((int)substr($sap_bin_data[0]->c_mm,-6));
+		// dd($sap_bin_data);
+		
+		if (isset($sap_bin_data[0]->c_mm)) {
+			$mmnum = (int)substr($sap_bin_data[0]->c_mm,-7);
+			// dd($mmnum);
+			$mmnum = $mmnum + 0;
+			$mmn = str_pad($mmnum, 8, '0', STR_PAD_LEFT);
+			$mm = "MM".$mmn;
 
-		$mmnum = (int)substr($sap_bin_data[0]->c_mm,-7);
-		// dd($mmnum);
-		$mmnum = $mmnum + 1;
-		$mmn = str_pad($mmnum, 8, '0', STR_PAD_LEFT);
-		$mm = "MM".$mmn;
+			$mattress_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT [skeda], [sap_bin] FROM [wastages] WHERE skeda = '".$skeda."' AND  sap_bin = '".$mm."' "));
 
-		// dd($mm);
+			if ($qty > 0) {
+				for ($i=1; $i <= $qty ; $i++) { 
+					
+					try {
+						$table = new wastage;
+						$table->no = $i + count($mattress_exist);
+						$table->skeda = $skeda;
+						$table->sap_bin = $mm;
+						$table->weight;
+						$table->location;
+						$table->material = $material;
+						$table->save();
 
-		if ($qty > 0) {
-			
-			for ($i=1; $i <= $qty ; $i++) { 
-				
-				try {
-					$table = new wastage;
+					}
+					catch (\Illuminate\Database\QueryException $e) {
+						dd("greska pri snimanju u tabelu, zovi IT (1)");
+					}
 
-					$table->no = $i;
-					$table->skeda = $skeda;
-					$table->sap_bin = $mm;
-					$table->weight;
-					$table->location;
-					$table->material = $material;
-										
-					$table->save();
-				}
-				catch (\Illuminate\Database\QueryException $e) {
-					dd("greska pri snimanju u tabelu, zovi IT (1)");
-				}
+					try {
+						$table = new wastages_print;
+						$table->no = $i + count($mattress_exist);
+						$table->skeda = $skeda;
+						$table->bin = $mm;
+						$table->printer = 'Krojacnica';
+						$table->printed = 0;
+						// $table->material = $material;
+						$table->save();
 
-				try {
-					$table = new wastages_print;
-
-					$table->no = $i;
-					$table->skeda = $skeda;
-					$table->bin = $mm;
-					$table->printer = 'Krojacnica';
-					$table->printed = 0;
-					// $table->material = $material;
-
-					$table->save();
-				}
-				catch (\Illuminate\Database\QueryException $e) {
-					dd("greska pri snimanju u tabelu, zovi IT (2)");
+					}
+					catch (\Illuminate\Database\QueryException $e) {
+						dd("greska pri snimanju u tabelu, zovi IT (2)");
+					}
 				}
 			}
+			return Redirect::to('wastage_cut_mm');
+
+
+		} else {
+
+			$sap_bin_data = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 sap_bin as c_mm FROM wastages WHERE sap_bin like 'M%' ORDER BY sap_bin desc"));
+			$mmnum = (int)substr($sap_bin_data[0]->c_mm,-7);
+			// dd($mmnum);
+			$mmnum = $mmnum + 1;
+			$mmn = str_pad($mmnum, 8, '0', STR_PAD_LEFT);
+			$mm = "MM".$mmn;
+
+			if ($qty > 0) {
+				for ($i=1; $i <= $qty ; $i++) { 
+					
+					try {
+						$table = new wastage;
+						$table->no = $i;
+						$table->skeda = $skeda;
+						$table->sap_bin = $mm;
+						$table->weight;
+						$table->location;
+						$table->material = $material;
+						$table->save();
+
+					}
+					catch (\Illuminate\Database\QueryException $e) {
+						dd("greska pri snimanju u tabelu, zovi IT (1)");
+					}
+
+					try {
+						$table = new wastages_print;
+						$table->no = $i;
+						$table->skeda = $skeda;
+						$table->bin = $mm;
+						$table->printer = 'Krojacnica';
+						$table->printed = 0;
+						// $table->material = $material;
+						$table->save();
+
+					}
+					catch (\Illuminate\Database\QueryException $e) {
+						dd("greska pri snimanju u tabelu, zovi IT (2)");
+					}
+				}
+			}
+			return Redirect::to('wastage_cut_mm');
+
+			
 		}
-		return Redirect::to('wastage_cut_mm');
+		
+
+		
 	}
 
 	public function index_wh() {

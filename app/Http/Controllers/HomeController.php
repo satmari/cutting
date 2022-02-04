@@ -150,6 +150,13 @@ class HomeController extends Controller {
 			  	return redirect('/cutter');
 		 	}
 
+		 	if ($user->is('TUB')) { 
+			    // if user has at least one role
+			    // dd("TUB");
+			    $msg = "Hi TUB";
+			  	return redirect('/tub');
+		 	}
+
 		}
 
 		return view('home');

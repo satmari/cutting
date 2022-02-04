@@ -98,58 +98,66 @@
                         
                         <hr>
                         @if ($skeda_item_type != "MM")
-                        <table  style="width:100%">
-                        <tr>
-                            <td style="width:12%">
-                                <div class="panel-body">
-                                <p>SP1: <!-- <span style="color:red;">*</span> --></p>
-                                    <input type="radio" value="SP1" id="sp1" name="location" class="form-control">
-                                </div>
-                            </td>
-                        
-                            <td style="width:12%">
-                                <div class="panel-body">
-                                <p>SP2:<!--  <span style="color:red;">*</span> --></p>
-                                    <input type="radio" value="SP2" id="sp2" name="location" class="form-control">
-                                </div>
-                            </td>
 
-                            <td style="width:12%">
-                                <div class="panel-body">
-                                <p>SP3:<!--  <span style="color:red;">*</span> --></p>
-                                    <input type="radio" value="SP3" id="sp3" name="location" class="form-control">
-                                </div>
-                            </td>
+                            @if ($skeda_item_type != "MT")
+                            <table  style="width:100%">
+                                <tr>
+                                    <td style="width:12%">
+                                        <div class="panel-body">
+                                        <p>SP1: <!-- <span style="color:red;">*</span> --></p>
+                                            <input type="radio" value="SP1" id="sp1" name="location" class="form-control">
+                                        </div>
+                                    </td>
+                                
+                                    <td style="width:12%">
+                                        <div class="panel-body">
+                                        <p>SP2:<!--  <span style="color:red;">*</span> --></p>
+                                            <input type="radio" value="SP2" id="sp2" name="location" class="form-control">
+                                        </div>
+                                    </td>
 
-                            <td style="width:12%">
-                                <div class="panel-body">
-                                <p>SP4:<!--  <span style="color:red;">*</span> --></p>
-                                    <input type="radio" value="SP4" id="sp4" name="location" class="form-control">
-                                </div>
-                            </td>
-                            <td style="width:12%">
-                                <div class="panel-body">
-                                <p>MS1: <!-- <span style="color:red;">*</span> --></p>
-                                    <input type="radio" value="MS1" id="ms1" name="location" class="form-control">
-                                </div>
-                            </td>
-                        
-                            <td style="width:12%">
-                                <div class="panel-body">
-                                <p>MS2:<!--  <span style="color:red;">*</span> --></p>
-                                    <input type="radio" value="MS2" id="ms2" name="location" class="form-control">
-                                </div>
-                            </td>
+                                    <td style="width:12%">
+                                        <div class="panel-body">
+                                        <p>SP3:<!--  <span style="color:red;">*</span> --></p>
+                                            <input type="radio" value="SP3" id="sp3" name="location" class="form-control">
+                                        </div>
+                                    </td>
 
-                            <td style="width:12%">
-                                <div class="panel-body">
-                                <p>MS3:<!--  <span style="color:red;">*</span> --></p>
-                                    <input type="radio" value="MS3" id="ms3" name="location" class="form-control">
-                                </div>
-                            </td>
+                                    <td style="width:12%">
+                                        <div class="panel-body">
+                                        <p>SP4:<!--  <span style="color:red;">*</span> --></p>
+                                            <input type="radio" value="SP4" id="sp4" name="location" class="form-control">
+                                        </div>
+                                    </td>
+                                    <td style="width:12%">
+                                        <div class="panel-body">
+                                        <p>MS1: <!-- <span style="color:red;">*</span> --></p>
+                                            <input type="radio" value="MS1" id="ms1" name="location" class="form-control">
+                                        </div>
+                                    </td>
+                                
+                                    <td style="width:12%">
+                                        <div class="panel-body">
+                                        <p>MS2:<!--  <span style="color:red;">*</span> --></p>
+                                            <input type="radio" value="MS2" id="ms2" name="location" class="form-control">
+                                        </div>
+                                    </td>
 
-                        </tr>
-                        </table>
+                                    <td style="width:12%">
+                                        <div class="panel-body">
+                                        <p>MS3:<!--  <span style="color:red;">*</span> --></p>
+                                            <input type="radio" value="MS3" id="ms3" name="location" class="form-control">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                              @else 
+                            
+                            <div class="panel-body">
+                            <p>TUB:<!--  <span style="color:red;">*</span> --></p>
+                                <input type="radio" value="TUB" id="tub" name="location" class="form-control" checked>
+                            </div>
+                            @endif
                         @else 
                             
                             <div class="panel-body">

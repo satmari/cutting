@@ -304,7 +304,7 @@ Route::get('other_functions/{id}', 'spreaderController@other_functions');
 Route::get('mattress_to_load/{id}', 'spreaderController@mattress_to_load');
 Route::get('mattress_to_unload/{id}', 'spreaderController@mattress_to_unload');
 Route::get('mattress_to_spread/{id}', 'spreaderController@mattress_to_spread');
-Route::get('other_functions/{id}', 'spreaderController@other_functions');
+
 Route::post('add_operator_comment', 'spreaderController@add_operator_comment');
 Route::get('change_marker_request/{id}', 'spreaderController@change_marker_request');
 Route::post('change_marker_request_post', 'spreaderController@change_marker_request_post');
@@ -378,6 +378,22 @@ Route::post('o_roll_insert_parts', 'lrController@o_roll_insert_parts');
 Route::get('o_roll_print', 'lrController@o_roll_print');
 Route::post('o_roll_print_confirm', 'lrController@o_roll_print_confirm');
 Route::post('o_roll_print_confirm_print', 'lrController@o_roll_print_confirm_print');
+
+// TUB
+Route::get('tub', 'tubController@index');
+Route::get('operator_login_tub', 'tubController@operator_login');
+Route::get('operator_logout_tub', 'tubController@operator_logout');
+Route::get('other_functions_tub/{id}', 'tubController@other_functions');
+Route::get('mattress_to_load_tub/{id}', 'tubController@mattress_to_load');
+Route::get('mattress_to_unload_tub/{id}', 'tubController@mattress_to_unload');
+Route::get('mattress_to_spread_tub/{id}', 'tubController@mattress_to_spread');
+Route::post('add_operator_comment_tub', 'tubController@add_operator_comment');
+
+Route::get('spread_mattress_tub_partial/{id}', 'tubController@spread_mattress_partial');
+Route::post('spread_mattress_tub_partial_post', 'tubController@spread_mattress_partial_post');
+Route::get('spread_mattress_tub_complete/{id}', 'tubController@spread_mattress_complete');
+Route::post('spread_mattress_tub_complete_post', 'tubController@spread_mattress_complete_post');
+
 
 // Search
 Route::get('recap_by_skeda_mattress', 'plannerController@recap_by_skeda_mattress');

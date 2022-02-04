@@ -432,11 +432,16 @@ class cutterController extends Controller {
 				// print_r($check_pro_in_posummarry[0]->location_all."<br>");
 			 	// dd($check_pro_in_posummarry);
 
-				if ($check_pro_in_posummarry[0]->location_all == "Subotica") {
-					$out_su = $out_su + 0; 
-				} else {	
-					$out_su = $out_su + 1;
-				}
+			 	if (!isset($check_pro_in_posummarry[0]->location_all)) {
+			 		dd('Fali komesa u posummary applikaciji, javiti planerima');
+
+			 	} else {
+			 		if ($check_pro_in_posummarry[0]->location_all == "Subotica") {
+						$out_su = $out_su + 0; 
+					} else {	
+						$out_su = $out_su + 1;
+					}	
+			 	}
 			}
 
 			// print_r("final: ".$out_su."<br>");

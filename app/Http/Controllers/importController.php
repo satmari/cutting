@@ -1323,6 +1323,7 @@ class importController extends Controller {
 								// print_r($find_in_mattresses[0]->skeda);
 
 								if ($update_mattress->skeda == $row['skeda']) {
+									// dd('ss1');
 
 									if ($update_mattress->skeda_item_type == $row['skeda_item_type']) {
 										
@@ -1354,8 +1355,40 @@ class importController extends Controller {
 											$length_mattress_new = mattress_markers::where('mattress_id', $update_mattress->id)->firstOrFail();
 											$length_mattress_new = $length_mattress_new->marker_length;
 
-											$cons_planned_new = (round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * (float)$row['layers'];
+											if ($row['skeda_item_type'] == 'MT') {
+
+												$simple_fabric = trim(substr($row['material'],0,11));
+												// dd($simple_fabric);
+												$mq_weight = DB::connection('sqlsrv3')->select(DB::raw("SELECT [fabric],[mq_weight]
+													FROM [settings].[dbo].[fabrics] WHERE fabric = '".$simple_fabric."' "));
+												// dd($mq_weight[0]->mq_weight);
+
+												if (isset($mq_weight[0]->mq_weight)) {
+													// var_dump($row['marker_name']);
+													// var_dump($row['skeda']);
+													// var_dump(round((float)$length_mattress_new,3));
+													// var_dump((float)$row['extra'] / 100);
+													// var_dump((float)$row['layers']);
+													// var_dump((float)$mq_weight[0]->mq_weight);
+													// var_dump(((float)$update_mattress->width_theor_usable*2)/100);
+
+													$cons_planned_new = ((round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * (float)$row['layers']) * ((float)$mq_weight[0]->mq_weight/1000) * (((float)$update_mattress->width_theor_usable*2)/100);
+
+													// dd('update cons_planned_new: '. $cons_planned_new. ' kg');
+													print_r('update cons_planned for: '.$update_mattress->mattress.' = '. $cons_planned_new. ' kg <br>');
+													
+	
+												} else {
+													// dd($update_mattress_markers->marker_name_orig);
+													dd('For mattress '.$update_mattress->mattress.' , fabric consumption doesnt exist in settings - fabric');
+												}
+
+											} else {
+												$cons_planned_new = (round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * (float)$row['layers'];
+												
+											}
 											// dd($cons_planned_new);
+											// dd('Stop');
 
 											$update_mattress_details->cons_planned = round((float)$cons_planned_new,2);
 											$update_mattress_details->cons_actual = round((float)$cons_planned_new,2);
@@ -1363,6 +1396,7 @@ class importController extends Controller {
 											$update_mattress_details->extra = (floaT)$row['extra'];
 											$update_mattress_details->overlapping = $row['overlapping'];
 											$update_mattress_details->tpa_number = trim($row['tpa_number']);
+
 											if (isset($row['pcs_bundle'])) {
 												$update_mattress_details->pcs_bundle = round($row['pcs_bundle'],0);
 											}
@@ -1394,8 +1428,8 @@ class importController extends Controller {
 				   			continue;
 
 						} else {
-
-							// matresses
+							// dd('ss');
+							// mattresses
 							$g_bin; //not mandatory / progressive 
 							$material = $row['material'];
 							$dye_lot = $row['dye_lot'];
@@ -1426,22 +1460,90 @@ class importController extends Controller {
 							// dd($length_mattress_new);
 							if (isset($length_mattress_new[0])) {
 
-								$length_mattress_new = $length_mattress_new[0]->marker_length;
-								$cons_planned_new = (round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * $layers;
-								$cons_planned = round((float)$cons_planned_new,2);
-								$cons_actual = round((float)$cons_planned_new,2);
+								if ($skeda_item_type == 'MT') {
+
+									$simple_fabric = trim(substr($row['material'],0,11));
+									// dd($simple_fabric);
+									$mq_weight = DB::connection('sqlsrv3')->select(DB::raw("SELECT [fabric],[mq_weight]
+										FROM [settings].[dbo].[fabrics] WHERE fabric = '".$simple_fabric."' "));
+									// dd($mq_weight);
+
+									if (isset($mq_weight[0]->mq_weight)) {
+
+										$length_mattress_new = $length_mattress_new[0]->marker_length;
+										// $cons_planned_new = (round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * $layers;
+										$cons_planned_new = ((round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * (float)$row['layers']) * ((float)$mq_weight[0]->mq_weight/1000) * (((float)$width_theor_usable*2)/100);
+										$cons_planned = round((float)$cons_planned_new,2);
+										$cons_actual = round((float)$cons_planned_new,2);
+
+										// var_dump($row['marker_name']);
+										// var_dump($row['skeda']);
+										// var_dump(round((float)$length_mattress_new,3));
+										// var_dump((float)$row['extra'] / 100);
+										// var_dump((float)$row['layers']);
+										// var_dump((float)$mq_weight[0]->mq_weight);
+										// var_dump(((float)$update_mattress->width_theor_usable*2)/100);
+
+										// dd('MAT not exist - marker exist: cons_planned_new: '. $cons_planned_new .' kg');
+										print_r('update cons_planned for: '.$mattress.' = '. $cons_planned_new. ' kg <br>');
+										
+									} else {
+										// dd($update_mattress_markers->marker_name_orig);
+										dd('For mattress '.$mattress.' , fabric consumption does not exist in settings - fabric');
+									}
+									
+								} else {
+
+									$length_mattress_new = $length_mattress_new[0]->marker_length;
+									$cons_planned_new = (round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * $layers;
+									$cons_planned = round((float)$cons_planned_new,2);
+									$cons_actual = round((float)$cons_planned_new,2);
+								}
 
 							} else {
-								$length_mattress_new = $length_mattress;
-								$cons_planned_new = (round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * $layers;
-								$cons_planned = round((float)$cons_planned_new,2);
-								$cons_actual = round((float)$cons_planned_new,2);
 
+								if ($skeda_item_type == 'MT') {
+
+									$simple_fabric = trim(substr($row['material'],0,11));
+									// dd($simple_fabric);
+									$mq_weight = DB::connection('sqlsrv3')->select(DB::raw("SELECT [fabric],[mq_weight]
+										FROM [settings].[dbo].[fabrics] WHERE fabric = '".$simple_fabric."' "));
+									// dd($simple_fabric);
+
+									if (isset($mq_weight[0]->mq_weight)) {
+
+										$length_mattress_new = $length_mattress;
+										// $cons_planned_new = (round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * $layers;
+										$cons_planned_new = ((round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * (float)$row['layers']) * ((float)$mq_weight[0]->mq_weight/1000) * (((float)$width_theor_usable*2)/100);
+										$cons_planned = round((float)$cons_planned_new,2);
+										$cons_actual = round((float)$cons_planned_new,2);		
+
+										// var_dump($row['marker_name']);
+										// var_dump($row['skeda']);
+										// var_dump(round((float)$length_mattress_new,3));
+										// var_dump((float)$row['extra'] / 100);
+										// var_dump((float)$row['layers']);
+										// var_dump((float)$mq_weight[0]->mq_weight);
+										// var_dump(((float)$update_mattress->width_theor_usable*2)/100);
+
+										// dd('MAT not exist - marker not exist:  cons_planned_new: '.$cons_planned_new .' kg') ;
+										var_dump('update cons_planned for: '.$mattress.' = '. $cons_planned_new. ' kg <br>');
+										
+
+									} else {
+										// dd($update_mattress_markers->marker_name_orig);
+										dd('For mattress '.$mattress.' , fabric consumption does not exist in settings - fabric');
+									}
+
+								} else {
+
+									$length_mattress_new = $length_mattress;
+									$cons_planned_new = (round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * $layers;
+									$cons_planned = round((float)$cons_planned_new,2);
+									$cons_actual = round((float)$cons_planned_new,2);
+								}
 							}
-							// dd($length_mattress_new);
-							// $cons_planned_new = (round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * $layers;
-							// $cons_planned = round((float)$cons_planned_new,2);
-							// $cons_actual = round((float)$cons_planned_new,2);
+
 
 							$extra = (floaT)$row['extra'];
 							// $pcs_bundle;	//manualy
