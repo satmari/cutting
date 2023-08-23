@@ -20,14 +20,18 @@ use App\mattress_eff;
 use App\o_roll;
 use App\paspul;
 use App\paspul_line;
+use App\paspul_rewound;
 use App\mattress_split_request;
+use App\paspul_stock;
+use App\paspul_stock_log;
 
 use App\print_standard_mattress;
 use App\print_mini_mattress;
 
+use App\paspul_location;
+
 // use DB;
 use Illuminate\Support\Facades\DB;
-
 use App\User;
 use Bican\Roles\Models\Role;
 use Bican\Roles\Models\Permission;
@@ -112,6 +116,7 @@ class plannerController extends Controller {
 		      ,m2.[printed_nalog]
 		      ,m2.[layer_limit]
 		      ,m2.[overlapping]
+		      ,m2.[req_time]
 		      --,'|'
 		      ,m3.[marker_id]
 		      ,m3.[marker_name]
@@ -194,9 +199,9 @@ class plannerController extends Controller {
 			} else {
 
 				$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-					ps.pro
-					,ps.style_size
-					,ps.sku
+					ps.[pro]
+					,ps.[style_size]
+					,ps.[sku]
 					,po.[location_all]
 					--,*
 				  FROM  [pro_skedas] as ps 
@@ -270,6 +275,7 @@ class plannerController extends Controller {
 			      ,m2.[printed_nalog]
 			      ,m2.[layer_limit]
 			      ,m2.[overlapping]
+			      ,m2.[req_time]
 			      --,'|'
 			      ,m3.[marker_id]
 			      ,m3.[marker_name]
@@ -431,6 +437,7 @@ class plannerController extends Controller {
 			      ,m2.[printed_nalog]
 			      ,m2.[layer_limit]
 			      ,m2.[overlapping]
+			      ,m2.[req_time]
 			      --,'|'
 			      ,m3.[marker_id]
 			      ,m3.[marker_name]
@@ -999,6 +1006,7 @@ class plannerController extends Controller {
 		      ,m2.[minimattress_code]
 		      ,m2.[printed_nalog]
 		      ,m2.[overlapping]
+		      ,m2.[req_time]
 		      --,'|'
 		      ,m3.[marker_id]
 		      ,m3.[marker_name]
@@ -1583,7 +1591,7 @@ class plannerController extends Controller {
 			FROM [marker_headers] as mh
 			WHERE marker_name =  '".$existing_marker."' "));
 			
-			$find_marker_style_size = DB::connection('sqlsrv')->select(DB::raw("SELECT mh.marker_name,
+			$find_marker_style_size = DB::connection('sqlsrv')->select(DB::raw("SELECT mh.marker_name,mh.marker_length,mh.marker_width,
 			   size = STUFF(
 					(SELECT DISTINCT ' ' +CAST(ml.style_size as VARCHAR(MAX) 
 					)+ CAST (ml.pcs_on_layer as VARCHAR(MAX))
@@ -1592,7 +1600,8 @@ class plannerController extends Controller {
 					FOR XML PATH('')),1,1,' '
 				)
 			FROM [marker_headers] as mh
-			WHERE mh.[status] = 'ACTIVE' "));
+			WHERE mh.[status] = 'ACTIVE'
+			ORDER BY mh.marker_width desc "));
 			// dd($find_marker_style_size);
 
 			$markers[] = '';
@@ -1601,7 +1610,7 @@ class plannerController extends Controller {
 
 				if (trim($find_marker_style_size[$t]->size) == trim($existing_marker_style_size[0]->size)) {
 					// print_r($find_marker_style_size[$t]->marker_name."<br>");
-					array_push($markers, $find_marker_style_size[$t]->marker_name);
+					array_push($markers, $find_marker_style_size[$t]->marker_name.' '.round($find_marker_style_size[$t]->marker_length,3));
 				}
 			}
 
@@ -1650,8 +1659,11 @@ class plannerController extends Controller {
 		$existing_marker_length = $input['existing_marker_length'];
 		$existing_marker_width = $input['existing_marker_width'];
 		$existing_min_length = $input['existing_min_length'];
-		$selected_marker = $input['selected_marker'];
+		$selected_marker_full = $input['selected_marker'];
 		// dd($selected_marker);
+
+		$selected_marker_array = explode(' ',$selected_marker_full);
+		$selected_marker = $selected_marker_array[0];
 
 		$markers = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 					id, marker_name, marker_width, marker_length, min_length
@@ -2263,6 +2275,7 @@ class plannerController extends Controller {
 		      ,m2.[minimattress_code]
 		      ,m2.[tpa_number]
 		      ,m2.[layer_limit]
+		      ,m2.[req_time]
 		      --,'|'
 		      ,m3.[marker_id]
 		      ,m3.[marker_name]
@@ -2374,6 +2387,8 @@ class plannerController extends Controller {
 		$comment_office = $data[0]->comment_office;
 		$tpa_number = $data[0]->tpa_number;
 		$location = $data[0]->location;
+		$req_time = $data[0]->req_time;
+
 
 		if ($skeda_item_type == 'MM') {
 
@@ -2381,10 +2396,56 @@ class plannerController extends Controller {
 			$data2 = DB::connection('sqlsrv')->select(DB::raw("SELECT [o_roll],[no_of_joinings],[g_bin]
 				FROM  [o_rolls]
 				WHERE mattress_id_new = '".$id."' "));
-			return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','data2','layer_limit','cut_operator','cut_date','sp_operator','sp_date'));
+			return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','data2','layer_limit','cut_operator','cut_date','sp_operator','sp_date','req_time'));
 		}
 
-		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','cut_operator','cut_date','sp_operator','sp_date'));
+		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','cut_operator','cut_date','sp_operator','sp_date','req_time'));
+	}
+
+	public function correct_location($id) {
+
+		// dd($id);
+		$mattress_phases = DB::connection('sqlsrv')->select(DB::raw("SELECT id, status, location FROM [mattress_phases] WHERE [mattress_id] = '".$id."' AND active  = 1 "));
+		// dd($mattress_phases);
+
+		if (isset($mattress_phases[0]->id)) {
+			
+			$status = $mattress_phases[0]->status;
+
+			if ($status == 'NOT_SET') {
+				$location = 'NOT_SET';
+
+			} elseif ($status == 'TO_CUT') {
+				$location = 'CUT';	
+				
+			} elseif ($status == 'ON_CUT') {
+				$location = 'CUT';	
+
+			} elseif ($status == 'TO_JOIN') {
+				$location = 'PSO';	
+
+			} elseif ($status == 'TO_PACK') {
+				$location = 'PACK';	
+
+			} elseif ($status == 'COMPLETED') {
+				$location = 'COMPLETED';	
+			} else {
+				dd('Nothing to change, status is different than (NOT_SET, TO_CUT, ON_CUT, TO_JOIN, TO_PACK, COMPLETED).  ');
+			}
+
+			// dd($location);
+
+			$mattress_phases_update = mattress_phases::findOrFail($mattress_phases[0]->id);
+			$mattress_phases_update->location = $location;
+			$mattress_phases_update->save();
+
+			dd('Status was updated successfuly');
+
+		} else {
+
+			dd('Mattress doesn’t have active=1 phase line, check with IT');
+		}
+
 	}
 
 	public function edit_mattress_confirm(Request $request) {
@@ -2396,12 +2457,28 @@ class plannerController extends Controller {
 		$id = $input['id'];
 		$mattress = $input['mattress'];
 		$skeda_item_type = $input['skeda_item_type'];
+		$g_bin = $input['g_bin'];
+		$material = $input['material'];
+		$dye_lot = $input['dye_lot'];
+		$color_desc = $input['color_desc'];
+		$skeda = $input['skeda'];
+		$width_theor_usable = $input['width_theor_usable'];
+		$layers = $input['layers'];
+		$layers_a = $input['layers_a'];
+		$cons_planned = $input['cons_planned'];
+		$cons_actual = $input['cons_actual'];
+		$marker_name = $input['marker_name'];
+		$marker_length = $input['marker_length'];
+		$marker_width = $input['marker_width'];
+		$tpp_mat_keep_wastage = $input['tpp_mat_keep_wastage'];
+		$tpa_number = $input['tpa_number'];
 
 		$priority = (int)$input['priority'];
 		$comment_office = $input['comment_office'];
 		$spreading_method = $input['spreading_method'];
 		$pcs_bundle = (int)$input['pcs_bundle'];
 		$bottom_paper = $input['bottom_paper'];
+		$req_time = round($input['req_time'],2);
 
 		if (isset($input['call_shift_manager'])) {
 			$call_shift_manager = (int)$input['call_shift_manager'];
@@ -2419,41 +2496,61 @@ class plannerController extends Controller {
 		// 	$tpp_mat_keep_wastage = 0;
 		// }
 		
+		$data_sp = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+		      m4.[status]
+		      ,m4.[location]
+		      ,m4.[device]
+		      ,m4.[active]
+		      ,m4.[operator1]
+		      ,m4.[operator2]
+		      ,m4.[updated_at]
+
+		  FROM [mattresses] as m1
+		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
+		  WHERE m1.[id] = '".$id."' AND status = 'TO_CUT'
+		  ORDER BY m4.updated_at desc"));
+		// dd($data_sp);
+
+		if (isset($data_sp[0])) {
+			$sp_operator = $data_sp[0]->operator1;
+			$sp_date = substr($data_sp[0]->updated_at,0,16);	
+		} else {
+			$sp_operator = NULL;
+			$sp_date = NULL;
+		}
+
+		$data_cut = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+		      m4.[status]
+		      ,m4.[location]
+		      ,m4.[device]
+		      ,m4.[active]
+		      ,m4.[operator1]
+		      ,m4.[operator2]
+		      ,m4.[updated_at]
+
+		  FROM [mattresses] as m1
+		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
+		  WHERE m1.[id] = '".$id."' AND (status = 'COMPLETED' OR status = 'TO_PACK')
+		  ORDER BY m4.updated_at asc"));
+		// dd($data_cut);
+
+		if (isset($data_cut[0])) {
+			$cut_operator = $data_cut[0]->operator1;
+			$cut_date = substr($data_cut[0]->updated_at,0,16);	
+		} else {
+			$cut_operator = NULL;
+			$cut_date = NULL;
+		}
+
 		$location = $input['location'];
 
-		// Gbin check !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// $g_bin = 'G000000001';
-
-		// if ($skeda_item_type == 'MM') {
-		// 	$g_bin = NULL;
-
-		// } else {
-		// 	$find_g_bin = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-		// 			TOP 1 g_bin
-		// 		FROM [mattresses] ORDER BY g_bin desc"));
-		// 	// dd($find_g_bin);
-		// 	$bin = (int)substr($find_g_bin[0]->g_bin, -8);
-		// 	// dd($bin);
-		// 	$num = str_pad($bin+1, 9, 0, STR_PAD_LEFT);
-		// 	// dd("G".$num);
-
-		// 	$g_bin = "G".$num;
-		// 	// dd($g_bin);
-		// }
-
-		// Position check
-		// $position = 1;
-		// $find_position_on_location = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-		// 			COUNT(location) as c 
-		// 		FROM [mattress_phases] WHERE location = '".$location."' AND active = '1' "));
-		// // dd($find_position_on_location[0]);
-		// if (isset($find_position_on_location[0])) {
-		// 	$position = $find_position_on_location[0]->c + 1;
-		// } else {
-		// 	$position = 1;
-		// }
-		// dd($position);
-
+	
 		$table001 = mattress::findOrFail($id);
 		$table001->spreading_method = $spreading_method;
 		$table001->save();
@@ -2471,9 +2568,16 @@ class plannerController extends Controller {
 		// $table1->tpp_mat_keep_wastage = $tpp_mat_keep_wastage;
 		$table1->bottom_paper = $bottom_paper;
 		$table1->comment_office = $comment_office;
+		$table1->req_time = $req_time;
 		$table1->save();
 
-		return Redirect::to('/plan_mattress/'.$location);
+		// return Redirect::to('/plan_mattress/'.$location);
+		
+		$msgs = 'Succesfuly saved';
+		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a',
+		'cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority',
+		'call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper',
+		'comment_office','location','cut_operator','cut_date','sp_operator','sp_date','req_time','msgs'));
 	}
 
 	public function edit_layers_a($id) {
@@ -3306,7 +3410,9 @@ class plannerController extends Controller {
 					JOIN marker_headers as mh ON mm.marker_name = mh.marker_name
 			WHERE o.status = 'CREATED' AND o.o_roll = '".$value."' order by o.g_bin asc"));
 			// dd($data);
-
+			if (!isset($data[0]->o_roll)) {
+				dd('Problem: can not find proper information, probably marker doesent exist');
+			}
 			array_push($gg, $data[0]->o_roll, $data[0]->g_bin, $data[0]->mattress_name_orig, $data[0]->marker_name, round($data[0]->marker_width,0), round($data[0]->marker_length,2), round($data[0]->efficiency,2), round($data[0]->average_consumption,2) );
 
 		}
@@ -3748,51 +3854,150 @@ class plannerController extends Controller {
 			}
 		}
 
-		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+		if ($location == 'PCO') {
+			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 
-			  p1.[id]
-		      ,p1.[paspul_roll]
-		      ,p1.[sap_su]
-		      ,p1.[material]
-		      ,p1.[color_desc]
-		      ,p1.[dye_lot]
-		      ,p1.[paspul_type]
+				  p1.[id]
+			      ,p1.[paspul_rewound_roll]
+			      ,p1.[rewound_length_partialy]
+			      ,p1.[kotur_partialy]
+			      ,p1.[paspul_roll_id]
+			      ,p1.[status]
 
-		      ,p1.[width]
-		      ,p1.[kotur_width]
-		      ,p1.[kotur_width_without_tension]
-		      ,p1.[kotur_planned]
-		      ,p1.[kotur_actual]
-		      ,p1.[rewound_length]
-		      ,p1.[rewound_length_a]
+			      ,p1.[sap_su]
+			      ,p1.[material]
+			      ,p1.[color_desc]
+			      ,p1.[dye_lot]
+			      ,p1.[paspul_type]
 
-		      ,p1.[pasbin]
-		      ,p1.[skeda_item_type]
-		      ,p1.[skeda]
-		      ,p1.[skeda_status]
+			      ,p1.[width]
+			      ,p1.[kotur_width]
+			      ,p1.[kotur_width_without_tension]
+			      ,p1.[kotur_planned]
+			      -- ,p1.[kotur_actual]
+			      ,p1.[rewound_length]
+			      --,p1.[rewound_length_a]
 
-		      ,p1.[rewound_roll_unit_of_measure]
-		      ,p1.[position]
-		      ,p1.[priority]
-		      ,p1.[comment_office]
-		      ,p1.[comment_operator]
-		      ,p1.[call_shift_manager]
-		      ,p1.[rewinding_method]
-		      ,p1.[tpa_number]
-		      ,p1.[created_at]
-		      ,p1.[updated_at]
+			      ,p1.[pasbin]
+			      ,p1.[skeda_item_type]
+			      ,p1.[skeda]
+			      ,p1.[skeda_status]
 
-		      ,p2.[status]
-		      ,p2.[location]
-		      ,p2.[device]
-		      ,p2.[active]
-		      ,p2.[operator1]
-		      ,p2.[operator2]
+			      ,p1.[rewound_roll_unit_of_measure]
+			      ,p1.[position]
+			      ,p1.[priority]
+			      ,p1.[comment_office]
+			      ,p1.[comment_operator]
+			      ,p1.[call_shift_manager]
+			      ,p1.[rewinding_method]
+			      ,p1.[tpa_number]
+			      ,p1.[created_at]
+			      ,p1.[updated_at]
 
-		  FROM [paspuls] as p1
-		  LEFT JOIN [paspul_lines] as p2 ON p2.[paspul_roll_id] = p1.[id]
-		  WHERE p2.[location] = '".$location."' AND p2.[active] = '1' 
-		  ORDER BY p1.[position] asc"));
+			  FROM [paspul_rewounds] as p1
+			  WHERE status = 'TO_CUT'
+			  ORDER BY p1.[priority] desc, p1.[paspul_rewound_roll] asc"));
+			// dd($data);
+
+
+		} elseif ($location == 'COMPLETED') {
+			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+
+				  p1.[id]
+			      ,p1.[paspul_rewound_roll]
+			      ,p1.[rewound_length_partialy]
+			      ,p1.[kotur_partialy]
+			      ,p1.[paspul_roll_id]
+			      ,p1.[status]
+
+			      ,p1.[sap_su]
+			      ,p1.[material]
+			      ,p1.[color_desc]
+			      ,p1.[dye_lot]
+			      ,p1.[paspul_type]
+
+			      ,p1.[width]
+			      ,p1.[kotur_width]
+			      ,p1.[kotur_width_without_tension]
+			      ,p1.[kotur_planned]
+			      -- ,p1.[kotur_actual]
+			      ,p1.[rewound_length]
+			      --,p1.[rewound_length_a]
+
+			      ,p1.[pasbin]
+			      ,p1.[skeda_item_type]
+			      ,p1.[skeda]
+			      ,p1.[skeda_status]
+
+			      ,p1.[rewound_roll_unit_of_measure]
+			      ,p1.[position]
+			      ,p1.[priority]
+			      ,p1.[comment_office]
+			      ,p1.[comment_operator]
+			      ,p1.[call_shift_manager]
+			      ,p1.[rewinding_method]
+			      ,p1.[tpa_number]
+			      ,p1.[created_at]
+			      ,p1.[updated_at]
+
+			  FROM [paspul_rewounds] as p1
+			  WHERE status = 'COMPLETED' and p1.[updated_at] > DATEADD(day,-30,GETDATE())
+			  ORDER BY p1.[updated_at] desc"));
+			// dd($data);
+		} else {
+
+
+			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+
+				  p1.[id]
+			      ,p1.[paspul_roll]
+			      ,p1.[sap_su]
+			      ,p1.[material]
+			      ,p1.[color_desc]
+			      ,p1.[dye_lot]
+			      ,p1.[paspul_type]
+
+			      ,p1.[width]
+			      ,p1.[kotur_width]
+			      ,p1.[kotur_width_without_tension]
+			      ,p1.[kotur_planned]
+			      ,p1.[kotur_actual]
+			      ,p1.[rewound_length]
+			      ,p1.[rewound_length_a]
+
+			      ,p1.[pasbin]
+			      ,p1.[skeda_item_type]
+			      ,p1.[skeda]
+			      ,p1.[skeda_status]
+
+			      ,p1.[rewound_roll_unit_of_measure]
+			      ,p1.[position]
+			      ,p1.[priority]
+			      ,p1.[comment_office]
+			      ,p1.[comment_operator]
+			      ,p1.[call_shift_manager]
+			      ,p1.[rewinding_method]
+			      ,p1.[tpa_number]
+			      ,p1.[created_at]
+			      ,p1.[updated_at]
+
+			      ,p2.[status]
+			      ,p2.[location]
+			      ,p2.[device]
+			      ,p2.[active]
+			      ,p2.[operator1]
+			      ,p2.[operator2]
+
+			      ,(SELECT SUM([rewound_length_partialy]) FROM [cutting].[dbo].[paspul_rewounds]
+					WHERE [paspul_roll_id] = p1.[id]) as rewound_sum
+
+			  FROM [paspuls] as p1
+			  LEFT JOIN [paspul_lines] as p2 ON p2.[paspul_roll_id] = p1.[id]
+			  WHERE p2.[location] = '".$location."' AND p2.[active] = '1' 
+			  ORDER BY p1.[position] asc"));
+		}
+
+		
 
 		$pros= '';
 		$skus= '';
@@ -4402,6 +4607,7 @@ class plannerController extends Controller {
 		$comment_office = $input['comment_office'];
 		$paspul_roll_id = $input['paspul_roll_id'];
 		$skeda = $input['skeda'];
+		$dye_lot = $input['dye_lot'];
 		$skeda_item_type = $input['skeda_item_type'];
 		$location = $input['location'];
 		// dd($skeda);
@@ -4431,7 +4637,7 @@ class plannerController extends Controller {
 		// $table->sap_su = $sap_su;
 		// $table->material = $material;
 		// $table->color_desc = $color_desc;
-		// $table->dye_lot = $dye_lot;
+		$table->dye_lot = $dye_lot;
 		// $table->paspul_type = $paspul_type;
 		// $table->width = $width;
 		// $table->kotur_width = $kotur_width;
@@ -4455,6 +4661,581 @@ class plannerController extends Controller {
 		$table->save();
 
 		return redirect('/plan_paspul/'.$location);
+	}
+
+	public function paspul_change_kotur_qty($id) {
+		// dd($id);
+
+		$operator = Session::get('operator');
+		if (!isset($operator) OR $operator == '') {
+			$work_place = "LR";
+			// Session::set('work_place',$work_place);
+
+			$operators = DB::connection('sqlsrv')->select(DB::raw("SELECT [id]
+			      ,[operator]
+			      ,[device]
+			      ,[device_array]
+			  FROM [operators]
+			  WHERE device like '%".$work_place."%' AND status = 'ACTIVE' "));
+			// dd($operators);
+
+			$operator = Session::get('operator');
+
+			$msg ='Operator must be logged!';
+			return view('pco.error',compact('msg', 'operator', 'operators'));
+		}
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+
+			  p1.[id]
+		      ,p1.[paspul_rewound_roll]
+		      ,p1.[rewound_length_partialy]
+		      ,p1.[kotur_partialy]
+		      ,p1.[paspul_roll_id]
+		      ,p1.[paspul_roll]
+		      ,p1.[status]
+
+		      ,p1.[sap_su]
+		      ,p1.[material]
+		      ,p1.[color_desc]
+		      ,p1.[dye_lot]
+		      ,p1.[paspul_type]
+
+		      ,p1.[width]
+		      ,p1.[kotur_width]
+		      ,p1.[kotur_width_without_tension]
+		      ,p1.[kotur_planned]
+		      -- ,p1.[kotur_actual]
+		      ,p1.[rewound_length]
+		      --,p1.[rewound_length_a]
+
+		      ,p1.[pasbin]
+		      ,p1.[skeda_item_type]
+		      ,p1.[skeda]
+		      ,p1.[skeda_status]
+
+		      ,p1.[rewound_roll_unit_of_measure]
+		      ,p1.[position]
+		      ,p1.[priority]
+		      ,p1.[comment_office]
+		      ,p1.[comment_operator]
+		      ,p1.[call_shift_manager]
+		      ,p1.[rewinding_method]
+		      ,p1.[tpa_number]
+		      ,p1.[created_at]
+		      ,p1.[updated_at]
+
+		  FROM [paspul_rewounds] as p1
+		  WHERE status = 'COMPLETED' and p1.[id] = '".$id."'
+		  ORDER BY p1.[paspul_rewound_roll] asc "));
+		// dd($data);
+
+		$paspul_rewound_roll = $data[0]->paspul_rewound_roll;
+		$rewound_length_partialy = $data[0]->rewound_length_partialy;
+		$kotur_partialy = $data[0]->kotur_partialy;
+		$status = $data[0]->status;
+
+		$paspul_roll_id = $data[0]->paspul_roll_id;
+		$paspul_roll = $data[0]->paspul_roll;
+		$sap_su = $data[0]->sap_su;
+		$material = $data[0]->material;
+		$color_desc = $data[0]->color_desc;
+		$dye_lot = $data[0]->dye_lot;
+		$paspul_type = $data[0]->paspul_type;
+
+		$width = $data[0]->width;
+		$kotur_width = $data[0]->kotur_width;
+		$kotur_width_without_tension = $data[0]->kotur_width_without_tension;
+		$kotur_planned = $data[0]->kotur_planned;
+		$rewound_length = $data[0]->rewound_length;
+
+		$pasbin = $data[0]->pasbin;
+		$skeda_item_type = $data[0]->skeda_item_type;
+		$skeda = $data[0]->skeda;
+		$skeda_status = $data[0]->skeda_status;
+		$rewound_roll_unit_of_measure = $data[0]->rewound_roll_unit_of_measure;
+		$position = $data[0]->position;
+		$priority = $data[0]->priority;
+		$comment_office = $data[0]->comment_office;
+		$comment_operator = $data[0]->comment_operator;
+		$call_shift_manager = $data[0]->call_shift_manager;
+
+		$rewinding_method = $data[0]->rewinding_method;
+		$tpa_number = $data[0]->tpa_number;
+
+		return view('planner.paspul_pco1', compact('id','paspul_roll','rewound_length_a','comment_office'
+			,'material','skeda','dye_lot','color_desc','skeda_item_type','rewinding_method','priority','call_shift_manager','comment_operator','comment_office'
+			,'kotur_partialy','paspul_rewound_roll','paspul_roll_id'));
+	}
+
+	public function paspul_pco1_planner_confirm(Request $request) {
+
+
+		$this->validate($request, ['kotur_partialy' => 'required']);
+		$input = $request->all(); 
+		// dd($input);
+
+		$id = $input['id'];
+		$paspul_rewound_roll = $input['paspul_rewound_roll'];
+
+		$paspul_roll = $input['paspul_roll'];
+		$paspul_roll_id = $input['paspul_roll_id'];
+
+		$kotur_partialy = (int)$input['kotur_partialy'];
+		// dd($kotur_partialy);
+				
+		// verify userId
+		if (Auth::check())
+		{
+		    $userId = Auth::user()->id;
+		    $device = Auth::user()->name;
+		} else {
+			// dd('User is not autenticated');
+			$msg ='User is not autenticated';
+			return view('planner.error',compact('msg'));
+		}
+
+		// CHECK FATHER
+		
+		$find_all_paspuls = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			  p1.[id]
+		      ,p1.[paspul_roll]
+		      ,p2.[status]
+		  FROM [paspuls] as p1
+		  LEFT JOIN [paspul_lines] as p2 ON p2.[paspul_roll_id] = p1.[id] and p2.[active] = 1 
+		  WHERE p1.[id] = '".$paspul_roll_id."'"));
+
+		$father_status = $find_all_paspuls[0]->status;
+		// dd($father_status);
+
+		if ($father_status == "COMPLETED") {
+
+			// UPDATE PASPUL REWOUND 
+
+			$table_prw = paspul_rewound::findOrFail($id);
+			$table_prw->kotur_partialy = $kotur_partialy;
+			$table_prw->save();
+
+			// CHECK ALL CHILD if completed
+			$find_all_paspuls = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					[id], [paspul_roll], [paspul_roll_id], [status] , [kotur_partialy]
+				FROM [paspul_rewounds] 
+				WHERE [paspul_roll_id] = '".$paspul_roll_id."' ")); // SKIP THIS CHILD
+			// dd($find_all_paspuls);
+
+			$to_completed = 0;
+			for ($i=0; $i < count($find_all_paspuls); $i++) {
+			
+				if ($find_all_paspuls[$i]->status != "COMPLETED") {
+					$to_completed = $to_completed;
+				} else {
+					$to_completed = $to_completed;
+				}
+			}
+			// dd($to_completed);
+
+			if ($to_completed == 0) {
+
+				// ALL CHILD (expt this) ARE COMPLETED
+				$no_of_child = count($find_all_paspuls);
+				$no_of_child = $no_of_child;
+				// dd($no_of_child);
+
+				$sum_of_child_kotur = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					SUM(kotur_partialy) as sum_k
+					FROM [paspul_rewounds]
+					WHERE [paspul_roll_id] = '".$paspul_roll_id."' "));
+				$sum_of_child_kotur = (int)$sum_of_child_kotur[0]->sum_k;
+				// dd($sum_of_child_kotur);
+				
+				$kotur_actual = (int)$sum_of_child_kotur / (int)$no_of_child;
+				$kotur_actual = round($kotur_actual,1);
+				// dd($kotur_actual);
+
+				$table = paspul::findOrFail($paspul_roll_id);
+				$table->kotur_actual = $kotur_actual; // CALCULATIONS
+				$table->save();
+			}
+		} 
+		
+		return redirect('/');
+	}
+
+	public function paspul_stock () {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("  SELECT s.* 
+					,round(k.[mtr_per_pcs],2) as [unit_cons]
+					
+					,CASE s.[uom]
+						WHEN 'meter'
+						THEN floor(s.[kotur_length] / k.[mtr_per_pcs]) 
+						WHEN 'ploce'
+						THEN floor(s.[kotur_length] * k.[mtr_per_pcs]) 
+						ELSE ''
+						END
+						as [pcs_kotur]
+					
+					,CASE s.[uom]
+						WHEN 'meter'
+						THEN (floor(s.[kotur_length] / k.[mtr_per_pcs]) * s.[kotur_qty]) 
+						WHEN 'ploce'
+						THEN (floor(s.[kotur_length] * k.[mtr_per_pcs]) * s.[kotur_qty]) 
+						ELSE ''
+						END
+						as FG_qty,
+					l.plant
+					
+			  	FROM [cutting].[dbo].[paspul_stocks] as s 
+			  	LEFT JOIN [cutting].[dbo].[paspul_stock_u_cons] as k ON k.skeda = s.skeda and k.paspul_type = s.paspul_type
+				LEFT JOIN [cutting].[dbo].[paspul_locations] as l ON l.[location] = s.[location] 
+				ORDER BY l.[location] asc
+			 "));
+		// dd($data);
+		return view('planner.paspul_table', compact('data'));
+	}
+
+	public function paspul_change_q ($id) {
+		// dd($id);
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT id, kotur_qty 
+			FROM paspul_stocks
+			WHERE id = '".$id."' "));
+
+		if (isset($data[0]->id)) {
+			$id =  $data[0]->id;
+			$kotur_qty = $data[0]->kotur_qty;
+		}
+
+		return view('planner.paspul_change_q', compact('id','kotur_qty'));
+	}
+
+	public function paspul_change_q_post (Request $request) {
+		
+		$this->validate($request, ['kotur_qty' => 'required']);
+		$input = $request->all(); 
+		// dd($input);
+
+
+		$pa_old = paspul_stock::findOrFail($input['id']);
+		
+		$table_stock = new paspul_stock_log;
+		$table_stock->pas_key = $pa_old->pas_key;
+		$table_stock->pas_key_e = $pa_old->pas_key_e;
+		$table_stock->location_from = $pa_old->location;
+		$table_stock->location_to = $pa_old->location;
+		$table_stock->location_type = 'change_qty';
+		$table_stock->kotur_qty = (int)$pa_old->kotur_qty;
+		$table_stock->operator = 'planner';
+		$table_stock->shift = Auth::user()->name;
+
+		$table_stock->kotur_width = $pa_old->kotur_width;
+		$table_stock->uom = $pa_old->uom;
+		$table_stock->material = $pa_old->material;
+		$table_stock->fg_color_code = $pa_old->fg_color_code;
+
+		$table_stock->skeda = $pa_old->skeda;
+		$table_stock->paspul_type = $pa_old->paspul_type;
+		$table_stock->dye_lot = $pa_old->dye_lot;
+		$table_stock->kotur_length = $pa_old->kotur_length;
+
+		$table_stock->returned_from = $pa_old->returned_from;
+		$table_stock->pcs_kotur = $pa_old->pcs_kotur;
+
+		$table_stock->save();
+
+		if ($input['kotur_qty'] == 0) {
+			
+			$table_stock->location_type = 'change_qty_to_0';
+			$table_stock->save();
+
+			$remove = paspul_stock::where('id',$pa_old->id)->delete();
+
+		} else {
+
+			$pa_old->kotur_qty = (int)$input['kotur_qty'];
+			$pa_old->save();
+		}
+	
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT s.* ,k.[unit_cons], s.[fg_color_code], l.[plant] FROM paspul_stocks as s 
+			LEFT JOIN [cutting].[dbo].[paspul_stock_by_keys] as k ON k.[pas_key] = s.[pas_key]
+			LEFT JOIN [cutting].[dbo].[paspul_locations] as l ON l.[location] = s.[location] 
+			ORDER BY l.[location] asc
+			 "));
+		// dd($data);
+		return view('planner.paspul_table', compact('data','id'));
+	}
+
+	public function paspul_stock_log () {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * 
+			FROM [cutting].[dbo].[paspul_stock_logs]
+			WHERE [created_at] > DATEADD(day,-30,GETDATE()) 
+			ORDER BY [created_at] desc"));
+		// dd($data);
+		return view('planner.paspul_table_log', compact('data'));
+	}
+
+	public function paspul_change_log_q ($id) {
+		// dd($id);
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * 
+			FROM paspul_stock_logs
+			WHERE id = '".$id."' "));
+
+		return view('planner.paspul_change_log_q', compact('id','data'));
+	}
+
+	public function paspul_change_log_q_post(Request $request) {
+		$this->validate($request, ['id' => 'required']);
+		$input = $request->all(); 
+		// dd($input);
+
+		// $data_log = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+		// 	FROM paspul_stock_logs
+		// 	WHERE id = '".$input['id']."' "));
+		// dd($data_log);
+		$data_log = paspul_stock_log::findOrFail($input['id']);
+		// dd($data_log);
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+			FROM paspul_stocks
+			WHERE pas_key = '".$data_log->pas_key."' and location = '".$data_log->location_from."' "));
+		// dd($data);
+
+		if (isset($data[0]->id)) {
+			// Exist on location
+
+			$pa1 = paspul_stock::findOrFail($data[0]->id);
+			$pa1->kotur_qty = $pa1->kotur_qty + $data_log->kotur_qty;
+			$pa1->save();
+
+		} else {
+			// NOT Exist on location
+
+			$table_stock = new paspul_stock;
+
+			$table_stock->skeda = $data_log->skeda;
+			$table_stock->paspul_type = $data_log->paspul_type;
+			$table_stock->dye_lot = $data_log->dye_lot;
+			$table_stock->kotur_length = $data_log->kotur_length;
+
+			$table_stock->pas_key = $data_log->pas_key;
+			$table_stock->pas_key_e = $data_log->pas_key_e;
+
+			$table_stock->location = $data_log->location_from;
+			$table_stock->pas_key_location = $data_log->pas_key.'_'.$data_log->location_from;
+
+			$table_stock->kotur_qty = $data_log->kotur_qty;
+			$table_stock->kotur_width = $data_log->kotur_width;
+			$table_stock->uom = $data_log->uom;
+			$table_stock->material = $data_log->material;
+			$table_stock->fg_color_code = $data_log->fg_color_code;
+			$table_stock->pcs_kotur = $data_log->pcs_kotur;
+
+			$table_stock->save();
+		}
+
+		$table_stock = new paspul_stock_log;
+		$table_stock->pas_key = $data_log->pas_key;
+		$table_stock->pas_key_e = $data_log->pas_key_e;
+		$table_stock->location_from = 'log';
+		$table_stock->location_to = $data_log->location_from;
+		$table_stock->location_type = 'return_from_log';
+		$table_stock->kotur_qty = $data_log->kotur_qty *(-1);
+		$table_stock->operator = 'planner';
+		$table_stock->shift = Auth::user()->name;
+
+		$table_stock->kotur_width = $data_log->kotur_width;
+		$table_stock->uom = $data_log->uom;
+		$table_stock->material = $data_log->material;
+		$table_stock->fg_color_code = $data_log->fg_color_code;
+		
+		$table_stock->skeda = $data_log->skeda;
+		$table_stock->paspul_type = $data_log->paspul_type;
+		$table_stock->dye_lot = $data_log->dye_lot;
+		$table_stock->kotur_length = $data_log->kotur_length;
+
+		$table_stock->returned_from = $data_log->returned_from;
+		$table_stock->pcs_kotur = $data_log->pcs_kotur;
+
+		$table_stock->save();
+
+		return Redirect::to('paspul_stock');
+	}
+
+	public function paspul_delete_line($id){
+		// dd($id);
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM paspul_stocks
+			WHERE [id] = '".$id."' "));
+		// dd($data);
+
+		return view('planner.paspul_delete_line', compact('data'));
+	}
+
+	public function paspul_delete_line_confirm(Request $request) {
+
+		$input = $request->all(); 
+		// dd($input);
+
+		$id = $input['id'];
+		// dd($id);
+
+		$pa_old = paspul_stock::findOrFail($id);
+		// dd($pa_old);
+		$pa_old->delete();
+				
+		$table_stock = new paspul_stock_log;
+		$table_stock->pas_key = $pa_old->pas_key;
+		$table_stock->pas_key_e = $pa_old->pas_key_e;
+		$table_stock->location_from = $pa_old->location;
+		$table_stock->location_to = 'DELETED';
+		$table_stock->location_type = 'delete';
+		$table_stock->kotur_qty = (int)$pa_old->qty;
+		$table_stock->operator = Auth::user()->name;
+		$table_stock->shift = Auth::user()->name;
+
+		$table_stock->kotur_width = $pa_old->kotur_width;
+		$table_stock->uom = $pa_old->uom;
+		$table_stock->material = $pa_old->material;
+		$table_stock->fg_color_code = $pa_old->fg_color_code;
+
+		$table_stock->skeda = $pa_old->skeda;
+		$table_stock->paspul_type = $pa_old->paspul_type;
+		$table_stock->dye_lot = $pa_old->dye_lot;
+		$table_stock->kotur_length = $pa_old->kotur_length;
+
+		$table_stock->returned_from = $pa_old->returned_from;
+		$table_stock->pcs_kotur = $pa_old->pcs_kotur;
+
+		$table_stock->save();
+
+		return Redirect::to('/paspul_stock');
+	}
+
+	public function paspul_remove_valy() {
+		// dd('test');
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT DISTINCT skeda FROM paspul_stocks
+			WHERE location = 'RECEIVED_IN_VALY'  "));
+		// dd($data);
+
+		$location_from = 'RECEIVED_IN_VALY';
+
+		return view('planner.paspul_remove_valy', compact('location_from','data'));
+	}
+
+	public function paspul_remove_valy_skeda(Request $request) {
+		$this->validate($request, ['skeda' => 'required']);
+		$input = $request->all(); 
+		// dd($input);
+
+		$skeda = $input['skeda'];
+		$location_from = $input['location_from'];
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM paspul_stocks
+			WHERE [location] = 'RECEIVED_IN_VALY' and [skeda] = '".$skeda."' "));
+		// dd($data);
+
+		return view('planner.paspul_remove_valy_confirm', compact('location_from','data','skeda'));	
+	}
+
+	public function paspul_remove_valy_remove(Request $request) {
+		$this->validate($request, ['skeda' => 'required']);
+		$input = $request->all(); 
+		// dd($input);
+
+		$skeda = $input['skeda'];
+		$location_from = $input['location_from'];
+
+		$op = 'planner';
+		// dd($op);
+
+		$pa_old = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM paspul_stocks
+			WHERE [location] = 'RECEIVED_IN_VALY' and [skeda] = '".$skeda."' "));
+		// dd($pa_old[0]);
+
+		for ($i=0; $i < count($pa_old); $i++) { 
+
+			// dd($pa_old[$i]->id);
+
+			// $pa_old = paspul_stock::findOrFail($pa_old[$i]->id);
+			// dd($pa_old);
+			// $pa_old->delete();
+
+			$paspul_stock_log = new paspul_stock_log;
+			$paspul_stock_log->pas_key = $pa_old[$i]->pas_key;
+			$paspul_stock_log->pas_key_e = $pa_old[$i]->pas_key_e;
+			$paspul_stock_log->location_from = $location_from;
+			$paspul_stock_log->location_to = 'REMOVED_VALY';
+			$paspul_stock_log->location_type = 'delete';
+			$paspul_stock_log->kotur_qty = $pa_old[$i]->kotur_qty;
+			$paspul_stock_log->operator = $op;
+			$paspul_stock_log->shift = Auth::user()->name;
+
+			$paspul_stock_log->kotur_width = $pa_old[$i]->kotur_width;
+			$paspul_stock_log->uom = $pa_old[$i]->uom;
+			$paspul_stock_log->material = $pa_old[$i]->material;
+			$paspul_stock_log->fg_color_code = $pa_old[$i]->fg_color_code;
+
+			$paspul_stock_log->skeda = $pa_old[$i]->skeda;
+			$paspul_stock_log->paspul_type = $pa_old[$i]->paspul_type;
+			$paspul_stock_log->dye_lot = $pa_old[$i]->dye_lot;
+			$paspul_stock_log->kotur_length = $pa_old[$i]->kotur_length;
+
+			$paspul_stock_log->returned_from = $pa_old[$i]->returned_from;
+			$paspul_stock_log->pcs_kotur = $pa_old[$i]->pcs_kotur;
+
+			$paspul_stock_log->save();
+
+
+			$remove = paspul_stock::where('id',$pa_old[$i]->id)->delete();
+				
+		}
+
+		return Redirect::to('/');
+	}
+
+	public function paspul_stock_check_fg_color_post() {
+
+		$data = DB::connection('sqlsrv')->update(DB::raw("update [paspul_stocks]
+		set [paspul_stocks].[fg_color_code] = SUBSTRING([pro_skedas].[sku],9,5)
+		from [paspul_stocks] 
+		JOIN [pro_skedas] ON [paspul_stocks].[skeda] = [pro_skedas].[skeda]
+		where [paspul_stocks].[fg_color_code] is null "));
+
+		return redirect('/paspul_stock');
+	}
+
+	public function paspul_stock_update_pc_kotur_post() {
+
+		$data = DB::connection('sqlsrv')->update(DB::raw("
+		
+	  	update [paspul_stocks] 
+		set [paspul_stocks].[pcs_kotur] = round([paspul_stocks].[kotur_length] / [paspul_stock_u_cons].[mtr_per_pcs],0,1)
+		from [paspul_stocks] 
+		JOIN [paspul_stock_u_cons] ON [paspul_stocks].[skeda] = [paspul_stock_u_cons].[skeda] AND [paspul_stocks].[paspul_type] = [paspul_stock_u_cons].[paspul_type]
+		WHERE [paspul_stocks].[uom] = 'meter'
+		
+		update [paspul_stocks] 
+		set [paspul_stocks].[pcs_kotur] = round([paspul_stocks].[kotur_length] * [paspul_stock_u_cons].[mtr_per_pcs],0,1)
+		from [paspul_stocks] 
+		JOIN [paspul_stock_u_cons] ON [paspul_stocks].[skeda] = [paspul_stock_u_cons].[skeda] AND [paspul_stocks].[paspul_type] = [paspul_stock_u_cons].[paspul_type]
+		WHERE [paspul_stocks].[uom] = 'ploce'"));
+
+		$data = DB::connection('sqlsrv')->update(DB::raw("
+
+	  	update [paspul_stock_logs] 
+		set [paspul_stock_logs].[pcs_kotur] = round([paspul_stock_logs].[kotur_length] / [paspul_stock_u_cons].[mtr_per_pcs],0,1)
+		from [paspul_stock_logs] 
+		JOIN [paspul_stock_u_cons] ON [paspul_stock_logs].[skeda] = [paspul_stock_u_cons].[skeda] AND [paspul_stock_logs].[paspul_type] = [paspul_stock_u_cons].[paspul_type]
+		WHERE [paspul_stock_logs].[uom] = 'meter'
+		
+	  	update [paspul_stock_logs] 
+		set [paspul_stock_logs].[pcs_kotur] = round([paspul_stock_logs].[kotur_length] * [paspul_stock_u_cons].[mtr_per_pcs],0,1)
+		from [paspul_stock_logs] 
+		JOIN [paspul_stock_u_cons] ON [paspul_stock_logs].[skeda] = [paspul_stock_u_cons].[skeda] AND [paspul_stock_logs].[paspul_type] = [paspul_stock_u_cons].[paspul_type]
+		WHERE [paspul_stock_logs].[uom] = 'ploce'"));
+
+
+		return redirect('/paspul_stock');
 	}
 
 //PRINTING
@@ -4491,6 +5272,7 @@ class plannerController extends Controller {
 		      ,m2.[comment_office]
 		      ,m2.[overlapping]
 		      ,m2.[tpp_mat_keep_wastage]
+		      ,m2.[tpa_number]
 		      --,'|'
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
@@ -4529,9 +5311,10 @@ class plannerController extends Controller {
 		$overlapping = $data[0]->overlapping;
 
 		$tpp_mat_keep_wastage = $data[0]->tpp_mat_keep_wastage;
+		$tpa_number = $data[0]->tpa_number;
 
 		if ($tpp_mat_keep_wastage == 1) {
-			$tpp_mat_keep_wastage = "YES";
+			$tpp_mat_keep_wastage = "YES"."-".$tpa_number;
 		} else {
 			$tpp_mat_keep_wastage = "NO";
 		}
@@ -4875,6 +5658,7 @@ class plannerController extends Controller {
 		      ,m2.[comment_office]
 		      ,m2.[overlapping]
 		      ,m2.[tpp_mat_keep_wastage]
+		      ,m2.[tpa_number]
 		      ,m2.[printed_nalog]
 		      ,m2.[layer_limit]
 		      --,'|'
@@ -4917,9 +5701,10 @@ class plannerController extends Controller {
 		$layer_limit = $data[0]->layer_limit;
 
 		$tpp_mat_keep_wastage = $data[0]->tpp_mat_keep_wastage;
+		$tpa_number = $data[0]->tpa_number;
 
 		if ($tpp_mat_keep_wastage == 1) {
-			$tpp_mat_keep_wastage = "YES";
+			$tpp_mat_keep_wastage = "YES"."-".$tpa_number;
 		} else {
 			$tpp_mat_keep_wastage = "NO";
 		}
@@ -5169,9 +5954,10 @@ class plannerController extends Controller {
 				$overlapping = $data[0]->overlapping;
 
 				$tpp_mat_keep_wastage = $data[0]->tpp_mat_keep_wastage;
+				$tpa_number = $data[0]->tpa_number;
 
 				if ($tpp_mat_keep_wastage == 1) {
-					$tpp_mat_keep_wastage = "YES";
+					$tpp_mat_keep_wastage = "YES"."-".$tpa_number;
 				} else {
 					$tpp_mat_keep_wastage = "NO";
 				}
@@ -6291,6 +7077,233 @@ class plannerController extends Controller {
 		}
 
 		return view('planner.recap_by_skeda_paspul_post', compact('data','skeda'));	
+	}
+
+	public function recap_by_g_bin_mattress(){
+
+		return view('planner.recap_by_g_bin_mattress');
+	}
+
+	public function recap_by_g_bin_mattress_post(Request $request) {
+
+		$this->validate($request, ['g_bin'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+		
+		$g_bin = trim($input['g_bin']);
+		// dd($g_bin);
+
+		$data = DB::connection('sqlsrv')->select(DB::raw(" SELECT 
+			   m2.[position]
+			  ,m1.[id]
+		      ,m1.[mattress]
+		      ,m1.[g_bin]
+		      ,m1.[material]
+		      ,m1.[dye_lot]
+		      ,m1.[color_desc]
+		      ,m1.[width_theor_usable]
+		      ,m1.[skeda]
+		      ,m1.[skeda_item_type]
+		      ,m1.[skeda_status]
+		      ,m1.[spreading_method]
+		      ,m1.[created_at]
+		      ,m1.[updated_at]
+		      --,'|'
+		      ,m2.[layers]
+		      ,m2.[layers_a]
+		      ,m2.[length_mattress]
+		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
+		      ,m2.[extra]
+		      ,m2.[pcs_bundle]
+		      ,m2.[layers_partial]
+		      ,m2.[position]
+		      ,m2.[priority]
+		      ,m2.[call_shift_manager]
+		      ,m2.[test_marker]
+		      ,m2.[tpp_mat_keep_wastage]
+		      ,m2.[printed_marker]
+		      ,m2.[mattress_packed]
+		      ,m2.[all_pro_for_main_plant]
+		      ,m2.[bottom_paper]
+		      ,m2.[layers_a_reasons]
+		      ,m2.[comment_office]
+		      ,m2.[comment_operator]
+		      ,m2.[minimattress_code]
+		      ,m2.[printed_nalog]
+		      ,m2.[layer_limit]
+		      ,m2.[overlapping]
+		      --,'|'
+		      ,m3.[marker_id]
+		      ,m3.[marker_name]
+		      ,m3.[marker_name_orig]
+		      ,m3.[marker_length]
+		      ,m3.[marker_width]
+		      ,m3.[min_length]
+		      --,'|'
+		      ,m4.[status]
+		      ,m4.[location]
+		      ,m4.[device]
+		      ,m4.[active]
+		      ,m4.[operator1]
+		      ,m4.[operator2]
+		      --,'|'
+		      -- ,m5.[style_size]
+		      -- ,m5.[pro_id]
+		      -- ,m5.[pro_pcs_layer]
+		      -- ,m5.[pro_pcs_planned]
+		      -- ,m5.[pro_pcs_actual]
+		      ,ms.[g_bin_orig]
+		      
+		  FROM [mattresses] as m1
+		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
+		  LEFT JOIN [mattress_split_requests] as ms ON ms.[mattress_id_new] = m1.[id]
+		  WHERE m1.[g_bin] like '".$g_bin."%' AND m4.active = '1' 
+		  ORDER BY m1.id asc"));
+		// dd($data);
+		
+	
+		$pros= '';
+		$skus= '';
+		$sku_s= '';
+		$location_all= '';
+		for ($i=0; $i < count($data) ; $i++) { 
+		
+			$id = $data[$i]->id;
+			// dd($id);
+
+			if (($data[$i]->skeda_item_type == 'MS') OR ($data[$i]->skeda_item_type == 'MM')) {
+				
+				$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					ps.[pro]
+					,ps.[style_size]
+					,ps.[sku]
+					,po.[location_all]
+					--,*
+				  FROM [mattress_pros] as mp
+				  JOIN [pro_skedas] as ps ON ps.[pro_id] = mp.[pro_id]
+				  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+				WHERE mp.[mattress_id] = '".$id."' "));
+				
+				for ($x=0; $x < count($prom); $x++) { 
+
+					$pros .= $prom[$x]->pro." ";
+					$skus .= $prom[$x]->style_size." ";
+					$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+					$sku_s .= $test." ";
+					// $sku_s .= $prom[$x]->sku." ";
+					if ($prom[$x]->location_all == 'Valy') {
+						$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+					} else {
+						$location_all .= $prom[$x]->location_all." ";
+					}
+				}
+
+				$data[$i]->pro = trim($pros);
+				$data[$i]->style_size = trim($skus);
+				$data[$i]->sku = trim($sku_s);
+				$data[$i]->location_all = trim($location_all);
+				$pros = '';
+				$skus = '';
+				$sku_s = '';
+				$location_all = '';
+
+			} else {
+
+				$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					ps.pro
+					,ps.style_size
+					,ps.sku
+					,po.[location_all]
+					--,*
+				  FROM  [pro_skedas] as ps 
+				  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+				WHERE ps.[skeda] = '".$data[$i]->skeda."' "));
+				// dd($prom);
+
+				for ($x=0; $x < count($prom); $x++) { 
+
+					$pros .= $prom[$x]->pro." ";
+					$skus .= $prom[$x]->style_size." ";
+					$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+					$sku_s .= $test." ";
+					// $sku_s .= $prom[$x]->sku." ";
+					if ($prom[$x]->location_all == 'Valy') {
+						$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+					} else {
+						$location_all .= $prom[$x]->location_all." ";
+					}
+				}
+
+				$data[$i]->pro = trim($pros);
+				$data[$i]->style_size = trim($skus);
+				$data[$i]->sku = trim($sku_s);
+				$data[$i]->location_all = trim($location_all);
+				$pros = '';
+				$skus = '';
+				$sku_s = '';
+				$location_all = '';
+			}
+		}
+
+		return view('planner.recap_by_g_bin_mattress_post', compact('data','g_bin'));
+	}
+
+	public function paspul_locations() {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+				  FROM [paspul_locations] ORDER BY plant, type, location asc"));
+		// dd($data);
+		return view('planner.paspul_locations', compact('data'));
+	}
+
+	public function paspul_location_new(){
+
+		return view('planner.paspul_location_new');
+	}
+
+	public function paspul_location_new_post (Request $request) {
+
+		$this->validate($request, ['location'=>'required','type'=>'required','plant'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+		
+		$location = strtoupper(trim($input['location']));
+		$type = $input['type'];
+		$plant = $input['plant'];
+
+		$table_p = new paspul_location;
+
+		$table_p->location = $location;
+		$table_p->type = $type;
+		$table_p->plant = $plant;
+		$table_p->save();
+
+		return redirect('/paspul_locations');
+	}
+
+	public function paspul_location_edit ($id) {
+		
+		$location = paspul_location::findOrFail($id);		
+		return view('planner.paspul_location_edit', compact('location'));
+	}
+
+	public function paspul_location_edit_post(Request $request) {
+
+		$this->validate($request, ['location'=>'required','type'=>'required','plant'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+
+		$table = paspul_location::findOrFail($input['id']);		
+		$table->location = $input['location'];
+		$table->type = $input['type'];
+		$table->plant = $input['plant'];
+		$table->save();
+		
+		return Redirect::to('/paspul_locations');
 	}
 
 }

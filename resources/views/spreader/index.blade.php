@@ -79,6 +79,7 @@
 		                            <th >Extra [cm]</th>
 		                            <th >Mattress Width [cm]</th>
 		                            <th >Layers</th>
+		                            <th >Req. time [min]</th>
 		                            <!-- <th >Layers in last shift</th> -->
 		                            <th >PRO</th>
 		                            <th >Destination</th>
@@ -86,7 +87,7 @@
 		                            <th >Material</th>
 		                            <th >Dye Lot</th>
 		                            <th >Color Desc</th>
-		                            <th >Planned Cons [m]</th>
+		                            <th >Actual Cons [m]</th>
 		                            <th >Spreading Method</th>
 		                            <th >Pcs per Bundle</th>
 		                            <th >Bottom Paper</th>
@@ -138,6 +139,7 @@
 		                            	<td>{{ round($req->marker_width,3)}}</td>
 		                            @endif
 		                            <td>{{ round($req->layers_a,0)}}</td>
+		                            <td>{{ round($req->req_time,2)}}</td>
 		                            <!-- <td></td> -->
 		                            <td style="width: 75px;">{{ $req->pro}}</td>
 		                            <td style="width: 60px;">{{ $req->location_all}}</td>
@@ -145,7 +147,7 @@
 		                            <td>{{ $req->material}}</td>
 		                            <td>{{ $req->dye_lot}}</td>
 		                            <td>{{ $req->color_desc}}</td>
-		                            <td>{{ round($req->cons_planned,3)}}</td>
+		                            <td>{{ round($req->cons_actual,3)}}</td>
 		                            <td style="width: 50px;">{{ $req->spreading_method}}</td>
 		                            <td >{{ round($req->pcs_bundle,0)}}</td>
 			                        <td>{{ $req->bottom_paper}}</td>
@@ -162,7 +164,7 @@
 						        	</td>
 		                            <td>{{ $req->status}}</td>
 		                            @if ($req->tpp_mat_keep_wastage == 1)
-		                            	<td>YES</td>
+		                            	<td>YES - {{$req->tpa_number}}</td>
 		                            @else
 		                            	<td>NO</td>
 		                            @endif

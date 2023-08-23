@@ -7,7 +7,6 @@
 			<div class="panel panel-default">
 				<div class="panel-heading"><b>Edit marker</b></div>
 				
-				
 					{!! Form::open(['url' => 'marker_edit_confirm']) !!}
 						
 						{!! Form::hidden('id', $data->id, ['class' => 'form-control']) !!}
@@ -16,18 +15,38 @@
 						<p>Status:<span style="color:red;">*</span></p>
 	               		{!! Form::select('status', array('ACTIVE'=>'ACTIVE', 'NOT ACTIVE' => 'NOT ACTIVE'), $data->status, array('class' => 'form-control', 'autofocus' => 'autofocus')) !!} 
 					</div>
+
+					<div class="panel-body">
+                        <p>Marker length:</p>
+                    	{!! Form::number('marker_length', round($data->marker_length,3) , ['class' => 'form-control', 'step'=>'0.001']) !!}
+                    </div>
+
+                    <div class="panel-body">
+                        <p>Efficiency:</p>
+                    	{!! Form::number('efficiency', round($data->efficiency,2) , ['class' => 'form-control', 'step'=>'0.01']) !!}
+                    </div>
 					
+					<div class="panel-body">
+                        <p>Cutting perimeter:</p>
+                    	{!! Form::number('cutting_perimeter', round($data->cutting_perimeter,2) , ['class' => 'form-control', 'step'=>'0.01']) !!}
+                    </div>
+
+                    <div class="panel-body">
+                        <p>Perimeter:</p>
+                    	{!! Form::number('perimeter', round($data->perimeter,2) , ['class' => 'form-control', 'step'=>'0.01']) !!}
+                    </div>
+
+                    <div class="panel-body">
+                        <p>Average Consumption:</p>
+                    	{!! Form::number('average_consumption', round($data->average_consumption,3) , ['class' => 'form-control', 'step'=>'0.001']) !!}
+                    </div>
+
 					<div class="panel-body">
 						{!! Form::submit('Save', ['class' => 'btn btn-success btn-lg center-block']) !!}
 					</div>
-
 					@include('errors.list')
-
 					{!! Form::close() !!}
-
-				
 				<br>
-				
 			</div>
 		</div>
 	</div>

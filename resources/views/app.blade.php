@@ -16,6 +16,7 @@
 	<link href="{{ asset('/css/choosen.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/bootstrap.min.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/bootstrap-table.css') }}" rel='stylesheet' type='text/css'>
+	<!-- <link rel="manifest" href="{{ asset('/css/manifest.json') }}"> -->
 	
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -120,7 +121,7 @@
 									<li role="separator" class="divider"></li>
 									<li><a href="{{ url('paspul_bin') }}">Paspul bin (excel)</a></li>
 									<li role="separator" class="divider"></li>
-									<li><a href="{{ url('consumption_sap') }}">Consumption SAP (excel)</a></li>
+									<li><a href="{{ url('consumption_sap') }}">Consumption SAP</a></li>
 								</ul>
 							</li>
 							<li><a href="{{ url('import') }}">Import</a></li>
@@ -129,6 +130,7 @@
 							<li><a href="{{ url('plan_mattress/BOARD') }}"><b><sapn style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;">Plan mattress</span></b></a></li>
 							<li><a href="{{ url('plan_mini_marker') }}"><b><sapn style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;">Plan mini-mattress</span></b></a></li>
 							<li><a href="{{ url('plan_paspul/NOT_SET') }}"><b><sapn style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;">Plan paspul</span></b></a></li>
+							<li><a href="{{ url('papsul_stock') }}"><b><sapn style="color: white;">Paspul stock</span></b></a></li>
 						</ul>
 					@endif
 
@@ -178,8 +180,9 @@
 									<li><a href="{{ url('mattress') }}">Mattress (excel)</a></li>
 									<li role="separator" class="divider"></li>
 									<li><a href="{{ url('paspul_bin') }}">Paspul bin (excel)</a></li>
+									<li><a href="{{ url('paspul_locations') }}">Paspul locations</a></li>
 									<li role="separator" class="divider"></li>
-									<li><a href="{{ url('consumption_sap') }}">Consumption SAP (excel)</a></li>
+									<li><a href="{{ url('consumption_sap') }}">Consumption SAP</a></li>
 								</ul>
 							</li>
 							<li><a href="{{ url('import') }}">Import</a></li>
@@ -188,11 +191,30 @@
 							<li><a href="{{ url('plan_mattress/BOARD') }}"><b><sapn style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;">Plan mattress</span></b></a></li>
 							<li><a href="{{ url('plan_mini_marker') }}"><b><sapn style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;">Plan mini-mattress</span></b></a></li>
 							<li><a href="{{ url('plan_paspul/NOT_SET') }}"><b><sapn style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;">Plan paspul</span></b></a></li>
+							
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Paspul stock<span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="{{ url('paspul_stock') }}"><b><sapn style="">Paspul stock</span></b></a></li>
+									<li><a href="{{ url('paspul_stock_log') }}"><b><sapn style="c">Paspul stock log</span></b></a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('paspul_remove_valy') }}"><b><sapn style="color: blue;">Remove RECEIVED_IN_VALY</span></b></a></li>
+								</ul>
+							</li>
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Search<span class="caret"></span></a>
 								<ul class="dropdown-menu" role="menu">
-										<li><a href="{{ url('recap_by_skeda_mattress') }}"><b><sapn style="color: gray">Mattresses by skeda</span></b></a></li>
-										<li><a href="{{ url('recap_by_skeda_paspul') }}"><b><sapn style="color: blue;">Paspuls by skeda</span></b></a></li>
+									<li><a href="{{ url('recap_by_skeda_mattress') }}"><b><sapn style="color: gray">Mattresses by skeda</span></b></a></li>
+									<li><a href="{{ url('recap_by_g_bin_mattress') }}"><b><sapn style="color: orange">Mattresses by g_bin</span></b></a></li>
+									<li><a href="{{ url('recap_by_skeda_paspul') }}"><b><sapn style="color: blue;">Paspuls by skeda</span></b></a></li>
+								</ul>
+							</li>
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Phase adv<span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="{{ url('cutting_xml') }}"><b><sapn style="color: gray">Cutting XML</span></b></a></li>
+									<li><a href="{{ url('cutting_bansek_xml') }}"><b><sapn style="color: orange">Bansek XML</span></b></a></li>
+									<li><a href="{{ url('cutting_bansek_errors') }}"><b><sapn style="color: red">Bansek XML - errors</span></b></a></li>
 								</ul>
 							</li>
 							
@@ -268,7 +290,6 @@
 	                            <a href="{{ url('operator_logout')}}" class="btn btn-danger">Logout</a>
                         	</form>
                             @endif
-                        	
                         </li>
                         <li>
 							
@@ -290,7 +311,6 @@
 	                            <a href="{{ url('operator_logout2')}}" class="btn btn-danger">Logout</a>
                         	</form>
                             @endif
-
                         </li>
 
 						@else
@@ -310,7 +330,6 @@
 	                        </div>
 	                        </li>
 	                        @endif
-
 	                    @endif
 
 						</ul>
@@ -321,7 +340,6 @@
 							<!-- <li><a href="{{ url('#') }}">MM test</a></li> -->
 
 						@if (isset($operators))
-
 						<li>
 							@if (!isset($operator))
 							<form class="form-inline" style="width:400px; padding: 8px;" name="1" action="{{ url('operator_login') }}" method="get" >
@@ -381,8 +399,6 @@
 	                        </div>
 	                        </li>
 	                        @endif
-
-
 	                    @endif
 	                    <li><a href="{{ url('/o_roll_scan') }}">Return leftover roll</a></li>
 						</ul>
@@ -609,7 +625,6 @@
 		                        @endif
 		                    @endif
 						</ul>
-
 					@endif
 
 					@if(Auth::user()->level() == 18)
@@ -684,6 +699,49 @@
 		                        @endif
 
 		                    @endif
+						</ul>
+					@endif
+
+					@if(Auth::user()->level() == 22)
+						<ul class="nav navbar-nav">
+							<li><a href="{{ url('req_lost') }}">Request for LOST BB</a></li>
+							
+						</ul>
+					@endif
+
+					@if(Auth::user()->level() == 23)
+						<ul class="nav navbar-nav">
+							<li><a href="{{ url('paspul_locations') }}">Paspul locations</a></li>
+							<li><a href="{{ url('import') }}">Import paspul</a></li>
+							<li><a href="{{ url('paspul_table_log/Subotica') }}">Paspul log table</a></li>
+							<li><a href="{{ url('search_u_cons') }}">Paspul unitary consumption table</a></li>
+							
+						</ul>
+					@endif
+					@if(Auth::user()->level() == 24)
+						<ul class="nav navbar-nav">
+							<li><a href="{{ url('paspul_locations') }}">Paspul locations</a></li>
+							<li><a href="{{ url('import') }}">Import paspul</a></li>
+							<li><a href="{{ url('paspul_table_log/Kikinda') }}">Paspul log table</a></li>
+							<li><a href="{{ url('search_u_cons') }}">Paspul unitary consumption table</a></li>
+							
+						</ul>
+					@endif
+
+					@if(Auth::user()->level() == 25)
+						<ul class="nav navbar-nav">
+							<li><a href="{{ url('paspul_locations') }}">Paspul locations</a></li>
+							<li><a href="{{ url('import') }}">Import paspul</a></li>
+							<li><a href="{{ url('paspul_table_log/Senta') }}">Paspul log table</a></li>
+							<li><a href="{{ url('search_u_cons') }}">Paspul unitary consumption table</a></li>
+							
+						</ul>
+					@endif
+
+					@if(Auth::user()->level() == 26)
+						<ul class="nav navbar-nav">
+							<li><a href="{{ url('paspul_table_log/WHSU') }}">Paspul log table</a></li>
+							
 						</ul>
 					@endif
 

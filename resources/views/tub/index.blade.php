@@ -70,7 +70,7 @@
 		                            <th >Material</th>
 		                            <th >Dye Lot</th>
 		                            <th >Color Desc</th>
-		                            <th >Planned Cons [kg]</th>
+		                            <th >Actual Cons [kg]</th>
 		                            <th >Spreading Method</th>
 		                            <th >Pcs per Bundle</th>
 		                            <th >Bottom Paper</th>
@@ -129,7 +129,7 @@
 		                            <td>{{ $req->material}}</td>
 		                            <td>{{ $req->dye_lot}}</td>
 		                            <td>{{ $req->color_desc}}</td>
-		                            <td>{{ round($req->cons_planned,3)}}</td>
+		                            <td>{{ round($req->cons_actual,3)}}</td>
 		                            <td style="width: 50px;">{{ $req->spreading_method}}</td>
 		                            <td >{{ round($req->pcs_bundle,0)}}</td>
 			                        <td>{{ $req->bottom_paper}}</td>

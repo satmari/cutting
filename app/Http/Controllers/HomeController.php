@@ -119,14 +119,16 @@ class HomeController extends Controller {
 			    // if user has at least one role
 			    // dd("PRW");
 			    // $msg = "Hi MS";
-			  	return redirect('/prw');
+			  	// return redirect('/prw');
+			  	return redirect('/prw1');
 		 	}
 
 		 	if ($user->is('PCO')) { 
 			    // if user has at least one role
 			    // dd("PCO");
 			    // $msg = "Hi MS";
-			  	return redirect('/pco');
+			  	// return redirect('/pco');
+			  	return redirect('/pco1');
 		 	}
 
 		 	if ($user->is('PACK')) { 
@@ -153,8 +155,33 @@ class HomeController extends Controller {
 		 	if ($user->is('TUB')) { 
 			    // if user has at least one role
 			    // dd("TUB");
-			    $msg = "Hi TUB";
+			    // $msg = "Hi TUB";
 			  	return redirect('/tub');
+		 	}
+
+		 	if ($user->is('K-PREP')) { 
+			    // if user has at least one role
+			    return redirect('/req_lost');
+		 	}
+
+		 	if ($user->is('PSS')) { 
+			    // if user has at least one role
+			    return redirect('/pss');
+		 	}
+
+		 	if ($user->is('PSK')) { 
+			    // if user has at least one role
+			    return redirect('/psk');
+		 	}
+
+		 	if ($user->is('PSZ')) { 
+			    // if user has at least one role
+			    return redirect('/psz');
+		 	}
+
+		 	if ($user->is('WHS')) { 
+			    // if user has at least one role
+			    return redirect('/whs');
 		 	}
 
 		}
@@ -238,4 +265,8 @@ class HomeController extends Controller {
 		dd($final);
 	}
 
+
+	public function tombola() {
+		return view('tombola');	
+	}
 }

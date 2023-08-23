@@ -70,7 +70,7 @@
 						</th>
 						
 
-				@for ($i = 1; $i < 11; $i++)
+				@for ($i = 1; $i < 16; $i++)
 				
   						<tr>
   							<td style="width:10%; padding:10px">

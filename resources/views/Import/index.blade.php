@@ -119,6 +119,45 @@
 				</div>
 
 				@endif
+
+				@if(Auth::check() && (Auth::user()->name == 'planner' OR Auth::user()->name == 'PSS1' OR Auth::user()->name == 'PSS2' OR Auth::user()->name == 'PSS3'
+				OR Auth::user()->name == 'PSK1' OR Auth::user()->name == 'PSK2' OR Auth::user()->name == 'PSK3'
+				OR Auth::user()->name == 'PSZ1' OR Auth::user()->name == 'PSZ2' OR Auth::user()->name == 'PSZ3'))
+				<div class="panel panel-default">
+					<div class="panel-heading"><b><big>Import paspul stock</big></b> with Excel file</div>
+					<p>Note: Excel file should contian:
+					skeda,	type,	dye lot,	length,	location,	kotur qty,	uom (meter/ploce),	kotur width,	material
+					</p>
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImport_papsul_stock']]) !!}
+					
+						<div class="panel-body">
+							{!! Form::file('file8', ['class' => 'center-block']) !!}
+						</div>
+						<div class="panel-body">
+							{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
+						</div>
+						@include('errors.list')
+					{!! Form::close() !!}
+				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading"><b><big>Return paspul from line</big></b> with Excel file</div>
+					<p>Note: Excel file should contian:
+					skeda,	type,	dye lot,	length,	location, kotur qty,	uom (meter/ploce),	kotur width,	material
+					</p>
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postReturn_papsul_stock']]) !!}
+					
+						<div class="panel-body">
+							{!! Form::file('file9', ['class' => 'center-block']) !!}
+						</div>
+						<div class="panel-body">
+							{!! Form::submit('Import', ['class' => 'btn btn-danger center-block']) !!}
+						</div>
+						@include('errors.list')
+					{!! Form::close() !!}
+				</div>
+				@endif
+
 			@endif
 
 			<div class="panel panel-default">

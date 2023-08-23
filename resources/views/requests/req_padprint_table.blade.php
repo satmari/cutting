@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <div class="text-center col-md-8 col-md-offset-2">
+        <div class="text-center">
             <div class="panel panel-success">
                 <div class="panel-heading"><b><big>Pad print</big></b> table requests from lines</div>
 
@@ -15,6 +15,7 @@
                         <a href="{{url('/req_cartonbox_table/')}}" class="btn btn-warning btn-xs ">Cartonbox requests</a>
                         <a href="{{url('/req_padprint_table/')}}" class="btn btn-success btn-xs ">Padprint requests</a>
                         <a href="{{url('/req_cut_part_table/')}}" class="btn btn-default btn-xs ">Cut part requests</a>
+                        <a href="{{url('/req_lost_table/')}}" class="btn btn-default btn-xs ">LostBB requests</a>
                     </p>
                     History of last 30 days
                     <p><a href="{{url('/req_padprint_table/')}}" class="btn btn-xs ">Back</a></p>
@@ -26,6 +27,7 @@
                         <a href="{{url('/req_cartonbox_table/')}}" class="btn btn-warning btn-xs ">Cartonbox requests</a>
                         <a href="{{url('/req_padprint_table/')}}" class="btn btn-success btn-xs ">Padprint requests</a>
                         <a href="{{url('/req_cut_part_table/')}}" class="btn btn-default btn-xs ">Cut part requests</a>
+                        <a href="{{url('/req_lost_table/')}}" class="btn btn-default btn-xs ">LostBB requests</a>
                     </p>
                     <a href="{{url('/req_padprint_table_history/')}}" class="btn btn-danger btn-xs ">History</a>
                 @endif

@@ -44,6 +44,11 @@
 					@endif
 
 					<div class="panel-body">
+						<p>How many times you cut roll because of material problem:</p>
+	               		{!! Form::input('number', 'num_of_cut_problems', 0, ['class' => 'form-control']) !!}
+					</div>
+
+					<div class="panel-body">
 						<p>Comment operator:</p>
 	               		{!! Form::textarea('comment_operator', $comment_operator , ['class' => 'form-control', 'rows' => 2]) !!}
 					</div>

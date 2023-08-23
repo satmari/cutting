@@ -37,7 +37,7 @@ class markerController extends Controller {
 		// // $date_before = date('Y-m-d H:i:s', strtotime(' -1 day'));
 		// dd($date_before);
 
-		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM marker_headers"));
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT id,marker_name,marker_width,marker_length,cutting_perimeter,perimeter,average_consumption,efficiency,status  FROM marker_headers where [status] = 'ACTIVE'"));
 		return view('marker.table',compact('data'));
 	}
 
@@ -236,6 +236,11 @@ class markerController extends Controller {
 
 		$id =  $input['id'];
 		$status =  $input['status'];
+		$marker_length =  round($input['marker_length'],3);
+		$efficiency =  round($input['efficiency'],2);
+		$cutting_perimeter =  round($input['cutting_perimeter'],2);
+		$perimeter =  round($input['perimeter'],2);
+		$average_consumption =  round($input['average_consumption'],3);
 
 		// dd($status);
 		$marker='';
@@ -263,12 +268,22 @@ class markerController extends Controller {
 			} else {
 				$data = marker_header::findOrFail($id);
 				$data->status = strtoupper($status);
+				$data->marker_length = $marker_length;
+				$data->efficiency = $efficiency;
+				$data->cutting_perimeter = $cutting_perimeter;
+				$data->perimeter = $perimeter;
+				$data->average_consumption = $average_consumption;
 				$data->save();
 			}
 
 		} else {
 			$data = marker_header::findOrFail($id);
 			$data->status = strtoupper($status);
+			$data->marker_length = $marker_length;
+			$data->efficiency = $efficiency;
+			$data->cutting_perimeter = $cutting_perimeter;
+			$data->perimeter = $perimeter;
+			$data->average_consumption = $average_consumption;
 			$data->save();
 		}
 

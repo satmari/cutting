@@ -2,7 +2,7 @@
 
 @section('content')
 
-{{ header( "refresh:60;url=/cutting" ) }}
+{{ header( "refresh:600;url=/cutting" ) }}
 <div class="container-fluid">
     <div class="row">
         <div class="text-center">

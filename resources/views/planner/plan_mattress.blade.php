@@ -412,6 +412,7 @@
 			                            <th >Mattress Width [cm]</th>
 			                            <th >Layers Planned</th>
 			                            <th >Layers Actual</th>
+			                            <th >Req. time [min]</th>
 										<th >PRO</th>
 										<th >Destination</th>
 			                            <th >SKU</th>
@@ -463,6 +464,7 @@
 				                            @endif
 				                            <td>{{ round($req->layers,0)}}</td>
 				                            <td>{{ round($req->layers_a,0)}}</td>
+				                            <td>{{ round($req->req_time,2)}}</td>
 				                            
 				                            <td style="width: 75px;">{{ $req->pro}}</td>
 				                            <td style="width: 60px;">{{ $req->location_all}}</td>

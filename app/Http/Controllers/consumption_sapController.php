@@ -29,9 +29,15 @@ class consumption_sapController extends Controller {
 	public function index()
 	{
 		//
-		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM consumption_saps"));
+		//$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM consumption_saps"));
+		$data = DB::connection('sqlsrv6')->select(DB::raw("SELECT TOP 10000 g_bin, SUM(qty*-1) as cons_real FROM [posummary].[dbo].[mb51_cons] GROUP BY g_bin  ORDER BY g_bin desc"));
+		$data1 = DB::connection('sqlsrv6')->select(DB::raw("SELECT TOP 1 * FROM [posummary].[dbo].[mb51_cons] ORDER BY created_at desc"));
+		// dd($data1);
+		
+		$last_entered_date = $data1[0]->created_at;
+
 		// dd($data);
-		return view('consumption_sap.table', compact('data'));
+		return view('consumption_sap.table', compact('data', 'last_entered_date'));
 	}
 
 	

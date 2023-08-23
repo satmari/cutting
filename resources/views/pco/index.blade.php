@@ -2,7 +2,7 @@
 
 @section('content')
 
-{{ header( "refresh:60;url=/cutting" ) }}
+{{ header( "refresh:600;url=/cutting" ) }}
 <div class="container-fluid">
     <div class="row">
         <div class="text-center">
@@ -49,11 +49,11 @@
 			                            <th >SKU</th>
 
 			                            <th >Paspul type</th>
-			                            <th >Kotur width (mm)</th>
-			                            <th >Roll min width (cm)</th>
-			                            <th >Rewound length actual</th>
+			                            <th >Kotur width [mm]</th>
+			                            <th >Roll min width [cm]</th>
+			                            <th >Rewound length actual [m]</th>
 			                            <th >Unit of measure</th>
-			                            <th >Planned kotur</th>
+			                            <th >Planned kotur [kom]</th>
 			                            
 			                            <th >Material</th>
 			                            <th >Color Desc</th>

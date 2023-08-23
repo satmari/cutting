@@ -5,7 +5,11 @@
     <div class="row">
         <div class="text-center">
             <div class="panel panel-default">
-                <div class="panel-heading">Consumption SAP</div>
+                <div class="panel-heading">Consumption SAP
+                    <p>
+                    <big><b>Last record: {{ substr($last_entered_date,0,16) }}</b></big>
+                    </p>
+                </div>
               
                 <div class="input-group"> <span class="input-group-addon">Filter</span>
                     <input id="filter" type="text" class="form-control" placeholder="Type here...">

@@ -12,12 +12,14 @@
                 </div>
 
                 <table class="table table-striped table-bordered" id="sort" 
-                data-export-types="['excel']"
-                data-show-export="true"
+                
                 
                 >
                 <!--
-                
+                data-export-types="['excel']"
+                data-show-export="true"
+                data-pagination="true"
+                data-height="300"
                 data-export-types="['excel']"
                 data-search="true"
                 data-show-refresh="true"
@@ -44,29 +46,28 @@
                             <th><b>Marker name</b></th>
                             <th><b>Width</b></th>
                             <th><b>Lenght</b></th>
-                            <th><b>Type</b></th>
-                            <th><b>Code</b></th>
-                            <th><b>F Code</b></th>
-                            <th><b>Constraint</b></th>
-                            <th><b>Spacing</b></th>
-                            <th><b>Top</b></th>
-                            <th><b>Bottom</b></th>
-                            <th><b>Right</b></th>
-                            <th><b>Left</b></th>
-                            <th><b>Proc. date</b></th>
+                            <!-- <th><b>Type</b></th>  -->
+                            <!-- <th><b>Code</b></th> -->
+                            <!-- <th><b>F Code</b></th> -->
+                            <!-- <th><b>Constraint</b></th> -->
+                            <!-- <th><b>Spacing</b></th> -->
+                            <!-- <th><b>Top</b></th> -->
+                            <!-- <th><b>Bottom</b></th> -->
+                            <!-- <th><b>Right</b></th> -->
+                            <!-- <th><b>Left</b></th> -->
+                            <!-- <th><b>Proc. date</b></th> -->
+                            <!-- <th><b>Cut perimeter</b></th> -->
+                            <!-- <th><b>Perimeter</b></th> -->
+                            <!-- <th><b>Avg. Cons</b></th> -->
+                            <!-- <th><b>Lines</b></th> -->
+                            <!-- <th><b>Curves</b></th> -->
+                            <!-- <th><b>Areas</b></th> -->
+                            <!-- <th><b>Angles</b></th> -->
+                            <!-- <th><b>Notches</b></th> -->
+                            <!-- <th><b>Tot. Pcs</b></th> -->
+                            <!-- <th><b>Key</b></th> -->
+                            <!-- <th><b>Min Len</b></th> -->
                             <th><b>Eff</b></th>
-                            <th><b>Cut per</b></th>
-                            <th><b>Per</b></th>
-                            <th><b>Avg. Cons</b></th>
-                            <th><b>Lines</b></th>
-                            <th><b>Curves</b></th>
-                            <th><b>Areas</b></th>
-                            <th><b>Angles</b></th>
-                            <th><b>Notches</b></th>
-                            <th><b>Tot. Pcs</b></th>
-                            <!-- <th><b>Var Mod</b></th> -->
-                            <th><b>Key</b></th>
-                            <th><b>Min Len</b></th>
                             <th><b>Status</b></th>
                             <th></th>
                             <th></th>
@@ -81,28 +82,10 @@
                                 <td>{{ $req->marker_name}}</td>
                                 <td>{{ round($req->marker_width,3) }}</td>
                                 <td>{{ round($req->marker_length,3)  }}</td>
-                                <td>{{ $req->marker_type }}</td>
-                                <td>{{ $req->marker_code }}</td>
-                                <td>{{ $req->fabric_type }}</td>
-                                <td>{{ $req->constraint }}</td>
-                                <td>{{ $req->spacing_around_pieces }}</td>
-                                <td>{{ $req->spacing_around_pieces_top }}</td>
-                                <td>{{ $req->spacing_around_pieces_bottom }}</td>
-                                <td>{{ $req->spacing_around_pieces_right }}</td>
-                                <td>{{ $req->spacing_around_pieces_left }}</td>
-                                <td>{{ substr($req->processing_date, 0, 10) }}</td>
+                                <!-- <td>{{-- round($req->cutting_perimeter,2)  --}}</td> -->
+                                <!-- <td>{{-- round($req->perimeter,2)  --}}</td> -->
+                                <!-- <td>{{-- round($req->average_consumption,2)  --}}</td> -->
                                 <td>{{ round($req->efficiency,2) }}</td>
-                                <td>{{ round($req->cutting_perimeter,2) }}</td>
-                                <td>{{ round($req->perimeter,2) }}</td>
-                                <td>{{ round($req->average_consumption,2) }}</td>
-                                <td>{{ round($req->lines,2)}}</td>
-                                <td>{{ round($req->curves,2)}}</td>
-                                <td>{{ round($req->areas,2)}}</td>
-                                <td>{{ round($req->angles,2)}}</td>
-                                <td>{{ round($req->notches,2)}}</td>
-                                <td>{{ round($req->total_pcs,2)}}</td>
-                                <td>{{ $req->key }}</td>
-                                <td>{{ round($req->min_length,2) }}</td>
                                 <td>{{ $req->status }}</td>
                                 <td><a href="{{ url('marker_edit/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit</a></td>
                                 <td><a href="{{ url('marker_details/'.$req->id) }}" class="btn btn-info btn-xs center-block">Details</a></td>
@@ -116,3 +99,6 @@
     </div>
 </div>
 @endsection
+
+
+

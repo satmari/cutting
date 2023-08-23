@@ -65,6 +65,41 @@ class Change extends Migration {
 		Schema::table('mattress_details', function($table)
 		{			
 			// $table->dropColumn('damaged_pcs');
+			// $table->integer('num_of_cut_problems')->nullable();
+			// $table->float('req_time')->nullable();
+
+		});
+
+		Schema::table('paspul_stocks', function($table)
+		{			
+			
+			// $table->float('kotur_width')->nullable();
+			// $table->string('uom')->nullable();
+			// $table->string('material')->nullable();
+			// $table->string('fg_color_code')->nullable();
+
+			// $table->string('returned_from')->nullable();
+
+			// $table->float('pcs_kotur')->nullable();
+
+		});
+
+		Schema::table('paspul_stock_logs', function($table)
+		{			
+			
+			// $table->float('kotur_width')->nullable();
+			// $table->string('uom')->nullable();
+			// $table->string('material')->nullable();
+			// $table->string('fg_color_code')->nullable();
+
+			// $table->string('skeda')->nullable();
+			// $table->string('paspul_type')->nullable();
+			// $table->string('dye_lot')->nullable();
+			// $table->float('kotur_length')->nullable();
+
+			// $table->string('returned_from')->nullable();
+
+			// $table->float('pcs_kotur')->nullable();
 
 		});
 

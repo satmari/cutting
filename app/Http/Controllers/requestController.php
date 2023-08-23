@@ -16,6 +16,7 @@ use App\req_cartonbox;
 use App\req_reprintbb;
 use App\req_padprint;
 use App\req_cut_part;
+use App\req_lost;
 
 use App\User;
 use Bican\Roles\Models\Role;
@@ -174,11 +175,6 @@ class requestController extends Controller {
 		$bagno = $input['bagno'];
 		$qty = (int)$input['qty'];
 
-		// $check_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT [Prod_ Order No_]
-		// FROM [Gordon_LIVE].[dbo].[GORDON\$Prod_ Order Line]
-		// WHERE [Status]= '3' and [Prod_ Order No_] like '%".$po."%' and [Variant Code] like '%".$size."%' "));
-		// dd($check_po[0]);
-
 		$check_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT DISTINCT (CASE WHEN po like '%-%' THEN substring(po, 1,6) ELSE substring (po, 4,6) END) as po, fg
 		FROM [trebovanje].[dbo].[sap_coois] WHERE po like '%".$po."%' AND substring(fg,14,5) = '".$size."' "));
 		// dd($check_po);
@@ -293,10 +289,6 @@ class requestController extends Controller {
 		$po = $input['po'];
 		$size = $input['size'];
 		
-		// $check_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT [Prod_ Order No_]
-		// FROM [Gordon_LIVE].[dbo].[GORDON\$Prod_ Order Line]
-		// WHERE [Status]= '3' and [Prod_ Order No_] like '%".$po."%' and [Variant Code] like '%".$size."%' "));
-		// // dd($check_po[0]);
 		$check_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT DISTINCT (CASE WHEN po like '%-%' THEN substring(po, 1,6) ELSE substring (po, 4,6) END) as po
 		FROM [trebovanje].[dbo].[sap_coois] WHERE po like '%".$po."%' AND substring(fg,14,5) = '".$size."' "));
 		// dd($check_po);
@@ -715,8 +707,120 @@ class requestController extends Controller {
 
 		return Redirect::to('req_cut_part_table/');
 	}
-	
-	
 
-	
+	public function req_lost() {
+
+		if (Auth::check())
+		{
+		    $userId = Auth::user()->id;
+		    $module = Auth::user()->name;
+		} else {
+			$msg = 'Modul is not autenticated';
+			return view('InteosLogin.error',compact('msg'));
+		}
+
+    	
+		$skus = DB::connection('sqlsrv6')->select(DB::raw("SELECT DISTINCT sku FROM [posummary].[dbo].[pro] ORDER BY sku asc"));
+		// dd($skus);
+
+    	return view('requests.req_lost_form', compact('module','skus'));
+	}
+
+	public function req_lostconfirm (Request $request) {	
+
+		// $this->validate($request, ['qty'=>'required','selected_sku'=>'required']);
+		$input = $request->all();
+		// dd($input);
+		$module = $input['module'];
+
+		$skus = DB::connection('sqlsrv6')->select(DB::raw("SELECT DISTINCT sku FROM [posummary].[dbo].[pro] ORDER BY sku asc"));
+
+		if (!isset($input['selected_sku'])) {
+			$msge = "Missing SKU";
+			return view('requests.req_lost_form', compact('module','skus','msge'));
+
+		} elseif ($input['selected_sku'] == "") {
+			$msge = "Missing SKU";
+			return view('requests.req_lost_form', compact('module','skus','msge'));
+		}
+
+		if (($input['qty']) <= 0) {
+			$msge = "Missing Qty";
+			return view('requests.req_lost_form', compact('module','skus','msge'));
+		}
+
+		$sku = trim($input['selected_sku']);
+		$qty = (int)$input['qty'];
+		$comment = $input['comment'];
+
+		try {
+			$table = new req_lost;
+
+			$table->sku = $sku;
+			$table->qty = $qty;
+			$table->module = $module;
+			$table->bagno = "LOST BB";
+			$table->status = "Pending";
+			$table->comment = $comment;
+
+			$table->save();
+		}
+		catch (\Illuminate\Database\QueryException $e) {
+			$msg = "Problem to save"; 
+			return view('requests.error', compact('msg'));
+		}
+
+		$msgs = "Successfuly saved";
+		return view('requests.req_lost_form', compact('module','skus','msgs'));
+
+	}
+
+	public function req_lost_table() {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM req_losts WHERE status = 'Pending' ORDER BY created_at asc"));
+		return view('requests.req_lost_table', compact('data'));
+	}
+
+	public function req_lost_table_history() {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM req_losts WHERE created_at >= DATEADD(day,-30,GETDATE()) ORDER BY created_at desc"));
+		$h = 'History';
+		return view('requests.req_lost_table', compact('data', 'h'));
+	}
+
+	public function edit_req_lost_status($id) {
+
+		return view('requests.req_lost_status', compact('id'));
+
+	}
+
+	public function req_lost_status(Request $request) {	
+
+		// $this->validate($request, ['qty'=>'required','selected_sku'=>'required']);
+		$input = $request->all();
+		// dd($input);
+		$id = $input['id'];
+		$comment = $input['comment'];
+		
+		try {
+			$table = req_lost::findOrFail($id);
+
+			$table->status = "Completed";
+			$table->comment = $comment;
+
+			$table->save();
+		}
+		catch (\Illuminate\Database\QueryException $e) {
+			$msg = "Problem to save"; 
+			return view('requests.error', compact('msg'));
+		}		
+
+		return Redirect::to('req_lost_table');
+	}
+
+	public function req_lost_table_history_line() {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM req_losts WHERE created_at >= DATEADD(day,-60,GETDATE()) ORDER BY created_at desc"));
+		return view('requests.req_lost_table_history_line', compact('data'));
+	}
 }

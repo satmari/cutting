@@ -36,6 +36,11 @@
 						<a href="{{url('/req_cut_part_table')}}" class="btn btn-default center-block">Cut parts</a>
 					</div>
 				</div>
+				<div class="panel-body">
+					<div class="">
+						<a href="{{url('/req_lost_table')}}" class="btn btn-default center-block">LostBB (K-PREP)</a>
+					</div>
+				</div>
 
 			</div>
 		</div>

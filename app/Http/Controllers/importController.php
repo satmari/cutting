@@ -34,6 +34,10 @@ use App\mattress_markers;
 use App\mattress_pro;
 use App\mattress_phases;
 
+use App\paspul_stock;
+use App\paspul_stock_log;
+use App\paspul_stock_u_cons;
+
 use App\User;
 use DB;
 
@@ -43,7 +47,6 @@ class importController extends Controller {
 		//
 
 		// $work_place = "PLANNER";
-
 		// $operators = DB::connection('sqlsrv')->select(DB::raw("SELECT [id]
 		//       ,[operator]
 		//       ,[device]
@@ -51,7 +54,6 @@ class importController extends Controller {
 		//   FROM [operators]
 		//   WHERE device like '%".$work_place."%' AND status = 'ACTIVE' "));
 		// // dd($operators);
-
 		// $operator = Session::get('operator');
 
 		// return view('Import.index', compact('operator', 'operators'));
@@ -59,6 +61,7 @@ class importController extends Controller {
 	}
 
 	public function postImportConsPo (Request $request) {
+		/*
 	    $getSheetName = Excel::load(Request::file('file1'))->getSheetNames();
 	    
 	    foreach($getSheetName as $sheetName)
@@ -73,7 +76,7 @@ class importController extends Controller {
 						$po = $row['po'];
 						// dd($row['po']);
 
-								/*
+								
 								$data = DB::connection('sqlsrv1')->select(DB::raw("SELECT case when COMP.[Status] = 3 then 'Released' else 'Check status' end as [Status],
 									      COMP.[Prod_ Order No_],
 									      COM2.[Item No_],
@@ -231,7 +234,7 @@ class importController extends Controller {
 
 										}
 
-							*/
+							
 
 
 						// Remove po from local db 
@@ -253,6 +256,7 @@ class importController extends Controller {
 	    }
 
 		return redirect('/');
+		*/
 	}
 
 	public function postImportUpdatePass(Request $request) {
@@ -886,7 +890,7 @@ class importController extends Controller {
 							$size = trim($s[1]);
 
 							if ($check_pro_id[0]->style_size != $style_size ) {
-				   				dd('For pro_id: '.$pro_id.' ,new style_size is different from old style_size!');
+				   				dd('For pro_id: '.$pro_id.' ,new style_size '.$style_size.' is different from old style_size '.$check_pro_id[0]->style_size.' !');
 				   			}
 
 				   			$bom_cons_per_pcs = round((float)$row['bom_cons_per_pcs'],3);
@@ -938,6 +942,8 @@ class importController extends Controller {
 							$padprint_color = strtoupper($row['padprint_color']);
 							
 							$style_size = trim(strtoupper($row['style_size']));
+							// dd($style_size);
+							// dd($row['style_size']);
 							$s = explode(" ", $style_size);
 							$style = trim($s[0]);
 							$size = trim($s[1]);
@@ -997,6 +1003,7 @@ class importController extends Controller {
 	                $pro_error = 0;
 
 	            });
+
 	        } elseif ($sheetName == 'PAS') {
 	        	Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file4'))->chunk(5000, function ($reader)
 	        
@@ -1287,6 +1294,8 @@ class importController extends Controller {
 
 						// +++++++++++++ mattresses
 						$mattress = $row['mattress']; 
+						// dd($row['mattress']);
+
 						// $find_in_mattresses = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM mattresses WHERE mattress = '".$mattress."' "));
 						$find_in_mattresses = DB::connection('sqlsrv')->select(DB::raw("SELECT distinct m1.[id]
 							,m1.[mattress]
@@ -1654,6 +1663,7 @@ class importController extends Controller {
 							// mattress_pros
 							$find_in_marker_lines = DB::connection('sqlsrv')->select(DB::raw("SELECT style_size, pcs_on_layer FROM marker_lines WHERE marker_name = '".$marker_name."' "));
 							// dd($find_in_marker_lines);
+							
 							if (!isset($find_in_marker_lines[0])) {
 
 								if (($skeda_item_type == 'MW') OR ($skeda_item_type == 'MB')) {
@@ -1684,7 +1694,7 @@ class importController extends Controller {
 
 					   		} else {
 
-					   			// dd($mattress);
+					   			// dd('mat: '.$mattress);
 								$find_in_mattress_pro = DB::connection('sqlsrv')->select(DB::raw("SELECT id FROM mattress_pros WHERE mattress = '".$mattress."' "));
 								// dd($find_in_mattress_pro);
 								if (isset($find_in_mattress_pro[0])) {				   			
@@ -1712,8 +1722,12 @@ class importController extends Controller {
 								   		// var_dump($skeda);
 
 							   			$find_in_pro_skedas = DB::connection('sqlsrv')->select(DB::raw("SELECT pro_id FROM pro_skedas WHERE skeda = '".$skeda."' AND style_size = '".$style_size."' "));
+							   			//var_dump('skeda: '.$skeda.' , style_size: '.$style_size.'</br>');
 							   			// dd($find_in_pro_skedas);
+
 							   			if (!isset($find_in_pro_skedas[0])) {
+
+							   				var_dump('m_err_3: skeda: '.$skeda.' , style_size: '.$style_size.'</br>');
 							   				// dd($style_size);
 							   				// dd($skeda);
 							   				// dd("Pro id not found in pro skeda");
@@ -2396,7 +2410,7 @@ class importController extends Controller {
 	}
 
 	public function postImport_marker_status(Request $request) {
-		 $getSheetName = Excel::load(Request::file('file7'))->getSheetNames();
+		$getSheetName = Excel::load(Request::file('file7'))->getSheetNames();
 	    
 	    foreach($getSheetName as $sheetName)    {	
 
@@ -2465,5 +2479,361 @@ class importController extends Controller {
 	        });
 	    }
 	    return redirect('/marker');
+	}
+
+	public function postImport_papsul_stock(Request $request) {
+		$getSheetName = Excel::load(Request::file('file8'))->getSheetNames();
+	    
+	    foreach($getSheetName as $sheetName)    {	
+
+	    	Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file8'))->chunk(5000, function ($reader) 
+	        {
+	                $readerarray = $reader->toArray();
+	                // var_dump($readerarray);
+
+	               
+	                foreach($readerarray as $row) {
+
+	                	// dd($row);
+	                	$skeda = strtoupper(trim($row['skeda']));
+
+	                	$paspul_type = $row['type'];
+	                	$dye_lot = strtoupper(trim($row['dye_lot']));
+	                	$kotur_length = round($row['length'],2);
+
+	                	if ($skeda == '' OR $paspul_type == '' OR $dye_lot == '' OR $kotur_length <= 0) {
+	                		var_dump('Skeda, paspul_type, dye_lot and kotur_length must exist <br>');	
+	                	}
+	                	if (strlen($skeda) != 14 ){
+	                		var_dump('Skeda, must be 14 characters <br>');		
+	                	}
+
+	                	// $location = strtoupper(trim($row['location']));
+	                	$location = 'JUST_CUT';
+	                	$kotur_qty = (int)$row['kotur_qty'];
+	                	$uom = trim(strtolower($row['uom']));
+	                	$kotur_width = (int)$row['kotur_width'];
+	                	$material = strtoupper(trim($row['material']));
+
+	                	$pas_key = $skeda.'_'.$paspul_type.'_'.$dye_lot.'_'.$kotur_length;
+	                	$pas_key_location = $pas_key.'_'.$location;
+	                	$pas_key_e = strtoupper(sprintf('%08x', crc32($pas_key)));
+	                	
+	                	// dd($pas_key_location);
+	                	// dd($pas_key_e);
+
+	                	$check_location = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [paspul_locations]
+							WHERE location = '".$location."' and type = 'stock' "));
+	                	if (!isset($check_location[0]->id)) {
+	                		var_dump('Paspul key '.$pas_key.' - location '.$location.' does not exist or location type is different than stock <br>');
+	                		continue;
+	                	}
+	                	// var_dump('Location ok ');
+
+	                	$prom1 =  DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [cutting].[dbo].[pro_skedas]
+						WHERE [skeda] =  '".$skeda."' "));
+
+	                	if (!isset($prom1[0]->sku)) {
+	                		dd('Ova skeda nikad nije radjena u cutting aplikaciji');
+	                	} else {
+	                		$fg_color_code = substr($prom1[0]->sku,9,4);	
+	                	}
+						
+						// var_dump($fg_color_code);
+
+	                	// check if check_mtr_per_pcs
+						$check_mtr_per_pcs = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+							mtr_per_pcs
+							FROM  [paspul_stock_u_cons] 
+						  	WHERE [skeda] = '".$skeda."' AND [paspul_type] = '".$paspul_type."' "));
+
+						if (isset($check_mtr_per_pcs[0]->mtr_per_pcs)) {
+								
+							if ($uom  == 'meter'){
+								
+								$pcs_kotur = floor($kotur_length / $check_mtr_per_pcs[0]->mtr_per_pcs);
+
+							} elseif ($uom == 'ploce') {
+
+								$pcs_kotur = floor($kotur_length * $check_mtr_per_pcs[0]->mtr_per_pcs);
+
+							} else {
+								
+								$pcs_kotur = NULL;
+							}
+						} else {
+							$pcs_kotur = NULL;
+						}
+
+
+						$check_if_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [paspul_stocks]
+							WHERE pas_key = '".$pas_key."' AND location = '".$location."' "));
+
+						if (isset($check_if_exist[0]->id)) {
+							var_dump('Paspul key '.$pas_key.' - exist, update qty -> done <br>');
+
+							$table_stock = paspul_stock::findOrFail($check_if_exist[0]->id);
+							$table_stock->kotur_qty = $table_stock->kotur_qty + $kotur_qty;
+							$table_stock->save();
+
+						} else {
+							var_dump('Paspul key '.$pas_key.' - doesnt exist, add new line -> done <br>');
+
+							$table_stock = new paspul_stock;
+
+							$table_stock->skeda = $skeda;
+							$table_stock->paspul_type = $paspul_type;
+							$table_stock->dye_lot = $dye_lot;
+							$table_stock->kotur_length = $kotur_length;
+
+							$table_stock->pas_key = $pas_key;
+							$table_stock->pas_key_e = strtoupper(sprintf('%08x', crc32($pas_key)));
+
+							$table_stock->pas_key_location = $pas_key_location;
+							$table_stock->location = $location;
+
+							$table_stock->kotur_qty = $kotur_qty;
+							$table_stock->kotur_width = $kotur_width;
+							$table_stock->uom = strtolower($uom);
+							$table_stock->material = $material;
+
+							$table_stock->fg_color_code = $fg_color_code;
+							$table_stock->pcs_kotur = $pcs_kotur;
+
+							$table_stock->save();
+													
+						}
+
+						$table_stock_log = new paspul_stock_log;
+						$table_stock_log->pas_key = $table_stock->pas_key;
+						$table_stock_log->pas_key_e = $table_stock->pas_key_e;
+
+						$table_stock_log->location_from = 'EXCEL';
+						$table_stock_log->location_to = $table_stock->location;
+						$table_stock_log->location_type = 'import';
+
+						$table_stock_log->kotur_qty = (int)$table_stock->kotur_qty;
+						$table_stock_log->operator =  Auth::user()->name;
+						$table_stock_log->shift = Auth::user()->name;
+
+						$table_stock_log->kotur_width = $table_stock->kotur_width;
+						$table_stock_log->uom = strtolower($table_stock->uom);
+						$table_stock_log->material = $table_stock->material;
+						$table_stock_log->fg_color_code = $table_stock->fg_color_code;
+
+						$table_stock_log->skeda = $table_stock->skeda;
+						$table_stock_log->paspul_type = $table_stock->paspul_type;
+						$table_stock_log->dye_lot = $table_stock->dye_lot;
+						$table_stock_log->kotur_length = $table_stock->kotur_length;
+
+						$table_stock_log->returned_from = $table_stock->returned_from;
+						$table_stock_log->pcs_kotur = $table_stock->pcs_kotur;
+
+						$table_stock_log->save();
+
+
+						//  paspul_stock_u_cons
+						$skeda_paspul_type = $table_stock->skeda.'_'.$table_stock->paspul_type;
+
+						$check_if_exist_skeda_paspul_type = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [paspul_stock_u_cons]
+							WHERE skeda_paspul_type = '".$skeda_paspul_type."' "));
+
+						if (!isset($check_if_exist_skeda_paspul_type[0])) {
+							
+							$table_u_cons = new paspul_stock_u_cons;
+							$table_u_cons->skeda_paspul_type = $skeda_paspul_type;
+							$table_u_cons->skeda = $table_stock->skeda;
+							$table_u_cons->paspul_type = $table_stock->paspul_type;
+
+							$style_1 = substr($table_stock->skeda, 0, 9);
+							$style = rtrim($style_1, '0');
+							$table_u_cons->style = $style;
+							$table_u_cons->mtr_per_pcs;
+
+							$table_u_cons->save();
+						}
+
+	                }
+	        });
+	    }
+	    // return redirect('/');
+	}
+
+	public function postReturn_papsul_stock(Request $request) {
+		$getSheetName = Excel::load(Request::file('file9'))->getSheetNames();
+	    
+	    foreach($getSheetName as $sheetName)    {	
+
+	    	Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file9'))->chunk(5000, function ($reader) 
+	        {
+	                $readerarray = $reader->toArray();
+	                // var_dump($readerarray);
+
+	               
+	                foreach($readerarray as $row) {
+
+	                	// dd($row);
+	                	$skeda = strtoupper(trim($row['skeda']));
+	                	$paspul_type = $row['type'];
+	                	$dye_lot = strtoupper(trim($row['dye_lot']));
+	                	$kotur_length = round($row['length'],2);
+	                	// $location = strtoupper(trim($row['location']));
+
+	                	$device = substr(Auth::user()->name,0,3);
+	                	// dd($device);
+
+	                	if ($device == 'PSS') {
+	                		$location = 'RETURN_SU_WH';
+	                	} elseif ($device == 'PSK') {
+	                		$location = 'RETURN_KI_WH';
+	                	} elseif ($device == 'PSZ') {
+	                		$location = 'RETURN_SE_WH';
+	                	} else {
+	                		dd('location issue');
+	                	}
+	                	// dd($location);
+
+	                	$returned_from = strtoupper(trim($row['location']));
+	                	$kotur_qty = (int)$row['kotur_qty'];
+	                	$uom = trim(strtolower($row['uom']));
+	                	$kotur_width = (int)$row['kotur_width'];
+	                	$material = strtoupper(trim($row['material']));
+
+	                	$pas_key = $skeda.'_'.$paspul_type.'_'.$dye_lot.'_'.$kotur_length;
+	                	$pas_key_location = $pas_key.'_'.$location;
+	                	$pas_key_e = strtoupper(sprintf('%08x', crc32($pas_key)));
+
+	                	// dd($pas_key_location);
+	                	// dd($pas_key_e);
+
+	                	$check_location = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [paspul_locations]
+							WHERE location = '".$location."' and type = 'stock' "));
+	                	if (!isset($check_location[0]->id)) {
+	                		var_dump('Paspul key '.$pas_key.' - location '.$location.' does not exist or location type is different than stock <br>');
+	                		continue;
+	                	}
+	                	// var_dump('Location ok ');
+
+	                	$prom1 =  DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [cutting].[dbo].[pro_skedas]
+						WHERE [skeda] =  '".$skeda."' "));
+
+						$fg_color_code = substr($prom1[0]->sku,9,4);
+						// var_dump($fg_color_code);
+
+	                	// check if check_mtr_per_pcs
+						$check_mtr_per_pcs = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+							mtr_per_pcs
+							FROM  [paspul_stock_u_cons] 
+						  	WHERE [skeda] = '".$skeda."' AND [paspul_type] = '".$paspul_type."' "));
+
+						if (isset($check_mtr_per_pcs[0]->mtr_per_pcs)) {
+								
+							if ($uom == 'meter') {
+								
+								$pcs_kotur = floor($kotur_length / $check_mtr_per_pcs[0]->mtr_per_pcs);
+
+							} elseif ($uom == 'ploce') {
+
+								$pcs_kotur = floor($kotur_length * $check_mtr_per_pcs[0]->mtr_per_pcs);
+
+							} else {
+								
+								$pcs_kotur = NULL;
+							}
+						}
+
+						$check_if_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [paspul_stocks]
+							WHERE pas_key = '".$pas_key."' AND location = '".$location."' "));
+
+						if (isset($check_if_exist[0]->id)) {
+							var_dump('Paspul key '.$pas_key.' - exist, update qty -> done <br>');
+
+							$table_stock = paspul_stock::findOrFail($check_if_exist[0]->id);
+							$table_stock->kotur_qty = $table_stock->kotur_qty + $kotur_qty;
+							$table_stock->returned_from = $returned_from;
+							$table_stock->save();
+
+						} else {
+							var_dump('Paspul key '.$pas_key.' - doesnt exist, add new line -> done <br>');
+
+							$table_stock = new paspul_stock;
+
+							$table_stock->pas_key_location = $pas_key_location;
+							$table_stock->location = $location;
+
+							$table_stock->pas_key = $pas_key;
+							$table_stock->pas_key_e = strtoupper(sprintf('%08x', crc32($pas_key)));
+
+							$table_stock->skeda = $skeda;
+							$table_stock->paspul_type = $paspul_type;
+							$table_stock->dye_lot = $dye_lot;
+							$table_stock->kotur_length = $kotur_length;
+							
+							$table_stock->kotur_qty = $kotur_qty;
+							$table_stock->kotur_width = $kotur_width;
+							$table_stock->uom = strtolower($uom);
+							$table_stock->material = $material;
+
+							$table_stock->fg_color_code = $fg_color_code;
+							$table_stock->pcs_kotur = $pcs_kotur;
+							
+							$table_stock->returned_from = $returned_from;
+
+							$table_stock->save();
+						}
+
+						// paspul_stock_log
+
+						$table_stock_log = new paspul_stock_log;
+						$table_stock_log->pas_key = $table_stock->pas_key;
+						$table_stock_log->pas_key_e = $table_stock->pas_key_e;
+
+						$table_stock_log->location_from = 'EXCEL';
+						$table_stock_log->location_to = $table_stock->location;
+						$table_stock_log->location_type = 'return_from_line';
+
+						$table_stock_log->kotur_qty = (int)$table_stock->kotur_qty;
+						$table_stock_log->operator =  Auth::user()->name;
+						$table_stock_log->shift = Auth::user()->name;
+
+						$table_stock_log->kotur_width = $table_stock->kotur_width;
+						$table_stock_log->uom = strtolower($table_stock->uom);
+						$table_stock_log->material = $table_stock->material;
+						$table_stock_log->fg_color_code = $table_stock->fg_color_code;
+
+						$table_stock_log->skeda = $table_stock->skeda;
+						$table_stock_log->paspul_type = $table_stock->paspul_type;
+						$table_stock_log->dye_lot = $table_stock->dye_lot;
+						$table_stock_log->kotur_length = $table_stock->kotur_length;
+
+						$table_stock_log->returned_from = $table_stock->returned_from;
+						$table_stock_log->pcs_kotur = $table_stock->pcs_kotur;
+
+						$table_stock_log->save();
+
+						//  paspul_stock_u_cons
+						$skeda_paspul_type = $table_stock->skeda.'_'.$table_stock->paspul_type;
+
+						$check_if_exist_skeda_paspul_type = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [paspul_stock_u_cons]
+							WHERE skeda_paspul_type = '".$skeda_paspul_type."' "));
+
+						if (!isset($check_if_exist_skeda_paspul_type[0])) {
+							
+							$table_u_cons = new paspul_stock_u_cons;
+							$table_u_cons->skeda_paspul_type = $skeda_paspul_type;
+							$table_u_cons->skeda = $table_stock->skeda;
+							$table_u_cons->paspul_type = $table_stock->paspul_type;
+
+							$style_1 = substr($table_stock->skeda, 0, 9);
+							$style = rtrim($style_1, '0');
+							$table_u_cons->style = $style;
+							$table_u_cons->mtr_per_pcs;
+
+							$table_u_cons->save();
+						}
+	                }
+	        });
+	    }
+	    // return redirect('/');
 	}
 }

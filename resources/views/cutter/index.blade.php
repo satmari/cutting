@@ -120,7 +120,7 @@
 		                            <td>{{ $req->status}}</td>
 		                            
 		                            @if ($req->tpp_mat_keep_wastage == 1)
-		                            	<td>YES</td>
+		                            	<td style="background: yellowgreen;">YES</td>
 		                            @else
 		                            	<td>NO</td>
 		                            @endif

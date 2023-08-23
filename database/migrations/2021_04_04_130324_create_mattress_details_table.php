@@ -48,6 +48,9 @@ class CreateMattressDetailsTable extends Migration {
 			$table->integer('printed_nalog')->nullable();
 			$table->integer('layer_limit')->nullable();
 
+			$table->integer('num_of_cut_problems')->nullable();
+			$table->float('req_time')->nullable();
+
 			$table->timestamps();
 		});
 	}

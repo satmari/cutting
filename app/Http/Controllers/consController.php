@@ -23,6 +23,7 @@ use Validator;
 
 class consController extends Controller {
 
+	/*
 	public function index()
 	{
 		//
@@ -293,42 +294,14 @@ class consController extends Controller {
 		if(isset($data[0])) {
 			for ($i=0; $i < count($data); $i++) { 
 
-				/*
-				$info = DB::connection('sqlsrv1')->select(DB::raw("SELECT po.[Status],
-					   po.[Docket No],
+				$info = DB::connection('sqlsrv1')->select(DB::raw("SELECT				   
+					   --po.[Status],
 					   --po.[No_],
-					   po.[Source No_],
-					   po.[Shortcut Dimension 2 Code],
-					   ile.[Item No_],
-					   ile.[Variant Code],
-					   -SUM(ile.[Quantity]) AS consumed,
-					   (SELECT case when [Status] = 3 then 'Released' else 'Check status' end FROM [Gordon_LIVE].[dbo].[GORDON\$Production Order] WHERE po.[Shortcut Dimension 2 Code] = [No_]) as po_status,
-					   (SELECT [Cutting Prod_ Line] FROM [Gordon_LIVE].[dbo].[GORDON\$Production Order] WHERE po.[Shortcut Dimension 2 Code] = [No_]) as po_flash,
-					   (SELECT case when [To be finished] = 1 then 'Yes' else 'No' end FROM [Gordon_LIVE].[dbo].[GORDON\$Production Order] WHERE po.[Shortcut Dimension 2 Code] = [No_]) as po_fin
-				FROM [Gordon_LIVE].[dbo].[GORDON\$Production Order] as po					   
-				LEFT JOIN [Gordon_LIVE].[dbo].[GORDON\$Item Ledger Entry] as ile ON ile.[Simulated Order No_] = po.[No_]
-				WHERE po.[Status] = 0 AND po.[No_] LIKE 'CUT%' AND po.[Docket No] LIKE '%WH%' AND ile.[Item No_] IS NOT NULL
-				AND po.[Shortcut Dimension 2 Code] LIKE '%".$data[$i]->po."%'
-				GROUP BY
-					   po.[Status],
-					   po.[Docket No],
-					   --po.[No_],
-					   po.[Source No_],
-					   po.[Shortcut Dimension 2 Code],
-					   ile.[Item No_],
-					   ile.[Variant Code]
-				order by po.[Shortcut Dimension 2 Code], consumed desc
-				"));
-				// dd($info);
-				*/
-
-				$info = DB::connection('sqlsrv1')->select(DB::raw("SELECT				   --po.[Status],
-					   --po.[No_],
-					   /*
-					   po.[Docket No],
-					   ile.[Item No_], 
-					   ile.[Variant Code],
-					   */
+					   
+					   --po.[Docket No],
+					   --ile.[Item No_], 
+					   --ile.[Variant Code],
+					   
 					   po.[Source No_],
 					   po.[Shortcut Dimension 2 Code],
 					  
@@ -357,11 +330,9 @@ class consController extends Controller {
 				GROUP BY
 					   --po.[Status],
 					   --po.[No_],
-					   /*
-					   po.[Docket No],
-					   ile.[Item No_],
-					   ile.[Variant Code],
-					   */
+					   --po.[Docket No],
+					   --ile.[Item No_],
+					   --ile.[Variant Code],
 					   po.[Shortcut Dimension 2 Code],
 					   po.[Source No_]
 					   
@@ -411,5 +382,6 @@ class consController extends Controller {
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM consumptions WHERE status = 'Released' ORDER BY po asc"));
 		return view('cons.table', compact('data'));
 	}
-
+	
+	*/
 }

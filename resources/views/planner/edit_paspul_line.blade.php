@@ -16,7 +16,7 @@
                         {!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
                         {!! Form::hidden('paspul_roll', $paspul_roll, ['class' => 'form-control']) !!}
                         {!! Form::hidden('paspul_roll_id', $paspul_roll_id, ['class' => 'form-control']) !!}
-                        {!! Form::hidden('skeda', $skeda, ['class' => 'form-control']) !!}
+                        <!-- {!! Form::hidden('skeda', $skeda, ['class' => 'form-control']) !!} -->
                         {!! Form::hidden('skeda_item_type', $skeda_item_type, ['class' => 'form-control']) !!}
                         {!! Form::hidden('location', $location, ['class' => 'form-control']) !!}
                         
@@ -47,7 +47,18 @@
                     
                     @if ($location != 'COMPLETED' )
 
-                        
+                        <div class="panel-body">
+                        <p>Skeda: <span style="color:red;">*</span></p>
+                            
+                           {!! Form::text('skeda', $skeda, ['class' => 'form-control', 'autofocus' => 'autofocus']) !!}
+                        </div>
+
+                        <div class="panel-body">
+                        <p>Dye lot: <span style="color:red;">*</span></p>
+                            
+                           {!! Form::text('dye_lot', $dye_lot, ['class' => 'form-control']) !!}
+                        </div>
+
                         <div class="panel-body">
                         <p>Priority: <span style="color:red;">*</span></p>
                             <!-- {!! Form::number('priority', $priority, ['class' => 'form-control']) !!} -->

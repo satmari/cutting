@@ -2,7 +2,7 @@
 
 @section('content')
 
-{{ header( "refresh:60;url=/cutting" ) }}
+{{ header( "refresh:600;url=/cutting" ) }}
 <div class="container-fluid">
     <div class="row">
         <div class="text-center">
@@ -44,7 +44,8 @@
 			                    		<th >Position</th>
 			                            <th >Paspul roll</th>
 			                            <th >SAP SU</th>
-			                            <th >Rewound length</th>
+			                            <th >Rewound length [m]</th>
+			                            <th >Already rewounded [m]</th>
 			                            <th >Unit of measure</th>
 
 			                            <th >PRO</th>
@@ -52,7 +53,7 @@
 			                            <th >SKU</th>
 
 			                            <th >Paspul type</th>
-			                            <th >Roll min width (cm)</th>
+			                            <th >Roll min width [cm]</th>
 			                            <th >Kotur width [mm]</th>
 			                            
 			                            <th >Material</th>
@@ -83,6 +84,7 @@
 			                            <td>{{ $req->paspul_roll}}</td>
 			                            <td>{{ $req->sap_su}}</td>
 			                            <td>{{ round($req->rewound_length_a,3) }}</td>
+			                            <td>{{ round($req->rewound_sum,3) }}</td>
 			                            <td>{{ $req->rewound_roll_unit_of_measure}}</td>
 
 			                            <td style="width: 75px;">{{ $req->pro}}</td>

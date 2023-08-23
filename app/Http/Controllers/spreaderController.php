@@ -67,6 +67,7 @@ class spreaderController extends Controller {
 		      ,m2.[layers_a]
 		      ,m2.[length_mattress]
 		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
 		      ,m2.[extra]
 		      ,m2.[pcs_bundle]
 		      ,m2.[layers_partial]
@@ -75,6 +76,7 @@ class spreaderController extends Controller {
 		      ,m2.[call_shift_manager]
 		      ,m2.[test_marker]
 		      ,m2.[tpp_mat_keep_wastage]
+		      ,m2.[tpa_number]
 		      ,m2.[printed_marker]
 		      ,m2.[mattress_packed]
 		      ,m2.[all_pro_for_main_plant]
@@ -85,6 +87,7 @@ class spreaderController extends Controller {
 		      ,m2.[minimattress_code]
 		      ,m2.[layer_limit]
 		      ,m2.[overlapping]
+		      ,m2.[req_time]
 		      --,'|'
 		      ,m3.[marker_id]
 		      ,m3.[marker_name]
@@ -129,13 +132,13 @@ class spreaderController extends Controller {
 			// dd($id);
 
 			$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				ps.pro
-				,ps.style_size
-				,ps.sku
+				ps.[pro]
+				,ps.[style_size]
+				,ps.[sku]
 				,po.[location_all]
 				--,*
 			  FROM [mattress_pros] as mp
-			  JOIN [pro_skedas] as ps ON ps.pro_id = mp.pro_id
+			  JOIN [pro_skedas] as ps ON ps.[pro_id] = mp.[pro_id]
 			  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
 			WHERE mp.mattress_id = '".$id."' "));
 			
@@ -1116,6 +1119,7 @@ class spreaderController extends Controller {
 		$comment_operator = $input['comment_operator'];
 		$layers_a_reasons = $input['layers_a_reasons'];
 		$layers_partial = (float)$input['layers_partial'];	
+		$num_of_cut_problems = (int)$input['num_of_cut_problems'];
 		
 		if($layers_a < 1) {
 			$msg ='Layers actual must be > 1';
@@ -1299,6 +1303,7 @@ class spreaderController extends Controller {
 				$table_update_2->comment_operator = $comment_operator;
 				$table_update_2->layers_a_reasons = $layers_a_reasons;
 				$table_update_2->layers_partial = (float)$layers_partial;
+				$table_update_2->num_of_cut_problems = (int)$num_of_cut_problems;
 				$table_update_2->save();
 
 				// mattress_phasess
@@ -1402,6 +1407,7 @@ class spreaderController extends Controller {
 				$table_update_4->comment_operator = $comment_operator;
 				$table_update_4->layers_a_reasons = $layers_a_reasons;
 				$table_update_4->layers_partial = (float)$layers_partial;
+				$table_update_4->num_of_cut_problems = (int)$num_of_cut_problems;
 				$table_update_4->save();
 
 				// marttres_pro update

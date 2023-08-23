@@ -1,0 +1,13 @@
+{ 
+
+  "name": "Cutting app", 
+
+  "short_name": "Cutting app", 
+
+  "start_url": "http://172.27.161.171/cutting",
+
+  "display": "standalone"
+
+  
+
+}

@@ -69,6 +69,7 @@ class tubController extends Controller {
 		      ,m2.[layers_a]
 		      ,m2.[length_mattress]
 		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
 		      ,m2.[extra]
 		      ,m2.[pcs_bundle]
 		      ,m2.[layers_partial]
@@ -130,15 +131,15 @@ class tubController extends Controller {
 			// dd($id);
 
 			$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				ps.pro
-				,ps.style_size
-				,ps.sku
+				ps.[pro]
+				,ps.[style_size]
+				,ps.[sku]
 				,po.[location_all]
 				--,*
 			  FROM [mattress_pros] as mp
-			  JOIN [pro_skedas] as ps ON ps.pro_id = mp.pro_id
+			  JOIN [pro_skedas] as ps ON ps.[pro_id] = mp.[pro_id]
 			  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
-			WHERE mp.mattress_id = '".$id."' "));
+			WHERE mp.[mattress_id] = '".$id."' "));
 			
 			for ($x=0; $x < count($prom); $x++) { 
 
@@ -152,16 +153,15 @@ class tubController extends Controller {
 				} else {
 					$location_all .= $prom[$x]->location_all." ";
 				}
-				
 			}
 
 			$data[$i]->pro = trim($pros);
 			$data[$i]->style_size = trim($skus);
 			$data[$i]->sku = trim($sku_s);
 			$data[$i]->location_all = trim($location_all);
-			$pros = '';
-			$skus = '';
-			$sku_s = '';
+			$pros 	= '';
+			$skus 	= '';
+			$sku_s 	= '';
 			$location_all = '';
 		}
 		// dd($data);

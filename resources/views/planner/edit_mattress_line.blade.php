@@ -10,6 +10,11 @@
                 <!-- <div class="input-group"> <span class="input-group-addon">Filter</span>
                     <input id="filter" type="text" class="form-control" placeholder="Type here...">
                 </div> -->
+                @if (isset($msgs))
+                    <div class="alert alert-success" role="alert">
+                    {{ $msgs }}     
+                    </div>
+                @endif
 
                 {!! Form::open(['method'=>'POST', 'url'=>'/edit_mattress_line_confirm']) !!}
 
@@ -17,6 +22,20 @@
                         {!! Form::hidden('mattress', $mattress, ['class' => 'form-control']) !!}
                         {!! Form::hidden('g_bin', $g_bin, ['class' => 'form-control']) !!}
                         {!! Form::hidden('skeda_item_type', $skeda_item_type, ['class' => 'form-control']) !!}
+                        {!! Form::hidden('material', $material, ['class' => 'form-control']) !!}
+                        {!! Form::hidden('dye_lot', $dye_lot, ['class' => 'form-control']) !!}
+                        {!! Form::hidden('color_desc', $color_desc, ['class' => 'form-control']) !!}
+                        {!! Form::hidden('skeda', $skeda, ['class' => 'form-control']) !!}
+                        {!! Form::hidden('width_theor_usable', round($width_theor_usable,3), ['class' => 'form-control']) !!}
+                        {!! Form::hidden('layers', round($layers,3), ['class' => 'form-control']) !!}
+                        {!! Form::hidden('layers_a', round($layers_a,3), ['class' => 'form-control']) !!}
+                        {!! Form::hidden('cons_planned', round($layers_a,3), ['class' => 'form-control']) !!}
+                        {!! Form::hidden('cons_actual', round($cons_actual,3), ['class' => 'form-control']) !!}
+                        {!! Form::hidden('marker_name', $marker_name, ['class' => 'form-control']) !!}
+                        {!! Form::hidden('marker_length', round($marker_length,3), ['class' => 'form-control']) !!}
+                        {!! Form::hidden('marker_width', round($marker_width,3), ['class' => 'form-control']) !!}
+                        {!! Form::hidden('tpp_mat_keep_wastage', $tpp_mat_keep_wastage, ['class' => 'form-control']) !!}
+                        {!! Form::hidden('tpa_number', $tpa_number, ['class' => 'form-control']) !!}
 
                         {!! Form::hidden('location', $location, ['class' => 'form-control']) !!}
                             
@@ -43,7 +62,9 @@
                             @if ($location == 'MM1')
                                 <tr><td>Layer limit</td><td><b>{{ $layer_limit }} </b></td></tr>
                             @endif
+                            <tr><td></td><td><a href="{{url('/correct_location/'.$id) }}" class="btn btn-danger btn-xs center-blo ck">Correct location</a></td></tr>
                             </table>
+
 
                             @if (isset($data2))
                             <table style="width:100%" class="table table-striped table-bordered">
@@ -76,7 +97,7 @@
                             </table>
                             @endif
                         
-                        @if ($location == 'COMPLETED' OR $location == 'DELETED')
+                    @if ($location == 'COMPLETED' OR $location == 'DELETED')
 
                         <div class="panel-body">
                         <p>Priority: <span style="color:red;">*</span></p>
@@ -87,6 +108,11 @@
                         <div class="panel-body">
                         <p>Pcs per bundle: <span style="color:red;">*</span></p>
                            {!! Form::number('pcs_bundle', round($pcs_bundle,0), ['class' => 'form-control', 'disabled']) !!}
+                        </div>
+
+                        <div class="panel-body">
+                        <p>Required time: <span style="color:red;">*</span></p>
+                           {!! Form::number('req_time', round($req_time,2), ['class' => 'form-control', 'disabled']) !!}
                         </div>
 
                         <div class="panel-body">
@@ -129,7 +155,7 @@
                         </div>
                         <br>
 
-                        @else
+                    @else
 
                         <div class="panel-body">
                         <p>Priority: <span style="color:red;">*</span></p>
@@ -140,6 +166,11 @@
                         <div class="panel-body">
                         <p>Pcs per bundle: <span style="color:red;">*</span></p>
                             {!! Form::number('pcs_bundle', round($pcs_bundle,0), ['class' => 'form-control']) !!}
+                        </div>
+
+                        <div class="panel-body">
+                        <p>Required time: <span style="color:red;">*</span></p>
+                           {!! Form::number('req_time', round($req_time,2), ['class' => 'form-control','step' => '0.01']) !!}
                         </div>
 
                         <div class="panel-body">
@@ -178,12 +209,19 @@
                         </table>
 
                         <hr>
-                        {!! Form::submit('Save', ['class' => 'btn  btn-success center-block']) !!}
+                        <br>
+                        {!! Form::submit('Save', ['class' => 'btn  btn-danger center-block']) !!}
                         <br>
                         @include('errors.list')
 
-                        @endif
+                    @endif
 
+                    
+
+                    <div class="panel-body">
+                        <a href="{{ url('plan_mattress/'.$location) }}" class="btn btn-default center-block">Back without Save</a></th>    
+                    </div>
+                    
                 {!! Form::close() !!}
             </div>
         </div>

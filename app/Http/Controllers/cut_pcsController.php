@@ -54,13 +54,13 @@ class cut_pcsController extends Controller {
 		$size = $bbdata[0]->size;
 		$bagno = $bbdata[0]->bagno;
 
-		$style_extra_img = DB::connection('sqlsrv5')->select(DB::raw("SELECT image
+		$style_extra_img = DB::connection('sqlsrv3')->select(DB::raw("SELECT image
 			FROM [settings].[dbo].[styles_extras]
 		  	WHERE style = '".$style."' AND color = '".$color."' AND size = '".$size."'
 		"));
 		// dd($style_extra_img[0]->image);
 
-		$style_img = DB::connection('sqlsrv5')->select(DB::raw("SELECT image
+		$style_img = DB::connection('sqlsrv3')->select(DB::raw("SELECT image
 			FROM [settings].[dbo].[styles]
 		  	WHERE style = '".$style."' 
 		"));
@@ -205,6 +205,15 @@ class cut_pcsController extends Controller {
 
 
 		return Redirect::to('http://172.27.161.172:8002/production');
+
+	}
+
+	public function req_extrabb_line_history($line) {
+		// dd($id);
+		// dd($line);
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [cutting].[dbo].[req_cut_parts] WHERE created_at >= DATEADD(day,-60,GETDATE()) AND module = '".$line."' ORDER BY created_at desc"));
+		return view('requests.req_cut_part_table_line', compact('data', 'line'));
 
 	}
 }
