@@ -1234,7 +1234,7 @@ class plannerController extends Controller {
 	        foreach ($_POST['SP'] as $value) {
 	            $i++;
 	            DB::table('mattress_details')->where('mattress_id', '=', $value)->update([ 'position' => $i ]);
-	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'MS3'/*, 'operator1' => Session::get('operator') */]);
+	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'TUB'/*, 'operator1' => Session::get('operator') */]);
 	        }	
 	}
 
@@ -2389,6 +2389,7 @@ class plannerController extends Controller {
 		$location = $data[0]->location;
 		$req_time = $data[0]->req_time;
 
+		$layer_limit = $data[0]->layer_limit;
 
 		if ($skeda_item_type == 'MM') {
 
@@ -2399,7 +2400,7 @@ class plannerController extends Controller {
 			return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','data2','layer_limit','cut_operator','cut_date','sp_operator','sp_date','req_time'));
 		}
 
-		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','cut_operator','cut_date','sp_operator','sp_date','req_time'));
+		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','cut_operator','cut_date','sp_operator','sp_date','req_time','layer_limit'));
 	}
 
 	public function correct_location($id) {
@@ -2479,6 +2480,8 @@ class plannerController extends Controller {
 		$pcs_bundle = (int)$input['pcs_bundle'];
 		$bottom_paper = $input['bottom_paper'];
 		$req_time = round($input['req_time'],2);
+
+		$layer_limit = $input['layer_limit'];
 
 		if (isset($input['call_shift_manager'])) {
 			$call_shift_manager = (int)$input['call_shift_manager'];
@@ -2577,7 +2580,7 @@ class plannerController extends Controller {
 		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a',
 		'cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority',
 		'call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper',
-		'comment_office','location','cut_operator','cut_date','sp_operator','sp_date','req_time','msgs'));
+		'comment_office','location','cut_operator','cut_date','sp_operator','sp_date','req_time','msgs','layer_limit'));
 	}
 
 	public function edit_layers_a($id) {
@@ -5273,6 +5276,7 @@ class plannerController extends Controller {
 		      ,m2.[overlapping]
 		      ,m2.[tpp_mat_keep_wastage]
 		      ,m2.[tpa_number]
+		      ,m2.[cons_actual]
 		      --,'|'
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
@@ -5297,9 +5301,15 @@ class plannerController extends Controller {
 		$skeda = $data[0]->skeda;
 		$skeda_item_type = $data[0]->skeda_item_type;
 		$spreading_method = $data[0]->spreading_method;
-		
 		$layers = round($data[0]->layers,0);
-		$pcs_bundle = round($data[0]->pcs_bundle,0);
+
+		if ($skeda_item_type == 'MT') {
+			$pcs_bundle = "".round($data[0]->cons_actual,0)." kg";
+		} else {
+			$pcs_bundle = round($data[0]->pcs_bundle,0);
+		}
+		// dd($pcs_bundle);
+
 		$bottom_paper = $data[0]->bottom_paper;
 		$comment_office = $data[0]->comment_office;
 
@@ -5320,7 +5330,7 @@ class plannerController extends Controller {
 		}
 
 		if (($skeda_item_type == 'MS') OR ($skeda_item_type == 'MM')) {
-		// MS or MM
+			// MS or MM
 
 				$data1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 				      mp.[mattress]
@@ -5396,7 +5406,7 @@ class plannerController extends Controller {
 					}	
 				}
 		} else {
-		// MB or MW
+			// MB or MW
 
 			$data1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			      m.[mattress]
@@ -5916,6 +5926,7 @@ class plannerController extends Controller {
 				      ,m2.[tpp_mat_keep_wastage]
 				      ,m2.[tpa_number]
 				      ,m2.[printed_nalog]
+				      ,m2.[cons_actual]
 				      --,'|'
 				      ,m3.[marker_name]
 				      ,m3.[marker_length]
@@ -5942,7 +5953,15 @@ class plannerController extends Controller {
 				$spreading_method = $data[0]->spreading_method;
 				
 				$layers = round($data[0]->layers,0);
-				$pcs_bundle = round($data[0]->pcs_bundle,0);
+				// $pcs_bundle = round($data[0]->pcs_bundle,0);
+
+				if ($skeda_item_type == 'MT') {
+					$pcs_bundle = "".round($data[0]->cons_actual,0)." kg";
+				} else {
+					$pcs_bundle = round($data[0]->pcs_bundle,0);
+				}
+				// dd($pcs_bundle);
+
 				$bottom_paper = $data[0]->bottom_paper;
 				$comment_office = $data[0]->comment_office;
 

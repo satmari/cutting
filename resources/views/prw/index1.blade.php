@@ -105,15 +105,20 @@
 			                            <td>{{ $req->skeda }}</td>
 			                            <td>{{ $req->pasbin }}</td>
 			                            <td class="
-				                            @if ($req->priority == 3) top_priority
+				                            @if ($req->priority == 6) ts_priority
+				                            @elseif ($req->priority == 5) ss_priority
+				                            @elseif ($req->priority == 4) fs_priority
+				                            @elseif ($req->priority == 3) top_priority
 						        	    	@elseif ($req->priority == 2) high_priority
 						        	    	@endif
 						        	    	">
-						        	    	@if ($req->priority == 3)Top
+						        	    	@if ($req->priority == 6)3rd shift
+						        	    	@elseif ($req->priority == 5)2nd shift
+						        	    	@elseif ($req->priority == 4)1st shift
+						        	    	@elseif ($req->priority == 3)Top
 						        	    	@elseif ($req->priority == 2)High
 					        	    		@elseif ($req->priority == 1)Normal
-						        	    	@endif
-						        	    </td>
+						        	    	@endif</td>
 						        	    <td>{{ $req->rewinding_method}}</td>
 										<td>
 											<a href="{{ url('paspul_prw1/'.$req->id) }}" class="btn btn-danger btn-xs center-block">

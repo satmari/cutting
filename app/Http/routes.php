@@ -163,6 +163,8 @@ Route::get('wastage_remove_skeda_partialy/{skeda}','wastageController@wastage_re
 Route::post('wastage_remove_skeda_partialy_post','wastageController@wastage_remove_skeda_partialy_post');
 
 Route::post('delete_wastage_line','wastageController@delete_wastage_line');
+// Route::get('delete_wastage_line_c','wastageController@delete_wastage_line_c');
+Route::post('delete_wastage_line_g','wastageController@delete_wastage_line_g');
 
 Route::get('wastage_edit/{id}','wastageController@wastage_edit');
 Route::post('wastage_edit_post','wastageController@wastage_edit_post');

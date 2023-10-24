@@ -381,16 +381,18 @@ class importController extends Controller {
         $json = json_encode($xmlObject);
         // dd($json);
 
-        $phpArray = json_decode($json, true); 
+        $phpArray = json_decode($json, true);
    		// dd($phpArray);
 
    		// dd($phpArray['Tolerances']['MarkerContent']['NewVariant']);
    		// print_r($phpArray['Marker']['@attributes']['Name']);
 
-   		$marker_name = $phpArray['Marker']['@attributes']['Name'];
-   		$marker_name = strtoupper($marker_name);
-   		// dd($marker_name);
+        
+   		$marker_file_name = $phpArray['Marker']['@attributes']['Name'];
+   		$marker_file_name = strtoupper($marker_file_name);
+   		// dd($marker_file_name);
 
+   		/*
    		function get_string_between($string, $start, $end){
 		    $string = ' ' . $string;
 		    $ini = strpos($string, $start);
@@ -403,6 +405,28 @@ class importController extends Controller {
 		$start = "PLX\\";
 		$end = ".PLX";
    		$marker_name = get_string_between($marker_name, $start, $end);
+   		*/
+
+   		// Split the string by "\"
+		$parts = explode('\\', $marker_file_name);
+		// dd($parts);
+
+		// Get the last part of the array
+		$lastPart = end($parts);
+		// dd($lastPart);
+
+		if (strpos($lastPart, '.plx') !== false) {
+		    $desiredPart = substr($lastPart, 0, strpos($lastPart, '.plx'));
+		    $marker_name = $desiredPart;
+
+		} else if (strpos($lastPart, '.PLX') !== false) {
+		    $desiredPart = substr($lastPart, 0, strpos($lastPart, '.PLX'));
+		    $marker_name = $desiredPart;
+
+		} else {
+		    dd("Not found marker_name");
+		}
+
    		// dd($marker_name);
    		// print_r('marker_name: '.$marker_name);
    		// print_r('<br>');
@@ -608,8 +632,11 @@ class importController extends Controller {
    			// dd($exist);
 
    			$st = explode('_', $model);
-			// dd($ex[1]);
-			$style = $st[1];
+			if (isset($st[1])) {
+				$style = $st[1];	
+			} else {
+				$style = "";
+			}
 
 			if ($style == 'F') {
 				$style = $st[2];
@@ -2181,146 +2208,154 @@ class importController extends Controller {
 	                $m_error = 0;
 	                // dd($m_lines);
 	            });
+
 			}
 	    }
 	    
-	    $pro_lines = Session::get('pro_lines');
-	    $pro_exist = Session::get('pro_exist');
-	    $pro_success = Session::get('pro_success');
-	    $pro_error = Session::get('pro_error');
-	    $pro_err = Session::get('pro_err');
-	    
-	    print_r('<br>');
-	    print_r('Pro Skeda table:');
-	    print_r('<br>');
-	    print_r('-	total lines: '.$pro_lines);
-	    print_r('<br>');
-	    print_r('-	already exist (update): '.$pro_exist);
-	    print_r('<br>');
-	    print_r('-	successfuly imported: '.$pro_success);
-	    print_r('<br>');
-	    print_r('-	errors: '.$pro_error);
-	    print_r('<br>');
-
-	    if (isset($pro_err)) {
-	    	Session::set('pro_err', null);
-
-		    $pro_err = explode("|", $pro_err);
-		    print_r('<br>');
+	    // Error on PRO
+		    $pro_lines = Session::get('pro_lines');
+		    $pro_exist = Session::get('pro_exist');
+		    $pro_success = Session::get('pro_success');
+		    $pro_error = Session::get('pro_error');
+		    $pro_err = Session::get('pro_err');
 		    
-		    foreach (array_filter($pro_err) as $line) {
-		    	print_r("*** Critical error **** Call IT now **** : Problem to save pro: ".$line."<br>");
-		    }	
-	    }
-
-	    Session::set('pro_lines', NULL);
-		Session::set('pro_exist', NULL);
-		Session::set('pro_success', NULL);
-		Session::set('pro_error', NULL);
-
-	    $pa_lines = Session::get('pa_lines');
-	    $pa_exist = Session::get('pa_exist');
-	    $pa_success = Session::get('pa_success');
-	    $pa_error = Session::get('pa_error');
-	    $pa_err = Session::get('pa_err');
-	    
-	    print_r('<br>');
-	    print_r('Paspul table:');
-	    print_r('<br>');
-	    print_r('-	total lines: '.$pa_lines);
-	    print_r('<br>');
-	    print_r('-	already exist (update): '.$pa_exist);
-	    print_r('<br>');
-	    print_r('-	successfuly imported: '.$pa_success);
-	    print_r('<br>');
-	    print_r('-	errors: '.$pa_error);
-	    print_r('<br>');
-
-	    if (isset($pa_err)) {
-	    	Session::set('pa_err', null);
-
-		    $pa_err = explode("|", $pa_err);
 		    print_r('<br>');
-		    
-		    foreach (array_filter($pa_err) as $line) {
-		    	print_r("*** Critical error **** Call IT now **** : Problem to save paspul: ".$line."<br>");
-		    }	
-	    }
-
-	    Session::set('pa_lines', NULL);
-		Session::set('pa_exist', NULL);
-		Session::set('pa_success', NULL);
-		Session::set('pa_error', NULL);
-
-		$m_lines = Session::get('m_lines');
-	    $m_exist = Session::get('m_exist');
-	    $m_success = Session::get('m_success');
-	    $m_error = Session::get('m_error');
-	    $m_err = Session::get('m_err');
-	    $m_err_1 = Session::get('m_err_1');
-	    $m_err_2 = Session::get('m_err_2');
-	    $m_err_3 = Session::get('m_err_3');
-
-	    print_r('<br>');
-	    print_r('Mattress table:');
-	    print_r('<br>');
-	    print_r('-	total lines: '.$m_lines);
-	    print_r('<br>');
-	    print_r('-	already exist (update): '.$m_exist);
-	    print_r('<br>');
-	    print_r('-	successfuly imported: '.$m_success);
-	    print_r('<br>');
-	    print_r('-	errors: '.$m_error);
-	    print_r('<br>');
-
-	    if (isset($m_err_1)) {
-	    	Session::set('m_err_1', null);
-
-		    $m_err_1 = explode("|", $m_err_1);
+		    print_r('Pro Skeda table:');
 		    print_r('<br>');
-		    
-		    foreach (array_filter($m_err_1) as $line_1) {
-		    	print_r("Error1: For Mattress '".$line_1."', marker name not exist in marker_headers table or marker status is NOT ACTIVE! <br>");
-		    }	
-	    }
-
-	    if (isset($m_err_2)) {
-	    	Session::set('m_err_2', null);
-
-		    $m_err_2 = explode("|", $m_err_2);
+		    print_r('-	total lines: '.$pro_lines);
 		    print_r('<br>');
-		    
-		    foreach (array_filter($m_err_2) as $line_2) {
-		    	print_r("Error2: For Mattress '".$line_2."', marker name not exist in marker_lines table <br>");
-		    }	
-	    }
-
-	    if (isset($m_err_3)) {
-	    	Session::set('m_err_3', null);
-
-		    $m_err_3 = explode("|", $m_err_3);
+		    print_r('-	already exist (update): '.$pro_exist);
 		    print_r('<br>');
-		    
-		    foreach (array_filter($m_err_3) as $line_3) {
-		    	print_r("Error3: Skeda '".$line_3."' not exist in pro_skedas table <br>");
-		    }	
-	    }
-
-	    if (isset($m_err)) {
-	    	Session::set('m_err', null);
-
-		    $m_err = explode("|", $m_err);
+		    print_r('-	successfuly imported: '.$pro_success);
 		    print_r('<br>');
-		    
-		    foreach (array_filter($m_err) as $line) {
-		    	print_r("*** Critical error **** Call IT now **** : Problem to save mattress: ".$line."<br>");
-		    }	
-	    }
+		    print_r('-	errors: '.$pro_error);
+		    print_r('<br>');
 
-	    Session::set('m_lines', NULL);
-		Session::set('m_exist', NULL);
-		Session::set('m_success', NULL);
-		Session::set('m_error', NULL);
+		    if (isset($pro_err)) {
+		    	Session::set('pro_err', null);
+
+			    $pro_err = explode("|", $pro_err);
+			    print_r('<br>');
+			    
+			    foreach (array_filter($pro_err) as $line) {
+			    	print_r("*** Critical error **** Call IT now **** : Problem to save pro: ".$line."<br>");
+			    }	
+		    }
+
+		    Session::set('pro_lines', NULL);
+			Session::set('pro_exist', NULL);
+			Session::set('pro_success', NULL);
+			Session::set('pro_error', NULL);
+		//
+
+		// Error on PA (paspul)
+		    $pa_lines = Session::get('pa_lines');
+		    $pa_exist = Session::get('pa_exist');
+		    $pa_success = Session::get('pa_success');
+		    $pa_error = Session::get('pa_error');
+		    $pa_err = Session::get('pa_err');
+		    
+		    print_r('<br>');
+		    print_r('Paspul table:');
+		    print_r('<br>');
+		    print_r('-	total lines: '.$pa_lines);
+		    print_r('<br>');
+		    print_r('-	already exist (update): '.$pa_exist);
+		    print_r('<br>');
+		    print_r('-	successfuly imported: '.$pa_success);
+		    print_r('<br>');
+		    print_r('-	errors: '.$pa_error);
+		    print_r('<br>');
+
+		    if (isset($pa_err)) {
+		    	Session::set('pa_err', null);
+
+			    $pa_err = explode("|", $pa_err);
+			    print_r('<br>');
+			    
+			    foreach (array_filter($pa_err) as $line) {
+			    	print_r("*** Critical error **** Call IT now **** : Problem to save paspul: ".$line."<br>");
+			    }	
+		    }
+
+		    Session::set('pa_lines', NULL);
+			Session::set('pa_exist', NULL);
+			Session::set('pa_success', NULL);
+			Session::set('pa_error', NULL);
+		//
+
+		// Error on M (mattress)
+
+			$m_lines = Session::get('m_lines');
+		    $m_exist = Session::get('m_exist');
+		    $m_success = Session::get('m_success');
+		    $m_error = Session::get('m_error');
+		    $m_err = Session::get('m_err');
+		    $m_err_1 = Session::get('m_err_1');
+		    $m_err_2 = Session::get('m_err_2');
+		    $m_err_3 = Session::get('m_err_3');
+
+		    print_r('<br>');
+		    print_r('Mattress table:');
+		    print_r('<br>');
+		    print_r('-	total lines: '.$m_lines);
+		    print_r('<br>');
+		    print_r('-	already exist (update): '.$m_exist);
+		    print_r('<br>');
+		    print_r('-	successfuly imported: '.$m_success);
+		    print_r('<br>');
+		    print_r('-	errors: '.$m_error);
+		    print_r('<br>');
+
+		    if (isset($m_err_1)) {
+		    	Session::set('m_err_1', null);
+
+			    $m_err_1 = explode("|", $m_err_1);
+			    print_r('<br>');
+			    
+			    foreach (array_filter($m_err_1) as $line_1) {
+			    	print_r("Error1: For Mattress '".$line_1."', marker name not exist in marker_headers table or marker status is NOT ACTIVE! <br>");
+			    }	
+		    }
+
+		    if (isset($m_err_2)) {
+		    	Session::set('m_err_2', null);
+
+			    $m_err_2 = explode("|", $m_err_2);
+			    print_r('<br>');
+			    
+			    foreach (array_filter($m_err_2) as $line_2) {
+			    	print_r("Error2: For Mattress '".$line_2."', marker name not exist in marker_lines table <br>");
+			    }	
+		    }
+
+		    if (isset($m_err_3)) {
+		    	Session::set('m_err_3', null);
+
+			    $m_err_3 = explode("|", $m_err_3);
+			    print_r('<br>');
+			    
+			    foreach (array_filter($m_err_3) as $line_3) {
+			    	print_r("Error3: Skeda '".$line_3."' not exist in pro_skedas table <br>");
+			    }	
+		    }
+
+		    if (isset($m_err)) {
+		    	Session::set('m_err', null);
+
+			    $m_err = explode("|", $m_err);
+			    print_r('<br>');
+			    
+			    foreach (array_filter($m_err) as $line) {
+			    	print_r("*** Critical error **** Call IT now **** : Problem to save mattress: ".$line."<br>");
+			    }	
+		    }
+
+		    Session::set('m_lines', NULL);
+			Session::set('m_exist', NULL);
+			Session::set('m_success', NULL);
+			Session::set('m_error', NULL);
+		//
 
 	}
 

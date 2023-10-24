@@ -200,15 +200,19 @@
 				                            <td>{{ $req->color_desc}}</td>
 				                            <td style="min-width: 120px;">{{ $req->skeda}}</td>
 				                            <td>{{ round($req->cons_actual,3)}}</td>
-				                            <td class="
-				                            @if ($req->priority == 3) top_priority
-						        	    	@elseif ($req->priority == 2) high_priority
-						        	    	@endif
-						        	    	">
-						        	    	@if ($req->priority == 3)Top
-						        	    	@elseif ($req->priority == 2)High
-					        	    		@elseif ($req->priority == 1)Normal
-						        	    	@endif</td>
+				                            <td class="@if ($req->priority == 6) ts_priority
+					                            @elseif ($req->priority == 5) ss_priority
+					                            @elseif ($req->priority == 4) fs_priority
+					                            @elseif ($req->priority == 3) top_priority
+							        	    	@elseif ($req->priority == 2) high_priority
+							        	    	@endif ">
+							        	    	@if ($req->priority == 6) 3rd shift
+							        	    	@elseif ($req->priority == 5) 2nd shift
+							        	    	@elseif ($req->priority == 4) 1st shift
+							        	    	@elseif ($req->priority == 3) Top
+							        	    	@elseif ($req->priority == 2) High
+						        	    		@elseif ($req->priority == 1) Normal
+							        	    	@endif</td>
 				                            
 				                            @if ($location == 'MM1')
 				                            	<td>{{ $req->layer_limit}}</td>
@@ -479,15 +483,20 @@
 				                            <td>{{ $req->overlapping}}</td>
 
 				                            {{-- <td>{{ $req->location}}</td> --}}
-				                            <td class="
-				                            @if ($req->priority == 3) top_priority
-						        	    	@elseif ($req->priority == 2) high_priority
-						        	    	@endif
-						        	    	">
-						        	    	@if ($req->priority == 3)Top
-						        	    	@elseif ($req->priority == 2)High
-					        	    		@elseif ($req->priority == 1)Normal
-						        	    	@endif</td>
+				                            <td class="@if ($req->priority == 6) ts_priority
+					                            @elseif ($req->priority == 5) ss_priority
+					                            @elseif ($req->priority == 4) fs_priority
+					                            @elseif ($req->priority == 3) top_priority
+							        	    	@elseif ($req->priority == 2) high_priority
+							        	    	@endif
+							        	    	">
+							        	    	@if ($req->priority == 6)3rd shift
+							        	    	@elseif ($req->priority == 5)2nd shift
+							        	    	@elseif ($req->priority == 4)1st shift
+							        	    	@elseif ($req->priority == 3)Top
+							        	    	@elseif ($req->priority == 2)High
+						        	    		@elseif ($req->priority == 1)Normal
+							        	    	@endif</td>
 				                            <td>{{ $req->status}}</td>
 				                            
 				                            @if ($location == 'MM1')
@@ -650,14 +659,20 @@
 
 				                            {{-- <td>{{ $req->location}}</td> --}}
 				                            <td class="
-				                            @if ($req->priority == 3) top_priority
-						        	    	@elseif ($req->priority == 2) high_priority
-						        	    	@endif
-						        	    	">
-						        	    	@if ($req->priority == 3)Top
-						        	    	@elseif ($req->priority == 2)High
-					        	    		@elseif ($req->priority == 1)Normal
-						        	    	@endif</td>
+					                            @if ($req->priority == 6) ts_priority
+					                            @elseif ($req->priority == 5) ss_priority
+					                            @elseif ($req->priority == 4) fs_priority
+					                            @elseif ($req->priority == 3) top_priority
+							        	    	@elseif ($req->priority == 2) high_priority
+							        	    	@endif
+							        	    	">
+							        	    	@if ($req->priority == 6)3rd shift
+							        	    	@elseif ($req->priority == 5)2nd shift
+							        	    	@elseif ($req->priority == 4)1st shift
+							        	    	@elseif ($req->priority == 3)Top
+							        	    	@elseif ($req->priority == 2)High
+						        	    		@elseif ($req->priority == 1)Normal
+							        	    	@endif</td>
 				                            <td>{{ $req->status}}</td>
 				                            
 				                            @if ($location == 'MM1')
@@ -806,14 +821,20 @@
 
 				                            <td>{{ $req->location}}</td>
 				                            <td class="
-				                            @if ($req->priority == 3) top_priority
-						        	    	@elseif ($req->priority == 2) high_priority
-						        	    	@endif
-						        	    	">
-						        	    	@if ($req->priority == 3)Top
-						        	    	@elseif ($req->priority == 2)High
-					        	    		@elseif ($req->priority == 1)Normal
-						        	    	@endif</td>
+					                            @if ($req->priority == 6) ts_priority
+					                            @elseif ($req->priority == 5) ss_priority
+					                            @elseif ($req->priority == 4) fs_priority
+					                            @elseif ($req->priority == 3) top_priority
+							        	    	@elseif ($req->priority == 2) high_priority
+							        	    	@endif
+							        	    	">
+							        	    	@if ($req->priority == 6)3rd shift
+							        	    	@elseif ($req->priority == 5)2nd shift
+							        	    	@elseif ($req->priority == 4)1st shift
+							        	    	@elseif ($req->priority == 3)Top
+							        	    	@elseif ($req->priority == 2)High
+						        	    		@elseif ($req->priority == 1)Normal
+							        	    	@endif</td>
 				                            <td>{{ $req->status}}</td>
 				                            <td>{{ $req->printed_marker}}</td>
 				                            
@@ -960,14 +981,20 @@
 				                            <td>{{ $req->overlapping}}</td>
 				                            <td>{{ $req->location}}</td>
 				                            <td class="
-				                            @if ($req->priority == 3) top_priority
-						        	    	@elseif ($req->priority == 2) high_priority
-						        	    	@endif
-						        	    	">
-						        	    	@if ($req->priority == 3)Top
-						        	    	@elseif ($req->priority == 2)High
-					        	    		@elseif ($req->priority == 1)Normal
-						        	    	@endif</td>
+					                            @if ($req->priority == 6) ts_priority
+					                            @elseif ($req->priority == 5) ss_priority
+					                            @elseif ($req->priority == 4) fs_priority
+					                            @elseif ($req->priority == 3) top_priority
+							        	    	@elseif ($req->priority == 2) high_priority
+							        	    	@endif
+							        	    	">
+							        	    	@if ($req->priority == 6)3rd shift
+							        	    	@elseif ($req->priority == 5)2nd shift
+							        	    	@elseif ($req->priority == 4)1st shift
+							        	    	@elseif ($req->priority == 3)Top
+							        	    	@elseif ($req->priority == 2)High
+						        	    		@elseif ($req->priority == 1)Normal
+							        	    	@endif</td>
 				                            <td>{{ $req->status}}</td>
 				                            
 				                            @if ($location == 'MM1')
@@ -1115,14 +1142,20 @@
 
 				                            <td>{{ $req->location}}</td>
 				                            <td class="
-				                            @if ($req->priority == 3) top_priority
-						        	    	@elseif ($req->priority == 2) high_priority
-						        	    	@endif
-						        	    	">
-						        	    	@if ($req->priority == 3)Top
-						        	    	@elseif ($req->priority == 2)High
-					        	    		@elseif ($req->priority == 1)Normal
-						        	    	@endif</td>
+					                            @if ($req->priority == 6) ts_priority
+					                            @elseif ($req->priority == 5) ss_priority
+					                            @elseif ($req->priority == 4) fs_priority
+					                            @elseif ($req->priority == 3) top_priority
+							        	    	@elseif ($req->priority == 2) high_priority
+							        	    	@endif
+							        	    	">
+							        	    	@if ($req->priority == 6)3rd shift
+							        	    	@elseif ($req->priority == 5)2nd shift
+							        	    	@elseif ($req->priority == 4)1st shift
+							        	    	@elseif ($req->priority == 3)Top
+							        	    	@elseif ($req->priority == 2)High
+						        	    		@elseif ($req->priority == 1)Normal
+							        	    	@endif</td>
 				                            <td>{{ $req->status}}</td>
 				                            
 				                            @if ($location == 'MM1')
@@ -1272,14 +1305,20 @@
 
 				                            <td>{{ $req->location}}</td>
 				                            <td class="
-				                            @if ($req->priority == 3) top_priority
-						        	    	@elseif ($req->priority == 2) high_priority
-						        	    	@endif
-						        	    	">
-						        	    	@if ($req->priority == 3)Top
-						        	    	@elseif ($req->priority == 2)High
-					        	    		@elseif ($req->priority == 1)Normal
-						        	    	@endif</td>
+				                            	@if ($req->priority == 6) ts_priority
+					                            @elseif ($req->priority == 5) ss_priority
+					                            @elseif ($req->priority == 4) fs_priority
+					                            @elseif ($req->priority == 3) top_priority
+							        	    	@elseif ($req->priority == 2) high_priority
+							        	    	@endif
+							        	    	">
+							        	    	@if ($req->priority == 6)3rd shift
+							        	    	@elseif ($req->priority == 5)2nd shift
+							        	    	@elseif ($req->priority == 4)1st shift
+							        	    	@elseif ($req->priority == 3)Top
+							        	    	@elseif ($req->priority == 2)High
+						        	    		@elseif ($req->priority == 1)Normal
+							        	    	@endif</td>
 				                            <td>{{ $req->status}}</td>
 				                            
 				                            @if ($location == 'MM1')
@@ -1464,14 +1503,20 @@
 				                            <td>{{ $req->layers_a}}</td>
 				                            <td>{{ round($req->cons_actual,3)}}</td>
 				                            <td class="
-				                            @if ($req->priority == 3) top_priority
-						        	    	@elseif ($req->priority == 2) high_priority
-						        	    	@endif
-						        	    	">
-						        	    	@if ($req->priority == 3)Top
-						        	    	@elseif ($req->priority == 2)High
-					        	    		@elseif ($req->priority == 1)Normal
-						        	    	@endif</td>
+					                            @if ($req->priority == 6) ts_priority
+					                            @elseif ($req->priority == 5) ss_priority
+					                            @elseif ($req->priority == 4) fs_priority
+					                            @elseif ($req->priority == 3) top_priority
+							        	    	@elseif ($req->priority == 2) high_priority
+							        	    	@endif
+							        	    	">
+							        	    	@if ($req->priority == 6)3rd shift
+							        	    	@elseif ($req->priority == 5)2nd shift
+							        	    	@elseif ($req->priority == 4)1st shift
+							        	    	@elseif ($req->priority == 3)Top
+							        	    	@elseif ($req->priority == 2)High
+						        	    		@elseif ($req->priority == 1)Normal
+							        	    	@endif</td>
 				                            <td>
 				                            	@if ($req->marker_name != '') 
 				                            		{{ $req->marker_name }}
@@ -1573,10 +1618,11 @@
 			<ul id="sortable2" class="connectedSortable_ul_1">
             	@foreach ($sp1 as $req1)
             	    <li class="ui-state-default
-            	    @if ($req1->priority == 3)
-        	    		top_priority
-        	    	@elseif ($req1->priority == 2)
-        	    		high_priority
+            	    @if ($req1->priority == 6) ts_priority
+            	    @elseif ($req1->priority == 5) ss_priority
+            	    @elseif ($req1->priority == 4) fs_priority
+            	    @elseif ($req1->priority == 3) top_priority
+        	    	@elseif ($req1->priority == 2) high_priority
         	    	@endif
             	    	" id="SP-{{ $req1->id }}" data-html="true" 
             	    	title="{{$req1->mattress}}<br />
@@ -1590,9 +1636,12 @@
             	    	Layers: {{round($req1->layers_a,0)}}<br />
             	    	Cons actual: {{round($req1->cons_actual,3)}}<br />
             	    	Priority: 
-			        	    	@if ($req1->priority == 3)Top
-			        	    	@elseif ($req1->priority == 2)High
-		        	    		@elseif ($req1->priority == 1)Normal
+            	    			@if ($req1->priority == 6) 3rd shift
+			        	    	@elseif ($req1->priority == 5) 2nd shift
+			        	    	@elseif ($req1->priority == 4) 1st shift
+			        	    	@elseif ($req1->priority == 3) Top
+			        	    	@elseif ($req1->priority == 2) High
+		        	    		@elseif ($req1->priority == 1) Normal
 			        	    	@endif
 			        	    	<br />
             	    	Marker: {{$req1->marker_name}}<br />
@@ -1613,10 +1662,11 @@
 			<ul id="sortable3" class="connectedSortable_ul_1">
             	@foreach ($sp2 as $req2)
             	    <li class="ui-state-default
-            	    @if ($req2->priority == 3)
-        	    		top_priority
-        	    	@elseif ($req2->priority == 2)
-        	    		high_priority
+            	     @if ($req2->priority == 6) ts_priority
+            	    @elseif ($req2->priority == 5) ss_priority
+            	    @elseif ($req2->priority == 4) fs_priority
+            	    @elseif ($req2->priority == 3) top_priority
+        	    	@elseif ($req2->priority == 2) high_priority
         	    	@endif
         	    		" id="SP-{{ $req2->id }}" data-html="true"
             	    	title="{{$req2->mattress}}<br />
@@ -1629,10 +1679,12 @@
             	    	Width theor usable: {{round($req2->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req2->layers_a,0)}}<br />
             	    	Cons actual: {{round($req2->cons_actual,3)}}<br />
-            	    	Priority: 
-			        	    	@if ($req2->priority == 3)Top
-			        	    	@elseif ($req2->priority == 2)High
-		        	    		@elseif ($req2->priority == 1)Normal
+            	    	Priority: @if ($req2->priority == 6) 3rd shift
+			        	    	@elseif ($req2->priority == 5) 2nd shift
+			        	    	@elseif ($req2->priority == 4) 1st shift
+			        	    	@elseif ($req2->priority == 3) Top
+			        	    	@elseif ($req2->priority == 2) High
+		        	    		@elseif ($req2->priority == 1) Normal
 			        	    	@endif
 			        	    	<br />
             	    	Marker: {{$req2->marker_name}}<br /> 
@@ -1654,10 +1706,11 @@
 			<ul id="sortable4" class="connectedSortable_ul_1">
             	@foreach ($sp3 as $req3)
             	    <li class="ui-state-default
-            	    @if ($req3->priority == 3)
-        	    		top_priority
-        	    	@elseif ($req3->priority == 2)
-        	    		high_priority
+            	     @if ($req3->priority == 6) ts_priority
+            	    @elseif ($req3->priority == 5) ss_priority
+            	    @elseif ($req3->priority == 4) fs_priority
+            	    @elseif ($req3->priority == 3) top_priority
+        	    	@elseif ($req3->priority == 2) high_priority
         	    	@endif
             	    	" id="SP-{{ $req3->id }}" data-html="true"
             	    	title="{{$req3->mattress}}<br />
@@ -1670,10 +1723,12 @@
             	    	Width theor usable: {{round($req3->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req3->layers_a,0)}}<br />
             	    	Cons actual: {{round($req3->cons_actual,3)}}<br /> 
-            	    	Priority: 
-			        	    	@if ($req3->priority == 3)Top
-			        	    	@elseif ($req3->priority == 2)High
-		        	    		@elseif ($req3->priority == 1)Normal
+            	    	Priority: @if ($req3->priority == 6) 3rd shift
+			        	    	@elseif ($req3->priority == 5) 2nd shift
+			        	    	@elseif ($req3->priority == 4) 1st shift
+			        	    	@elseif ($req3->priority == 3) Top
+			        	    	@elseif ($req3->priority == 2) High
+		        	    		@elseif ($req3->priority == 1) Normal
 			        	    	@endif
 			        	    	<br />
             	    	Marker: {{$req3->marker_name}}<br /> 
@@ -1694,10 +1749,11 @@
 			<ul id="sortable5" class="connectedSortable_ul_1">
             	@foreach ($sp4 as $req4)
             	    <li class="ui-state-default
-            	    @if ($req4->priority == 3)
-        	    		top_priority
-        	    	@elseif ($req4->priority == 2)
-        	    		high_priority
+            	      @if ($req4->priority == 6) ts_priority
+            	    @elseif ($req4->priority == 5) ss_priority
+            	    @elseif ($req4->priority == 4) fs_priority
+            	    @elseif ($req4->priority == 3) top_priority
+        	    	@elseif ($req4->priority == 2) high_priority
         	    	@endif
             	    	" id="SP-{{ $req4->id }}" data-html="true"
             	    	title="{{$req4->mattress}}<br /> 
@@ -1710,8 +1766,10 @@
             	    	Width theor usable: {{round($req4->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req4->layers_a,0)}}<br />
             	    	Cons actual: {{round($req4->cons_actual,3)}}<br /> 
-            	    	Priority: 
-			        	    	@if ($req4->priority == 3)Top
+            	    	Priority: @if ($req4->priority == 6) 3rd shift
+			        	    	@elseif ($req4->priority == 5)2nd shift
+			        	    	@elseif ($req4->priority == 4)1st shift
+			        	    	@elseif ($req4->priority == 3)Top
 			        	    	@elseif ($req4->priority == 2)High
 		        	    		@elseif ($req4->priority == 1)Normal
 			        	    	@endif
@@ -1734,10 +1792,11 @@
 			<ul id="sortable6" class="connectedSortable_ul_1">
             	@foreach ($ms1 as $req5)
             	    <li class="ui-state-default
-            	    @if ($req5->priority == 3)
-        	    		top_priority
-        	    	@elseif ($req5->priority == 2)
-        	    		high_priority
+            	     @if ($req5->priority == 6) ts_priority
+            	    @elseif ($req5->priority == 5) ss_priority
+            	    @elseif ($req5->priority == 4) fs_priority
+            	    @elseif ($req5->priority == 3) top_priority
+        	    	@elseif ($req5->priority == 2) high_priority
         	    	@endif
             	    	" id="SP-{{ $req5->id }}" data-html="true" 
             	    	title="{{$req5->mattress}}<br /> 
@@ -1750,8 +1809,10 @@
             	    	Width theor usable: {{round($req5->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req5->layers_a,0)}}<br />
             	    	Cons actual: {{round($req5->cons_actual,3)}}<br /> 
-            	    	Priority: 
-			        	    	@if ($req5->priority == 3)Top
+            	    	Priority: @if ($req5->priority == 6) 3rd shift
+			        	    	@elseif ($req5->priority == 5)2nd shift
+			        	    	@elseif ($req5->priority == 4)1st shift
+			        	    	@elseif ($req5->priority == 3)Top
 			        	    	@elseif ($req5->priority == 2)High
 		        	    		@elseif ($req5->priority == 1)Normal
 			        	    	@endif
@@ -1774,10 +1835,11 @@
 			<ul id="sortable7" class="connectedSortable_ul_1">
             	@foreach ($ms2 as $req6)
             	    <li class="ui-state-default
-            	   @if ($req6->priority == 3)
-        	    		top_priority
-        	    	@elseif ($req6->priority == 2)
-        	    		high_priority
+            	     @if ($req6->priority == 6) ts_priority
+            	    @elseif ($req6->priority == 5) ss_priority
+            	    @elseif ($req6->priority == 4) fs_priority
+            	    @elseif ($req6->priority == 3) top_priority
+        	    	@elseif ($req6->priority == 2) high_priority
         	    	@endif
             	    	" id="SP-{{ $req6->id }}" data-html="true"
             	    	title="{{$req6->mattress}}<br /> 
@@ -1790,8 +1852,10 @@
             	    	Width theor usable: {{round($req6->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req6->layers_a,0)}}<br />
             	    	Cons actual: {{round($req6->cons_actual,3)}}<br />
-            	    	Priority: 
-			        	    	@if ($req6->priority == 3)Top
+            	    	Priority: @if ($req6->priority == 6) 3rd shift
+			        	    	@elseif ($req6->priority == 5)2nd shift
+			        	    	@elseif ($req6->priority == 4)1st shift
+			        	    	@elseif ($req6->priority == 3)Top
 			        	    	@elseif ($req6->priority == 2)High
 		        	    		@elseif ($req6->priority == 1)Normal
 			        	    	@endif
@@ -1814,10 +1878,11 @@
 			<ul id="sortable8" class="connectedSortable_ul_1" style='background-color:#8fe3a266; !important'>
             	@foreach ($tub as $req7)
             	    <li class="ui-state-default
-            	    @if ($req7->priority == 3)
-        	    		top_priority
-        	    	@elseif ($req7->priority == 2)
-        	    		high_priority
+            	     @if ($req7->priority == 6) ts_priority
+            	    @elseif ($req7->priority == 5) ss_priority
+            	    @elseif ($req7->priority == 4) fs_priority
+            	    @elseif ($req7->priority == 3) top_priority
+        	    	@elseif ($req7->priority == 2) high_priority
         	    	@endif
             	    	" id="SP-{{ $req7->id }}" data-html="true"
             	    	title="{{$req7->mattress}}<br /> 
@@ -1830,8 +1895,10 @@
             	    	Width theor usable: {{round($req7->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req7->layers_a,0)}}<br />
             	    	Cons actual: {{round($req7->cons_actual,3)}}<br /> 
-            	    	Priority: 
-			        	    	@if ($req7->priority == 3)Top
+            	    	Priority: @if ($req7->priority == 6) 3rd shift
+			        	    	@elseif ($req7->priority == 5)2nd shift
+			        	    	@elseif ($req7->priority == 4)1st shift
+			        	    	@elseif ($req7->priority == 3)Top
 			        	    	@elseif ($req7->priority == 2)High
 		        	    		@elseif ($req7->priority == 1)Normal
 			        	    	@endif
@@ -1855,10 +1922,11 @@
 			<ul id="sortable9" class="connectedSortable_ul_1">
             	@foreach ($mm1 as $req8)
             	    <li class="ui-state-default
-            	    @if ($req8->priority == 3)
-        	    		top_priority
-        	    	@elseif ($req8->priority == 2)
-        	    		high_priority
+            	      @if ($req8->priority == 6) ts_priority
+            	    @elseif ($req8->priority == 5) ss_priority
+            	    @elseif ($req8->priority == 4) fs_priority
+            	    @elseif ($req8->priority == 3) top_priority
+        	    	@elseif ($req8->priority == 2) high_priority
         	    	@endif
             	    	" id="SP-{{ $req8->id }}" data-html="true"
             	    	title="{{$req8->mattress}}<br /> 
@@ -1871,10 +1939,12 @@
             	    	Width theor usable: {{round($req8->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req8->layers_a,0)}}<br />
             	    	Cons actual: {{round($req8->cons_actual,3)}}<br /> 
-            	    	Priority: 
-			        	    	@if ($req8->priority == 3)Top
-			        	    	@elseif ($req8->priority == 2)High
-		        	    		@elseif ($req8->priority == 1)Normal
+            	    	Priority: @if ($req8->priority == 6) 3rd shift
+			        	    	@elseif ($req8->priority == 5) 2nd shift
+			        	    	@elseif ($req8->priority == 4) 1st shift
+			        	    	@elseif ($req8->priority == 3) Top
+			        	    	@elseif ($req8->priority == 2) High
+		        	    		@elseif ($req8->priority == 1) Normal
 			        	    	@endif
 			        	    	<br />
             	    	Marker: {{$req8->marker_name}}<br /> 

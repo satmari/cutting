@@ -627,11 +627,34 @@ class wastageController extends Controller {
 		$forminput = $request->all();
 		$id = $forminput['id'];
 
-		dd("Zlatko treba da potvrdi");
-		$table = wastage::findOrFail($id);
+		// dd("Zlatko treba da potvrdi");
+		// $table = wastage::findOrFail($id);
 		// $table->delete();
 
-		return Redirect::to('/');
+		// return Redirect::to('/');
+		return view('wastage.delete_wastage_line_c', compact('id'));
+	}
+
+	public function delete_wastage_line_g(Request $request) {	
+
+		// $this->validate($request, ['location'=>'required', 'container'=>'required']);
+		$forminput = $request->all();
+		// dd($forminput);
+
+		$id = $forminput['id'];
+		$pass = $forminput['pass'];
+
+		if ($pass == 'peckes') {
+
+			$table = wastage::findOrFail($id);
+			$table->delete();
+
+			return Redirect::to('/');	
+
+		} else {
+			dd("Password is not correct!!!");
+		}
+
 	}
 
 	public function wastage_edit($id) {	

@@ -105,14 +105,20 @@
 
 				                            <td>{{ $req->location}}</td>
 				                            <td class="
-				                            @if ($req->priority == 3) top_priority
-						        	    	@elseif ($req->priority == 2) high_priority
-						        	    	@endif
-						        	    	">
-						        	    	@if ($req->priority == 3)Top
-						        	    	@elseif ($req->priority == 2)High
-					        	    		@elseif ($req->priority == 1)Normal
-						        	    	@endif</td>
+					                            @if ($req->priority == 6) ts_priority
+					                            @elseif ($req->priority == 5) ss_priority
+					                            @elseif ($req->priority == 4) fs_priority
+					                            @elseif ($req->priority == 3) top_priority
+							        	    	@elseif ($req->priority == 2) high_priority
+							        	    	@endif
+							        	    	">
+							        	    	@if ($req->priority == 6)3rd shift
+							        	    	@elseif ($req->priority == 5)2nd shift
+							        	    	@elseif ($req->priority == 4)1st shift
+							        	    	@elseif ($req->priority == 3)Top
+							        	    	@elseif ($req->priority == 2)High
+						        	    		@elseif ($req->priority == 1)Normal
+							        	    	@endif</td>
 				                            <td>{{ $req->status}}</td>
 				                            
 				                            <td><a href="{{ url('edit_mattress_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit mattress</a><br>

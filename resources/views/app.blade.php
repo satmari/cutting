@@ -954,8 +954,8 @@ $(function() {
         // axis: 'y',
         update: function (event, ui) {
             var data = $(this).sortable('serialize');
-            console.log("position changed 2");
-            console.log(data);
+            // console.log("position changed 2");
+            // console.log(data);
             // POST to server using $.post or $.ajax
           	  $.ajax({
           	      data: data,
@@ -968,8 +968,8 @@ $(function() {
         // axis: 'y',
         update: function (event, ui) {
             var data = $(this).sortable('serialize');
-            console.log("position changed 3");
-            console.log(data);
+            // console.log("position changed 3");
+            // console.log(data);
             // POST to server using $.post or $.ajax
           	  $.ajax({
           	      data: data,
@@ -982,8 +982,8 @@ $(function() {
         // axis: 'y',
         update: function (event, ui) {
             var data = $(this).sortable('serialize');
-            console.log("position changed 4");
-            console.log(data);
+            // console.log("position changed 4");
+            // console.log(data);
             // POST to server using $.post or $.ajax
           	  $.ajax({
           	      data: data,
@@ -996,8 +996,8 @@ $(function() {
         // axis: 'y',
         update: function (event, ui) {
             var data = $(this).sortable('serialize');
-            console.log("position changed 5");
-            console.log(data);
+            // console.log("position changed 5");
+            // console.log(data);
             // POST to server using $.post or $.ajax
           	  $.ajax({
           	      data: data,
@@ -1010,8 +1010,8 @@ $(function() {
         // axis: 'y',
         update: function (event, ui) {
             var data = $(this).sortable('serialize');
-            console.log("position changed 6");
-            console.log(data);
+            // console.log("position changed 6");
+            // console.log(data);
             // POST to server using $.post or $.ajax
           	  $.ajax({
           	      data: data,
@@ -1024,8 +1024,8 @@ $(function() {
         // axis: 'y',
         update: function (event, ui) {
             var data = $(this).sortable('serialize');
-            console.log("position changed 7");
-            console.log(data);
+            // console.log("position changed 7");
+            // console.log(data);
             // POST to server using $.post or $.ajax
           	  $.ajax({
           	      data: data,
@@ -1042,9 +1042,9 @@ $(function() {
             // console.log(data);
             // POST to server using $.post or $.ajax
           	  $.ajax({
-          	      // data: data,
-          	      // type: 'POST',
-          	      // url: '{{ route('posts.reposition8') }}'
+          	      data: data,
+          	      type: 'POST',
+          	      url: '{{ route('posts.reposition8') }}'
          	});
     	}
     });

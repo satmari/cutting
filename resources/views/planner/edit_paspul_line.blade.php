@@ -62,7 +62,7 @@
                         <div class="panel-body">
                         <p>Priority: <span style="color:red;">*</span></p>
                             <!-- {!! Form::number('priority', $priority, ['class' => 'form-control']) !!} -->
-                            {!! Form::select('priority', array('1'=>'Normal','2'=>'High','3'=>'Top'), $priority, array('class' => 'form-control')) !!} 
+                            {!! Form::select('priority', array('1'=>'Normal','2'=>'High','3'=>'Top','4'=>'1st shift','5'=>'2nd shift','6'=>'3rd shift'), $priority, array('class' => 'form-control')) !!} 
                         </div>
 
                         <div class="panel-body">
@@ -92,7 +92,7 @@
                         <div class="panel-body">
                         <p>Priority: <span style="color:red;">*</span></p>
                             <!-- {!! Form::number('priority', $priority, ['class' => 'form-control']) !!} -->
-                            {!! Form::select('priority', array('1'=>'Normal','2'=>'High','3'=>'Top'), $priority, array('class' => 'form-control', 'disabled')) !!} 
+                            {!! Form::select('priority', array('1'=>'Normal','2'=>'High','3'=>'Top','4'=>'1st shift','5'=>'2nd shift','6'=>'3rd shift'), $priority, array('class' => 'form-control', 'disabled')) !!} 
                         </div>
 
                         <div class="panel-body">

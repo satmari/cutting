@@ -36,8 +36,11 @@
                         {!! Form::hidden('marker_width', round($marker_width,3), ['class' => 'form-control']) !!}
                         {!! Form::hidden('tpp_mat_keep_wastage', $tpp_mat_keep_wastage, ['class' => 'form-control']) !!}
                         {!! Form::hidden('tpa_number', $tpa_number, ['class' => 'form-control']) !!}
-
                         {!! Form::hidden('location', $location, ['class' => 'form-control']) !!}
+                        
+                        {!! Form::hidden('layer_limit', $layer_limit, ['class' => 'form-control']) !!}
+                        
+
                             
                             <table style="width:100%; font-size: large;" class="table table-striped table-bordered">
                             <tr><td>Mattress</td><td><b>{{ $mattress }} </b></td></tr>
@@ -102,7 +105,7 @@
                         <div class="panel-body">
                         <p>Priority: <span style="color:red;">*</span></p>
                             <!-- {!! Form::number('priority', $priority, ['class' => 'form-control']) !!} -->
-                            {!! Form::select('priority', array('1'=>'Normal','2'=>'High','3'=>'Top'), $priority, array('class' => 'form-control', 'disabled')) !!} 
+                            {!! Form::select('priority', array('1'=>'Normal','2'=>'High','3'=>'Top','4'=>'1st shift','5'=>'2nd shift','6'=>'3rd shift'), $priority, array('class' => 'form-control', 'disabled')) !!} 
                         </div>
 
                         <div class="panel-body">
@@ -160,7 +163,7 @@
                         <div class="panel-body">
                         <p>Priority: <span style="color:red;">*</span></p>
                             <!-- {!! Form::number('priority', $priority, ['class' => 'form-control']) !!} -->
-                            {!! Form::select('priority', array('1'=>'Normal','2'=>'High','3'=>'Top'), $priority, array('class' => 'form-control')) !!} 
+                            {!! Form::select('priority', array('1'=>'Normal','2'=>'High','3'=>'Top','4'=>'1st shift','5'=>'2nd shift','6'=>'3rd shift'), $priority, array('class' => 'form-control')) !!} 
                         </div>
 
                         <div class="panel-body">
@@ -197,7 +200,6 @@
                                     {!! Form::checkbox('call_shift_manager', '1' , $call_shift_manager , ['class' => 'form-control']) !!}
                                 </div>
                             </td>
-                        
                             <td style="width:49%">
                                 <div class="panel-body">
                                 <p>Test marker:<!--  <span style="color:red;">*</span> --></p>
@@ -215,9 +217,6 @@
                         @include('errors.list')
 
                     @endif
-
-                    
-
                     <div class="panel-body">
                         <a href="{{ url('plan_mattress/'.$location) }}" class="btn btn-default center-block">Back without Save</a></th>    
                     </div>

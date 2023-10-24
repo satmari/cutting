@@ -8,7 +8,7 @@
                 <div class="panel-heading"><b><big>Cut part </big></b> table requests from line <b><big>{{$line}}</big></b> from last 60 days</div>
                 <br>
                 
-                <a class="btn btn-primary" href="http://172.27.161.172:8002/" role="button">Back to BBStock app</a>
+                <a class="btn btn-primary" href="http://172.27.161.172/bbstock2/" role="button">Back to BBStock app</a>
                 <br>
                 <div class="input-group"> <span class="input-group-addon">Filter</span>
                     <input id="filter" type="text" class="form-control" placeholder="Type here...">
