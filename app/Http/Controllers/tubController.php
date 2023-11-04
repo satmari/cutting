@@ -30,8 +30,7 @@ use Validator;
 class tubController extends Controller {
 
 	
-	public function index()
-	{
+	public function index() {
 		//
 		// dd('cao');
 
@@ -358,8 +357,7 @@ class tubController extends Controller {
 			// }
 		}
 
-		return view('tub.index', compact('data','location','operators','operator','operator2','eff','eff2'));
-		
+		return view('tub.index', compact('data','location','operators','operator','operator2','eff','eff2'));	
 	}
 
 	public function operator_login (Request $request) {
@@ -931,6 +929,7 @@ class tubController extends Controller {
 		$data_location = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 				m.[g_bin]
 				--,mp.[pro_id]
+				,m.[skeda_item_type]
 				,s.[pro]
 				,p.[location_all]
 			FROM [mattresses] as m
@@ -941,8 +940,14 @@ class tubController extends Controller {
 			"));
 		// dd($data_location);
 
+
+
 		$out_su = 0;
 		if (isset($data_location[0]->location_all)) {
+
+			if ($data_location[0]->skeda_item_type != 'MT') {
+				dd('Error, please login machine again');
+			}
 
 			for ($i=0; $i < count($data_location); $i++) { 
 

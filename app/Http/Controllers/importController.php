@@ -865,8 +865,8 @@ class importController extends Controller {
 		Session::set('pro', null);
 
 		// $msg[] = '';
-	    foreach($getSheetName as $sheetName)
-	    {
+	    foreach($getSheetName as $sheetName) {
+
 	        if ($sheetName == 'PRO') {
 	        	Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file4'))->chunk(5000, function ($reader)
 	            {
@@ -879,8 +879,7 @@ class importController extends Controller {
 	                $pro_success = 0;
 	                $pro_error = 0;
 	                
-	                foreach($readerarray as $row)
-	                {
+	                foreach($readerarray as $row){
 						$pro_lines = $pro_lines + 1;
 
 						$pro_id = $row['pro_id'];
@@ -1016,6 +1015,7 @@ class importController extends Controller {
 								//error
 								$pro_error = $pro_error + 1;
 							}
+				   		
 				   		}
 					}
 
@@ -1058,7 +1058,7 @@ class importController extends Controller {
 						// dd($check_paspul_roll);
 
 				  		if (isset($check_paspul_roll[0])) {
-				  				// dd("Paspul_roll already exist in paspul table");
+				  			// dd("Paspul_roll already exist in paspul table");
 
 				  			if (($check_paspul_roll[0]->status == 'NOT_SET') OR ($check_paspul_roll[0]->status == 'TO_REWIND')) {
 				  				
@@ -1286,6 +1286,7 @@ class importController extends Controller {
 								//error
 								$pa_error = $pa_error + 1;
 							}
+				  		
 				  		}
 	                }
 
@@ -1301,9 +1302,8 @@ class importController extends Controller {
 	            });
 
 	        } elseif ($sheetName == 'MAT') {
-	        	Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file4'))->chunk(5000, function ($reader)
-	        
-	            {
+	        	Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file4'))->chunk(5000, function ($reader) {
+
 	                $readerarray = $reader->toArray();
 	                //var_dump($readerarray);
 	                // foreach(array_slice($readerarray, 1) as $row)
@@ -1313,8 +1313,8 @@ class importController extends Controller {
 	                $m_success = 0;
 	                $m_error = 0;
 
-	                foreach($readerarray as $row)
-	                {
+	                foreach($readerarray as $row) {
+
 						$m_lines = $m_lines + 1;
 						// print_r('MAT');
 						// dd($row);
@@ -1339,7 +1339,7 @@ class importController extends Controller {
 						  WHERE m1.[mattress] = '".$mattress."' "));
 						// dd($find_in_mattresses);
 
-						if (isset($find_in_mattresses[0])) {
+						if (isset($find_in_mattresses[0])) { 
 							
 							// dd("Mattress '".$mattress."' already exist in mattresses table");
 							// $err = Session::get('err');
@@ -1453,6 +1453,7 @@ class importController extends Controller {
 									} else {
 										dd('For mattress '.$update_mattress->mattress.' , skeda_item_type is different than existing');
 									}
+								
 								} else {
 									dd('For mattress '.$update_mattress->mattress.' , skeda is different than existing');
 								}
@@ -1463,7 +1464,7 @@ class importController extends Controller {
 							$skeda_item_type = $row['skeda_item_type'];
 				   			continue;
 
-						} else {
+						} else { 
 							// dd('ss');
 							// mattresses
 							$g_bin; //not mandatory / progressive 
@@ -1482,13 +1483,6 @@ class importController extends Controller {
 							$length_mattress = round((float)$row['length_mattress'],3);
 							// dd($length_mattress);
 							
-							// $length_mattress_new = mattress_markers::where('mattress_id', $update_mattress->id)->firstOrFail();
-							// $length_mattress_new = $length_mattress_new->marker_length;
-
-							// dd(strval($row['marker_name']));
-							// $length_mattress_new = marker_header::where('marker_name', strval($row['marker_name']))->firstOrFail();
-							
-
 							$length_mattress_new = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 marker_length 
 							FROM marker_headers
 							WHERE marker_name = '".strval($row['marker_name'])."'"));
@@ -1578,8 +1572,8 @@ class importController extends Controller {
 									$cons_planned = round((float)$cons_planned_new,2);
 									$cons_actual = round((float)$cons_planned_new,2);
 								}
+							
 							}
-
 
 							$extra = (floaT)$row['extra'];
 							// $pcs_bundle;	//manualy
@@ -1669,7 +1663,9 @@ class importController extends Controller {
 
 									//error
 									$m_error = $m_error + 1;
+					   			
 					   			}
+
 					   		} else {
 
 					   			$marker_id = $find_in_marker_headers[0]->id; // find by marker_name
@@ -1677,6 +1673,7 @@ class importController extends Controller {
 								$marker_length = round((float)$find_in_marker_headers[0]->marker_length,3); // find by marker_name
 								$marker_width = round((float)$find_in_marker_headers[0]->marker_width,3); // find by marker_name
 								$min_length = (float)$find_in_marker_headers[0]->min_length; // find by marker_name	
+					   		
 					   		}
 
 					   		// mattress_phases
@@ -1696,6 +1693,7 @@ class importController extends Controller {
 								if (($skeda_item_type == 'MW') OR ($skeda_item_type == 'MB')) {
 									
 								} else {
+									
 									// dd("Marker name ".$marker_name." not exist in marker_lines table");
 						   			// $err = Session::get('err');
 									// dd($msg);
@@ -1717,6 +1715,7 @@ class importController extends Controller {
 
 									//error
 									$m_error = $m_error + 1;
+								
 								}
 
 					   		} else {
@@ -1791,35 +1790,25 @@ class importController extends Controller {
 							   			}
 							   		}
 						   		}
+					   		
 					   		}
+						
 						}
 
 				   		// check errors
-					    // $err = Session::get('err');
-					    // dd($err);
 					    
-					    // if (isset($err) OR !is_null($err)) {
-					    // 	Session::set('err', null);
-
-					   //  $err = explode("#", $err);
-
-					   //  print_r('Mattress:');
-					   //  foreach ($err as $line) {
-					   //  	print_r($line."<br>");
-					   //  }	
-					   //  print_r('<br>');
-
 						$m_err_1 = Session::get('m_err_1');
 						$m_err_2 = Session::get('m_err_2');
 						$m_err_3 = Session::get('m_err_3');
 
 						if ((isset($m_err_1) OR !is_null($m_err_1)) OR (isset($m_err_2) OR !is_null($m_err_2)) OR (isset($m_err_3) OR !is_null($m_err_3))) {
+							// exist some error
 
 					    } else {
-					    //save to database
+					    	// save to database
 
-					    	if (($skeda_item_type == 'MW') OR ($skeda_item_type == 'MB')) {
-					    	// Ploce	
+					    	if (($skeda_item_type == 'MW') OR ($skeda_item_type == 'MB')) { 
+					    		// Ploce	
 					    		
 					    		try {
 									$table0 = new mattress;
@@ -1998,8 +1987,8 @@ class importController extends Controller {
 									$mattress_pro_array = '';
 								*/
 
-							} else {
-							// Standard Marker
+							} else { 
+								// Standard Marker
 
 								try {
 									$table0 = new mattress;
@@ -2212,7 +2201,7 @@ class importController extends Controller {
 			}
 	    }
 	    
-	    // Error on PRO
+	    // Error on PRO 
 		    $pro_lines = Session::get('pro_lines');
 		    $pro_exist = Session::get('pro_exist');
 		    $pro_success = Session::get('pro_success');
@@ -2356,7 +2345,6 @@ class importController extends Controller {
 			Session::set('m_success', NULL);
 			Session::set('m_error', NULL);
 		//
-
 	}
 
 	public function postImport_pas_bin(Request $request) {

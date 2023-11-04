@@ -151,9 +151,15 @@
 					        	    	@endif</td>
 		                            <td>{{ $req->status}}</td>
 		                            @if ($req->tpp_mat_keep_wastage == 1)
-		                            	<td>YES - {{$req->tpa_number}}</td>
+		                            	
+		                            	@if (isset($req->tpa_number))
+		                            		<td>YES - {{$req->tpa_number}}</td>
+		                            	@else
+		                            		<td>YES</td>
+		                            	@endif
+
 		                            @else
-		                            	<td>NO</td>
+		                            		<td>NO</td>
 		                            @endif
 
 		                            @if ( Auth::user()->name == 'MM11')

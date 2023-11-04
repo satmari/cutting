@@ -1650,7 +1650,7 @@
             	    	Comment office: {{$req1->comment_office}}<br />
             	    	<b>Status: {{$req1->status }}<b />
             	    	">
-            	    	<span class="">{{$req1->g_bin}}<br>{{$req1->mattress}}</span>
+            	    	<span class="">{{$req1->g_bin}}<br><a href="{{ url('edit_mattress_line/'.$req1->id) }}">{{$req1->mattress}}</a></span>
 
         	    	</li>
 				@endforeach	  
@@ -1694,7 +1694,7 @@
             	    	<b>Status: {{$req2->status }}<b />
             	    	">
             	    	
-            	    	<span class="">{{$req2->g_bin}}<br>{{$req2->mattress}}</span>
+            	    	<span class="">{{$req2->g_bin}}<br><a href="{{ url('edit_mattress_line/'.$req2->id) }}">{{$req2->mattress}}</a></span>
 
             	    </li>
 				@endforeach	  
@@ -1737,7 +1737,7 @@
             	    	Comment office: {{$req3->comment_office}}<br />
             	    	<b>Status: {{$req3->status }}<b />
             	    	">
-            	    	<span class="">{{$req3->g_bin}}<br>{{$req3->mattress}}</span>
+            	    	<span class="">{{$req3->g_bin}}<br><a href="{{ url('edit_mattress_line/'.$req3->id) }}">{{$req3->mattress}}</a></span>
 
             	    </li>
 				@endforeach	  
@@ -1780,7 +1780,7 @@
             	    	Comment office: {{$req4->comment_office}}<br />
             	    	<b>Status: {{$req4->status }}<b />
             	    	">
-            	    	<span class="">{{$req4->g_bin}}<br>{{$req4->mattress}}</span>
+            	    	<span class="">{{$req4->g_bin}}<br><a href="{{ url('edit_mattress_line/'.$req4->id) }}">{{$req4->mattress}}</a></span>
 
             	    </li>
 				@endforeach	  
@@ -1823,7 +1823,7 @@
             	    	Comment office: {{$req5->comment_office}}<br />
             	    	<b>Status: {{$req5->status }}<b />
             	    	">
-            	    	<span class="">{{$req5->g_bin}}<br>{{$req5->mattress}}</span>
+            	    	<span class="">{{$req5->g_bin}}<br><a href="{{ url('edit_mattress_line/'.$req5->id) }}">{{$req5->mattress}}</a></span>
 
             	    </li>
 				@endforeach	  
@@ -1866,7 +1866,7 @@
             	    	Comment office: {{$req6->comment_office}}<br />
             	    	<b>Status: {{$req6->status }}<b />
             	    	">
-            	    	<span class="">{{$req6->g_bin}}<br>{{$req6->mattress}}</span>
+            	    	<span class="">{{$req6->g_bin}}<br><a href="{{ url('edit_mattress_line/'.$req6->id) }}">{{$req6->mattress}}</a></span>
 
             	   	</li>
 				@endforeach	  
@@ -1909,7 +1909,7 @@
             	    	Comment office: {{$req7->comment_office}}<br />
             	    	<b>Status: {{$req7->status }}<b />
             	    	">
-            	    	<span class="">{{$req7->g_bin}}<br>{{$req7->mattress}}</span>
+            	    	<span class="">{{$req7->g_bin}}<br><a href="{{ url('edit_mattress_line/'.$req7->id) }}">{{$req7->mattress}}</a></span>
 
             	    </li>
 				@endforeach	  
@@ -1953,7 +1953,7 @@
             	    	Comment office: {{$req8->comment_office}}<br />
             	    	<b>Status: {{$req8->status }}<b />
             	    	">
-            	    	<span class="">{{$req8->g_bin}}<br>{{$req8->mattress}}</span>
+            	    	<span class="">{{$req8->g_bin}}<br><a href="{{ url('edit_mattress_line/'.$req8->id) }}">{{$req8->mattress}}</a></span>
 
             	    </li>
 				@endforeach	  

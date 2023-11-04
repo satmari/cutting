@@ -409,6 +409,14 @@ html>body #sortable1 #sortable2 #sortable3 #sortable4 #sortable5 li {
   color: #fd0000 !important;
 }
 
+.top_priority a:link{
+  color: #fd0000 !important;
+}
+
+.top_priority a:visited{
+  color: #fd0000 !important;
+}
+
 .top_priority {
   background-color: #ff00008a !important;
   -moz-border-radius: 5px;
@@ -416,6 +424,14 @@ html>body #sortable1 #sortable2 #sortable3 #sortable4 #sortable5 li {
 }
 
 .high_priority {
+  color: #ec930d !important;
+}
+
+.high_priority a:link{
+  color: #ec930d !important;
+}
+
+.high_priority a:visited{
   color: #ec930d !important;
 }
 
@@ -430,6 +446,14 @@ html>body #sortable1 #sortable2 #sortable3 #sortable4 #sortable5 li {
   color: #9531b5cc !important;
 }
 
+.fs_priority a:link{
+  color: #9531b5cc !important;
+}
+
+.fs_priority a:visited{
+  color: #9531b5cc !important;
+}
+
 .fs_priority {
   /*color: #ec930d !important;*/
   background-color: #b982f5cc !important;
@@ -441,6 +465,14 @@ html>body #sortable1 #sortable2 #sortable3 #sortable4 #sortable5 li {
   color: #10b52b !important;
 }
 
+.ss_priority a:link{
+  color: #10b52b !important;
+}
+
+.ss_priority a:visited{
+  color: #10b52b !important;
+}
+
 .ss_priority {
   /*color: #ec930d !important;*/
   background-color: #63ff7dcc !important;
@@ -449,6 +481,14 @@ html>body #sortable1 #sortable2 #sortable3 #sortable4 #sortable5 li {
 }
 
 .ts_priority {
+  color: #007995cc !important;
+}
+
+.ts_priority a:link{
+  color: #007995cc !important;
+}
+
+.ts_priority a:visited{
   color: #007995cc !important;
 }
 
