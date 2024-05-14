@@ -14,7 +14,11 @@
 				{!! Form::model($wastage_line , ['method' => 'POST', 'url' => '/wastage_edit_post']) !!}
 
 				{!! Form::hidden('id', $wastage_line->id, ['class' => 'form-control']) !!}
-
+				
+				<div class="panel-body">
+					<span>Weight:</span>
+					{!! Form::input('number', 'weight', round($wastage_line->weight,2), ['class' => 'form-control']) !!}
+				</div>
 				<div class="panel-body">
 					<span>Reported to logistic:</span>
 					{!! Form::select('log_rep', array(''=>'','YES'=>'YES','NO'=>'NO'), $wastage_line->log_rep, array('class' => 'form-control')) !!} 

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
 use App\marker_header;
+use App\marker_headers_log;
 use App\marker_line;
 use DB;
 
@@ -37,7 +38,7 @@ class markerController extends Controller {
 		// // $date_before = date('Y-m-d H:i:s', strtotime(' -1 day'));
 		// dd($date_before);
 
-		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT id,marker_name,marker_width,marker_length,cutting_perimeter,perimeter,average_consumption,efficiency,status  FROM marker_headers where [status] = 'ACTIVE'"));
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT id,marker_name,marker_width,marker_length,cutting_perimeter,perimeter,average_consumption,efficiency,status,creation_type  FROM marker_headers where [status] = 'ACTIVE' OR [status] = 'USELESS' "));
 		return view('marker.table',compact('data'));
 	}
 
@@ -54,6 +55,18 @@ class markerController extends Controller {
 		$this->validate($request, ['marker_name'=>'required']);
 		$input = $request->all(); // change use (delete or comment user Requestl; )
 		// dd($input);
+
+		if (!isset($input['creation_type'])) {
+			dd('creation_type not set');
+			
+		} else {
+			// dd('set');
+			if ($input['creation_type'] == '') {
+				
+				dd('creation_type is empty, please go back');
+			} 
+		}
+		// dd('stop');
 
 		$marker_name = strtoupper($input['marker_name']);
 		$marker_header_id = $input['marker_header_id'];
@@ -96,6 +109,8 @@ class markerController extends Controller {
 		$size =  $input['size'];
 		$qty =  $input['qty'];
 
+		$creation_type = $input['creation_type'];
+
 		// print_r($style_size);
 
 		// save to header
@@ -136,7 +151,54 @@ class markerController extends Controller {
 		$table->min_length = $min_length;
 		$table->status = "ACTIVE";
 
+		$table->creation_type = $creation_type;
+
 		$table->save();
+
+
+		// save to header
+		$table_log = new marker_headers_log;
+
+		$table_log->marker_name = $marker_name;
+
+		$table_log->marker_width = $marker_width;
+		$table_log->marker_length = $marker_length;
+
+		$table_log->marker_type = $marker_type;
+		$table_log->marker_code = $marker_code;
+		$table_log->fabric_type = $fabric_type;
+		$table_log->constraint = $constraint;
+
+		$table_log->spacing_around_pieces = $spacing_around_pieces;
+		$table_log->spacing_around_pieces_top = $spacing_around_pieces_top;
+		$table_log->spacing_around_pieces_bottom = $spacing_around_pieces_bottom;
+		$table_log->spacing_around_pieces_right = $spacing_around_pieces_right;
+		$table_log->spacing_around_pieces_left = $spacing_around_pieces_left;
+
+		$table_log->processing_date = $processing_date;
+
+		$table_log->efficiency = $efficiency;
+		$table_log->cutting_perimeter = $cutting_perimeter;
+		$table_log->perimeter = $perimeter;
+		$table_log->average_consumption = $average_consumption;
+		$table_log->lines = $lines;
+		$table_log->curves = $curves;
+		$table_log->areas = $areas;
+		$table_log->angles = $angles;
+		$table_log->notches = $notches;
+		$table_log->total_pcs =  $total_pcs;
+
+		$table_log->variant_model = $variant_model;
+		$table_log->key = $key;
+
+		$table_log->min_length = $min_length;
+		$table_log->status = "ACTIVE";
+
+		$table_log->creation_type = $creation_type;
+
+		$table_log->save();
+
+
 
 
 		for ($i=0; $i < count($style); $i++) { 
@@ -236,6 +298,7 @@ class markerController extends Controller {
 
 		$id =  $input['id'];
 		$status =  $input['status'];
+		$creation_type =  $input['creation_type'];
 		$marker_length =  round($input['marker_length'],3);
 		$efficiency =  round($input['efficiency'],2);
 		$cutting_perimeter =  round($input['cutting_perimeter'],2);
@@ -273,6 +336,7 @@ class markerController extends Controller {
 				$data->cutting_perimeter = $cutting_perimeter;
 				$data->perimeter = $perimeter;
 				$data->average_consumption = $average_consumption;
+				$data->creation_type = $creation_type;
 				$data->save();
 			}
 
@@ -284,6 +348,7 @@ class markerController extends Controller {
 			$data->cutting_perimeter = $cutting_perimeter;
 			$data->perimeter = $perimeter;
 			$data->average_consumption = $average_consumption;
+			$data->creation_type = $creation_type;
 			$data->save();
 		}
 

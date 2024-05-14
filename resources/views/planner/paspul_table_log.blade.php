@@ -83,6 +83,9 @@
 		                            
 
 									@if(Auth::user()->level() == 3 )
+											<!-- <td>
+												<a href="{{ url('paspul_change_log_q/'.$req->id) }}" class="btn btn-danger btn-xs">Return to stock</a>
+											</td> -->
 										@if ($req->location_type == 'line' OR $req->location_type == 'bb')
 											@if ($req->skeda != '')
 											<td>

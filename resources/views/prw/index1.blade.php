@@ -80,7 +80,12 @@
 			                    @foreach ($data as $req)
 			                        <tr class="ss" id="item[]={{ $req->id }}" style="border-top: 3px solid grey;
 				                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
-											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
+											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);
+											 @if ((int)$req->rewound_length_a - ((int)$req->rewound_length_a-(int)$req->rewound_sum))
+											 color:red !important;font-weight: 700;
+											 
+											 @endif
+											 ">
 			                            
 			                            <td>{{ $req->position}}</td>
 			                            <td>{{ $req->paspul_roll}}</td>
@@ -122,7 +127,8 @@
 						        	    <td>{{ $req->rewinding_method}}</td>
 										<td>
 											<a href="{{ url('paspul_prw1/'.$req->id) }}" class="btn btn-danger btn-xs center-block">
-											Rewound paspul roll</a>
+											Rewound paspul roll</a><br>
+										<a href="{{ url('request_material_p/'.$req->id) }}" class="btn btn-default btn-xs center-block">Material request</a>
 										</td>
 										
 

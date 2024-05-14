@@ -158,6 +158,73 @@
 				</div>
 				@endif
 
+
+				@if(Auth::check() && (Auth::user()->name == 'admin') OR (Auth::user()->name == 'planner'))				
+
+				<div class="panel panel-default">
+					<div class="panel-heading"><b><big>Style parts import</big></b> with Excel file</div>
+					<p>Note: Excel file should contian:
+					Style,	Part
+					</p>
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImport_style_parts']]) !!}
+					
+						<div class="panel-body">
+							{!! Form::file('file10', ['class' => 'center-block']) !!}
+						</div>
+						<div class="panel-body">
+							{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
+						</div>
+						@include('errors.list')
+					{!! Form::close() !!}
+				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">Import BOM cons</div>
+					</p>
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'action'=>['importController@bom_cons_post']]) !!}
+					
+					<div class="panel-body">
+						{!! Form::file('file11', ['class' => 'center-block']) !!}
+					</div>
+					<div class="panel-body">
+						{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
+					</div>
+					@include('errors.list')
+				{!! Form::close() !!}
+				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">Import Skeda ratios</div>
+					</p>
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'action'=>['importController@skeda_ratio_post']]) !!}
+					
+					<div class="panel-body">
+						{!! Form::file('file12', ['class' => 'center-block']) !!}
+					</div>
+					<div class="panel-body">
+						{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
+					</div>
+					@include('errors.list')
+				{!! Form::close() !!}
+				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">Import cutting SMV</div>
+					</p>
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'action'=>['importController@bom_cutting_smv_post']]) !!}
+					
+					<div class="panel-body">
+						{!! Form::file('file13', ['class' => 'center-block']) !!}
+					</div>
+					<div class="panel-body">
+						{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
+					</div>
+					@include('errors.list')
+				{!! Form::close() !!}
+				</div>
+
+				@endif
+
 			@endif
 
 			<div class="panel panel-default">

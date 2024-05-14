@@ -17,6 +17,7 @@ use Maatwebsite\Excel\Facades\Excel;
 // use Request; // only for import
 
 use App\operators;
+use App\operator_others;
 use App\User;
 use DB;
 
@@ -55,6 +56,8 @@ class operatorsController extends Controller {
 					'PLOT' => 'Ploter operator',
 					'CUT' => 'Cutting operator',
 					'TUB' => 'Tubolare operator',
+					'FO' => 'Forklift operator',
+					'CPO' => 'Checking part operator',
 					'PLANNER' => 'Planner'
 				];
 		// dd($data);
@@ -110,6 +113,8 @@ class operatorsController extends Controller {
 					'PLOT' => 'Ploter operator',
 					'CUT' => 'Cutting operator',
 					'TUB' => 'Tubolare operator',
+					'FO' => 'Forklift operator',
+					'CPO' => 'Checking part operator',
 					'PLANNER' => 'Planner'
 				];
 
@@ -151,5 +156,54 @@ class operatorsController extends Controller {
 		}
 
 		return Redirect::to('operators');
+	}
+
+
+	public function operator_others()
+	{
+		//
+		$work_place = "PLANNER";
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+		  FROM [operator_others]
+		  ORDER BY [rnumber] asc
+		  "));
+		// dd($data);
+
+		return view('Operators.operator_others',compact('data'));
+
+	}
+
+	public function operator_create_others() {
+		
+		// dd($data);
+		return view('Operators.create_others');
+	}
+
+	public function operator_others_create_post(Request $request)
+	{
+		//
+		$this->validate($request, ['operator'=>'required', 'rnumber'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+		
+		$rnumber = $input['rnumber'];
+		$operator = $input['operator'];
+
+
+		try {
+			$table = new operator_others;
+
+			$table->operator = $operator;
+			$table->rnumber = $rnumber;
+		
+			$table->save();
+		}
+		catch (\Illuminate\Database\QueryException $e) {
+			$msg = 'Operator already exist';
+			return view('Operators.error', compact('msg'));
+		}
+
+		return Redirect::to('operator_others');
 	}
 }

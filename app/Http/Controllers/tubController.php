@@ -16,6 +16,8 @@ use App\mattress_eff;
 use App\mattresses;
 use App\mattress_pro;
 use App\o_roll;
+use App\material_requests;
+use App\material_request_phases;
 
 use DB;
 
@@ -461,7 +463,9 @@ class tubController extends Controller {
 			$date = date('Y-m-d H:i:s');
 		}
 
-		// $table3_new = new mattress_phases;
+		// $find_position = mattress_details::where('mattress_id','=',$id)->get();
+		// $pre_position = $find_position[0]->position;
+
 		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 		$table3_new->mattress_id = $id;
 		$table3_new->mattress = $mattress;
@@ -473,6 +477,7 @@ class tubController extends Controller {
 		$table3_new->operator2 = $operator2;
 		$table3_new->date = $date;
 		$table3_new->id_status = $id.'-'.$status;
+		// $table3_new->pre_position = $pre_position;
 		$table3_new->save();
 
 
@@ -602,8 +607,9 @@ class tubController extends Controller {
 		}
 		$status = "TO_LOAD";
 
-		// add to mattress_phases
-		// $table3_new = new mattress_phases;
+		// $find_position = mattress_details::where('mattress_id','=',$id)->get();
+		// $pre_position = $find_position[0]->position;
+		
 		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 		$table3_new->mattress_id = $id;
 		$table3_new->mattress = $mattress;
@@ -615,6 +621,7 @@ class tubController extends Controller {
 		$table3_new->operator2 = $operator2;
 		$table3_new->date = $date;
 		$table3_new->id_status = $id.'-'.$status;
+		// $table3_new->pre_position = $pre_position;
 		$table3_new->save();
 
 		return redirect('/tub');
@@ -1066,24 +1073,7 @@ class tubController extends Controller {
 				$table_update_2->layers_partial = (float)$layers_partial;
 				$table_update_2->save();
 
-				// mattress_phasess
-				// all mattress_phases for this mattress set to NOT ACTIVE
-				// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				// 		id, mattress 
-				// 	FROM [mattress_phases] WHERE mattress_id = '".$id."' AND active = 1"));
 				
-				// if (isset($find_all_mattress_phasses[0])) {
-				// 	$mattress = $find_all_mattress_phasses[0]->mattress;
-
-				// 	// dd($find_all_mattress_phasses);
-				// 	for ($y=0; $y < count($find_all_mattress_phasses); $y++) { 
-						
-				// 			$table_update_3 = mattress_phases::findOrFail($find_all_mattress_phasses[$y]->id);
-				// 			$table_update_3->active = 0;
-				// 			$table_update_3->save();
-				// 	}	
-				// }
-
 				$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
 					SET NOCOUNT ON;
 					UPDATE [mattress_phases]
@@ -1099,8 +1089,9 @@ class tubController extends Controller {
 					$date = date('Y-m-d H:i:s');
 				}
 				
-				// save mattress_phases
-				// $table1_new = new mattress_phases;
+				// $find_position = mattress_details::where('mattress_id','=',$id)->get();
+				// $pre_position = $find_position[0]->position;
+
 				$table1_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 				$table1_new->mattress_id = $id;
 				$table1_new->mattress = $mattress;
@@ -1112,6 +1103,7 @@ class tubController extends Controller {
 				$table1_new->operator2 = $operator2;
 				$table1_new->date = $date;
 				$table1_new->id_status = $id.'-'.$status;
+				// $table1_new->pre_position = $pre_position;
 				$table1_new->save();
 				
 
@@ -1210,7 +1202,9 @@ class tubController extends Controller {
 					$date = date('Y-m-d H:i:s');
 				}
 
-				// $table4_new = new mattress_phases;
+				// $find_position = mattress_details::where('mattress_id','=',$id)->get();
+				// $pre_position = $find_position[0]->position;
+				
 				$table4_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 				$table4_new->mattress_id = $id;
 				$table4_new->mattress = $mattress;
@@ -1222,6 +1216,7 @@ class tubController extends Controller {
 				$table4_new->operator2 = $operator2;
 				$table4_new->date = $date;
 				$table4_new->id_status = $id.'-'.$status;
+				// $table4_new->pre_position = $pre_position;
 				$table4_new->save();
 			}
 
@@ -1246,4 +1241,113 @@ class tubController extends Controller {
 		// dd('stop');
 		return redirect('/tub');
 	}
+
+	public function request_material($id) {
+
+		$operator = Session::get('operator');
+		if (!isset($operator) OR $operator == '') {
+			// return redirect('/spreader');
+			$msg ='Operator must be logged!';
+			return view('tub.error',compact('msg'));
+		}
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				m.[material],
+				m.[dye_lot]
+			FROM [mattress_details] as d
+			JOIN [mattresses] as m ON m.[id] = d.[mattress_id]
+			INNER JOIN [mattress_phases] as p ON p.[mattress_id] = d.[mattress_id] AND p.[active] = 1
+			WHERE m.[id] = '".$id."' "));
+		// dd($data);
+
+		$material = $data[0]->material;
+		$dye_lot  = $data[0]->dye_lot;
+
+		// verify userId
+		if (Auth::check())
+		{
+		    $userId = Auth::user()->id;
+		    $device = Auth::user()->name;
+		} else {
+			$msg ='Device is not autenticated';
+			return view('tub.error',compact('msg'));
+		}
+		$location = substr($device, 0,3);
+		$sap_locations = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM sap_locations "));
+
+		return view('tub.request_material',compact('material','dye_lot','location','device','sap_locations'));
+	}
+
+	public function request_material_insert(Request $request) {
+		//
+		// $this->validate($request, ['sap_location1' => 'required']);
+		$input = $request->all(); 
+		// dd($input);
+
+		// dd('trenutno nije moguce snimiti zahtev');
+
+		$material = $input['material'];
+		$dye_lot = $input['dye_lot'];
+		$location = $input['location'];
+		$device = $input['device'];
+		$sap_location1 = $input['sap_location1'];
+	
+		if ($input['sap_location1'] == '') {
+			$msg ='SAP location 1 can not be empty.';
+			return view('spreader.error',compact('msg'));
+		}
+
+		if ($input['comment'] == '') {
+			$comment = NULL;
+		} else {
+			$comment = $input['comment'];
+		}		
+
+		$operator = Session::get('operator');
+		$counter = 0;
+		
+
+		if ($input['sap_location6'] != '') {
+			$counter = 6;
+		} else if ($input['sap_location5'] != '') {
+			$counter = 5;
+		} else if ($input['sap_location4'] != '') {
+			$counter = 4;
+		} else if ($input['sap_location3'] != '') {
+			$counter = 3;
+		} else if ($input['sap_location2'] != '') {
+			$counter = 2;
+		} else if ($input['sap_location1'] != '') {
+			$counter = 1;
+		}
+
+		for ($i=1; $i <= $counter; $i++) { 
+
+			// var_dump('c= '.$counter.'<br/>');
+			$table = new material_requests;
+			$table->material = $material;
+			$table->dye_lot = $dye_lot;
+			$table->sap_location1 = $input['sap_location'.$i];
+			// var_dump('loc is: '.$table->sap_location1.'<br/>');
+			$table->requred_qty;
+			$table->comment = $comment;
+			$table->save();
+
+			$status = 'CREATED';
+
+			$table_phases = material_request_phases::firstOrNew(['id_status' => $table->id.'-'.$status]);
+			$table_phases->material_request_id = $table->id;
+			$table_phases->status = $status;
+			$table_phases->location = $location;
+			$table_phases->device = $device;
+			$table_phases->active = 1;
+			$table_phases->operator1 = $operator;
+			$table_phases->operator2;
+			$table_phases->id_status = $table->id."-".$status;
+			$table_phases->save();
+		}
+
+		return redirect('/request_material_table');
+	}
+
 }

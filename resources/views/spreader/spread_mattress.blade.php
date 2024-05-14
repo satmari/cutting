@@ -11,7 +11,6 @@
 				
 				<div class="panel-body">	
 				@if ($status == 'TO_SPREAD')
-
 					<a href="{{ url('spread_mattress_complete/'.$id) }}" class="btn btn-danger center-block" >Spread mattress completly</a>
 					<br>
 					@if ($already_partialy_spreaded > 0)
@@ -20,14 +19,13 @@
 						<a href="{{ url('spread_mattress_partial/'.$id) }}" class="btn btn-warning center-block">Spread mattress partialy</a>
 					@endif
 					<br>
-				
 				@elseif ($status == 'SUSPENDED')
 
 					<a href="{{ url('spread_mattress_complete/'.$id) }}" class="btn btn-danger center-block" disabled>Spread mattress completly</a>
 					<br>
 					<a href="{{ url('spread_mattress_partial/'.$id) }}" class="btn btn-warning center-block" disabled>Spread mattress partialy</a>
 					<br>
-				@endif	
+				@endif
 
 	            @if (isset($success))
 				<div class="alert alert-success" role="alert">

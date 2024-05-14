@@ -6,7 +6,7 @@
 		<div class="text-center col-md-5 col-md-offset-4">
 			<div class="panel panel-default">
 				<div class="panel-heading">Cut phase adv &nbsp; &nbsp; &nbsp; &nbsp;
-					<a class="" href="cutting_xml_all"><b>Last 5000 lines</b></a>
+					<a class="" href="cutting_xml_all"><b>Last 10000 lines</b></a>
 				</div>
 
 				

@@ -30,7 +30,8 @@ class CreateMattressPhasesTable extends Migration {
 
 			$table->dateTime('date')->nullable();
 
-			$table->string('id_status')->nullable(); // added key in future
+			$table->string('id_status')->nullable(); // added 
+			$table->integer('pre_position')->nullable(); // added
 
 			$table->timestamps();
 		});

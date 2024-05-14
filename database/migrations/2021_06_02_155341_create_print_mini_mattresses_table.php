@@ -26,6 +26,7 @@ class CreatePrintMiniMattressesTable extends Migration {
 			$table->string('marker_width_0')->nullable();
 			$table->string('min_length_0')->nullable();
 			$table->string('spreading_method_0')->nullable();
+			$table->string('spreading_profile_0')->nullable();
 			$table->string('material_0')->nullable();
 			$table->string('color_desc_0')->nullable();
 			$table->string('dye_lot_0')->nullable();
@@ -67,6 +68,7 @@ class CreatePrintMiniMattressesTable extends Migration {
 			$table->string('min_length_1')->nullable();
 			$table->string('marker_width_1')->nullable();
 			$table->string('spreading_method_1')->nullable();
+			$table->string('spreading_profile_1')->nullable();
 			$table->string('material_1')->nullable();
 			$table->string('color_desc_1')->nullable();
 			$table->string('dye_lot_1')->nullable();

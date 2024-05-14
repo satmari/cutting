@@ -13,7 +13,8 @@
 
 				<div class="panel-body">
 					<div class="">
-						<a href="{{url('/')}}" class="btn btn-default center-block">Back</a>
+						<!-- <a href="{{url('/')}}" >Back</a> -->
+						<button class="btn btn-default center-block" onclick="history.back()">Go Back</button>
 					</div>
 				</div>
 			</div>

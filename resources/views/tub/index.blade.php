@@ -192,7 +192,8 @@
 											@if ($req->status == 'ON_HOLD')
 													disabled
 												@endif
-												>Other functions</a>
+												>Other functions</a><br>
+										<a href="{{ url('request_material_t/'.$req->id) }}" class="btn btn-default btn-xs center-block">Material request</a>
 									</td>
 		                        </tr>
 		                        <tr style="border-bottom: 3px solid grey;

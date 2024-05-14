@@ -69,6 +69,7 @@
                             <!-- <th><b>Min Len</b></th> -->
                             <th><b>Eff</b></th>
                             <th><b>Status</b></th>
+                            <th><b>Creation type</b></th>
                             <th></th>
                             <th></th>
                             <th></th>
@@ -87,6 +88,7 @@
                                 <!-- <td>{{-- round($req->average_consumption,2)  --}}</td> -->
                                 <td>{{ round($req->efficiency,2) }}</td>
                                 <td>{{ $req->status }}</td>
+                                <td>{{ $req->creation_type }}</td>
                                 <td><a href="{{ url('marker_edit/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit</a></td>
                                 <td><a href="{{ url('marker_details/'.$req->id) }}" class="btn btn-info btn-xs center-block">Details</a></td>
                                 <td><a href="{{ url('marker_delete/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Delete</a></td>

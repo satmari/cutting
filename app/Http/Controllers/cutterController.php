@@ -226,8 +226,9 @@ class cutterController extends Controller {
 			$date = date('Y-m-d H:i:s');
 		}
 
-		// save new mattress_phases
-		// $table3_new = new mattress_phases;
+		// $find_position = mattress_details::where('mattress_id','=',$id)->get();
+		// $pre_position = $find_position[0]->position;
+		
 		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 		$table3_new->mattress_id = $id;
 		$table3_new->mattress = $mattress;
@@ -239,6 +240,7 @@ class cutterController extends Controller {
 		$table3_new->operator2;
 		$table3_new->date = $date;
 		$table3_new->id_status = $id.'-'.$status;
+		// $table3_new->pre_position = $pre_position;
 		$table3_new->save();
 
 		return redirect('/cutter');
@@ -578,8 +580,9 @@ class cutterController extends Controller {
 
 		$date_now = date('Y-m-d H:i:s');
 
-		// save new mattress_phases
-		// $table3_new = new mattress_phases;
+		// $find_position = mattress_details::where('mattress_id','=',$id)->get();
+		// $pre_position = $find_position[0]->position;
+
 		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 		$table3_new->mattress_id = $id;
 		$table3_new->mattress = $mattress;
@@ -591,6 +594,7 @@ class cutterController extends Controller {
 		$table3_new->operator2;
 		$table3_new->date = $date;
 		$table3_new->id_status = $id.'-'.$status;
+		// $table3_new->pre_position = $pre_position;
 		$table3_new->save();
 
 		// reorder position of CUT

@@ -268,7 +268,9 @@ class packController extends Controller {
 		}		
 		// save mattress_phases
 		
-		// $table3_new = new mattress_phases;
+		// $find_position = mattress_details::where('mattress_id','=',$id)->get();
+		// $pre_position = $find_position[0]->position;
+
 		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 		$table3_new->mattress_id = $id;
 		$table3_new->mattress = $mattress;
@@ -280,6 +282,7 @@ class packController extends Controller {
 		$table3_new->operator2;
 		$table3_new->date = $date;
 		$table3_new->id_status = $id.'-'.$status;
+		// $table3_new->pre_position = $pre_position;
 		$table3_new->save();
 
 		$reorder_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 

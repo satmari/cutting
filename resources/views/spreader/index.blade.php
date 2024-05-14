@@ -15,22 +15,20 @@
 		            	OR (Auth::user()->name == 'MS21') OR (Auth::user()->name == 'MS22') OR (Auth::user()->name == 'MS23')
 		            	OR (Auth::user()->name == 'MS31') OR (Auth::user()->name == 'MS32') OR (Auth::user()->name == 'MS33')
 		            	)
-		            	<div class="input-group">
-		            		<span class="input-group-addon" style="">
-		            			Efficiency1: &nbsp; <big><b>{{ $eff}} </b></big>
-		            		
-		            			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-		            			Efficiency2: &nbsp; <big><b>{{ $eff2}} </b></big>
-		            		
-		            		</span>
-		                </div>
+			            	<div class="input-group">
+			            		<span class="input-group-addon" style="">
+			            			Efficiency1: &nbsp; <big><b>{{ $eff}} </b></big>
+			            		
+			            			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+			            			Efficiency2: &nbsp; <big><b>{{ $eff2}} </b></big>
+			            		</span>
+			                </div>
 		                @else
-		                <div class="input-group">
-		            		<span class="input-group-addon">
-		            			Efficiency: &nbsp; &nbsp; <big><b>{{ $eff}} </b></big>
-		            		</span>
-		                </div>
-
+			                <div class="input-group">
+			            		<span class="input-group-addon">
+			            			Efficiency: &nbsp; &nbsp; <big><b>{{ $eff}} </b></big>
+			            		</span>
+			                </div>
 		                @endif
 
 		        	 	<div class="input-group"> <span class="input-group-addon">Filter</span>
@@ -73,6 +71,7 @@
 		                            @else 
 		                            	<th >Pos</th>
 			                            <th >G-bin</th>
+			                            <th >Skeda</th>
 		                            @endif
 		                            <th >Marker</th>
 		                            <th >Marker Length [m]</th>
@@ -128,6 +127,7 @@
 		                            @else
 		                            	<td>{{ $req->position}}</td>
 		                            	<td class=""><span>{{ $req->g_bin}}</span></td>
+		                            	<td class=""><span>{{ $req->skeda}}</span></td>
 		                            @endif
 
 		                            <td>{{ $req->marker_name}}</td>
@@ -181,17 +181,30 @@
 
 									<td>
 										@if ($req->status == 'TO_LOAD')
-											<a href="{{ url('mattress_to_load/'.$req->id) }}" class="btn btn-info btn-xs center-block"
-												@if ($req->status == 'ON_HOLD')
-													disabled
-												@endif>
-												Load mattress</a>
+
+											@if ($req->status == 'ON_HOLD')
+												<a href="{{ url('mattress_to_load/'.$req->id) }}" class="btn btn-danger btn-xs center-block" disabled >
+													Load mattress
+												</a>
+											@else
+												<a href="{{ url('mattress_to_load/'.$req->id) }}" class="btn btn-info btn-xs center-block" >
+													Load mattress
+												</a>
+											@endif
+
+
 										@else
-											<a href="{{ url('mattress_to_spread/'.$req->id) }}" class="btn btn-warning btn-xs center-block"
-												@if ($req->status == 'ON_HOLD')
-													disabled
-												@endif
-												>Spread mattress</a>
+
+											@if ($req->status == 'ON_HOLD')
+												<a href="{{ url('mattress_to_spread/'.$req->id) }}" class="btn btn-danger btn-xs center-block" disabled>
+													Spread mattress
+												</a>
+											@else
+												<a href="{{ url('mattress_to_spread/'.$req->id) }}" class="btn btn-warning btn-xs center-block"  >
+													Spread mattress
+												</a>
+											@endif
+
 										@endif
 									</td>
 									<!-- <td>
@@ -200,11 +213,13 @@
 										@endif	
 									</td> -->
 									<td>
-										<a href="{{ url('other_functions/'.$req->id) }}" class="btn btn-default btn-xs center-block"
-											@if ($req->status == 'ON_HOLD')
-													disabled
-												@endif
-												>Other functions</a>
+										@if ($req->status == 'ON_HOLD')
+											<a href="{{ url('other_functions/'.$req->id) }}" class="btn btn-danger btn-xs center-block" disabled> Other functions</a><br>
+										@else
+											<a href="{{ url('other_functions/'.$req->id) }}" class="btn btn-default btn-xs center-block" > Other functions</a><br>
+										@endif
+										
+										<a href="{{ url('request_material/'.$req->id) }}" class="btn btn-default btn-xs center-block">Material request</a>
 									</td>
 		                        </tr>
 		                        <tr style="border-bottom: 3px solid grey;

@@ -74,6 +74,7 @@
                             <th><b>Qty</b></th>
                             <th data-sortable="true">Status</th>
                             <th data-sortable="true">Created</th>
+                            <th data-sortable="true">Updated</th>
                             <th>Comment</th>
                             <th></th>
                             
@@ -88,7 +89,8 @@
                             <td>{{ $req->style }}</td>
                             <td><b>{{ $req->qty }}</b></td>
                             <td>{{ $req->status }}</td>
-                            <td>{{ $req->created_at }}</td>
+                            <td>{{ substr($req->created_at,0,16) }}</td>
+                            <td>{{ substr($req->updated_at,0,16) }}</td>
                             <td>{{ $req->comment }}</td>
                             
                             @if(!isset($h))

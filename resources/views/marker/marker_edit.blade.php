@@ -13,7 +13,7 @@
 
 					<div class="panel-body">
 						<p>Status:<span style="color:red;">*</span></p>
-	               		{!! Form::select('status', array('ACTIVE'=>'ACTIVE', 'NOT ACTIVE' => 'NOT ACTIVE'), $data->status, array('class' => 'form-control', 'autofocus' => 'autofocus')) !!} 
+	               		{!! Form::select('status', array('ACTIVE'=>'ACTIVE', 'NOT ACTIVE' => 'NOT ACTIVE', 'USELESS' => 'USELESS'), $data->status, array('class' => 'form-control', 'autofocus' => 'autofocus')) !!} 
 					</div>
 
 					<div class="panel-body">
@@ -39,6 +39,11 @@
                     <div class="panel-body">
                         <p>Average Consumption:</p>
                     	{!! Form::number('average_consumption', round($data->average_consumption,3) , ['class' => 'form-control', 'step'=>'0.001']) !!}
+                    </div>
+
+                    <div class="panel-body">
+                        <p>Creation type:</p>
+                    	{!! Form::select('creation_type', array(''=>'','Local 8min'=>'Local 8min', 'Local 12min' => 'Local 12min', 'Local manually' => 'Local manually', 'Cloud fast' => 'Cloud fast', 'Cloud std 1h' => 'Cloud std 1h', 'Cloud std 4h' => 'Cloud std 4h', 'Cloud std 12h' => 'Cloud std 12h'), $data->creation_type , array('class' => 'form-control', 'autofocus' => 'autofocus')) !!} 
                     </div>
 
 					<div class="panel-body">

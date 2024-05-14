@@ -16,6 +16,8 @@ use App\marker_change;
 use App\paspul;
 use App\paspul_line;
 use App\paspul_rewound;
+use App\material_requests;
+use App\material_request_phases;
 
 use DB;
 
@@ -1064,5 +1066,104 @@ class prwController extends Controller {
 
 		return redirect('/');
 	}
+
+	public function request_material($id) {
+
+		$operator = Session::get('operator');
+		if (!isset($operator) OR $operator == '') {
+			// return redirect('/spreader');
+			$msg ='Operator must be logged!';
+			return view('prw.error',compact('msg'));
+		}
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			      p.[material]
+				  ,p.[dye_lot]
+			FROM [cutting].[dbo].[paspuls] as p
+			INNER JOIN [cutting].[dbo].[paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] and pl.[active] = 1
+			WHERE p.[id] = '".$id."' "));
+		// dd($data);
+
+		$material = $data[0]->material;
+		$dye_lot  = $data[0]->dye_lot;
+
+		// verify userId
+		if (Auth::check())
+		{
+		    $userId = Auth::user()->id;
+		    $device = Auth::user()->name;
+		} else {
+			$msg ='Device is not autenticated';
+			return view('prw.error',compact('msg'));
+		}
+		$location = substr($device, 0,3);
+		$sap_locations = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM sap_locations "));
+
+		return view('prw.request_material',compact('material','dye_lot','location','device','sap_locations'));
+	}
+
+	public function request_material_insert(Request $request) {
+		//
+		// $this->validate($request, ['sap_location1' => 'required']);
+		$input = $request->all(); 
+		// dd($input);
+
+		$material = $input['material'];
+		$dye_lot = $input['dye_lot'];
+		$location = $input['location'];
+		$device = $input['device'];
+
+		$sap_location1 = NULL;
+		$sap_location2 = NULL;
+		$sap_location3 = NULL;
+		$sap_location4 = NULL;
+		$sap_location5 = NULL;
+		$sap_location6 = NULL;
+
+		if ((int)$input['required_qty'] == 0 ) {
+			$msg ='For PRW user, required qty is mandatory, please add.';
+			return view('prw.error',compact('msg'));
+		} else {
+			$required_qty = (int)$input['required_qty'];
+		}
+
+		if ($input['comment'] == '') {
+			$comment = NULL;
+		} else {
+			$comment = $input['comment'];
+		}
+		
+		$operator = Session::get('operator');
+
+		$table = new material_requests;
+		$table->material = $material;
+		$table->dye_lot = $dye_lot;
+		$table->sap_location1;
+		$table->sap_location2;
+		$table->sap_location3;
+		$table->sap_location4;
+		$table->sap_location5;
+		$table->sap_location6;
+		$table->required_qty = $required_qty;
+		$table->comment = $comment;
+		$table->save();
+
+		$status = 'CREATED';
+
+		$table_phases = material_request_phases::firstOrNew(['id_status' => $table->id.'-'.$status]);
+		$table_phases->material_request_id = $table->id;
+		$table_phases->status = $status;
+		$table_phases->location = $location;
+		$table_phases->device = $device;
+		$table_phases->active = 1;
+		$table_phases->operator1 = $operator;
+		$table_phases->operator2;
+		$table_phases->id_status = $table->id."-".$status;
+		$table_phases->save();
+
+		return redirect('request_material_table');
+	}
+
+	
 
 }

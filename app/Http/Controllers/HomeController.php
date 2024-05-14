@@ -184,6 +184,17 @@ class HomeController extends Controller {
 			    return redirect('/whs');
 		 	}
 
+		 	if ($user->is('FO')) { 
+			    // if user has at least one role
+			    return redirect('/fo');
+		 	}
+
+		 	if ($user->is('CPO')) { 
+			    // if user has at least one role
+			    // dd('cpo');
+			    return redirect('/cpo');
+		 	}
+
 		}
 
 		return view('home');
@@ -191,6 +202,9 @@ class HomeController extends Controller {
 
 	public function test() {
 		// dd("test");
+		// $id = 4;
+		// $pre_position = mattress_details::where('mattress_id','=',$id)->get();
+		// dd($pre_position[0]->position);
 
 		/*
 		$find_mattress_id = DB::connection('sqlsrv')->select(DB::raw("SELECT mattress_id, status, COUNT(*) as lines
@@ -258,11 +272,11 @@ class HomeController extends Controller {
 		// $table3_new->save();
 
 
-		$jedan = 1;
-		$dva = 'dva';
+		// $jedan = 1;
+		// $dva = 'dva';
 
-		$final = $jedan.'-'.$dva;
-		dd($final);
+		// $final = $jedan.'-'.$dva;
+		// dd($final);
 	}
 
 

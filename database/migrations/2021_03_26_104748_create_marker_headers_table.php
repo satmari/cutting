@@ -51,6 +51,8 @@ class CreateMarkerHeadersTable extends Migration {
 			$table->float('min_length')->nullable();
 			$table->string('status');
 
+			$table->string('creation_type')->nullable();
+
 			$table->timestamps();
 		});
 	}

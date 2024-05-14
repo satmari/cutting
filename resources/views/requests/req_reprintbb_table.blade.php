@@ -73,6 +73,7 @@
                             <th>Leader</th>
                             <th data-sortable="true">Status</th>
                             <th data-sortable="true">Created</th>
+                            <th data-sortable="true">Updated</th>
                             <th>Comment</th>
                             <th></th>
                             
@@ -88,7 +89,8 @@
                             <td><b>{{ $req->module }}</b></td>
                             <td>{{ $req->leader }}</td>
                             <td>{{ $req->status }}</td>
-                            <td>{{ $req->created_at }}</td>
+                            <td>{{ substr($req->created_at,0,16) }}</td>
+                            <td>{{ substr($req->updated_at,0,16) }}</td>
                             <td>{{ $req->comment }}</td>
 
                             

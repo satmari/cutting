@@ -49,6 +49,7 @@
                             <th data-sortable="true">Komentar</th>
                             <th data-sortable="true">Status</th>
                             <th data-sortable="true">Created</th>
+                            <th data-sortable="true">Updated</th>
                             
                             
                         </tr>
@@ -63,7 +64,8 @@
                             <td>{{ $req->bagno }}</td>
                             <td>{{ $req->comment }}</td>
                             <td><b>{{ $req->status }}</b></td>
-                            <td>{{ $req->created_at }}</td>
+                            <td>{{ substr($req->created_at,0,16) }}</td>
+                            <td>{{ substr($req->updated_at,0,16) }}</td>
                             
                                                         
                         </tr>

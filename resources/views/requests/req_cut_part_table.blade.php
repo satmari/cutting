@@ -78,6 +78,7 @@
                             <th data-sortable="true">Status</th>
                             <th>Comment</th>
                             <th data-sortable="true">Created</th>
+                            <th data-sortable="true">Updated</th>
                             <th></th>
                             
                         </tr>
@@ -98,7 +99,8 @@
                             <td><a href="http://172.27.161.173/settings/public/storage/StyleImages/{{ $req->image }}" target="_blank" onClick="javascript:window.open('http://172.27.161.173/settings/public/storage/StyleImages/{{ $req->image }}','Windows','width=650,height=350,toolbar=no,menubar=no,scrollbars=yes,resizable=yes,location=no,directories=no,status=no');return false" )>show image</a> </td>
                             <td>{{ $req->status }}</td>
                             <td>{{ $req->comment }}</td>
-                            <td>{{ $req->created_at }}</td>
+                            <td>{{ substr($req->created_at,0,16) }}</td>
+                            <td>{{ substr($req->updated_at,0,16) }}</td>
                             
                             @if(!isset($h))
                                 <td><a href="{{url('/req_cut_part_status/'.$req->id)}}" class="btn btn-danger btn-xs ">Change status</a></td>    

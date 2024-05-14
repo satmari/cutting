@@ -191,6 +191,7 @@ Route::post('postImportConsPo', 'importController@postImportConsPo');
 Route::get('postImportUpdatePass', 'importController@postImportUpdatePass');
 Route::post('postImportMaterials', 'importController@postImportMaterials');
 Route::post('postImport_marker_status', 'importController@postImport_marker_status');
+Route::post('postImport_style_parts', 'importController@postImport_style_parts');
 
 Route::get('wastage_table_import','importController@index');
 Route::post('postImportWastage_report','importController@postImportWastage_report');
@@ -198,6 +199,13 @@ Route::post('postImport_marker','importController@postImport_marker');
 Route::post('postImport_skeda','importController@postImport_skeda');
 Route::post('postImport_pas_bin','importController@postImport_pas_bin');
 Route::post('postImport_consumption','importController@postImport_consumption');
+
+Route::post('bom_cons_post', 'importController@bom_cons_post');
+Route::post('skeda_ratio_post', 'importController@skeda_ratio_post');
+
+Route::post('bom_cutting_smv_post', 'importController@bom_cutting_smv_post');
+
+
 
 // Cutting XML
 Route::get('cutting_xml', 'cutting_xml@cutting_xml');
@@ -212,6 +220,12 @@ Route::get('operator_create', 'operatorsController@operator_create');
 Route::post('operator_create_post', 'operatorsController@operator_create_post');
 Route::get('operator_edit/{id}', 'operatorsController@operator_edit');
 Route::post('operator_edit_post', 'operatorsController@operator_edit_post');
+
+// Operatos others
+Route::get('operator_others', 'operatorsController@operator_others');
+Route::get('operator_create_others', 'operatorsController@operator_create_others');
+Route::post('operator_others_create_post', 'operatorsController@operator_others_create_post');
+
 
 // Marker
 Route::get('marker', 'markerController@index');
@@ -245,6 +259,7 @@ Route::get('plan_mattress/{location}', 'plannerController@plan_mattress');
 Route::get('operator_login_planner', 'plannerController@operator_login');
 Route::get('operator_logout_planner', 'plannerController@operator_logout');
 Route::post('posts/reposition' , [ 'uses' => 'plannerController@reposition', 'as' => 'posts.reposition' ]);
+Route::post('posts/reposition0', [ 'uses' => 'plannerController@reposition0', 'as' => 'posts.reposition0' ]);
 Route::post('posts/reposition1', [ 'uses' => 'plannerController@reposition1', 'as' => 'posts.reposition1' ]);
 Route::post('posts/reposition2', [ 'uses' => 'plannerController@reposition2', 'as' => 'posts.reposition2' ]);
 Route::post('posts/reposition3', [ 'uses' => 'plannerController@reposition3', 'as' => 'posts.reposition3' ]);
@@ -353,6 +368,12 @@ Route::post('spread_mattress_partial_post', 'spreaderController@spread_mattress_
 Route::get('spread_mattress_complete/{id}', 'spreaderController@spread_mattress_complete');
 Route::post('spread_mattress_complete_post', 'spreaderController@spread_mattress_complete_post');
 
+Route::get('request_material/{id}', 'spreaderController@request_material');
+Route::post('request_material_insert', 'spreaderController@request_material_insert');
+Route::get('request_material_table', 'spreaderController@request_material_table');
+Route::get('request_material_delete/{id}', 'spreaderController@request_material_delete');
+Route::get('request_material_delete_confirm/{id}', 'spreaderController@request_material_delete_confirm');
+
 // CUT
 Route::get('cutter', 'cutterController@index');
 Route::get('operator_login_cut', 'cutterController@operator_login');
@@ -398,6 +419,10 @@ Route::get('paspul_prw1/{id}', 'prwController@paspul_prw1');
 Route::post('paspul_prw1_confirm', 'prwController@paspul_prw1_confirm');
 Route::get('finish_rewound/{id}', 'prwController@finish_rewound');
 
+Route::get('request_material_p/{id}', 'prwController@request_material');
+Route::post('request_material_p_insert', 'prwController@request_material_insert');
+// Route::get('request_material_p_table', 'prwController@request_material_table');
+
 // PCO
 Route::get('pco', 'pcoController@index');
 Route::get('operator_login_pco', 'pcoController@operator_login');
@@ -437,6 +462,9 @@ Route::get('spread_mattress_tub_partial/{id}', 'tubController@spread_mattress_pa
 Route::post('spread_mattress_tub_partial_post', 'tubController@spread_mattress_partial_post');
 Route::get('spread_mattress_tub_complete/{id}', 'tubController@spread_mattress_complete');
 Route::post('spread_mattress_tub_complete_post', 'tubController@spread_mattress_complete_post');
+
+Route::get('request_material_t/{id}', 'tubController@request_material');
+Route::post('request_material_t_insert', 'tubController@request_material_insert');
 
 // PSS
 Route::get('pss', 'pssController@index');
@@ -584,6 +612,48 @@ Route::post('paspul_transfer_su_va_pas_post', 'whsController@paspul_transfer_su_
 Route::post('paspul_transfer_su_va_qty_post', 'whsController@paspul_transfer_su_va_qty_post');
 Route::post('paspul_transfer_su_va_op_post', 'whsController@paspul_transfer_su_va_op_post');
 
+// FO
+Route::get('fo', 'foController@index');
+Route::get('operator_login_fo', 'foController@operator_login');
+Route::get('operator_logout_fo', 'foController@operator_logout');
+Route::get('request_material_accept/{id}', 'foController@request_material_accept');
+Route::get('request_material_accept_confirm/{id}', 'foController@request_material_accept_confirm');
+
+Route::get('request_material_deliver/{id}', 'foController@request_material_deliver');
+
+Route::get('request_material_deliver_confirm/{id}', 'foController@request_material_deliver_confirm');
+Route::get('request_material_deliver_confirm_post/{id}', 'foController@request_material_deliver_confirm_post');
+
+Route::get('request_material_relax_confirm/{id}', 'foController@request_material_relax_confirm');
+Route::get('request_material_relax_confirm_post/{id}', 'foController@request_material_relax_confirm_post');
+
+Route::get('request_material_qc_confirm/{id}', 'foController@request_material_qc_confirm');
+Route::get('request_material_qc_confirm_post/{id}', 'foController@request_material_qc_confirm_post');
+
+// CPO
+Route::get('cpo', 'cpoController@index');
+Route::get('cpo_all', 'cpoController@index_all');
+Route::get('cpo_scan', 'cpoController@cpo_scan');
+
+Route::get('operator_login_cpo', 'cpoController@operator_login');
+Route::get('operator_logout_cpo', 'cpoController@operator_logout');
+
+Route::post('cpo_header_table', 'cpoController@cpo_header_table');
+
+Route::get('cpo_new_check/{g_bin}', 'cpoController@cpo_new_check');
+Route::get('cpo_check_edit/{id}', 'cpoController@cpo_check_edit');
+
+Route::post('cpo_insert_style_size_bundle', 'cpoController@cpo_insert_style_size_bundle');
+Route::post('cpo_insert_part', 'cpoController@cpo_insert_part');
+
+Route::post('cpo_new_check_layers', 'cpoController@cpo_new_check_layers');
+Route::post('cpo_new_check_layers_post', 'cpoController@cpo_new_check_layers_post');
+
+Route::get('cpo_edit_check_layers/{id}', 'cpoController@cpo_edit_check_layers');
+Route::post('cpo_edit_check_layers_post', 'cpoController@cpo_edit_check_layers_post');
+
+Route::get('set_status_g_bin/{g_bin}', 'cpoController@set_status_g_bin');
+Route::post('set_status_g_bin_post', 'cpoController@set_status_g_bin_post');
 
 // Search
 Route::get('recap_by_skeda_mattress', 'plannerController@recap_by_skeda_mattress');

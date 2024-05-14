@@ -38,6 +38,13 @@ use App\paspul_stock;
 use App\paspul_stock_log;
 use App\paspul_stock_u_cons;
 
+use App\part_style;
+use App\bom_cons;
+use App\skeda_ratio_import;
+
+use App\cutting_smv_by_category;
+use App\cutting_smv_by_material;
+
 use App\User;
 use DB;
 
@@ -1790,9 +1797,7 @@ class importController extends Controller {
 							   			}
 							   		}
 						   		}
-					   		
 					   		}
-						
 						}
 
 				   		// check errors
@@ -2738,7 +2743,11 @@ class importController extends Controller {
 	                	// var_dump('Location ok ');
 
 	                	$prom1 =  DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [cutting].[dbo].[pro_skedas]
-						WHERE [skeda] =  '".$skeda."' "));
+							WHERE [skeda] =  '".$skeda."' "));
+
+	                	if (!isset($prom1[0]->sku)) {
+	                		dd("Can not finf SKU for this skeda: ".$skeda." ");
+	                	}
 
 						$fg_color_code = substr($prom1[0]->sku,9,4);
 						// var_dump($fg_color_code);
@@ -2859,4 +2868,307 @@ class importController extends Controller {
 	    }
 	    // return redirect('/');
 	}
+
+	public function postImport_style_parts(Request $request) {
+		$getSheetName = Excel::load(Request::file('file10'))->getSheetNames();
+	    
+	    foreach($getSheetName as $sheetName)    {	
+
+	    	Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file10'))->chunk(5000, function ($reader) 
+	        {
+	                $readerarray = $reader->toArray();
+	                // var_dump($readerarray);
+
+	                foreach($readerarray as $row) {
+
+	                	// dd($row);
+
+	                	$style = strtoupper(trim($row['style']));
+	               		$part = strtoupper(trim($row['part']));
+	                	
+	               		$table = new part_style;
+						$table->style = $style;
+						$table->part = $part;
+						$table->save();
+
+	               	}
+
+	        });
+	    }
+
+	    // return redirect('/');
+	    dd("Uspesno importovano");
+	}
+
+	public function bom_cons_post(Request $request) {
+		$getSheetName = Excel::load(Request::file('file11'))->getSheetNames();
+
+		// dd($request->request->get('import_date'));
+		// $order_group_macro = Request::get('order_group_macro');
+		// $order_group = Request::get('order_group');
+
+		// dd($order_group);
+
+		// dd($import_date);
+		// dd(Request::all());
+
+		// $import_date = $request->input('import_date');
+		// dd($import_date);
+
+	    
+	    foreach($getSheetName as $sheetName)
+	    {
+	        //if ($sheetName === 'Product-General-Table')  {
+	    	//selectSheetsByIndex(0)
+	           	// DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+	            //DB::table('users')->truncate();
+	
+	            //Excel::selectSheets($sheetName)->load($request->file('file'), function ($reader)
+	            //Excel::selectSheets($sheetName)->load(Input::file('file'), function ($reader)
+	            //Excel::filter('chunk')->selectSheetsByIndex(0)->load(Request::file('file'))->chunk(50, function ($reader)
+	            Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file11'))->chunk(10000, function ($reader)
+	            
+	            {
+	                $readerarray = $reader->toArray();
+	                // var_dump($readerarray);
+	                // $head = $reader->getHeading();
+	                // $head = $reader->first()->keys()->toArray();
+	                // dd($head);
+
+	                foreach($readerarray as $row)
+	                {
+	                	// dd($row);
+
+						$order = $row['order'];
+						$style = trim($row['style']);
+						$material = trim($row['material']);
+						$father = trim($row['father']);
+
+						$main = round((float)$row['main'],3);
+						$pas_ag = round((float)$row['pas_ag'],3);
+						$ploce = round((float)$row['ploce'],3);
+						$total_cons = round((float)$row['total_cons'],3);
+
+						$table = new bom_cons;
+						$table->order = $order;
+						$table->style = $style;
+						$table->material = $material;
+						$table->father = $father;
+						
+						$table->main = $main;
+						$table->pas_ag = $pas_ag;
+						$table->ploce = $ploce;
+						$table->total_cons = $total_cons;
+						
+						$table->save();
+						
+	                }
+	            });
+	    }
+	    dd('Succesfuly imported,  (please close this page/tab because if you refresh it will import again) ');
+		// return redirect('/');
+	}
+
+	public function skeda_ratio_post(Request $request) {
+		$getSheetName = Excel::load(Request::file('file12'))->getSheetNames();
+
+		// dd($request->request->get('import_date'));
+		// $order_group_macro = Request::get('order_group_macro');
+		// $order_group = Request::get('order_group');
+
+		// dd($order_group);
+
+		// dd($import_date);
+		// dd(Request::all());
+
+		// $import_date = $request->input('import_date');
+		// dd($import_date);
+
+
+	    foreach($getSheetName as $sheetName)
+	    {
+	        //if ($sheetName === 'Product-General-Table')  {
+	    	//selectSheetsByIndex(0)
+	           	// DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+	            //DB::table('users')->truncate();
+	
+	            //Excel::selectSheets($sheetName)->load($request->file('file'), function ($reader)
+	            //Excel::selectSheets($sheetName)->load(Input::file('file'), function ($reader)
+	            //Excel::filter('chunk')->selectSheetsByIndex(0)->load(Request::file('file'))->chunk(50, function ($reader)
+	            Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file12'))->chunk(10000, function ($reader)
+	            
+	            {
+	                $readerarray = $reader->toArray();
+	                // var_dump($readerarray);
+	                // $head = $reader->getHeading();
+	                // $head = $reader->first()->keys()->toArray();
+	                // dd($head);
+
+	                foreach($readerarray as $row)
+	                {
+	                	// dd($row);
+
+						$skeda = $row['skeda'];
+
+						// $total = round((float)$row['total'],1);
+						$size_xs = round((float)$row['size_xs'],2);
+						$size_s = round((float)$row['size_s'],2);
+						$size_m = round((float)$row['size_m'],2);
+						$size_l = round((float)$row['size_l'],2);
+						$size_xl = round((float)$row['size_xl'],2);
+						$size_xxl = round((float)$row['size_xxl'],2);
+						$size_sm = round((float)$row['size_sm'],2);
+						$size_ml = round((float)$row['size_ml'],2);
+						$size_xssho = round((float)$row['size_xssho'],2);
+						$size_ssho = round((float)$row['size_ssho'],2);
+						$size_msho = round((float)$row['size_msho'],2);
+						$size_lsho = round((float)$row['size_lsho'],2);
+						$size_tu = round((float)$row['size_tu'],2);
+						$size_2y = round((float)$row['size_2y'],2);
+						$size_3_4y = round((float)$row['size_3_4y'],2);
+						$size_5_6y = round((float)$row['size_5_6y'],2);
+						$size_7_8y = round((float)$row['size_7_8y'],2);
+						$size_9_10y = round((float)$row['size_9_10y'],2);
+						$size_11_12y = round((float)$row['size_11_12y'],2);
+						$size_2 = round((float)$row['size_2'],2);
+						$size_3 = round((float)$row['size_3'],2);
+						$size_4 = round((float)$row['size_4'],2);
+						$size_5 = round((float)$row['size_5'],2);
+						$size_6 = round((float)$row['size_6'],2);
+						$size_12 = round((float)$row['size_12'],2);
+						$size_34 = round((float)$row['size_34'],2);
+
+						
+						$table = new skeda_ratio_import;
+						
+						$table->skeda = $skeda;
+						// $table->total = $total;
+						$table->size_xs = $size_xs;
+						$table->size_s = $size_s;
+						$table->size_m = $size_m;
+						$table->size_l = $size_l;
+						$table->size_xl = $size_xl;
+						$table->size_xxl = $size_xxl;
+						$table->size_sm = $size_sm;
+						$table->size_ml = $size_ml;
+						$table->size_xssho = $size_xssho;
+						$table->size_ssho = $size_ssho;
+						$table->size_msho = $size_msho;
+						$table->size_lsho = $size_lsho;
+						$table->size_tu = $size_tu;
+						$table->size_2y = $size_2y;
+						$table->size_3_4y = $size_3_4y;
+						$table->size_5_6y = $size_5_6y;
+						$table->size_7_8y = $size_7_8y;
+						$table->size_9_10y = $size_9_10y;
+						$table->size_11_12y = $size_11_12y;
+						$table->size_2 = $size_2;
+						$table->size_3 = $size_3;
+						$table->size_4 = $size_4;
+						$table->size_5 = $size_5;
+						$table->size_6 = $size_6;
+						$table->size_12 = $size_12;
+						$table->size_34 = $size_34;
+												
+						$table->save();
+						
+	                }
+	            });
+	    }
+	    dd('Succesfuly imported,  (please close this page/tab because if you refresh it will import again) ');
+		// return redirect('/');
+	}
+
+	public function bom_cutting_smv_post(Request $request) {
+		$getSheetName = Excel::load(Request::file('file13'))->getSheetNames();
+		// dd($getSheetName);
+
+		// dd($request->request->get('import_date'));
+		// $order_group_macro = Request::get('order_group_macro');
+		// $order_group = Request::get('order_group');
+
+		// dd($order_group);
+
+		// dd($import_date);
+		// dd(Request::all());
+
+		// $import_date = $request->input('import_date');
+		// dd($import_date);
+
+
+	    foreach($getSheetName as $sheetName)
+	    {
+	        if ($sheetName == 'SMV by Category') {
+
+	            Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file13'))->chunk(10000, function ($reader)
+	            {
+	                $readerarray = $reader->toArray();
+	                // var_dump($readerarray);
+	                // $head = $reader->getHeading();
+	                // $head = $reader->first()->keys()->toArray();
+	                // dd($head);
+
+	                DB::table('cutting_smv_by_categories')->truncate();
+
+	                foreach($readerarray as $row)
+	                {
+	                	// dd($row);
+
+	                	$spreading_method = trim($row['spreading_method']);
+	                	$material = trim($row['material']);
+	                	$layers_group = trim($row['layers_group']);
+	                	$length_group = trim($row['length_group']);
+	                	$average_of_min_per_meter_minm = round($row['average_of_min_per_meter_minm'],3);
+	                	// dd($average_of_min_per_meter_minm);
+
+	                	$table = new cutting_smv_by_category;
+						$table->spreading_method = $spreading_method;
+						$table->material = $material;
+						$table->layers_group = $layers_group;
+						$table->length_group = $length_group;
+						$table->average_of_min_per_meter_minm = $average_of_min_per_meter_minm;
+						$table->save();
+
+
+	                }
+	            });
+
+	        } else if ($sheetName == 'SMV by Material') {
+
+	        	Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file13'))->chunk(10000, function ($reader)
+	            {
+	                $readerarray = $reader->toArray();
+	                // var_dump($readerarray);
+	                // $head = $reader->getHeading();
+	                // $head = $reader->first()->keys()->toArray();
+	                // dd($head);
+
+	                DB::table('cutting_smv_by_materials')->truncate();
+
+	                foreach($readerarray as $row)
+	                {
+	                	// dd($row);
+
+	                	$material = trim($row['material']);
+	                	$average_of_min_per_meter_minm = round($row['average_of_min_per_meter_minm'],3);
+	                	// dd($average_of_min_per_meter_minm);
+
+	                	$table2 = new cutting_smv_by_material;
+						$table2->material = $material;
+						$table2->average_of_min_per_meter_minm = $average_of_min_per_meter_minm;
+						$table2->save();
+
+	                }
+	            });
+
+	        } else {
+	        	dd('error: problem to read Excel sheet name');
+	        }
+	    }
+	    dd('Succesfuly imported!');
+		// return redirect('/');
+	}
+
+
+
 }

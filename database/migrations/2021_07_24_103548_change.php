@@ -27,6 +27,9 @@ class Change extends Migration {
     		
     		// $table->dateTime('date')->nullable();
     		// $table->string('id_status')->nullable();
+    		// $table->integer('position')->nullable();
+    		// $table->dropColumn('position');
+    		// $table->integer('pre_position')->nullable();
     		
 		});
 
@@ -102,6 +105,51 @@ class Change extends Migration {
 			// $table->float('pcs_kotur')->nullable();
 
 		});
+
+		Schema::table('marker_headers', function($table)
+		{
+			// $table->string('creation_type')->nullable();
+			
+		});
+
+		Schema::table('parts', function($table)
+		{
+			// $table->string('creation_type')->nullable();
+			// $table->string('key_part')->nullable();
+			// $table->string('key_part')->nullable(false)->unique()->change();
+		});
+
+
+		Schema::table('part_lines', function($table) 
+		{
+            // $table->renameColumn('comment', 'operator');
+            // $table->string('operator')->nullable();
+			// $table->string('device')->nullable();
+			// $table->string('key_part_line')->nullable();
+			// $table->string('key_part_line')->nullable(false)->unique()->change();
+        });
+
+        Schema::table('part_g_bin_statuses', function($table) 
+		{
+            
+            // $table->string('operator')->nullable();
+			// $table->string('device')->nullable();
+        });
+
+        Schema::table('print_mini_mattresses', function($table) 
+		{
+            // $table->string('spreading_profile_0')->nullable();
+            // $table->string('spreading_profile_1')->nullable();
+            
+			
+        });
+        
+        Schema::table('print_standard_mattresses', function($table) 
+		{
+            // $table->string('spreading_profile')->nullable();
+            
+        });
+        
 
 	}
 

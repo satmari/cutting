@@ -77,68 +77,68 @@ class plannerController extends Controller {
 		} 
 
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-			   m2.[position]
-			  ,m1.[id]
-		      ,m1.[mattress]
-		      ,m1.[g_bin]
-		      ,m1.[material]
-		      ,m1.[dye_lot]
-		      ,m1.[color_desc]
-		      ,m1.[width_theor_usable]
-		      ,m1.[skeda]
-		      ,m1.[skeda_item_type]
-		      ,m1.[skeda_status]
-		      ,m1.[spreading_method]
-		      ,m1.[created_at]
-		      ,m1.[updated_at]
-		      --,'|'
-		      ,m2.[layers]
-		      ,m2.[layers_a]
-		      ,m2.[length_mattress]
-		      ,m2.[cons_planned]
-		      ,m2.[cons_actual]
-		      ,m2.[extra]
-		      ,m2.[pcs_bundle]
-		      ,m2.[layers_partial]
-		      ,m2.[position]
-		      ,m2.[priority]
-		      ,m2.[call_shift_manager]
-		      ,m2.[test_marker]
-		      ,m2.[tpp_mat_keep_wastage]
-		      ,m2.[printed_marker]
-		      ,m2.[mattress_packed]
-		      ,m2.[all_pro_for_main_plant]
-		      ,m2.[bottom_paper]
-		      ,m2.[layers_a_reasons]
-		      ,m2.[comment_office]
-		      ,m2.[comment_operator]
-		      ,m2.[minimattress_code]
-		      ,m2.[printed_nalog]
-		      ,m2.[layer_limit]
-		      ,m2.[overlapping]
-		      ,m2.[req_time]
-		      --,'|'
-		      ,m3.[marker_id]
-		      ,m3.[marker_name]
-		      ,m3.[marker_name_orig]
-		      ,m3.[marker_length]
-		      ,m3.[marker_width]
-		      ,m3.[min_length]
-		      --,'|'
-		      ,m4.[status]
-		      ,m4.[location]
-		      ,m4.[device]
-		      ,m4.[active]
-		      ,m4.[operator1]
-		      ,m4.[operator2]
-		      --,'|'
-		      -- ,m5.[style_size]
-		      -- ,m5.[pro_id]
-		      -- ,m5.[pro_pcs_layer]
-		      -- ,m5.[pro_pcs_planned]
-		      -- ,m5.[pro_pcs_actual]
-		      ,ms.[g_bin_orig]
-		      
+		   m2.[position]
+		  ,m1.[id]
+	      ,m1.[mattress]
+	      ,m1.[g_bin]
+	      ,m1.[material]
+	      ,m1.[dye_lot]
+	      ,m1.[color_desc]
+	      ,m1.[width_theor_usable]
+	      ,m1.[skeda]
+	      ,m1.[skeda_item_type]
+	      ,m1.[skeda_status]
+	      ,m1.[spreading_method]
+	      ,m1.[created_at]
+	      ,m1.[updated_at]
+	      --,'|'
+	      ,m2.[layers]
+	      ,m2.[layers_a]
+	      ,m2.[length_mattress]
+	      ,m2.[cons_planned]
+	      ,m2.[cons_actual]
+	      ,m2.[extra]
+	      ,m2.[pcs_bundle]
+	      ,m2.[layers_partial]
+	      ,m2.[position]
+	      ,m2.[priority]
+	      ,m2.[call_shift_manager]
+	      ,m2.[test_marker]
+	      ,m2.[tpp_mat_keep_wastage]
+	      ,m2.[printed_marker]
+	      ,m2.[mattress_packed]
+	      ,m2.[all_pro_for_main_plant]
+	      ,m2.[bottom_paper]
+	      ,m2.[layers_a_reasons]
+	      ,m2.[comment_office]
+	      ,m2.[comment_operator]
+	      ,m2.[minimattress_code]
+	      ,m2.[printed_nalog]
+	      ,m2.[layer_limit]
+	      ,m2.[overlapping]
+	      ,m2.[req_time]
+	      --,'|'
+	      ,m3.[marker_id]
+	      ,m3.[marker_name]
+	      ,m3.[marker_name_orig]
+	      ,m3.[marker_length]
+	      ,m3.[marker_width]
+	      ,m3.[min_length]
+	      --,'|'
+	      ,m4.[status]
+	      ,m4.[location]
+	      ,m4.[device]
+	      ,m4.[active]
+	      ,m4.[operator1]
+	      ,m4.[operator2]
+	      --,'|'
+	      -- ,m5.[style_size]
+	      -- ,m5.[pro_id]
+	      -- ,m5.[pro_pcs_layer]
+	      -- ,m5.[pro_pcs_planned]
+	      -- ,m5.[pro_pcs_actual]
+	      ,ms.[g_bin_orig]
+	      
 		  FROM [mattresses] as m1
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -146,7 +146,9 @@ class plannerController extends Controller {
 		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
 		  LEFT JOIN [mattress_split_requests] as ms ON ms.[mattress_id_new] = m1.[id]
 		  WHERE m4.[location] = '".$location."' AND m4.[active] = '1' 
-		  ORDER BY m2.[position] asc"));
+		 
+		  ORDER BY m2.[position] asc
+		"));
 		// dd($data);
 	
 		$pros= '';
@@ -556,9 +558,9 @@ class plannerController extends Controller {
 		}
 
 		if ($location == 'BOARD') {
-			// dd("Test");
-			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-			  m1.[id]
+			
+			$sp0 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			   m1.[id]
 		      ,m1.[mattress]
 		      ,m1.[material]
 		      ,m1.[g_bin]
@@ -580,12 +582,85 @@ class plannerController extends Controller {
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
 		      ,m4.[status]
-		  FROM [mattresses] as m1
-		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'NOT_SET' AND m4.[active] = 1 
-		  ORDER BY m2.[position] asc"));
+		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+		      ,(SELECT 
+					(x.average_of_min_per_meter_minm)
+				
+					FROM (
+						SELECT 
+						*,
+						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+					WHERE	x.spreading_method = (SELECT 
+												CASE 
+												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+												ELSE 'FACE UP/DOWN'
+												END)
+							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+			 	) as average_of_min_per_meter_minm_c,
+			 	(SELECT 
+						average_of_min_per_meter_minm
+					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+			 	) as average_of_min_per_meter_minm_m,
+				 (SELECT 
+						ROUND(AVG(average_of_min_per_meter_minm),3)
+				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+			  FROM [mattresses] as m1
+			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+			  WHERE m4.[location] = 'SP0' AND m4.[active] = 1 
+			  ORDER BY m1.[skeda] asc"));
+
+			$sp0_req_time = [];
+			foreach ($sp0 as $line) {
+
+				if ($line->average_of_min_per_meter_minm_c != 0) {
+					// dd('test');
+			        if (array_key_exists($line->priority, $sp0_req_time)) {
+			            $sp0_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        } else { 
+			            $sp0_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        }
+
+				} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+					if (array_key_exists($line->priority, $sp0_req_time)) {
+			            $sp0_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        } else { 
+			            $sp0_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        }
+
+				} else {
+
+					if (array_key_exists($line->priority, $sp0_req_time)) {
+			            $sp0_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        } else {
+			            $sp0_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        }
+
+				}
+			}
+			// dd($sp0_req_time);
+
+			$sp0_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				SUM(m3.[marker_length]) as sum_m_length,
+				SUM(m2.[layers_a]) as sum_m_layers,
+				SUM(m2.[cons_actual]) as sum_m_cons
+				FROM [mattresses] as m1
+				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				WHERE m4.[location] = 'SP0' AND m4.[active] = 1"));
+			
+			$sp0_m = $sp0_m[0]->sum_m_cons;
+
 			
 			$sp1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			   m1.[id]
@@ -610,24 +685,90 @@ class plannerController extends Controller {
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
 		      ,m4.[status]
-		  FROM [mattresses] as m1
-		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'SP1' AND m4.[active] = 1 
-		  ORDER BY m2.[position] asc"));
+		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+		      ,(SELECT 
+					(x.average_of_min_per_meter_minm)
+				
+					FROM (
+						SELECT 
+						*,
+						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+					WHERE	x.spreading_method = (SELECT 
+												CASE 
+												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+												ELSE 'FACE UP/DOWN'
+												END)
+							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+			 	) as average_of_min_per_meter_minm_c,
+			 	(SELECT 
+						average_of_min_per_meter_minm
+					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+			 	) as average_of_min_per_meter_minm_m,
+				 (SELECT 
+						ROUND(AVG(average_of_min_per_meter_minm),3)
+				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+
+			  FROM [mattresses] as m1
+			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+			  WHERE m4.[location] = 'SP1' AND m4.[active] = 1 
+			  ORDER BY m2.[position] asc"));
+
+			// dd($sp1);
+
+			
+			$sp1_req_time = [];
+			foreach ($sp1 as $line) {
+
+				if ($line->average_of_min_per_meter_minm_c != 0) {
+					// dd('test');
+			        if (array_key_exists($line->priority, $sp1_req_time)) {
+			            $sp1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        } else { 
+			            $sp1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        }
+
+				} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+					if (array_key_exists($line->priority, $sp1_req_time)) {
+			            $sp1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        } else { 
+			            $sp1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        }
+
+				} else {
+
+					if (array_key_exists($line->priority, $sp1_req_time)) {
+			            $sp1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        } else {
+			            $sp1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        }
+
+				}
+			}
+			// dd($sp1_req_time);
+			
 
 			$sp1_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.[layers_a]) as sum_m_layers,
-					SUM(m2.[cons_actual]) as sum_m_cons
-			FROM [mattresses] as m1
-			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			WHERE m4.[location] = 'SP1' AND m4.[active] = 1"));
+				SUM(m3.[marker_length]) as sum_m_length,
+				SUM(m2.[layers_a]) as sum_m_layers,
+				SUM(m2.[cons_actual]) as sum_m_cons
+				FROM [mattresses] as m1
+				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				WHERE m4.[location] = 'SP1' AND m4.[active] = 1"));
+
 			$sp1_m = $sp1_m[0]->sum_m_cons;
-			// dd($sp1_m);
+
 
 			$sp2 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			   m1.[id]
@@ -652,22 +793,83 @@ class plannerController extends Controller {
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
 		      ,m4.[status]
-		  FROM [mattresses] as m1
-		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'SP2' AND m4.[active] = 1 
-		  ORDER BY m2.[position] asc"));
+		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+		      ,(SELECT 
+					(x.average_of_min_per_meter_minm)
+				
+					FROM (
+						SELECT 
+						*,
+						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+					WHERE	x.spreading_method = (SELECT 
+												CASE 
+												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+												ELSE 'FACE UP/DOWN'
+												END)
+							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+			 	) as average_of_min_per_meter_minm_c,
+			 	(SELECT 
+						average_of_min_per_meter_minm
+					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+			 	) as average_of_min_per_meter_minm_m,
+				 (SELECT 
+						ROUND(AVG(average_of_min_per_meter_minm),3)
+				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+			  FROM [mattresses] as m1
+			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+			  WHERE m4.[location] = 'SP2' AND m4.[active] = 1 
+			  ORDER BY m2.[position] asc"));
+			
+			$sp2_req_time = [];
+			foreach ($sp2 as $line) {
+
+				if ($line->average_of_min_per_meter_minm_c != 0) {
+					// dd('test');
+			        if (array_key_exists($line->priority, $sp2_req_time)) {
+			            $sp2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        } else { 
+			            $sp2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        }
+
+				} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+					if (array_key_exists($line->priority, $sp2_req_time)) {
+			            $sp2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        } else { 
+			            $sp2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        }
+
+				} else {
+
+					if (array_key_exists($line->priority, $sp2_req_time)) {
+			            $sp2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        } else {
+			            $sp2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        }
+
+				}
+			}
+			// dd($sp2_req_time);
 
 			$sp2_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.[layers_a]) as sum_m_layers,
-					SUM(m2.[cons_actual]) as sum_m_cons
-			FROM [mattresses] as m1
-			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			WHERE m4.[location] = 'SP2' AND m4.[active] = 1"));
+				SUM(m3.[marker_length]) as sum_m_length,
+				SUM(m2.[layers_a]) as sum_m_layers,
+				SUM(m2.[cons_actual]) as sum_m_cons
+				FROM [mattresses] as m1
+				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				WHERE m4.[location] = 'SP2' AND m4.[active] = 1"));
+			
 			$sp2_m = $sp2_m[0]->sum_m_cons;
 
 			$sp3 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -693,23 +895,83 @@ class plannerController extends Controller {
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
 		      ,m4.[status]
-		  FROM [mattresses] as m1
-		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'SP3' AND m4.[active] = 1 
-		  ORDER BY m2.[position] asc"));
-			// dd($sp3);
+		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+		      ,(SELECT 
+					(x.average_of_min_per_meter_minm)
+				
+					FROM (
+						SELECT 
+						*,
+						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+					WHERE	x.spreading_method = (SELECT 
+												CASE 
+												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+												ELSE 'FACE UP/DOWN'
+												END)
+							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+			 	) as average_of_min_per_meter_minm_c,
+			 	(SELECT 
+						average_of_min_per_meter_minm
+					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+			 	) as average_of_min_per_meter_minm_m,
+				 (SELECT 
+						ROUND(AVG(average_of_min_per_meter_minm),3)
+				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+			  FROM [mattresses] as m1
+			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+			  WHERE m4.[location] = 'SP3' AND m4.[active] = 1 
+			  ORDER BY m2.[position] asc"));
 
+			$sp3_req_time = [];
+			foreach ($sp3 as $line) {
+
+				if ($line->average_of_min_per_meter_minm_c != 0) {
+					// dd('test');
+			        if (array_key_exists($line->priority, $sp3_req_time)) {
+			            $sp3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        } else { 
+			            $sp3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        }
+
+				} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+					if (array_key_exists($line->priority, $sp3_req_time)) {
+			            $sp3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        } else { 
+			            $sp3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        }
+
+				} else {
+
+					if (array_key_exists($line->priority, $sp3_req_time)) {
+			            $sp3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        } else {
+			            $sp3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        }
+
+				}
+			}
+			// dd($sp3_req_time);
+			
 			$sp3_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.[layers_a]) as sum_m_layers,
-					SUM(m2.[cons_actual]) as sum_m_cons
-			FROM [mattresses] as m1
-			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			WHERE m4.[location] = 'SP3' AND m4.[active] = 1"));
+				SUM(m3.[marker_length]) as sum_m_length,
+				SUM(m2.[layers_a]) as sum_m_layers,
+				SUM(m2.[cons_actual]) as sum_m_cons
+				FROM [mattresses] as m1
+				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				WHERE m4.[location] = 'SP3' AND m4.[active] = 1"));
+
 			$sp3_m = $sp3_m[0]->sum_m_cons;
 
 			$sp4 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -735,22 +997,84 @@ class plannerController extends Controller {
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
 		      ,m4.[status]
-		  FROM [mattresses] as m1
-		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'SP4' AND m4.[active] = 1 
-		  ORDER BY m2.[position] asc"));
+		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+		      ,(SELECT 
+					(x.average_of_min_per_meter_minm)
+				
+					FROM (
+						SELECT 
+						*,
+						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+					WHERE	x.spreading_method = (SELECT 
+												CASE 
+												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+												ELSE 'FACE UP/DOWN'
+												END)
+							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+			 	) as average_of_min_per_meter_minm_c,
+			 	(SELECT 
+						average_of_min_per_meter_minm
+					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+			 	) as average_of_min_per_meter_minm_m,
+				 (SELECT 
+						ROUND(AVG(average_of_min_per_meter_minm),3)
+				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+			  FROM [mattresses] as m1
+			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+			  WHERE m4.[location] = 'SP4' AND m4.[active] = 1 
+			  ORDER BY m2.[position] asc"));
+
+			
+			$sp4_req_time = [];
+			foreach ($sp4 as $line) {
+
+				if ($line->average_of_min_per_meter_minm_c != 0) {
+					// dd('test');
+			        if (array_key_exists($line->priority, $sp4_req_time)) {
+			            $sp4_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        } else { 
+			            $sp4_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        }
+
+				} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+					if (array_key_exists($line->priority, $sp4_req_time)) {
+			            $sp4_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        } else { 
+			            $sp4_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        }
+
+				} else {
+
+					if (array_key_exists($line->priority, $sp4_req_time)) {
+			            $sp4_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        } else {
+			            $sp4_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        }
+
+				}
+			}
+			// dd($sp4_req_time);
 
 			$sp4_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.[layers_a]) as sum_m_layers,
-					SUM(m2.[cons_actual]) as sum_m_cons
-			FROM [mattresses] as m1
-			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			WHERE m4.[location] = 'SP4' AND m4.[active] = 1"));
+				SUM(m3.[marker_length]) as sum_m_length,
+				SUM(m2.[layers_a]) as sum_m_layers,
+				SUM(m2.[cons_actual]) as sum_m_cons
+				FROM [mattresses] as m1
+				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				WHERE m4.[location] = 'SP4' AND m4.[active] = 1"));
+			
 			$sp4_m = $sp4_m[0]->sum_m_cons;
 
 			$ms1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -776,22 +1100,82 @@ class plannerController extends Controller {
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
 		      ,m4.[status]
-		  FROM [mattresses] as m1
-		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'MS1' AND m4.[active] = 1 
-		  ORDER BY m2.[position] asc"));
+		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+		      ,(SELECT 
+					(x.average_of_min_per_meter_minm)
+				
+					FROM (
+						SELECT 
+						*,
+						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+					WHERE	x.spreading_method = (SELECT 
+												CASE 
+												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+												ELSE 'FACE UP/DOWN'
+												END)
+							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+			 	) as average_of_min_per_meter_minm_c,
+			 	(SELECT 
+						average_of_min_per_meter_minm
+					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+			 	) as average_of_min_per_meter_minm_m,
+				 (SELECT 
+						ROUND(AVG(average_of_min_per_meter_minm),3)
+				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+			  FROM [mattresses] as m1
+			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+			  WHERE m4.[location] = 'MS1' AND m4.[active] = 1 
+			  ORDER BY m2.[position] asc"));
+
+			$ms1_req_time = [];
+			foreach ($ms1 as $line) {
+
+				if ($line->average_of_min_per_meter_minm_c != 0) {
+					// dd('test');
+			        if (array_key_exists($line->priority, $ms1_req_time)) {
+			            $ms1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        } else { 
+			            $ms1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        }
+
+				} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+					if (array_key_exists($line->priority, $ms1_req_time)) {
+			            $ms1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        } else { 
+			            $ms1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        }
+
+				} else {
+
+					if (array_key_exists($line->priority, $ms1_req_time)) {
+			            $ms1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        } else {
+			            $ms1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        }
+				}
+			}
+			// dd($ms1_req_time);
 
 			$ms1_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.[layers_a]) as sum_m_layers,
-					SUM(m2.[cons_actual]) as sum_m_cons
-			FROM [mattresses] as m1
-			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			WHERE m4.[location] = 'MS1' AND m4.[active] = 1"));
+				SUM(m3.[marker_length]) as sum_m_length,
+				SUM(m2.[layers_a]) as sum_m_layers,
+				SUM(m2.[cons_actual]) as sum_m_cons
+				FROM [mattresses] as m1
+				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				WHERE m4.[location] = 'MS1' AND m4.[active] = 1"));
+			
 			$ms1_m = $ms1_m[0]->sum_m_cons;
 
 			$ms2 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -817,26 +1201,86 @@ class plannerController extends Controller {
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
 		      ,m4.[status]
-		  FROM [mattresses] as m1
-		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'MS2' AND m4.[active] = 1 
-		  ORDER BY m2.[position] asc"));
+		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+		      ,(SELECT 
+					(x.average_of_min_per_meter_minm)
+				
+					FROM (
+						SELECT 
+						*,
+						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+					WHERE	x.spreading_method = (SELECT 
+												CASE 
+												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+												ELSE 'FACE UP/DOWN'
+												END)
+							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+			 	) as average_of_min_per_meter_minm_c,
+			 	(SELECT 
+						average_of_min_per_meter_minm
+					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+			 	) as average_of_min_per_meter_minm_m,
+				 (SELECT 
+						ROUND(AVG(average_of_min_per_meter_minm),3)
+				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+			  FROM [mattresses] as m1
+			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+			  WHERE m4.[location] = 'MS2' AND m4.[active] = 1 
+			  ORDER BY m2.[position] asc"));
+
+			$ms2_req_time = [];
+			foreach ($ms2 as $line) {
+
+				if ($line->average_of_min_per_meter_minm_c != 0) {
+					// dd('test');
+			        if (array_key_exists($line->priority, $ms2_req_time)) {
+			            $ms2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        } else { 
+			            $ms2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        }
+
+				} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+					if (array_key_exists($line->priority, $ms2_req_time)) {
+			            $ms2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        } else { 
+			            $ms2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        }
+
+				} else {
+
+					if (array_key_exists($line->priority, $ms2_req_time)) {
+			            $ms2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        } else {
+			            $ms2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        }
+				}
+			}
+			// dd($ms2_req_time);
 
 			$ms2_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.[layers_a]) as sum_m_layers,
-					SUM(m2.[cons_actual]) as sum_m_cons
-			FROM [mattresses] as m1
-			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			WHERE m4.[location] = 'MS2' AND m4.[active] = 1"));
+				SUM(m3.[marker_length]) as sum_m_length,
+				SUM(m2.[layers_a]) as sum_m_layers,
+				SUM(m2.[cons_actual]) as sum_m_cons
+				FROM [mattresses] as m1
+				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				WHERE m4.[location] = 'MS2' AND m4.[active] = 1"));
+			
 			$ms2_m = $ms2_m[0]->sum_m_cons;
 
 			$ms3 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-			 m1.[id]
+			   m1.[id]
 		      ,m1.[mattress]
 		      ,m1.[material]
 		      ,m1.[g_bin]
@@ -858,27 +1302,86 @@ class plannerController extends Controller {
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
 		      ,m4.[status]
-		  FROM [mattresses] as m1
-		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'MS3' AND m4.[active] = 1 
-		  ORDER BY m2.[position] asc"));
-			// dd($sp3);
+		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+		      ,(SELECT 
+					(x.average_of_min_per_meter_minm)
+				
+					FROM (
+						SELECT 
+						*,
+						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+					WHERE	x.spreading_method = (SELECT 
+												CASE 
+												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+												ELSE 'FACE UP/DOWN'
+												END)
+							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+			 	) as average_of_min_per_meter_minm_c,
+			 	(SELECT 
+						average_of_min_per_meter_minm
+					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+			 	) as average_of_min_per_meter_minm_m,
+				 (SELECT 
+						ROUND(AVG(average_of_min_per_meter_minm),3)
+				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+			  FROM [mattresses] as m1
+			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+			  WHERE m4.[location] = 'MS3' AND m4.[active] = 1 
+			  ORDER BY m2.[position] asc"));
 
+			$ms3_req_time = [];
+			foreach ($ms3 as $line) {
+
+				if ($line->average_of_min_per_meter_minm_c != 0) {
+					// dd('test');
+			        if (array_key_exists($line->priority, $ms3_req_time)) {
+			            $ms3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        } else { 
+			            $ms3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        }
+
+				} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+					if (array_key_exists($line->priority, $ms3_req_time)) {
+			            $ms3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        } else { 
+			            $ms3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        }
+
+				} else {
+
+					if (array_key_exists($line->priority, $ms3_req_time)) {
+			            $ms3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        } else {
+			            $ms3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        }
+				}
+			}
+			
+			
 			$ms3_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.[layers_a]) as sum_m_layers,
-					SUM(m2.[cons_actual]) as sum_m_cons
-			FROM [mattresses] as m1
-			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			WHERE m4.[location] = 'MS3' AND m4.[active] = 1"));
+				SUM(m3.[marker_length]) as sum_m_length,
+				SUM(m2.[layers_a]) as sum_m_layers,
+				SUM(m2.[cons_actual]) as sum_m_cons
+				FROM [mattresses] as m1
+				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				WHERE m4.[location] = 'MS3' AND m4.[active] = 1"));
+			
 			$ms3_m = $ms3_m[0]->sum_m_cons;
 
 			$tub = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-			 m1.[id]
+			   m1.[id]
 		      ,m1.[mattress]
 		      ,m1.[material]
 		      ,m1.[g_bin]
@@ -900,23 +1403,82 @@ class plannerController extends Controller {
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
 		      ,m4.[status]
-		  FROM [mattresses] as m1
-		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'TUB' AND m4.[active] = 1 
-		  ORDER BY m2.[position] asc"));
-			// dd($tub);
+		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+		      ,(SELECT 
+					(x.average_of_min_per_meter_minm)
+				
+					FROM (
+						SELECT 
+						*,
+						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+					WHERE	x.spreading_method = (SELECT 
+												CASE 
+												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+												ELSE 'FACE UP/DOWN'
+												END)
+							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+			 	) as average_of_min_per_meter_minm_c,
+			 	(SELECT 
+						average_of_min_per_meter_minm
+					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+			 	) as average_of_min_per_meter_minm_m,
+				 (SELECT 
+						ROUND(AVG(average_of_min_per_meter_minm),3)
+				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+			  FROM [mattresses] as m1
+			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+			  WHERE m4.[location] = 'TUB' AND m4.[active] = 1 
+			  ORDER BY m2.[position] asc"));
 
+			$tub_req_time = [];
+			foreach ($tub as $line) {
+
+				if ($line->average_of_min_per_meter_minm_c != 0) {
+					// dd('test');
+			        if (array_key_exists($line->priority, $tub_req_time)) {
+			            $tub_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        } else { 
+			            $tub_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        }
+
+				} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+					if (array_key_exists($line->priority, $tub_req_time)) {
+			            $tub_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        } else { 
+			            $tub_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        }
+
+				} else {
+
+					if (array_key_exists($line->priority, $tub_req_time)) {
+			            $tub_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        } else {
+			            $tub_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        }
+				}
+			}
+			// dd($tub_req_time);
+			
 			$tub_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.[layers_a]) as sum_m_layers,
-					SUM(m2.[cons_actual]) as sum_m_cons
-			FROM [mattresses] as m1
-			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			WHERE m4.[location] = 'TUB' AND m4.[active] = 1"));
+				SUM(m3.[marker_length]) as sum_m_length,
+				SUM(m2.[layers_a]) as sum_m_layers,
+				SUM(m2.[cons_actual]) as sum_m_cons
+				FROM [mattresses] as m1
+				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				WHERE m4.[location] = 'TUB' AND m4.[active] = 1"));
+			
 			$tub_m = $tub_m[0]->sum_m_cons;
 
 			$mm1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -942,31 +1504,94 @@ class plannerController extends Controller {
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
 		      ,m4.[status]
-		  FROM [mattresses] as m1
-		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  WHERE m4.[location] = 'MM1' AND m4.[active] = 1 
-		  ORDER BY m2.[position] asc"));
+		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+		      ,(SELECT 
+					(x.average_of_min_per_meter_minm)
+				
+					FROM (
+						SELECT 
+						*,
+						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+					WHERE	x.spreading_method = (SELECT 
+												CASE 
+												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+												ELSE 'FACE UP/DOWN'
+												END)
+							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+			 	) as average_of_min_per_meter_minm_c,
+			 	(SELECT 
+						average_of_min_per_meter_minm
+					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+			 	) as average_of_min_per_meter_minm_m,
+				 (SELECT 
+						ROUND(AVG(average_of_min_per_meter_minm),3)
+				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+			  FROM [mattresses] as m1
+			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+			  WHERE m4.[location] = 'MM1' AND m4.[active] = 1 
+			  ORDER BY m2.[position] asc"));
+
+			$mm1_req_time = [];
+			foreach ($mm1 as $line) {
+
+				if ($line->average_of_min_per_meter_minm_c != 0) {
+					// dd('test');
+			        if (array_key_exists($line->priority, $mm1_req_time)) {
+			            $mm1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        } else { 
+			            $mm1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			        }
+
+				} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+					if (array_key_exists($line->priority, $mm1_req_time)) {
+			            $mm1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        } else { 
+			            $mm1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			        }
+
+				} else {
+
+					if (array_key_exists($line->priority, $mm1_req_time)) {
+			            $mm1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        } else {
+			            $mm1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			        }
+
+				}
+			}
+			
 
 			$mm1_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-					SUM(m3.[marker_length]) as sum_m_length,
-					SUM(m2.[layers_a]) as sum_m_layers,
-					SUM(m2.[cons_actual]) as sum_m_cons,
-					SUM(o.[no_of_joinings]) as o_sum
-			FROM [mattresses] as m1
-			LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			JOIN [o_rolls] as o ON o.[mattress_id_new] = m1.[id]
-			WHERE m4.[location] = 'MM1' AND m4.[active] = 1"));
-			// $mm1_m = $mm1_m[0]->sum_m_cons;
+				SUM(m3.[marker_length]) as sum_m_length,
+				SUM(m2.[layers_a]) as sum_m_layers,
+				SUM(m2.[cons_actual]) as sum_m_cons,
+				SUM(o.[no_of_joinings]) as o_sum
+				FROM [mattresses] as m1
+				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				JOIN [o_rolls] as o ON o.[mattress_id_new] = m1.[id]
+				WHERE m4.[location] = 'MM1' AND m4.[active] = 1"));
+			
 			$mm1_m = $mm1_m[0]->o_sum;
 
-			return view('planner.plan_mattress', compact('data','location','sp1','sp2','sp3','sp4','ms1','ms2','ms3','tub','mm1','operator','operators','sp1_m','sp2_m','sp3_m','sp4_m','ms1_m','ms2_m','ms3_m','tub_m','mm1_m'));
+			return view('planner.plan_mattress', compact('data','location','sp0','sp1','sp2','sp3','sp4','ms1','ms2','ms3','tub','mm1','operator','operators',
+				'sp0_m','sp1_m','sp2_m','sp3_m','sp4_m','ms1_m','ms2_m','ms3_m','tub_m','mm1_m',
+				'sp0_req_time','sp1_req_time','sp2_req_time','sp3_req_time','sp4_req_time','ms1_req_time','ms2_req_time','ms3_req_time','tub_req_time','mm1_req_time'));
 		}
 
 		if ($location == 'BOARD_TABLE') {
+
 			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			   m2.[position]
 			  ,m1.[id]
@@ -1029,16 +1654,15 @@ class plannerController extends Controller {
 		      -- ,m5.[pro_pcs_actual]
 		      ,ms.[g_bin_orig]
 		      
-		  FROM [mattresses] as m1
-		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
-		  LEFT JOIN [mattress_split_requests] as ms ON ms.[mattress_id_new] = m1.[id]
-		  WHERE (m4.[location] IN ('SP1','SP2','SP3','SP4','MS1','MS2','MS3','MM1','TUB')) AND m4.[active] = '1' 
-		  ORDER BY m2.[position] asc"));
-			// dd($data);
-
+			  FROM [mattresses] as m1
+			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+			  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
+			  LEFT JOIN [mattress_split_requests] as ms ON ms.[mattress_id_new] = m1.[id]
+			  WHERE (m4.[location] IN ('SP0','SP1','SP2','SP3','SP4','MS1','MS2','MS3','MM1','TUB')) AND m4.[active] = '1' 
+			  ORDER BY m2.[position] asc"));
+			
 			$pros= '';
 			$skus= '';
 			$sku_s= '';
@@ -1122,8 +1746,14 @@ class plannerController extends Controller {
 					$location_all = '';
 				}
 			}
-		
+
 			return view('planner.plan_mattress', compact('data','location','operator','operators'));
+		}
+
+		if ($location == 'DELETED') {
+		}
+
+		if ($location == 'COMPLETED') {
 		}
 
 		return view('planner.plan_mattress', compact('data','location','operator','operators'));
@@ -1134,6 +1764,7 @@ class plannerController extends Controller {
 		// $this->validate($request, ['container' => 'required']);
 		$input = $request->all(); 
 		// dd($input);
+
 		if (isset($input['selected_operator'])) {
 			$selected_operator = $input['selected_operator'];
 
@@ -1169,6 +1800,20 @@ class plannerController extends Controller {
         	}	
         }
     }
+
+    public function reposition0() {
+	        $i = 0;
+	        foreach ($_POST['SP'] as $value) {
+	            $i++;
+	            DB::table('mattress_details')->where('mattress_id', '=', $value)->update([ 'position' => $i ]);
+	            
+	            // DB::table('mattress_details as d')
+	            // ->join('mattresses as m', 'm.id', '=', 'd.mattress_id')
+	            // ->where('m.id', '=', $value)->update(['d.position' =>  DB::raw($i) ]);
+	            
+	            DB::table('mattress_phases')->where('mattress_id', '=', $value)->where('active','=',1)->update(['location' => 'SP0'/*, 'operator1' => Session::get('operator')*/]);
+	        }	
+	}
 
 	public function reposition2() {
 	        $i = 0;
@@ -1517,8 +2162,10 @@ class plannerController extends Controller {
 		} else {
 			$date = date('Y-m-d H:i:s');
 		}
-	
-		// $table3_new = new mattress_phases;
+		
+		// $find_position = mattress_details::where('mattress_id','=',$id)->get();
+		// $pre_position = $find_position[0]->position;
+		
 		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 		$table3_new->mattress_id = $id;
 		$table3_new->mattress = $mattress;
@@ -1530,6 +2177,7 @@ class plannerController extends Controller {
 		$table3_new->operator2;
 		$table3_new->date = $date;
 		$table3_new->id_status = $id.'-'.$status;
+		// $table3_new->pre_position = $pre_position;
 		$table3_new->save();
 	
 
@@ -1591,7 +2239,7 @@ class plannerController extends Controller {
 			FROM [marker_headers] as mh
 			WHERE marker_name =  '".$existing_marker."' "));
 			
-			$find_marker_style_size = DB::connection('sqlsrv')->select(DB::raw("SELECT mh.marker_name,mh.marker_length,mh.marker_width,
+			$find_marker_style_size = DB::connection('sqlsrv')->select(DB::raw("SELECT mh.marker_name,mh.marker_length,mh.marker_width,mh.status,
 			   size = STUFF(
 					(SELECT DISTINCT ' ' +CAST(ml.style_size as VARCHAR(MAX) 
 					)+ CAST (ml.pcs_on_layer as VARCHAR(MAX))
@@ -1600,7 +2248,8 @@ class plannerController extends Controller {
 					FOR XML PATH('')),1,1,' '
 				)
 			FROM [marker_headers] as mh
-			WHERE mh.[status] = 'ACTIVE'
+			--WHERE mh.[status] = 'ACTIVE' 
+			WHERE mh.[status] = 'ACTIVE' OR mh.[status] = 'USELESS'
 			ORDER BY mh.marker_width desc "));
 			// dd($find_marker_style_size);
 
@@ -1610,7 +2259,7 @@ class plannerController extends Controller {
 
 				if (trim($find_marker_style_size[$t]->size) == trim($existing_marker_style_size[0]->size)) {
 					// print_r($find_marker_style_size[$t]->marker_name."<br>");
-					array_push($markers, $find_marker_style_size[$t]->marker_name.' '.round($find_marker_style_size[$t]->marker_length,3));
+					array_push($markers, $find_marker_style_size[$t]->marker_name.' '.round($find_marker_style_size[$t]->marker_length,3).'->'.$find_marker_style_size[$t]->status);
 				}
 			}
 
@@ -1668,8 +2317,15 @@ class plannerController extends Controller {
 		$markers = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 					id, marker_name, marker_width, marker_length, min_length
 				FROM [marker_headers] 
-				WHERE marker_name = '".$selected_marker."'  "));
-		// dd($markers);
+				WHERE marker_name = '".$selected_marker."'  AND status = 'ACTIVE' "));
+		if (!isset($markers[0]->id)) {
+			
+			$msg = 'Selected marker has the status USELESS, please choose a marker with lower width.';
+			return view('planner.error',compact('msg'));
+
+			// dd('Selected marker has the status USELESS, please choose a marker with lower width.');
+		}
+		// dd('marker is fine');
 
 		$table4 = mattress_markers::findOrFail($existing_mattress_marker_id);
 		$table4->marker_id = (int)$markers[0]->id;
@@ -1752,8 +2408,9 @@ class plannerController extends Controller {
 
 		$status = "TO_LOAD";
 
-		// add to mattress_phases
-		// $table3_new = new mattress_phases;
+		// $find_position = mattress_details::where('mattress_id','=',$id)->get();
+		// $pre_position = $find_position[0]->position;
+		
 		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 		$table3_new->mattress_id = $id;
 		$table3_new->mattress = $mattress;
@@ -1765,6 +2422,7 @@ class plannerController extends Controller {
 		$table3_new->operator2;
 		$table3_new->date = $date;
 		$table3_new->id_status = $id.'-'.$status;
+		// $table3_new->pre_position = $pre_position;
 		$table3_new->save();
 
 		return Redirect::to('/plan_mattress/BOARD');
@@ -1799,17 +2457,19 @@ class plannerController extends Controller {
 
 		$requested_width = $find_marker[0]->requested_width;
 		$requested_length = $find_marker[0]->requested_length;
+		$width_theor_usable = $find_marker[0]->width_theor_usable;
 
 		$comment_operator = $find_marker[0]->comment_operator;
 
-		$markers = DB::connection('sqlsrv')->select(DB::raw("SELECT [id],[marker_name]
+		$markers = DB::connection('sqlsrv')->select(DB::raw("SELECT [id],[marker_name],[status]
   			FROM [marker_headers]
-  			WHERE [status] = 'ACTIVE' "));
+  			WHERE [status] = 'ACTIVE' or  [status] = 'USELESS' "));
 
 
 		return view('planner.split_mattress',compact('id','mattress_id_orig','mattress_orig','g_bin_orig','marker_name_orig', 
 				'marker_id_orig','marker_width','marker_length','requested_width','requested_length','comment_operator'
-				,'markers'));
+				,'markers','width_theor_usable'));
+
 	}
 
 	public function split_mattress_post(Request $request) {
@@ -1943,8 +2603,15 @@ class plannerController extends Controller {
 
 		$marker_new = DB::connection('sqlsrv')->select(DB::raw("SELECT id, marker_name, marker_length, marker_width, min_length
 			FROM marker_headers
-			WHERE id = '".$selected_marker."' "));
+			WHERE status = 'ACTIVE' and id = '".$selected_marker."' "));
 		// dd($marker_new);
+
+		if (!isset($marker_new[0]->id)) {
+			// dd('greska');
+			$msg = 'Selected marker has the status USELESS, please choose a marker with lower width.';
+			return view('planner.error',compact('msg'));
+		}
+		
 
 		// ----
 		$marker_id = $marker_new[0]->id;
@@ -2401,6 +3068,7 @@ class plannerController extends Controller {
 		}
 
 		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','cut_operator','cut_date','sp_operator','sp_date','req_time','layer_limit'));
+
 	}
 
 	public function correct_location($id) {
@@ -2446,7 +3114,6 @@ class plannerController extends Controller {
 
 			dd('Mattress doesn’t have active=1 phase line, check with IT');
 		}
-
 	}
 
 	public function edit_mattress_confirm(Request $request) {
@@ -2507,7 +3174,7 @@ class plannerController extends Controller {
 		      ,m4.[operator1]
 		      ,m4.[operator2]
 		      ,m4.[updated_at]
-
+		      
 		  FROM [mattresses] as m1
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -2533,7 +3200,7 @@ class plannerController extends Controller {
 		      ,m4.[operator1]
 		      ,m4.[operator2]
 		      ,m4.[updated_at]
-
+		      
 		  FROM [mattresses] as m1
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -2545,10 +3212,12 @@ class plannerController extends Controller {
 
 		if (isset($data_cut[0])) {
 			$cut_operator = $data_cut[0]->operator1;
-			$cut_date = substr($data_cut[0]->updated_at,0,16);	
+			$cut_date = substr($data_cut[0]->updated_at,0,16);
+			
 		} else {
 			$cut_operator = NULL;
 			$cut_date = NULL;
+
 		}
 
 		$location = $input['location'];
@@ -2570,17 +3239,24 @@ class plannerController extends Controller {
 		$table1->test_marker = $test_marker;
 		// $table1->tpp_mat_keep_wastage = $tpp_mat_keep_wastage;
 		$table1->bottom_paper = $bottom_paper;
-		$table1->comment_office = $comment_office;
+		if ($comment_office == '') {
+			$table1->comment_office = '';
+		} else if ($table1->comment_office != $comment_office) {
+			$table1->comment_office = Session::get('operator').'->'.$comment_office;
+		}
 		$table1->req_time = $req_time;
 		$table1->save();
 
 		// return Redirect::to('/plan_mattress/'.$location);
+		return Redirect::to('/plan_mattress/BOARD');
 		
-		$msgs = 'Succesfuly saved';
+		// $msgs = 'Succesfuly saved';
+		/*
 		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a',
 		'cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority',
 		'call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper',
 		'comment_office','location','cut_operator','cut_date','sp_operator','sp_date','req_time','msgs','layer_limit'));
+		*/
 	}
 
 	public function edit_layers_a($id) {
@@ -2896,7 +3572,9 @@ class plannerController extends Controller {
 			$date = date('Y-m-d H:i:s');
 		}
 
-		// $table3_new = new mattress_phases;
+		// $find_position = mattress_details::where('mattress_id','=',$id)->get();
+		// $pre_position = $find_position[0]->position;
+		
 		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 		$table3_new->mattress_id = $id;
 		$table3_new->mattress = $mattress;
@@ -2908,6 +3586,7 @@ class plannerController extends Controller {
 		$table3_new->operator2;
 		$table3_new->date = $date;
 		$table3_new->id_status = $id.'-'.$status;
+		// $table3_new->pre_position = $pre_position;
 		$table3_new->save();
 	
 		// reorder position of NOT_SET
@@ -5241,6 +5920,7 @@ class plannerController extends Controller {
 		return redirect('/paspul_stock');
 	}
 
+
 //PRINTING
 	public function print_mattress ($id) {
 
@@ -5295,6 +5975,21 @@ class plannerController extends Controller {
 		$mattress = $data[0]->mattress;
 		$g_bin = $data[0]->g_bin;
 		$material = $data[0]->material;
+
+		$fabric = trim(substr($material, 0,11));
+		$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
+			 FROM [settings].[dbo].[fabrics]
+		  WHERE [fabric] = '".$fabric."' "));
+		// dd($fabric_data);
+
+		if(isset($fabric_data[0]->sp_parameter)) {
+			$spreading_profile = $fabric_data[0]->sp_parameter;
+		} else {
+			$spreading_profile = '';
+		}
+		// dd('spreading profile: '.$spreading_profile);
+
+
 		$dye_lot = $data[0]->dye_lot;
 		$color_desc = $data[0]->color_desc;
 		$width_theor_usable = round($data[0]->width_theor_usable,3);
@@ -5501,6 +6196,7 @@ class plannerController extends Controller {
 		} 
 		$table->marker_width = $marker_width;
 		$table->spreading_method = $spreading_method;
+		$table->spreading_profile = $spreading_profile;
 		$table->material = $material;
 		$table->color_desc = $color_desc;
 		$table->dye_lot = $dye_lot;
@@ -5689,6 +6385,20 @@ class plannerController extends Controller {
 		$id = $data[0]->id;
 		$mattress = $data[0]->mattress;
 		$material = $data[0]->material;
+
+		$fabric = trim(substr($material, 0,11));
+		$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
+			 FROM [settings].[dbo].[fabrics]
+		  WHERE [fabric] = '".$fabric."' "));
+		// dd($fabric_data);
+
+		if(isset($fabric_data[0]->sp_parameter)) {
+			$spreading_profile = $fabric_data[0]->sp_parameter;
+		} else {
+			$spreading_profile = '';
+		}
+		// dd('spreading profile: '.$spreading_profile);
+
 		$dye_lot = '0-O';
 		$color_desc = $data[0]->color_desc;
 		$width_theor_usable = round($data[0]->width_theor_usable,3);
@@ -5792,6 +6502,7 @@ class plannerController extends Controller {
 		$table->marker_width_0 = $marker_width;
 		$table->min_length_0 = $min_length;
 		$table->spreading_method_0 = $spreading_method;
+		$table->spreading_profile_0 = $spreading_profile;
 		$table->material_0 = $material;
 		$table->color_desc_0 = $color_desc;
 		$table->dye_lot_0 = $dye_lot;
@@ -5945,6 +6656,19 @@ class plannerController extends Controller {
 				$mattress = $data[0]->mattress;
 				$g_bin = $data[0]->g_bin;
 				$material = $data[0]->material;
+				$fabric = trim(substr($material, 0,11));
+				$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
+					 FROM [settings].[dbo].[fabrics]
+				  WHERE [fabric] = '".$fabric."' "));
+				// dd($fabric_data);
+
+				if(isset($fabric_data[0]->sp_parameter)) {
+					$spreading_profile = $fabric_data[0]->sp_parameter;
+				} else {
+					$spreading_profile = '';
+				}
+				// dd('spreading profile: '.$spreading_profile);
+
 				$dye_lot = $data[0]->dye_lot;
 				$color_desc = $data[0]->color_desc;
 				$width_theor_usable = round($data[0]->width_theor_usable,3);
@@ -6156,6 +6880,7 @@ class plannerController extends Controller {
 				} 
 				$table->marker_width = $marker_width;
 				$table->spreading_method = $spreading_method;
+				$table->spreading_profile = $spreading_profile;
 				$table->material = $material;
 				$table->color_desc = $color_desc;
 				$table->dye_lot = $dye_lot;
@@ -6418,6 +7143,17 @@ class plannerController extends Controller {
 					${"id_{$x}"} = $data[0]->id;
 					${"mattress_{$x}"} = $data[0]->mattress;
 					${"material_{$x}"} = $data[0]->material;
+					$fabric = trim(substr(${"material_{$x}"}, 0,11));
+					$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
+						 FROM [settings].[dbo].[fabrics]
+					  WHERE [fabric] = '".$fabric."' "));
+					// dd($fabric_data);
+					if(isset($fabric_data[0]->sp_parameter)) {
+						${"spreading_profile_{$x}"} = $fabric_data[0]->sp_parameter;
+					} else {
+						${"spreading_profile_{$x}"} = '';
+					}
+					
 					${"dye_lot_{$x}"} = '0-O';
 					${"color_desc_{$x}"} = $data[0]->color_desc;
 					${"width_theor_usable_{$x}"} = round($data[0]->width_theor_usable,3);
@@ -6514,6 +7250,7 @@ class plannerController extends Controller {
 				$table->marker_width_0 = $marker_width_0;
 				$table->min_length_0 = $min_length_0;
 				$table->spreading_method_0 = $spreading_method_0;
+				$table->spreading_profile_0 = $spreading_profile_0;
 				$table->material_0 = $material_0;
 				$table->color_desc_0 = $color_desc_0;
 				$table->dye_lot_0 = $dye_lot_0;
@@ -6563,6 +7300,7 @@ class plannerController extends Controller {
 				$table->marker_width_1 = $marker_width_1;
 				$table->min_length_1 = $min_length_1;
 				$table->spreading_method_1 = $spreading_method_1;
+				$table->spreading_profile_1 = $spreading_profile_1;
 				$table->material_1 = $material_1;
 				$table->color_desc_1 = $color_desc_1;
 				$table->dye_lot_1 = $dye_lot_1;
@@ -6672,6 +7410,18 @@ class plannerController extends Controller {
 				${"id_{$x}"} = $data[0]->id;
 				${"mattress_{$x}"} = $data[0]->mattress;
 				${"material_{$x}"} = $data[0]->material;
+
+				$fabric = trim(substr(${"material_{$x}"}, 0,11));
+				$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
+					 FROM [settings].[dbo].[fabrics]
+				  WHERE [fabric] = '".$fabric."' "));
+				// dd($fabric_data);
+				if(isset($fabric_data[0]->sp_parameter)) {
+					${"spreading_profile_{$x}"} = $fabric_data[0]->sp_parameter;
+				} else {
+					${"spreading_profile_{$x}"} = '';
+				}
+
 				${"dye_lot_{$x}"} = '0-O';
 				${"color_desc_{$x}"} = $data[0]->color_desc;
 				${"width_theor_usable_{$x}"} = round($data[0]->width_theor_usable,3);
@@ -6760,6 +7510,7 @@ class plannerController extends Controller {
 				$table1->marker_width_0 = $marker_width_0;
 				$table1->min_length_0 = $min_length_0;
 				$table1->spreading_method_0 = $spreading_method_0;
+				$table1->spreading_profile_0 = $spreading_profile_0;
 				$table1->material_0 = $material_0;
 				$table1->color_desc_0 = $color_desc_0;
 				$table1->dye_lot_0 = $dye_lot_0;
@@ -6816,6 +7567,7 @@ class plannerController extends Controller {
 
 		return redirect('/');
 	}
+
 
 //SEARCH
 	public function recap_by_skeda_mattress(){

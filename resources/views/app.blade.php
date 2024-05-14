@@ -74,38 +74,37 @@
 						</ul>
 					@endif
 
+					<!-- admin -->
 					@if(Auth::user()->level() == 1)
 						<ul class="nav navbar-nav">
 							<!-- <li><a href="{{ url('#') }}">Planner test</a></li> -->
 							@if (isset($operators))
 							<li>
-								<form class="form-inline" style="width:400px; padding: 8px;" 
-								action="{{ url('operator_login_planner') }}" method="get" >
 								@if (!isset($operator))
-								<select name="selected_operator" class="select form-control select-form" 
-								style="width:150px !important">
-	                                <option value="" selected></option>
-	                        	    @foreach ($operators as $line)
-	                                <option value="{{ $line->operator }}">
-	                                    {{ $line->operator }}
-	                            	</option>
-	                            	@endforeach
-	                            </select>
-	                            <input type="submit" value="Login" class="btn btn-success">
-	                            </form>
+									<form class="form-inline" style="width:400px; padding: 8px;" 
+									action="{{ url('operator_login_planner') }}" method="get" >
+										<select name="selected_operator" class="select form-control select-form" 
+											style="width:150px !important">
+			                                <option value="" selected></option>
+			                        	    @foreach ($operators as $line)
+			                                <option value="{{ $line->operator }}">
+			                                    {{ $line->operator }}
+			                            	</option>
+			                            	@endforeach
+			                            </select>
+			                            <input type="submit" value="Login" class="btn btn-success">
+		                            </form>
 	                            @else
-	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-	                            <a href="{{ url('operator_logout_planner')}}" class="btn btn-danger">Logout</a>
+	                            <br>
+	                            <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+	                            <a href="{{ url('operator_logout_planner')}}" class="btn btn-danger btn-xs">Logout</a></strong>
 	                            @endif
 	                        </li>
 							@else
 								@if(Session::has('operator'))
-								<li>
-									<div style="width:400px; padding: 8px;">
-			                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-				                        <a href="{{ url('operator_logout_planner')}}" class="btn btn-danger">Logout</a>
-			                    	</div>
-			                    </li>
+								<br>
+	                            <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+	                            <a href="{{ url('operator_logout_planner')}}" class="btn btn-danger btn-xs">Logout</a></strong>
 		                        @endif
 		                    @endif
 						</ul>
@@ -134,38 +133,39 @@
 						</ul>
 					@endif
 
+					<!-- planner -->
 					@if(Auth::user()->level() == 3)
 						<ul class="nav navbar-nav">
-							<!-- <li><a href="{{ url('#') }}">Planner test</a></li> -->
+							<!-- <li><a href="{{ url('#') }}">Planner </a></li> -->
 							@if (isset($operators))
 							<li>
-								<form class="form-inline" style="width:400px; padding: 8px;" 
-								action="{{ url('operator_login_planner') }}" method="get" >
 								@if (!isset($operator))
-								<select name="selected_operator" class="select form-control select-form" 
-								style="width:150px !important">
-	                                <option value="" selected></option>
-	                        	    @foreach ($operators as $line)
-	                                <option value="{{ $line->operator }}">
-	                                    {{ $line->operator }}
-	                            	</option>
-	                            	@endforeach
-	                            </select>
-	                            <input type="submit" value="Login" class="btn btn-success">
-	                            </form>
+									<form class="form-inline" style="width:400px; padding: 8px;" 
+									action="{{ url('operator_login_planner') }}" method="get" >
+										<select name="selected_operator" class="select form-control select-form" 
+										style="width:150px !important">
+			                                <option value="" selected></option>
+			                        	    @foreach ($operators as $line)
+			                                <option value="{{ $line->operator }}">
+			                                    {{ $line->operator }}
+			                            	</option>
+			                            	@endforeach
+			                            </select>
+			                            <input type="submit" value="Login" class="btn btn-success">
+		                            </form>
 	                            @else
-	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-	                            <a href="{{ url('operator_logout_planner')}}" class="btn btn-danger">Logout</a>
+	                            <br>
+	                            <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+	                            <a href="{{ url('operator_logout_planner')}}" class="btn btn-danger btn-xs">Logout</a></strong>
 	                            @endif
 	                        </li>
 							@else
 								@if(Session::has('operator'))
 								<li>
-									<div style="width:400px; padding: 8px;">
-			                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-				                        <a href="{{ url('operator_logout_planner')}}" class="btn btn-danger">Logout</a>
-			                    	</div>
-			                    </li>
+									<br>
+			                        <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout_planner')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+		                        </li>
 		                        @endif
 		                    @endif
 						</ul>
@@ -217,57 +217,64 @@
 									<li><a href="{{ url('cutting_bansek_errors') }}"><b><sapn style="color: red">Bansek XML - errors</span></b></a></li>
 								</ul>
 							</li>
+							<li><a href="{{ url('cpo') }}">Cut parts inspection</a></li>
 							
 						</ul>
 					@endif
 
+					<!-- guest -->
 					@if(Auth::user()->level() == 20)
 						<ul class="nav navbar-nav">
 							<li><a href="{{ url('#') }}">Guest test</a></li>
 						</ul>
 					@endif
 
+					<!-- SP -->
 					@if(Auth::user()->level() == 10)
 						<ul class="nav navbar-nav">
 							<!-- <li><a href="{{ url('#') }}">SP test</a></li> -->
+							<li><a href="{{ url('request_material_table') }}">Material Request table</a></li>
+							
 
 						@if (isset($operators))
 						<li>
-							<form class="form-inline" style="width:400px; padding: 8px;" 
-							action="{{ url('operator_login') }}" method="get" >
 							@if (!isset($operator))
-							<select name="selected_operator" class="select form-control select-form" 
-							style="width:150px !important">
-                                <option value="" selected></option>
-                        	    @foreach ($operators as $line)
-                                <option value="{{ $line->operator }}">
-                                    {{ $line->operator }}
-                            	</option>
-                            	@endforeach
-                            </select>
-                            <input type="submit" value="Login" class="btn btn-success">
-                            </form>
+								<form class="form-inline" style="width:400px; padding: 8px;" 
+								action="{{ url('operator_login') }}" method="get" >
+									<select name="selected_operator" class="select form-control select-form" 
+									style="width:150px !important">
+		                                <option value="" selected></option>
+		                        	    @foreach ($operators as $line)
+		                                <option value="{{ $line->operator }}">
+		                                    {{ $line->operator }}
+		                            	</option>
+		                            	@endforeach
+		                            </select>
+		                            <input type="submit" value="Login" class="btn btn-success">
+	                            </form>
                             @else
-                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <a href="{{ url('operator_logout')}}" class="btn btn-danger">Logout</a>
+                            <br>
+                            <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="{{ url('operator_logout')}}" class="btn btn-danger btn-xs">Logout</a></strong>
                             @endif
                         </li>
 						@else
 							@if(Session::has('operator'))
-							<li>
-							<div style="width:400px; padding: 8px;">
-	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-		                        <a href="{{ url('operator_logout')}}" class="btn btn-danger">Logout</a>
-	                        </div>
-	                        </li>
+								<li>
+									<br>
+			                        <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+		                        </li>
 	                        @endif
 	                    @endif
 						</ul>
 					@endif
 
+					<!-- MS -->
 					@if(Auth::user()->level() == 11)
 						<ul class="nav navbar-nav">
 							<!-- <li><a href="{{ url('#') }}">MS test</a></li> -->
+							<li><a href="{{ url('request_material_table') }}">Material Request table</a></li>
 						@if (isset($operators))
 
 						<li>
@@ -335,6 +342,7 @@
 						</ul>
 					@endif
 
+					<!-- MM -->
 					@if(Auth::user()->level() == 12)
 						<ul class="nav navbar-nav">
 							<!-- <li><a href="{{ url('#') }}">MM test</a></li> -->
@@ -404,304 +412,318 @@
 						</ul>
 					@endif
 
+					<!-- TUB -->
 					@if(Auth::user()->level() == 21)
 						<ul class="nav navbar-nav">
-							<!-- <li><a href="{{ url('#') }}">SP test</a></li> -->
-
+							<!-- <li><a href="{{ url('#') }}">TUB test</a></li> -->
+							<li><a href="{{ url('request_material_table') }}">Material Request table</a></li>
 						@if (isset($operators))
-						<li>
-							<form class="form-inline" style="width:400px; padding: 8px;" 
-							action="{{ url('operator_login_tub') }}" method="get" >
-							@if (!isset($operator))
-							<select name="selected_operator" class="select form-control select-form" 
-							style="width:150px !important">
-                                <option value="" selected></option>
-                        	    @foreach ($operators as $line)
-                                <option value="{{ $line->operator }}">
-                                    {{ $line->operator }}
-                            	</option>
-                            	@endforeach
-                            </select>
-                            <input type="submit" value="Login" class="btn btn-success">
-                            </form>
-                            @else
-                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <a href="{{ url('operator_logout_tub')}}" class="btn btn-danger">Logout</a>
-                            @endif
-                        </li>
+							<li>
+								@if (!isset($operator))
+									<form class="form-inline" style="width:400px; padding: 8px;" 
+									action="{{ url('operator_login_tub') }}" method="get" >
+										<select name="selected_operator" class="select form-control select-form" 
+										style="width:150px !important">
+			                                <option value="" selected></option>
+			                        	    @foreach ($operators as $line)
+			                                <option value="{{ $line->operator }}">
+			                                    {{ $line->operator }}
+			                            	</option>
+			                            	@endforeach
+			                            </select>
+			                            <input type="submit" value="Login" class="btn btn-success">
+		                            </form>
+                            	@else
+		                            <br>
+		                            <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+		                            <a href="{{ url('operator_logout_tub')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+                            	@endif
+                        	</li>
 						@else
 							@if(Session::has('operator'))
-							<li>
-							<div style="width:400px; padding: 8px;">
-	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-		                        <a href="{{ url('operator_logout_tub')}}" class="btn btn-danger">Logout</a>
-	                        </div>
-	                        </li>
+								<li>
+									<br>
+			                        <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout_tub')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+		                        </li>
 	                        @endif
 	                    @endif
 						</ul>
 					@endif
 
+					<!-- LR -->
 					@if(Auth::user()->level() == 13)
 						<ul class="nav navbar-nav">
 							<!-- <li><a href="{{ url('#') }}">LR test</a></li> -->
 							@if (isset($operators))
-						<li>
-							<form class="form-inline" style="width:400px; padding: 8px;" 
-							action="{{ url('operator_login_lr') }}" method="get" >
-							@if (!isset($operator))
-							<select name="selected_operator" class="select form-control select-form" 
-							style="width:150px !important">
-                                <option value="" selected></option>
-                        	    @foreach ($operators as $line)
-                                <option value="{{ $line->operator }}">
-                                    {{ $line->operator }}
-                            	</option>
-                            	@endforeach
-                            </select>
-                            <input type="submit" value="Login" class="btn btn-success">
-                            </form>
-                            @else
-                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <a href="{{ url('operator_logout_lr')}}" class="btn btn-danger">Logout</a>
-                            @endif
-                        </li>
-						@else
-							@if(Session::has('operator'))
-							<li>
-							<div style="width:400px; padding: 8px;">
-	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-		                        <a href="{{ url('operator_logout_lr')}}" class="btn btn-danger">Logout</a>
-	                        </div>
-	                        </li>
-	                        @endif
-	                    @endif
-						</ul>
-					@endif
-
-					@if(Auth::user()->level() == 14)
-						<ul class="nav navbar-nav">
-							<!-- <li><a href="{{ url('#') }}">PSO test</a></li> -->
-							@if (isset($operators))
-						<li>
-							<form class="form-inline" style="width:400px; padding: 8px;" 
-							action="{{ url('operator_login_pso') }}" method="get" >
-							@if (!isset($operator))
-							<select name="selected_operator" class="select form-control select-form" 
-							style="width:150px !important">
-                                <option value="" selected></option>
-                        	    @foreach ($operators as $line)
-                                <option value="{{ $line->operator }}">
-                                    {{ $line->operator }}
-                            	</option>
-                            	@endforeach
-                            </select>
-                            <input type="submit" value="Login" class="btn btn-success">
-                            </form>
-                            @else
-                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <a href="{{ url('operator_logout_pso')}}" class="btn btn-danger">Logout</a>
-                            @endif
-                        </li>
-						@else
-							@if(Session::has('operator'))
-							<li>
-							<div style="width:400px; padding: 8px;">
-	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-		                        <a href="{{ url('operator_logout_pso')}}" class="btn btn-danger">Logout</a>
-	                        </div>
-	                        </li>
-	                        @endif
-	                    @endif
-						</ul>
-					@endif
-
-					@if(Auth::user()->level() == 15)
-						<ul class="nav navbar-nav">
-							<!-- <li><a href="{{ url('#') }}">PRW test</a></li> -->
-							@if (isset($operators))
-						<li>
-							<form class="form-inline" style="width:400px; padding: 8px;" 
-							action="{{ url('operator_login_prw') }}" method="get" >
-							@if (!isset($operator))
-							<select name="selected_operator" class="select form-control select-form" 
-							style="width:150px !important">
-                                <option value="" selected></option>
-                        	    @foreach ($operators as $line)
-                                <option value="{{ $line->operator }}">
-                                    {{ $line->operator }}
-                            	</option>
-                            	@endforeach
-                            </select>
-                            <input type="submit" value="Login" class="btn btn-success">
-                            </form>
-                            @else
-                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <a href="{{ url('operator_logout_prw')}}" class="btn btn-danger">Logout</a>
-                            @endif
-                        </li>
-						@else
-							@if(Session::has('operator'))
-							<li>
-							<div style="width:400px; padding: 8px;">
-	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-		                        <a href="{{ url('operator_logout_prw')}}" class="btn btn-danger">Logout</a>
-	                        </div>
-	                        </li>
-	                        @endif
-	                    @endif
-						</ul>
-					@endif
-
-					@if(Auth::user()->level() == 16)
-						<ul class="nav navbar-nav">
-							<!-- <li><a href="{{ url('#') }}">PCO test</a></li> -->
-								@if (isset($operators))
-							<li>
-								<form class="form-inline" style="width:400px; padding: 8px;" 
-								action="{{ url('operator_login_pco') }}" method="get" >
-								@if (!isset($operator))
-								<select name="selected_operator" class="select form-control select-form" 
-								style="width:150px !important">
-	                                <option value="" selected></option>
-	                        	    @foreach ($operators as $line)
-	                                <option value="{{ $line->operator }}">
-	                                    {{ $line->operator }}
-	                            	</option>
-	                            	@endforeach
-	                            </select>
-	                            <input type="submit" value="Login" class="btn btn-success">
-	                            </form>
-	                            @else
-	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-	                            <a href="{{ url('operator_logout_pco')}}" class="btn btn-danger">Logout</a>
-	                            @endif
-	                        </li>
+								<li>
+									@if (!isset($operator))
+										<form class="form-inline" style="width:400px; padding: 8px;" 
+										action="{{ url('operator_login_lr') }}" method="get" >
+											<select name="selected_operator" class="select form-control select-form" 
+											style="width:150px !important">
+				                                <option value="" selected></option>
+				                        	    @foreach ($operators as $line)
+				                                <option value="{{ $line->operator }}">
+				                                    {{ $line->operator }}
+				                            	</option>
+				                            	@endforeach
+				                            </select>
+				                            <input type="submit" value="Login" class="btn btn-success">
+			                            </form>
+		                            @else
+		                            <br>
+		                            <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+		                            <a href="{{ url('operator_logout_lr')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+		                            @endif
+		                        </li>
 							@else
 								@if(Session::has('operator'))
 								<li>
-								<div style="width:400px; padding: 8px;">
-		                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-			                        <a href="{{ url('operator_logout_pco')}}" class="btn btn-danger">Logout</a>
-		                        </div>
+									<br>
+			                        <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout_lr')}}" class="btn btn-danger btn-xs">Logout</a></strong>
 		                        </li>
 		                        @endif
 		                    @endif
 						</ul>
 					@endif
 
+					<!-- PSO -->
+					@if(Auth::user()->level() == 14)
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">PSO test</a></li> -->
+							@if (isset($operators))
+								<li>
+									@if (!isset($operator))	
+										<form class="form-inline" style="width:400px; padding: 8px;" 
+										action="{{ url('operator_login_pso') }}" method="get" >
+											<select name="selected_operator" class="select form-control select-form" 
+											style="width:150px !important">
+				                                <option value="" selected></option>
+				                        	    @foreach ($operators as $line)
+				                                <option value="{{ $line->operator }}">
+				                                    {{ $line->operator }}
+				                            	</option>
+				                            	@endforeach
+				                            </select>
+				                            <input type="submit" value="Login" class="btn btn-success">
+			                            </form>
+	                            	@else
+	                            	<br>
+	                            	<strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+	                            	<a href="{{ url('operator_logout_pso')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+
+	                            @endif
+	                        </li>
+							@else
+								@if(Session::has('operator'))
+								<li>
+									<br>
+			                        <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout_pso')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+		                        </li>
+		                        @endif
+		                    @endif
+						</ul>
+					@endif
+
+					<!-- PRW -->
+					@if(Auth::user()->level() == 15)
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">PRW test</a></li> -->
+							<li><a href="{{ url('request_material_table') }}">Material Request table</a></li>
+
+							@if (isset($operators))
+								<li>
+									@if (!isset($operator))
+										<form class="form-inline" style="width:400px; padding: 8px;" 
+										action="{{ url('operator_login_prw') }}" method="get" >
+								
+											<select name="selected_operator" class="select form-control select-form" 
+											style="width:150px !important">
+				                                <option value="" selected></option>
+				                        	    @foreach ($operators as $line)
+				                                <option value="{{ $line->operator }}">
+				                                    {{ $line->operator }}
+				                            	</option>
+				                            	@endforeach
+				                            </select>
+				                            <input type="submit" value="Login" class="btn btn-success">
+	                            		</form>
+	                            	@else
+	                            	<br>
+	                            	<strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+	                            	<a href="{{ url('operator_logout_prw')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+	                            	
+	                            	@endif
+	                        </li>
+							@else
+								@if(Session::has('operator'))
+								<li>
+									<br>
+			                        <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout_prw')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+		                        </li>
+		                        @endif
+		                    @endif
+						</ul>
+					@endif
+
+					<!-- PCO -->
+					@if(Auth::user()->level() == 16)
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">PCO test</a></li> -->
+							@if (isset($operators))
+								<li>
+									@if (!isset($operator))
+									<form class="form-inline" style="width:400px; padding: 8px;" 
+									action="{{ url('operator_login_pco') }}" method="get" >
+										<select name="selected_operator" class="select form-control select-form" 
+										style="width:150px !important">
+			                                <option value="" selected></option>
+			                        	    @foreach ($operators as $line)
+			                                <option value="{{ $line->operator }}">
+			                                    {{ $line->operator }}
+			                            	</option>
+			                            	@endforeach
+			                            </select>
+			                            <input type="submit" value="Login" class="btn btn-success">
+		                            </form>
+		                            @else
+		                            	<br>
+			                            <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+			                            <a href="{{ url('operator_logout_pco')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+		                            @endif
+	                        </li>
+							@else
+								@if(Session::has('operator'))
+								<li>
+									<br>
+			                        <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout_pco')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+		                        </li>
+		                        @endif
+		                    @endif
+						</ul>
+					@endif
+
+					<!-- PACK -->
 					@if(Auth::user()->level() == 17)
 						<ul class="nav navbar-nav">
 							<!-- <li><a href="{{ url('#') }}">PACK test</a></li> -->
 							@if (isset($operators))
 							<li>
-								<form class="form-inline" style="width:400px; padding: 8px;" 
-								action="{{ url('operator_login_pack') }}" method="get" >
 								@if (!isset($operator))
-								<select name="selected_operator" class="select form-control select-form" 
-								style="width:150px !important">
-	                                <option value="" selected></option>
-	                        	    @foreach ($operators as $line)
-	                                <option value="{{ $line->operator }}">
-	                                    {{ $line->operator }}
-	                            	</option>
-	                            	@endforeach
-	                            </select>
-	                            <input type="submit" value="Login" class="btn btn-success">
-	                            </form>
+									<form class="form-inline" style="width:400px; padding: 8px;" 
+									action="{{ url('operator_login_pack') }}" method="get" >
+										<select name="selected_operator" class="select form-control select-form" 
+										style="width:150px !important">
+			                                <option value="" selected></option>
+			                        	    @foreach ($operators as $line)
+			                                <option value="{{ $line->operator }}">
+			                                    {{ $line->operator }}
+			                            	</option>
+			                            	@endforeach
+			                            </select>
+			                            <input type="submit" value="Login" class="btn btn-success">
+		                        	</form>    
 	                            @else
-	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-	                            <a href="{{ url('operator_logout_pack')}}" class="btn btn-danger">Logout</a>
+		                            <br>
+		                            <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+		                            <a href="{{ url('operator_logout_pack')}}" class="btn btn-danger btn-xs">Logout</a></strong>
 	                            @endif
 	                        </li>
 							@else
 								@if(Session::has('operator'))
 								<li>
-								<div style="width:400px; padding: 8px;">
-		                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-			                        <a href="{{ url('operator_logout_pack')}}" class="btn btn-danger">Logout</a>
-		                        </div>
+									<br>
+			                        <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout_pack')}}" class="btn btn-danger btn-xs">Logout</a></strong>
 		                        </li>
 		                        @endif
 		                    @endif
 						</ul>
 					@endif
 
+					<!-- PLOT -->
 					@if(Auth::user()->level() == 18)
 						<ul class="nav navbar-nav">
 							<!-- <li><a href="{{ url('#') }}">PLOT test</a></li> -->
 							@if (isset($operators))
-							<li>
-								<form class="form-inline" style="width:400px; padding: 8px;" 
-								action="{{ url('operator_login_plot') }}" method="get" >
-								@if (!isset($operator))
-								<select name="selected_operator" class="select form-control select-form" 
-								style="width:150px !important">
-	                                <option value="" selected></option>
-	                        	    @foreach ($operators as $line)
-	                                <option value="{{ $line->operator }}">
-	                                    {{ $line->operator }}
-	                            	</option>
-	                            	@endforeach
-	                            </select>
-	                            <input type="submit" value="Login" class="btn btn-success">
-	                            </form>
-	                            @else
-	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-	                            <a href="{{ url('operator_logout_plot')}}" class="btn btn-danger">Logout</a>
-	                            @endif
+								<li>
+									@if (!isset($operator))
+										<form class="form-inline" style="width:400px; padding: 8px;" 
+										action="{{ url('operator_login_plot') }}" method="get" >
+											<select name="selected_operator" class="select form-control select-form" 
+											style="width:150px !important">
+				                                <option value="" selected></option>
+				                        	    @foreach ($operators as $line)
+				                                <option value="{{ $line->operator }}">
+				                                    {{ $line->operator }}
+				                            	</option>
+				                            	@endforeach
+				                            </select>
+				                            <input type="submit" value="Login" class="btn btn-success">
+			                            </form>
+		                            @else
+			                            <br>
+			                            <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+			                            <a href="{{ url('operator_logout_plot')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+		                            @endif
 	                        </li>
 							@else
 								@if(Session::has('operator'))
 								<li>
-								<div style="width:400px; padding: 8px;">
-		                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-			                        <a href="{{ url('operator_logout_plot')}}" class="btn btn-danger">Logout</a>
-		                        </div>
+									<br>
+			                        <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout_plot')}}" class="btn btn-danger btn-xs">Logout</a></strong>
 		                        </li>
 		                        @endif
 		                    @endif
 						</ul>
 					@endif
 
+					<!-- LEC -->
 					@if(Auth::user()->level() == 19)
 						<ul class="nav navbar-nav">
 							<!-- <li><a href="{{ url('#') }}">CUT test</a></li> -->
 							@if (isset($operators))
 							<li>
-								<form class="form-inline" style="width:400px; padding: 8px;" 
-								action="{{ url('operator_login_cut') }}" method="get" >
 								@if (!isset($operator))
-								<select name="selected_operator" class="select form-control select-form" 
-								style="width:150px !important">
-	                                <option value="" selected></option>
-	                        	    @foreach ($operators as $line)
-	                                <option value="{{ $line->operator }}">
-	                                    {{ $line->operator }}
-	                            	</option>
-	                            	@endforeach
-	                            </select>
-	                            <input type="submit" value="Login" class="btn btn-success">
-	                            </form>
+									<form class="form-inline" style="width:400px; padding: 8px;" 
+									action="{{ url('operator_login_cut') }}" method="get" >
+										<select name="selected_operator" class="select form-control select-form" 
+										style="width:150px !important">
+			                                <option value="" selected></option>
+			                        	    @foreach ($operators as $line)
+			                                <option value="{{ $line->operator }}">
+			                                    {{ $line->operator }}
+			                            	</option>
+			                            	@endforeach
+			                            </select>
+		                            <input type="submit" value="Login" class="btn btn-success">
+		                            </form>
 	                            @else
-	                            <span style="color: white; text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-	                            <a href="{{ url('operator_logout_cut')}}" class="btn btn-danger">Logout</a>
+		                            <br>
+		                            <strong style="color: white; text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+		                            <a href="{{ url('operator_logout_cut')}}" class="btn btn-danger btn-xs">Logout</a></strong>
 	                            @endif
 	                        </li>
 							@else
 								@if(Session::has('operator'))
 								<li>
-								<div style="width:400px; padding: 8px;">
-		                            <span style="color: white; text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
-			                        <a href="{{ url('operator_logout_cut')}}" class="btn btn-danger">Logout</a>
-		                        </div>
-		                    	</li>
+									<br>
+			                        <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout_cut')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+		                        </li>
 		                        @endif
 
 		                    @endif
 						</ul>
 					@endif
 
+					<!-- K-PREP -->
 					@if(Auth::user()->level() == 22)
 						<ul class="nav navbar-nav">
 							<li><a href="{{ url('req_lost') }}">Request for LOST BB</a></li>
@@ -709,6 +731,7 @@
 						</ul>
 					@endif
 
+					<!-- PSS -->
 					@if(Auth::user()->level() == 23)
 						<ul class="nav navbar-nav">
 							<li><a href="{{ url('paspul_locations') }}">Paspul locations</a></li>
@@ -718,6 +741,8 @@
 							
 						</ul>
 					@endif
+
+					<!-- PSK -->
 					@if(Auth::user()->level() == 24)
 						<ul class="nav navbar-nav">
 							<li><a href="{{ url('paspul_locations') }}">Paspul locations</a></li>
@@ -728,6 +753,7 @@
 						</ul>
 					@endif
 
+					<!-- PSZ -->
 					@if(Auth::user()->level() == 25)
 						<ul class="nav navbar-nav">
 							<li><a href="{{ url('paspul_locations') }}">Paspul locations</a></li>
@@ -738,6 +764,7 @@
 						</ul>
 					@endif
 
+					<!-- WHS -->
 					@if(Auth::user()->level() == 26)
 						<ul class="nav navbar-nav">
 							<li><a href="{{ url('paspul_table_log/WHSU') }}">Paspul log table</a></li>
@@ -745,6 +772,85 @@
 						</ul>
 					@endif
 
+					<!-- FO -->
+					@if(Auth::user()->level() == 27)
+
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('request_material_table') }}">Material Request table</a></li> -->
+							@if (isset($operators))
+							<li>
+								@if (!isset($operator))
+									<form class="form-inline" style="width:400px; padding: 8px;" 
+									action="{{ url('operator_login_fo') }}" method="get" >
+										<select name="selected_operator" class="select form-control select-form" 
+										style="width:150px !important">
+			                                <option value="" selected></option>
+			                        	    @foreach ($operators as $line)
+			                                <option value="{{ $line->operator }}">
+			                                    {{ $line->operator }}
+			                            	</option>
+			                            	@endforeach
+			                            </select>
+			                            <input type="submit" value="Login" class="btn btn-success">
+		                            </form>
+	                            @else
+		                            <br>
+		                            <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+		                            <a href="{{ url('operator_logout_fo')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+	                            @endif
+	                            
+	                        </li>
+							@else
+								@if(Session::has('operator'))
+								<li>
+									<br>
+			                        <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout_fo')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+		                        </li>
+		                        @endif
+		                    @endif
+						</ul>
+					@endif
+
+					<!-- CPO -->
+					@if(Auth::user()->level() == 28)
+						<ul class="nav navbar-nav">
+							<li><a href="{{ url('cpo') }}">G_bin statuses</a></li>
+							<li><a href="{{ url('cpo_scan') }}">New g_bin check</a></li>
+							&nbsp;&nbsp;&nbsp;
+							@if (isset($operators))
+							<li>
+								@if (!isset($operator))
+									<form class="form-inline" style="width:400px; padding: 8px;" 
+									action="{{ url('operator_login_cpo') }}" method="get" >
+										<select name="selected_operator" class="select form-control select-form" 
+										style="width:150px !important">
+			                                <option value="" selected></option>
+			                        	    @foreach ($operators as $line)
+			                                <option value="{{ $line->operator }}">
+			                                    {{ $line->operator }}
+			                            	</option>
+			                            	@endforeach
+			                            </select>
+			                            <input type="submit" value="Login" class="btn btn-success">
+		                            </form>
+	                            @else
+		                            <br>
+		                            <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+		                            <a href="{{ url('operator_logout_cpo')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+	                            @endif
+	                        </li>
+							@else
+								@if(Session::has('operator'))
+								<li>
+									<br>
+			                        <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        <a href="{{ url('operator_logout_cpo')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+		                        </li>
+		                        @endif
+		                    @endif
+						</ul>
+					@endif
 				@endif
 
 				<ul class="nav navbar-nav navbar-right">
@@ -760,6 +866,7 @@
 						</li>
 					@endif
 				</ul>
+
 			</div>
 		</div>
 	</nav>
@@ -923,7 +1030,7 @@ $(function() {
 <script>
   $(document).ready(function() {
 
-  	$("#sortable1 , #sortable2 , #sortable3 , #sortable4 , #sortable5, #sortable6, #sortable7, #sort_able8, #sort_able9" ).sortable({
+  	$("#sortable0 ,#sortable1 , #sortable2 , #sortable3 , #sortable4 , #sortable5, #sortable6, #sortable7, #sort_able8, #sort_able9" ).sortable({
     	connectWith: ".connectedSortable_ul_1",
     	dropOnEmpty: true
     }).disableSelection();
@@ -949,6 +1056,21 @@ $(function() {
   //       return false;
   //     }
   //   });
+	
+	$('#sortable0').sortable({
+        // axis: 'y',
+        update: function (event, ui) {
+            var data = $(this).sortable('serialize');
+            // console.log("position changed 2");
+            // console.log(data);
+            // POST to server using $.post or $.ajax
+          	  $.ajax({
+          	      data: data,
+          	      type: 'POST',
+          	      url: '{{ route('posts.reposition0') }}'
+         	});
+    	}
+    });
 
     $('#sortable2').sortable({
         // axis: 'y',
@@ -1056,9 +1178,9 @@ $(function() {
             // console.log(data);
             // POST to server using $.post or $.ajax
           	  $.ajax({
-          	      // data: data,
-          	      // type: 'POST',
-          	      // url: '{{ route('posts.reposition9') }}'
+          	      data: data,
+          	      type: 'POST',
+          	      url: '{{ route('posts.reposition9') }}'
          	});
     	}
     });

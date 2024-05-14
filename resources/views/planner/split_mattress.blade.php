@@ -25,6 +25,8 @@
                             Width: <b>{{ round($marker_width,0) }}</b> cm ;
                             Length: <b>{{ round($marker_length,2) }}</b> m
                         </p>
+                        <br>
+                        <p>Theoretical usable width: <b>{{ round($width_theor_usable, 2) }}</b> cm</p>
                         <p>
                             Requested width: <b>{{ round($requested_width, 2) }}</b> m
                             Requested length: <b>{{ round($requested_length,0) }}</b> cm <br>
@@ -43,7 +45,7 @@
                             
                             @foreach ($markers as $m)
                             <option value="{{ $m->id }}">
-                                {{ $m->marker_name }}
+                                {{ $m->marker_name }} => {{ $m->status }}
                             </option>
                             @endforeach
                         </select>

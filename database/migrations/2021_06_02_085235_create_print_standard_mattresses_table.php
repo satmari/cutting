@@ -27,6 +27,7 @@ class CreatePrintStandardMattressesTable extends Migration {
 			$table->string('marker_width')->nullable();
 			$table->string('marker_length')->nullable();
 			$table->string('spreading_method')->nullable();
+			$table->string('spreading_profile')->nullable();
 			$table->string('material')->nullable();
 			$table->string('color_desc')->nullable();
 			$table->string('dye_lot')->nullable();

@@ -95,7 +95,6 @@ class wastageController extends Controller {
 		$material_data_tpp = DB::connection('sqlsrv')->select(DB::raw("SELECT DISTINCT tpp_material FROM [cutting].[dbo].[tpp_materials]"));
 
 		return view('Wastage.index_c',compact('material_data','material_data_tpp','skeda'));
-
 	}
 
 	public function req_wastage_cut(Request $request) {
@@ -111,6 +110,10 @@ class wastageController extends Controller {
 
 		if ($qty > 10) {
 			dd("Maksimalna kolicina je 10 nalepnica, verovatno ste skenirali barkod umesto da ste uneli kolicinu. Pokusajte ponovo");
+		}
+
+		if (strlen($sap_bin) != 10) {
+			dd("Krojni nalog odnosno SAP bin mora imati 10 karaktera");
 		}
 		
 		$mattress_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT [skeda], [sap_bin] FROM [wastages] WHERE skeda = '".$skeda."' AND  sap_bin = '".$sap_bin."' "));
@@ -312,9 +315,6 @@ class wastageController extends Controller {
 
 			
 		}
-		
-
-		
 	}
 
 	public function index_wh() {
@@ -343,10 +343,33 @@ class wastageController extends Controller {
 			$msg = 'Greska: Za unesen SAP bin ne postoje infrmacije, pokusaj ponovo.';
 			return view('wastage.index_wh_scan', compact('msg'));
 
+		} 
+
+		$skeda = $data[0]->skeda;
+
+		$check_skeda = DB::connection('sqlsrv6')->select(DB::raw("SELECT TOP 1 tpp_shipments, tpp_wastage FROM [pro] WHERE skeda = '".$skeda."' ORDER BY id asc "));
+		// dd($check_skeda);
+
+		if (isset($check_skeda[0]->tpp_shipments)) {
+			$tpp_shipments = $check_skeda[0]->tpp_shipments;
+			$tpp_wastage = $check_skeda[0]->tpp_wastage;
+
+			if ($tpp_shipments == 'COMPLETE') {
+				
+				$msg = 'Greska: TPP ship. vrednost u PoSummary app je COMPLETED';
+				return view('wastage.index_wh_scan', compact('msg'));
+			} else {
+				//go 
+
+			}
+
+		} else {
+
+			$msg = 'Greska: Nema informacija za ovu skedu u PoSummary app';
+			return view('wastage.index_wh_scan', compact('msg'));
 		}
 
 		return view('wastage.insert', compact('data', 'sap_bin'));
-
 	}
 
 	public function req_wastage_wh_insert(Request $request) {
@@ -383,7 +406,7 @@ class wastageController extends Controller {
 			}
 		}
 
-	return Redirect::to('wastage_wh');
+		return Redirect::to('wastage_wh');
 	}
 
 	public function move_sapbin_container() {
@@ -453,7 +476,6 @@ class wastageController extends Controller {
 		return Redirect::to('wastage_wh');
 	}
 
-
 	public function move_container_location() {
 
 		return view('wastage.move_container_location');
@@ -515,7 +537,6 @@ class wastageController extends Controller {
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT distinct(skeda) FROM [wastages] "));
 		// dd($data);
 		return view('wastage.wastage_remove_skeda', compact('data'));
-
 	}
 
 	public function wastage_remove_skeda_post($id) {
@@ -618,7 +639,6 @@ class wastageController extends Controller {
 		}
 
 		return Redirect::to('wastage_wh');
-
 	}
 
 	public function delete_wastage_line(Request $request) {	
@@ -654,7 +674,6 @@ class wastageController extends Controller {
 		} else {
 			dd("Password is not correct!!!");
 		}
-
 	}
 
 	public function wastage_edit($id) {	
@@ -669,15 +688,20 @@ class wastageController extends Controller {
 
 		// $this->validate($request, ['location'=>'required', 'container'=>'required']);
 		$forminput = $request->all();
+		// dd($forminput);
+
 		$id = $forminput['id'];
 		$log_rep = $forminput['log_rep'];
+		$weight = $forminput['weight'];
 		// dd($id);
 
 		$table = wastage::findOrFail($id);
-		$table->log_rep = $log_rep;
+		$table->log_rep = 	$log_rep;
+		$table->weight = 	round((float)$weight,2);
+		
 		$table->save();
 		
 		return Redirect::to('wastage_table');
-
 	}
+	
 }

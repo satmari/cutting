@@ -9,6 +9,7 @@
 
 				@if((Auth::check() && Auth::user()->name == "admin") OR ( Auth::check() && Auth::user()->name == "planner"))
 					<a href="{{ url('operator_create') }}" class="btn btn-success btn-xs ">Add new operator</a>
+					<a href="{{ url('operator_others') }}" class="btn btn-danger btn-xs ">Operators on Relax and Inspe</a>
 				@endif
 
 				</div>

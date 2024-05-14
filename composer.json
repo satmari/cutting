@@ -12,7 +12,8 @@
 		"maatwebsite/excel": "~2.0.0",
 		"gbrock/laravel-table": "dev-master",
 		"league/csv": "^7.2",
-		"nesbot/carbon": "^1.21"
+		"nesbot/carbon": "^1.21",
+		"doctrine/dbal": "^2.5"
 
 	},
 	"require-dev": {

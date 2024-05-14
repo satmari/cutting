@@ -33,7 +33,9 @@
                             
                             @for ($i = 1; $i <= count($markers); $i++)
                             <option value="{{ $markers[$i] }}">
-                                {{ $markers[$i] }}
+                               
+                                    {{ $markers[$i] }}
+                               
                             </option>
                             @endfor
                         </select>

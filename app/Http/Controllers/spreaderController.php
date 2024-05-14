@@ -16,6 +16,8 @@ use App\mattress_eff;
 use App\mattress_pro;
 use App\mattresses;
 use App\mattress_split_request;
+use App\material_requests;
+use App\material_request_phases;
 
 use DB;
 
@@ -433,7 +435,7 @@ class spreaderController extends Controller {
 			WHERE operator = '".$operator."' COLLATE Latin1_General_CI_AI 
 			AND ( [device] like '%SP%' OR [device] like '%MM%' OR [device] like '%MS%')"));
 		if (!isset($check_op)) {
-			dd("Wrong operator, call IT or Sonja !");
+			dd("Wrong operator, call IT!");
 		}
 
 
@@ -453,24 +455,6 @@ class spreaderController extends Controller {
 		}
 		$location = substr($device, 0,3);
 		
-		// mattress_phasess
-		// all mattress_phases for this mattress set to NOT ACTIVE
-		// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-		// 		id, mattress 
-		// 	FROM [mattress_phases] WHERE mattress_id = '".$id."' AND active = 1"));
-		
-		// if (isset($find_all_mattress_phasses[0])) {
-		// 	$mattress = $find_all_mattress_phasses[0]->mattress;
-
-		// 	// dd($find_all_mattress_phasses);
-		// 	for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
-
-		// 			$table3 = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
-		// 			$table3->active = 0;
-		// 			$table3->save();
-		// 	}	
-		// }
-
 		$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
 			SET NOCOUNT ON;
 			UPDATE [mattress_phases]
@@ -492,7 +476,9 @@ class spreaderController extends Controller {
 			$date = date('Y-m-d H:i:s');
 		}
 
-		// $table3_new = new mattress_phases;
+		$find_position = mattress_details::where('mattress_id','=',$id)->get();
+		$pre_position = $find_position[0]->position;
+
 		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 		$table3_new->mattress_id = $id;
 		$table3_new->mattress = $mattress;
@@ -504,8 +490,8 @@ class spreaderController extends Controller {
 		$table3_new->operator2 = $operator2;
 		$table3_new->date = $date;
 		$table3_new->id_status = $id.'-'.$status;
+		$table3_new->pre_position = $pre_position;
 		$table3_new->save();
-
 
 		return redirect('/spreader');
 	}
@@ -596,26 +582,6 @@ class spreaderController extends Controller {
 		}
 		$location = substr($device, 0,3);
 
-		// mattress_phasess
-		// all mattress_phases for this mattress set to NOT ACTIVE
-		// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT
-		//  	mp.[id], mp.[mattress], mp.[status], m.[g_bin]
-		//  	FROM [mattress_phases] as mp 
-		//  	JOIN [mattresses] as m ON m.[id] = mp.[mattress_id]
-		//  	WHERE mp.[mattress_id] = '".$id."' AND mp.[active] = 1  "));
-		
-		// if (isset($find_all_mattress_phasses[0])) {
-		// 	$mattress = $find_all_mattress_phasses[0]->mattress;
-
-		// 	// dd($find_all_mattress_phasses);
-		// 	for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
-
-		// 			$table3_update = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
-		// 			$table3_update->active = 0;
-		// 			$table3_update->save();
-		// 	}
-		// }
-
 		$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
 			SET NOCOUNT ON;
 			UPDATE [mattress_phases]
@@ -633,8 +599,9 @@ class spreaderController extends Controller {
 		}
 		$status = "TO_LOAD";
 
-		// add to mattress_phases
-		// $table3_new = new mattress_phases;
+		$find_position = mattress_details::where('mattress_id','=',$id)->get();
+		$pre_position = $find_position[0]->position;
+
 		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 		$table3_new->mattress_id = $id;
 		$table3_new->mattress = $mattress;
@@ -646,6 +613,7 @@ class spreaderController extends Controller {
 		$table3_new->operator2 = $operator2;
 		$table3_new->date = $date;
 		$table3_new->id_status = $id.'-'.$status;
+		// $table3_new->pre_position = $pre_position;
 		$table3_new->save();
 
 		return redirect('/spreader');
@@ -712,7 +680,7 @@ class spreaderController extends Controller {
 			WHERE operator = '".$operator."' COLLATE Latin1_General_CI_AI 
 			AND ( [device] like '%SP%' OR [device] like '%MM%' OR [device] like '%MS%')"));
 		if (!isset($check_op)) {
-			dd("Wrong operator, call Atila !");
+			dd("Wrong operator, call IT !");
 		}
 
 		$operator2 = Session::get('operator2');
@@ -730,26 +698,7 @@ class spreaderController extends Controller {
 			return view('spreader.error',compact('msg'));
 		}
 		$location = substr($device, 0,3);
-		
-		// mattress_phasess
-		// all mattress_phases for this mattress set to NOT ACTIVE
-		// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT
-		//  	id, mattress, status 
-		//  	FROM [mattress_phases] WHERE mattress_id = '".$id."' AND active = 1 "));
-		// // dd($find_all_mattress_phasses);
-
-		// if (isset($find_all_mattress_phasses[0])) {
-		// 	$mattress = $find_all_mattress_phasses[0]->mattress;
-
-		// 	// dd($find_all_mattress_phasses);
-		// 	for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
-
-		// 		$table3_update = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
-		// 		$table3_update->active = 0;
-		// 		$table3_update->save();
-		// 	}
-		// }
-
+	
 		$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
 			SET NOCOUNT ON;
 			UPDATE [mattress_phases]
@@ -766,7 +715,9 @@ class spreaderController extends Controller {
 		}
 		$status = 'ON_HOLD';
 
-		// $table3_new = new mattress_phases;
+		// $find_position = mattress_details::where('mattress_id','=',$id)->get();
+		// $pre_position = $find_position[0]->position;
+
 		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 		$table3_new->mattress_id = $id;
 		$table3_new->mattress = $mattress;
@@ -778,6 +729,7 @@ class spreaderController extends Controller {
 		$table3_new->operator2 = $operator2;
 		$table3_new->date = $date;
 		$table3_new->id_status = $id.'-'.$status;
+		// $table3_new->pre_position = $pre_position;
 		$table3_new->save();
 	
 		// if is partialy spreaded to delete line in eff ???????????????????????????????????
@@ -1137,7 +1089,7 @@ class spreaderController extends Controller {
 			WHERE operator = '".$operator."' COLLATE Latin1_General_CI_AI 
 			AND ( [device] like '%SP%' OR [device] like '%MM%' OR [device] like '%MS%')"));
 		if (!isset($check_op)) {
-			dd("Wrong operator, call Atila !");
+			dd("Wrong operator, call IT!");
 		}
 
 		$operator2 = Session::get('operator2');
@@ -1299,6 +1251,9 @@ class spreaderController extends Controller {
 				// $table_update_1->location_before;
 				$table_update_1->save();
 
+				$find_position = mattress_details::where('mattress_id','=',$id)->get();
+				$pre_position = $find_position[0]->position;
+
 				// print_r($position);
 				$table_update_2 = mattress_details::findOrFail($data[0]->id);
 				$table_update_2->layers_a = (float)$layers_a;
@@ -1311,24 +1266,7 @@ class spreaderController extends Controller {
 				$table_update_2->num_of_cut_problems = (int)$num_of_cut_problems;
 				$table_update_2->save();
 
-				// mattress_phasess
-				// all mattress_phases for this mattress set to NOT ACTIVE
-				// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				// 		id, mattress 
-				// 	FROM [mattress_phases] WHERE mattress_id = '".$id."' AND active = 1"));
 				
-				// if (isset($find_all_mattress_phasses[0])) {
-				// 	$mattress = $find_all_mattress_phasses[0]->mattress;
-
-				// 	// dd($find_all_mattress_phasses);
-				// 	for ($y=0; $y < count($find_all_mattress_phasses); $y++) { 
-						
-				// 			$table_update_3 = mattress_phases::findOrFail($find_all_mattress_phasses[$y]->id);
-				// 			$table_update_3->active = 0;
-				// 			$table_update_3->save();
-				// 	}	
-				// }
-
 				$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
 					SET NOCOUNT ON;
 					UPDATE [mattress_phases]
@@ -1343,6 +1281,7 @@ class spreaderController extends Controller {
 					$status = "TO_JOIN";
 					$location_new = "PSO";
 					$active = 1;
+					$pre_position = NULL;
 				} else {
 					$status = "TO_CUT";
 					$location_new = "CUT";
@@ -1354,9 +1293,9 @@ class spreaderController extends Controller {
 				} else {
 					$date = date('Y-m-d H:i:s');
 				}
+
+				// find pre_position				
 				
-				// save mattress_phases
-				// $table1_new = new mattress_phases;
 				$table1_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 				$table1_new->mattress_id = $id;
 				$table1_new->mattress = $mattress;
@@ -1368,6 +1307,7 @@ class spreaderController extends Controller {
 				$table1_new->operator2 = $operator2;
 				$table1_new->date = $date;
 				$table1_new->id_status = $id.'-'.$status;
+				$table1_new->pre_position = $pre_position;
 				$table1_new->save();
 				
 
@@ -1403,6 +1343,9 @@ class spreaderController extends Controller {
 				// $table2_new->$location_before;
 				$table2_new->save();
 
+				$find_position = mattress_details::where('mattress_id','=',$id)->get();
+				$pre_position = $find_position[0]->position;
+
 				// print_r($position);
 				$table_update_4 = mattress_details::findOrFail($data[0]->id);
 				$table_update_4->layers_a = (float)$layers_a;
@@ -1432,24 +1375,6 @@ class spreaderController extends Controller {
 				}
 				// dd('Stop');
 
-				// mattress_phasess
-				// all mattress_phases for this mattress set to NOT ACTIVE
-				// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				// 		[id], [mattress] 
-				// FROM [mattress_phases] WHERE [mattress_id] = '".$id."' AND [active] = 1"));
-				
-				// if (isset($find_all_mattress_phasses[0])) {
-				// 	$mattress = $find_all_mattress_phasses[0]->mattress;
-
-				// 	// dd($find_all_mattress_phasses);
-				// 	for ($o=0; $o < count($find_all_mattress_phasses); $o++) { 
-
-				// 			$table3_aa = mattress_phases::findOrFail($find_all_mattress_phasses[$o]->id);
-				// 			$table3_aa->active = 0;
-				// 			$table3_aa->save();
-				// 	}
-				// }
-
 				$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
 					SET NOCOUNT ON;
 					UPDATE [mattress_phases]
@@ -1476,7 +1401,8 @@ class spreaderController extends Controller {
 					$date = date('Y-m-d H:i:s');
 				}
 
-				// $table4_new = new mattress_phases;
+				// find pre_position				
+
 				$table4_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
 				$table4_new->mattress_id = $id;
 				$table4_new->mattress = $mattress;
@@ -1488,7 +1414,9 @@ class spreaderController extends Controller {
 				$table4_new->operator2 = $operator2;
 				$table4_new->date = $date;
 				$table4_new->id_status = $id.'-'.$status;
+				$table4_new->pre_position = $pre_position;
 				$table4_new->save();
+			
 			}
 
 			// dd($location);
@@ -1512,4 +1440,183 @@ class spreaderController extends Controller {
 		// dd('stop');
 		return redirect('/spreader');
 	}
+
+	public function request_material($id) {
+
+		$operator = Session::get('operator');
+		if (!isset($operator) OR $operator == '') {
+			// return redirect('/spreader');
+			$msg ='Operator must be logged!';
+			return view('spreader.error',compact('msg'));
+		}
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				m.[material],
+				m.[dye_lot]
+			FROM [mattress_details] as d
+			JOIN [mattresses] as m ON m.[id] = d.[mattress_id]
+			INNER JOIN [mattress_phases] as p ON p.[mattress_id] = d.[mattress_id] AND p.[active] = 1
+			WHERE m.[id] = '".$id."' "));
+		// dd($data);
+
+		$material = $data[0]->material;
+		$dye_lot  = $data[0]->dye_lot;
+
+		// verify userId
+		if (Auth::check())
+		{
+		    $userId = Auth::user()->id;
+		    $device = Auth::user()->name;
+		} else {
+			$msg ='Device is not autenticated';
+			return view('spreader.error',compact('msg'));
+		}
+		$location = substr($device, 0,3);
+		$sap_locations = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM sap_locations "));
+
+		return view('spreader.request_material',compact('material','dye_lot','location','device','sap_locations'));
+	}
+
+	public function request_material_insert(Request $request) {
+		//
+		// $this->validate($request, ['sap_location1' => 'required']);
+		$input = $request->all(); 
+		// dd($input);
+
+		// dd('trenutno nije moguce snimiti zahtev');
+
+		$material = $input['material'];
+		$dye_lot = $input['dye_lot'];
+		$location = $input['location'];
+		$device = $input['device'];
+		$sap_location1 = $input['sap_location1'];
+	
+		if ($input['sap_location1'] == '') {
+			$msg ='SAP location 1 can not be empty.';
+			return view('spreader.error',compact('msg'));
+		}
+
+		if ($input['comment'] == '') {
+			$comment = NULL;
+		} else {
+			$comment = $input['comment'];
+		}		
+
+		$operator = Session::get('operator');
+		$counter = 0;
+		
+
+		if ($input['sap_location6'] != '') {
+			$counter = 6;
+		} else if ($input['sap_location5'] != '') {
+			$counter = 5;
+		} else if ($input['sap_location4'] != '') {
+			$counter = 4;
+		} else if ($input['sap_location3'] != '') {
+			$counter = 3;
+		} else if ($input['sap_location2'] != '') {
+			$counter = 2;
+		} else if ($input['sap_location1'] != '') {
+			$counter = 1;
+		}
+
+		for ($i=1; $i <= $counter; $i++) { 
+
+			// var_dump('c= '.$counter.'<br/>');
+			$table = new material_requests;
+			$table->material = $material;
+			$table->dye_lot = $dye_lot;
+			$table->sap_location1 = $input['sap_location'.$i];
+			// var_dump('loc is: '.$table->sap_location1.'<br/>');
+			$table->requred_qty;
+			$table->comment = $comment;
+			$table->save();
+
+			$status = 'CREATED';
+
+			$table_phases = material_request_phases::firstOrNew(['id_status' => $table->id.'-'.$status]);
+			$table_phases->material_request_id = $table->id;
+			$table_phases->status = $status;
+			$table_phases->location = $location;
+			$table_phases->device = $device;
+			$table_phases->active = 1;
+			$table_phases->operator1 = $operator;
+			$table_phases->operator2;
+			$table_phases->id_status = $table->id."-".$status;
+			$table_phases->save();
+		}
+
+		return redirect('/request_material_table');
+	}
+
+	public function request_material_table () {
+
+		// verify userId
+		if (Auth::check())
+		{
+		    $userId = Auth::user()->id;
+		    $device = Auth::user()->name;
+		} else {
+			$msg ='Device is not autenticated';
+			return view('spreader.error',compact('msg'));
+		}
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				mr.*,
+				mrp.status, mrp.location, mrp.operator1, mrp.operator2, mrp.updated_at as up
+				,(SELECT location FROM [material_request_phases] WHERE [material_request_id] =  mr.[id] AND [status] = 'CREATED') as location_created
+			FROM [material_requests] as mr
+			JOIN [material_request_phases] as mrp ON mrp.[material_request_id] = mr.[id]
+		 	WHERE (mrp.[status] = 'CREATED' OR mrp.[status] = 'ACCEPTED' OR mrp.[status] = 'RELAX' OR mrp.[status] = 'QC') AND active = '1'
+		 	ORDER by mr.[created_at] asc "));
+		// dd($data);
+
+		return view('spreader.request_material_table',compact('data','location'));			
+	}
+
+	public function request_material_delete($id) {
+		// dd($id);
+
+		return view('spreader.request_material_delete',compact('id'));
+	}
+
+	public function request_material_delete_confirm($id) { 
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				mr.*,
+				mrp.status, mrp.location, mrp.device, mrp.operator1, mrp.operator2
+			FROM [material_requests] as mr
+			JOIN [material_request_phases] as mrp ON mrp.[material_request_id] = mr.[id]
+		 	WHERE mrp.active = '1' and mr.id = '".$id."'
+		 	ORDER by mrp.[status] desc, mrp.[created_at] desc "));		
+		// dd($data);
+
+		$location 	= $data[0]->location;
+		$device 	= $data[0]->device;
+		$operator1	= $data[0]->operator1;
+		$operator2 	= $data[0]->operator2;
+
+
+		$request_material_phases_not_active = DB::connection('sqlsrv')->update(DB::raw("
+			UPDATE [material_request_phases]
+			SET active = 0
+			WHERE material_request_id = '".$id."' AND active = 1;
+		"));
+
+		$status = 'DELETED';
+
+		$table_phases = material_request_phases::firstOrNew(['id_status' => $id.'-'.$status]);
+		$table_phases->material_request_id = $id;
+		$table_phases->status = $status;
+		$table_phases->location = $location;
+		$table_phases->device = $device;
+		$table_phases->active = 1;
+		$table_phases->operator1 = $operator1;
+		$table_phases->operator2 = $operator2;
+		$table_phases->id_status = $id."-".$status;
+		$table_phases->save();
+
+		return redirect('/request_material_table');
+	}
+
 }
