@@ -51,6 +51,8 @@ class CreateMattressDetailsTable extends Migration {
 			$table->integer('num_of_cut_problems')->nullable();
 			$table->float('req_time')->nullable();
 
+			$table->string('mandatory_to_ins')->nullable();
+
 			$table->timestamps();
 		});
 	}

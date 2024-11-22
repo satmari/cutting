@@ -5,7 +5,8 @@
 	<div class="row vertical-center-row">
 		<div class="text-center col-md-5 col-md-offset-4">
 			<div class="panel panel-default">
-				<div class="panel-heading"><b>Other (spreader) functions for: {{ $g_bin }}</b></div>
+				<div class="panel-heading"><b>Other (spreader) functions for: {{ $g_bin }}</b>
+				</div>
 					
 
 				@if (isset($data2))
@@ -25,68 +26,77 @@
                 <br>
 			    	
 			    <div class="panel-body">	
-				@if ($status == 'TO_SPREAD')
-					<a href="{{ url('mattress_to_unload/'.$id) }}" class="btn btn-warning center-block" >Unload mattress</a>
-					<br>
-					<a href="{{ url('change_marker_request/'.$id) }}" class="btn btn-info center-block">Change marker request (width)</a>
-					<br>
-					<a href="{{ url('split_marker_request/'.$id) }}" class="btn btn-primary center-block">Split marker request (width, height)</a>
-					<!-- <br>
-					<a href="{{ url('create_new_mattress_request/'.$id) }}" class="btn btn-info center-block">Create new mattress request</a> -->
-				@elseif ($status == 'TO_LOAD')
+					@if ($status == 'TO_SPREAD')
+						<a href="{{ url('mattress_to_unload/'.$id) }}" class="btn btn-warning center-block" >Unload mattress</a>
+						<br>
+						<a href="{{ url('change_marker_request/'.$id) }}" class="btn btn-info center-block">Change marker request (width)</a>
+						<br>
+						<a href="{{ url('split_marker_request/'.$id) }}" class="btn btn-primary center-block">Split marker request (width, height)</a>
+						<!-- <br>
+						<a href="{{ url('create_new_mattress_request/'.$id) }}" class="btn btn-info center-block">Create new mattress request</a> -->
 
-					<a href="{{ url('mattress_to_unload/'.$id) }}" class="btn btn-warning center-block" disabled>Unload mattress</a>
-					<br>
-					<a href="{{ url('change_marker_request/'.$id) }}" class="btn btn-info center-block">Change marker request (width)</a>
-					<br>
-					<a href="{{ url('split_marker_request/'.$id) }}" class="btn btn-primary center-block">Split marker request (width, height)</a>
-					<!-- <br>
-					<a href="{{ url('create_new_mattress_request/'.$id) }}" class="btn btn-info center-block">Create new mattress request</a> -->
-				@elseif ($status == 'SUSPENDED')
+					@elseif ($status == 'TO_JOIN')
+						<a href="{{ url('mattress_to_unload/'.$id) }}" class="btn btn-warning center-block" >Unload mattress</a>
+						<br>
+						<a href="{{ url('change_marker_request/'.$id) }}" class="btn btn-info center-block">Change marker request (width)</a>
+						<br>
+						<a href="{{ url('split_marker_request/'.$id) }}" class="btn btn-primary center-block">Split marker request (width, height)</a>
+						<!-- <br>
+						<a href="{{ url('create_new_mattress_request/'.$id) }}" class="btn btn-info center-block">Create new mattress request</a> -->
+					@elseif ($status == 'TO_LOAD')
 
-					<a href="{{ url('mattress_to_unload/'.$id) }}" class="btn btn-warning center-block" disabled>Unload mattress</a>
-					<br>
-					<a href="{{ url('change_marker_request/'.$id) }}" class="btn btn-info center-block" disabled>Change marker request (width)</a>
-					<br>
-					<a href="{{ url('split_marker_request/'.$id) }}" class="btn btn-primary center-block" disabled>Split marker request (width, height)</a>
-					<!-- <br>
-					<a href="{{ url('create_new_mattress_request/'.$id) }}" class="btn btn-info center-block" disabled>Create new mattress request</a> -->
-				@endif	
+						<a href="{{ url('mattress_to_unload/'.$id) }}" class="btn btn-warning center-block" disabled>Unload mattress</a>
+						<br>
+						<a href="{{ url('change_marker_request/'.$id) }}" class="btn btn-info center-block">Change marker request (width)</a>
+						<br>
+						<a href="{{ url('split_marker_request/'.$id) }}" class="btn btn-primary center-block">Split marker request (width, height)</a>
+						<!-- <br>
+						<a href="{{ url('create_new_mattress_request/'.$id) }}" class="btn btn-info center-block">Create new mattress request</a> -->
+					@elseif ($status == 'SUSPENDED')
 
-				<hr>
-				{!! Form::open(['method'=>'POST', 'url'=>'add_operator_comment']) !!}
-					{!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
-					{!! Form::hidden('mattress', $mattress, ['class' => 'form-control']) !!}
-					{!! Form::hidden('g_bin', $g_bin, ['class' => 'form-control']) !!}
-					{!! Form::hidden('status', $status, ['class' => 'form-control']) !!}
-					
-				<div class="panel-body">
-	                <p>Comment operator:</p>
-	            	{!! Form::textarea('comment_operator', $comment_operator , ['class' => 'form-control', 'rows' => 5]) !!}
-				</div>
+						<a href="{{ url('mattress_to_unload/'.$id) }}" class="btn btn-warning center-block" disabled>Unload mattress</a>
+						<br>
+						<a href="{{ url('change_marker_request/'.$id) }}" class="btn btn-info center-block" disabled>Change marker request (width)</a>
+						<br>
+						<a href="{{ url('split_marker_request/'.$id) }}" class="btn btn-primary center-block" disabled>Split marker request (width, height)</a>
+						<!-- <br>
+						<a href="{{ url('create_new_mattress_request/'.$id) }}" class="btn btn-info center-block" disabled>Create new mattress request</a> -->
+					@endif	
 
-				{!! Form::submit('Save comment', ['class' => 'btn  btn-success center-block']) !!}
-	            <br>
-	            @include('errors.list')
-	            {!! Form::close() !!}
+					<hr>
+					{!! Form::open(['method'=>'POST', 'url'=>'add_operator_comment']) !!}
+						{!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
+						{!! Form::hidden('mattress', $mattress, ['class' => 'form-control']) !!}
+						{!! Form::hidden('g_bin', $g_bin, ['class' => 'form-control']) !!}
+						{!! Form::hidden('status', $status, ['class' => 'form-control']) !!}
+						
+					<div class="panel-body">
+		                <p>Comment operator:</p>
+		            	{!! Form::textarea('comment_operator', $comment_operator , ['class' => 'form-control', 'rows' => 5]) !!}
+					</div>
 
-	            @if (isset($success))
-				<div class="alert alert-success" role="alert">
-				  {{ $success }}
-				</div>
-				@endif
-				@if (isset($danger))
-				<div class="alert alert-danger" role="alert">
-				  {{ $danger }}
-				</div>
-				@endif
+					{!! Form::submit('Save comment', ['class' => 'btn  btn-success center-block']) !!}
+		            <br>
+		            @include('errors.list')
+		            {!! Form::close() !!}
 
-	            <hr>
-	            <a href="{{ url('spreader') }}" class="btn btn-default center-bl ock">Back</a>
-	            <br>
-	            <br>
+		            @if (isset($success))
+					<div class="alert alert-success" role="alert">
+					  {{ $success }}
+					</div>
+					@endif
+					@if (isset($danger))
+					<div class="alert alert-danger" role="alert">
+					  {{ $danger }}
+					</div>
+					@endif
 
-			</div>	
+		            <hr>
+		            <a href="{{ url('spreader') }}" class="btn btn-default center-bl ock">Back</a>
+		            <br>
+		            <br>
+
+				</div>	
 			</div>
 		</div>
 	</div>

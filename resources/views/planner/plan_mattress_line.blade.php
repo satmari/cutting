@@ -55,13 +55,20 @@
                         <div class="panel-body">
                         <p>Priority: <span style="color:red;">*</span></p>
                             <!-- {!! Form::number('priority', $priority, ['class' => 'form-control']) !!} -->
-                            {!! Form::select('priority', array('1'=>'Normal','2'=>'High','3'=>'Top','4'=>'1st shift','5'=>'2nd shift','6'=>'3rd shift'), 1, array('class' => 'form-control')) !!} 
+                            {!! Form::select('priority', array('1'=>'Normal','2'=>'Flash','3'=>'Top','4'=>'1st shift','5'=>'2nd shift','6'=>'3rd shift','7'=>'Test'), 1, array('class' => 'form-control')) !!} 
+                        </div>
+
+                        <div class="panel-body">
+                        <p>Mandatory to inspect cut parts (test marker):</p>
+                            {!! Form::select('mandatory_to_ins', array('NO'=>'NO','YES'=>'YES'), 'NO', array('class' => 'form-control')) !!} 
                         </div>
 
                         <div class="panel-body">
                         <p>Pcs per bundle: <span style="color:red;">*</span></p>
                             {!! Form::number('pcs_bundle', round($pcs_bundle,0), ['class' => 'form-control', 'autofocus' => 'autofocus', 'step' => '0']) !!}
                         </div>
+
+                        
 
                         <div class="panel-body">
                         <p>Comment office: <!-- <span style="color:red;">*</span> --></p>

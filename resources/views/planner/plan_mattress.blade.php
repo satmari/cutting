@@ -8,83 +8,84 @@
 				<!-- <div class="panel-heading">Plan matress: <b>{{$location}}</b></div> -->
 				<br>
 				<div class="btn-group plan_menu" width="width=100%">
-				<a href="{{ url('plan_mattress/DELETED')}}" class="btn btn-default 
-				 @if ($location == 'DELETED') plan_menu_a @endif "
-				 ><span class="glyphicon glyphicon-trash" ></span></a>
-				 <a href="{{ url('plan_mattress/NOT_SET')}}" class="btn btn-default
-				 @if ($location == 'NOT_SET') plan_menu_a @endif "
-				 ><span class="glyphicon glyphicon-list-alt">&nbsp;<b>NOT SET</b></span></a>
-				  <a href="{{ url('plan_mattress/SP0') }}" class="btn btn-primary
-				 @if ($location == 'SP0') plan_menu_a @endif "
-				 ><span class="glyphicon glyphicon glyphicon-list-alt" >&nbsp;<b>SP0</b></span></a>
-				 <a href="{{ url('plan_mattress/SP1') }}" class="btn btn-primary
-				 @if ($location == 'SP1') plan_menu_a @endif "
-				 ><span class="glyphicon glyphicon-road" >&nbsp;<b>SP1</b></span></a>
-				 <a href="{{ url('plan_mattress/SP2') }}" class="btn btn-primary
-				 @if ($location == 'SP2') plan_menu_a @endif "
-				 ><span class="glyphicon glyphicon-road" >&nbsp;<b>SP2</b></span></a>
-				 <a href="{{ url('plan_mattress/SP3') }}" class="btn btn-primary
-				 @if ($location == 'SP3') plan_menu_a @endif "
-				 ><span class="glyphicon glyphicon-road" >&nbsp;<b>SP3</b></span></a>
-				 <a href="{{ url('plan_mattress/SP4') }}" class="btn btn-primary
-				 @if ($location == 'SP4') plan_menu_a @endif "
-				 ><span class="glyphicon glyphicon-road" >&nbsp;<b>SP4</b></span></a>
-				 <a href="{{ url('plan_mattress/MS1') }}" class="btn btn-success
-				 @if ($location == 'MS1') plan_menu_a @endif "
-				 ><span class="glyphicon  glyphicon-inbox" >&nbsp;<b>MS1</b></span></a>
-				 <a href="{{ url('plan_mattress/MS2') }}" class="btn btn-success
-				@if ($location == 'MS2') plan_menu_a @endif "
-				><span class="glyphicon glyphicon-inbox" >&nbsp;<b>MS2</b></span></a>
-				<a href="{{ url('plan_mattress/MS3') }}" class="btn btn-success
-				@if ($location == 'MS3') plan_menu_a @endif "
-				><span class="glyphicon glyphicon-inbox" >&nbsp;<b>MS3</b></span></a>
-				<a href="{{ url('plan_mattress/TUB') }}" class="btn btn-success 
-				@if ($location == 'TUB') plan_menu_a @endif " style="background-color:green; color:white !important;"
-				><span class="glyphicon glyphicon-inbox" >&nbsp;<b>TUB</b></span></a>
-				<a href="{{ url('plan_mattress/MM1') }}" class="btn btn-info
-				@if ($location == 'MM1') plan_menu_a @endif "
-				><span class="glyphicon glyphicon-inbox">&nbsp;<b>MM1</b></span></a>
-				<!-- <a href="{{ url('plan_mattress/LR') }}" class="btn btn-default
-				@if ($location == 'LR') plan_menu_a @endif "
-				><span class="glyphicon glyphicon-refresh">&nbsp;<b>LR</b></span></a> -->
-				<a href="{{ url('plan_mattress/PLOT') }}" class="btn btn-default
-				@if ($location == 'PLOT') plan_menu_a @endif "
-				><span class="glyphicon glyphicon-print">&nbsp;<b>PLOT</b></span></a>
-				<!--
-				<a href="{{ url('plan_mattress/LEC1') }}" class="btn btn-warning
-				@if ($location == 'LEC1') plan_menu_a @endif "
-				><span class="glyphicon glyphicon-scissors">&nbsp;<b>LEC1</b></span></a>
-				<a href="{{ url('plan_mattress/LEC2') }}" class="btn btn-warning
-				@if ($location == 'LEC2') plan_menu_a @endif "
-				><span class="glyphicon glyphicon-scissors">&nbsp;<b>LEC2</b></span></a>
-				-->
-				<a href="{{ url('plan_mattress/CUT') }}" class="btn btn-danger
-				@if ($location == 'CUT') plan_menu_a @endif "
-				><span class="glyphicon glyphicon-scissors">&nbsp;<b>CUT</b></span></a>
-				<a href="{{ url('plan_mattress/PACK') }}" class="btn btn-warning
-				@if ($location == 'PACK') plan_menu_a @endif "
-				><span class="glyphicon glyphicon-briefcase">&nbsp;<b>PACK</b></span></a>
-				<a href="{{ url('plan_mattress/PSO') }}" class="btn btn-danger
-				@if ($location == 'PSO') plan_menu_a @endif "
-				><span class="glyphicon glyphicon-duplicate">&nbsp;<b>PSO</b></span></a>
-				<a href="{{ url('plan_mattress/COMPLETED') }}" style="color:black" class="btn btn-success
-				@if ($location == 'COMPLETED') plan_menu_a @endif "
-				><span class="glyphicon glyphicon-ok">&nbsp;<b>COMPLETED</b></span></a>
-				<!-- <a href="{{ url('plan_mattress/PRW') }}" class="btn btn-default
-				@if ($location == 'PRW') plan_menu_a @endif "
-				><span class="glyphicon glyphicon-transfer">&nbsp;<b>PRW</b></span></a>
-				<a href="{{ url('plan_mattress/PCO') }}" class="btn btn-default
-				@if ($location == 'PCO') plan_menu_a @endif "
-				><span class="glyphicon glyphicon-import">&nbsp;<b>PCO</b></span></a> -->
-				<a href="{{ url('plan_mattress/ON_HOLD')}}" style="background-color:black; color:white !important;" class="btn btn-danger
-				 @if ($location == 'ON_HOLD') plan_menu_a @endif "
-				 ><span class="glyphicon glyphicon-flag">&nbsp;<b>ON HOLD</b></span></a>
+					<a href="{{ url('plan_mattress/DELETED')}}" class="btn btn-default 
+					@if ($location == 'DELETED') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-trash" ></span></a>
+					<a href="{{ url('plan_mattress/NOT_SET')}}" class="btn btn-default
+					@if ($location == 'NOT_SET') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-list-alt">&nbsp;<b>NOT SET</b></span></a>
+					<a href="{{ url('plan_mattress/SP0') }}" class="btn btn-primary
+					@if ($location == 'SP0') plan_menu_a @endif "
+					><span class="glyphicon glyphicon glyphicon-list-alt" >&nbsp;<b>SP0</b></span></a>
+					<a href="{{ url('plan_mattress/SP1') }}" class="btn btn-primary
+					@if ($location == 'SP1') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-road" >&nbsp;<b>SP1</b></span></a>
+					<a href="{{ url('plan_mattress/SP2') }}" class="btn btn-primary
+					@if ($location == 'SP2') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-road" >&nbsp;<b>SP2</b></span></a>
+					<a href="{{ url('plan_mattress/SP3') }}" class="btn btn-primary
+					@if ($location == 'SP3') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-road" >&nbsp;<b>SP3</b></span></a>
+					<a href="{{ url('plan_mattress/SP4') }}" class="btn btn-primary
+					@if ($location == 'SP4') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-road" >&nbsp;<b>SP4</b></span></a>
+					<a href="{{ url('plan_mattress/MS1') }}" class="btn btn-success
+					@if ($location == 'MS1') plan_menu_a @endif "
+					><span class="glyphicon  glyphicon-inbox" >&nbsp;<b>MS1</b></span></a>
+					<a href="{{ url('plan_mattress/MS2') }}" class="btn btn-success
+					@if ($location == 'MS2') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-inbox" >&nbsp;<b>MS2</b></span></a>
+					<a href="{{ url('plan_mattress/MS3') }}" class="btn btn-success
+					@if ($location == 'MS3') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-inbox" >&nbsp;<b>MS3</b></span></a>
+					<a href="{{ url('plan_mattress/TUB') }}" class="btn btn-success 
+					@if ($location == 'TUB') plan_menu_a @endif " style="background-color:green; color:white !important;"
+					><span class="glyphicon glyphicon-inbox" >&nbsp;<b>TUB</b></span></a>
+					<a href="{{ url('plan_mattress/MM1') }}" class="btn btn-info
+					@if ($location == 'MM1') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-inbox">&nbsp;<b>MM1</b></span></a>
+					<!-- <a href="{{ url('plan_mattress/LR') }}" class="btn btn-default
+					@if ($location == 'LR') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-refresh">&nbsp;<b>LR</b></span></a> -->
+					<a href="{{ url('plan_mattress/PLOT') }}" class="btn btn-default
+					@if ($location == 'PLOT') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-print">&nbsp;<b>PLOT</b></span></a>
+					<!--
+					<a href="{{ url('plan_mattress/LEC1') }}" class="btn btn-warning
+					@if ($location == 'LEC1') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-scissors">&nbsp;<b>LEC1</b></span></a>
+					<a href="{{ url('plan_mattress/LEC2') }}" class="btn btn-warning
+					@if ($location == 'LEC2') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-scissors">&nbsp;<b>LEC2</b></span></a>
+					-->
+					<a href="{{ url('plan_mattress/CUT') }}" class="btn btn-danger
+					@if ($location == 'CUT') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-scissors">&nbsp;<b>CUT</b></span></a>
+					<a href="{{ url('plan_mattress/PACK') }}" class="btn btn-warning
+					@if ($location == 'PACK') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-briefcase">&nbsp;<b>PACK</b></span></a>
+					<a href="{{ url('plan_mattress/PSO') }}" class="btn btn-danger
+					@if ($location == 'PSO') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-duplicate">&nbsp;<b>PSO</b></span></a>
+					<a href="{{ url('plan_mattress/COMPLETED') }}" style="color:black" class="btn btn-success
+					@if ($location == 'COMPLETED') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-ok">&nbsp;<b>COMPLETED</b></span></a>
+					<!-- <a href="{{ url('plan_mattress/PRW') }}" class="btn btn-default
+					@if ($location == 'PRW') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-transfer">&nbsp;<b>PRW</b></span></a>
+					<a href="{{ url('plan_mattress/PCO') }}" class="btn btn-default
+					@if ($location == 'PCO') plan_menu_a @endif "
+					><span class="glyphicon glyphicon-import">&nbsp;<b>PCO</b></span></a> -->
+					<a href="{{ url('plan_mattress/ON_HOLD')}}" style="background-color:black; color:white !important;" class="btn btn-danger
+					 @if ($location == 'ON_HOLD') plan_menu_a @endif "
+					 ><span class="glyphicon glyphicon-flag">&nbsp;<b>ON HOLD</b></span></a>
 
-				 <a href="{{ url('plan_mattress/TO_SPLIT')}}" style="background-color:brown; color:white !important;" class="btn btn-danger
-				 @if ($location == 'TO_SPLIT') plan_menu_a @endif "
-				 ><span class="glyphicon glyphicon-flag">&nbsp;<b>TO SPLIT</b></span></a>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					 <a href="{{ url('plan_mattress/TO_SPLIT')}}" style="background-color:brown; color:white !important;" class="btn btn-danger
+					 @if ($location == 'TO_SPLIT') plan_menu_a @endif "
+					 ><span class="glyphicon glyphicon-flag">&nbsp;<b>TO SPLIT</b></span></a>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				</div>
+
 				<br><br>
 				<a href="{{ url('plan_mattress/BOARD_TABLE')}}" class="btn btn-default
 				@if ($location == 'BOARD_TABLE') plan_menu_a @endif"
@@ -203,17 +204,20 @@
 				                            <td>{{ $req->color_desc}}</td>
 				                            <td style="min-width: 120px;">{{ $req->skeda}}</td>
 				                            <td>{{ round($req->cons_actual,3)}}</td>
-				                            <td class="@if ($req->priority == 6) ts_priority
+				                            <td class="
+				                            	@if ($req->priority == 7) tt_priority
+				                            	@elseif ($req->priority == 6) ts_priority
 					                            @elseif ($req->priority == 5) ss_priority
 					                            @elseif ($req->priority == 4) fs_priority
 					                            @elseif ($req->priority == 3) top_priority
 							        	    	@elseif ($req->priority == 2) high_priority
 							        	    	@endif ">
-							        	    	@if ($req->priority == 6) 3rd shift
+							        	    	@if ($req->priority == 7) Test
+							        	    	@elseif ($req->priority == 6) 3rd shift
 							        	    	@elseif ($req->priority == 5) 2nd shift
 							        	    	@elseif ($req->priority == 4) 1st shift
 							        	    	@elseif ($req->priority == 3) Top
-							        	    	@elseif ($req->priority == 2) High
+							        	    	@elseif ($req->priority == 2) Flash
 						        	    		@elseif ($req->priority == 1) Normal
 							        	    	@endif</td>
 				                            
@@ -486,18 +490,21 @@
 				                            <td>{{ $req->overlapping}}</td>
 
 				                            {{-- <td>{{ $req->location}}</td> --}}
-				                            <td class="@if ($req->priority == 6) ts_priority
+				                            <td class="
+				                            	@if ($req->priority == 7) tt_priority
+				                            	@elseif ($req->priority == 6) ts_priority
 					                            @elseif ($req->priority == 5) ss_priority
 					                            @elseif ($req->priority == 4) fs_priority
 					                            @elseif ($req->priority == 3) top_priority
 							        	    	@elseif ($req->priority == 2) high_priority
 							        	    	@endif
 							        	    	">
-							        	    	@if ($req->priority == 6)3rd shift
+							        	    	@if ($req->priority == 7)Test
+							        	    	@elseif ($req->priority == 6)3rd shift
 							        	    	@elseif ($req->priority == 5)2nd shift
 							        	    	@elseif ($req->priority == 4)1st shift
 							        	    	@elseif ($req->priority == 3)Top
-							        	    	@elseif ($req->priority == 2)High
+							        	    	@elseif ($req->priority == 2)Flash
 						        	    		@elseif ($req->priority == 1)Normal
 							        	    	@endif</td>
 				                            <td>{{ $req->status}}</td>
@@ -662,18 +669,20 @@
 
 				                            {{-- <td>{{ $req->location}}</td> --}}
 				                            <td class="
-					                            @if ($req->priority == 6) ts_priority
+					                            @if ($req->priority == 7) tt_priority
+					                            @elseif ($req->priority == 6) ts_priority
 					                            @elseif ($req->priority == 5) ss_priority
 					                            @elseif ($req->priority == 4) fs_priority
 					                            @elseif ($req->priority == 3) top_priority
 							        	    	@elseif ($req->priority == 2) high_priority
 							        	    	@endif
 							        	    	">
-							        	    	@if ($req->priority == 6)3rd shift
+							        	    	@if ($req->priority == 7)Test
+							        	    	@elseif ($req->priority == 6)3rd shift
 							        	    	@elseif ($req->priority == 5)2nd shift
 							        	    	@elseif ($req->priority == 4)1st shift
 							        	    	@elseif ($req->priority == 3)Top
-							        	    	@elseif ($req->priority == 2)High
+							        	    	@elseif ($req->priority == 2)Flash
 						        	    		@elseif ($req->priority == 1)Normal
 							        	    	@endif</td>
 				                            <td>{{ $req->status}}</td>
@@ -824,18 +833,20 @@
 
 				                            <td>{{ $req->location}}</td>
 				                            <td class="
-					                            @if ($req->priority == 6) ts_priority
+					                            @if ($req->priority == 7) tt_priority
+					                            @elseif ($req->priority == 6) ts_priority
 					                            @elseif ($req->priority == 5) ss_priority
 					                            @elseif ($req->priority == 4) fs_priority
 					                            @elseif ($req->priority == 3) top_priority
 							        	    	@elseif ($req->priority == 2) high_priority
 							        	    	@endif
 							        	    	">
-							        	    	@if ($req->priority == 6)3rd shift
+							        	    	@if ($req->priority == 7)Test
+							        	    	@elseif ($req->priority == 6)3rd shift
 							        	    	@elseif ($req->priority == 5)2nd shift
 							        	    	@elseif ($req->priority == 4)1st shift
 							        	    	@elseif ($req->priority == 3)Top
-							        	    	@elseif ($req->priority == 2)High
+							        	    	@elseif ($req->priority == 2)Flash
 						        	    		@elseif ($req->priority == 1)Normal
 							        	    	@endif</td>
 				                            <td>{{ $req->status}}</td>
@@ -984,18 +995,20 @@
 				                            <td>{{ $req->overlapping}}</td>
 				                            <td>{{ $req->location}}</td>
 				                            <td class="
-					                            @if ($req->priority == 6) ts_priority
+					                            @if ($req->priority == 7) tt_priority
+					                            @elseif ($req->priority == 6) ts_priority
 					                            @elseif ($req->priority == 5) ss_priority
 					                            @elseif ($req->priority == 4) fs_priority
 					                            @elseif ($req->priority == 3) top_priority
 							        	    	@elseif ($req->priority == 2) high_priority
 							        	    	@endif
 							        	    	">
-							        	    	@if ($req->priority == 6)3rd shift
+							        	    	@if ($req->priority == 7)Test
+							        	    	@elseif ($req->priority == 6)3rd shift
 							        	    	@elseif ($req->priority == 5)2nd shift
 							        	    	@elseif ($req->priority == 4)1st shift
 							        	    	@elseif ($req->priority == 3)Top
-							        	    	@elseif ($req->priority == 2)High
+							        	    	@elseif ($req->priority == 2)Flash
 						        	    		@elseif ($req->priority == 1)Normal
 							        	    	@endif</td>
 				                            <td>{{ $req->status}}</td>
@@ -1145,18 +1158,20 @@
 
 				                            <td>{{ $req->location}}</td>
 				                            <td class="
-					                            @if ($req->priority == 6) ts_priority
+					                            @if ($req->priority == 7) tt_priority
+					                            @elseif ($req->priority == 6) ts_priority
 					                            @elseif ($req->priority == 5) ss_priority
 					                            @elseif ($req->priority == 4) fs_priority
 					                            @elseif ($req->priority == 3) top_priority
 							        	    	@elseif ($req->priority == 2) high_priority
 							        	    	@endif
 							        	    	">
-							        	    	@if ($req->priority == 6)3rd shift
+							        	    	@if ($req->priority == 7)Test
+							        	    	@elseif ($req->priority == 6)3rd shift
 							        	    	@elseif ($req->priority == 5)2nd shift
 							        	    	@elseif ($req->priority == 4)1st shift
 							        	    	@elseif ($req->priority == 3)Top
-							        	    	@elseif ($req->priority == 2)High
+							        	    	@elseif ($req->priority == 2)Flash
 						        	    		@elseif ($req->priority == 1)Normal
 							        	    	@endif</td>
 				                            <td>{{ $req->status}}</td>
@@ -1308,18 +1323,20 @@
 
 				                            <td>{{ $req->location}}</td>
 				                            <td class="
-				                            	@if ($req->priority == 6) ts_priority
+				                            	@if ($req->priority == 7) tt_priority
+				                            	@elseif ($req->priority == 6) ts_priority
 					                            @elseif ($req->priority == 5) ss_priority
 					                            @elseif ($req->priority == 4) fs_priority
 					                            @elseif ($req->priority == 3) top_priority
 							        	    	@elseif ($req->priority == 2) high_priority
 							        	    	@endif
 							        	    	">
-							        	    	@if ($req->priority == 6)3rd shift
+							        	    	@if ($req->priority == 7)Test
+							        	    	@elseif ($req->priority == 6)3rd shift
 							        	    	@elseif ($req->priority == 5)2nd shift
 							        	    	@elseif ($req->priority == 4)1st shift
 							        	    	@elseif ($req->priority == 3)Top
-							        	    	@elseif ($req->priority == 2)High
+							        	    	@elseif ($req->priority == 2)Flash
 						        	    		@elseif ($req->priority == 1)Normal
 							        	    	@endif</td>
 				                            <td>{{ $req->status}}</td>
@@ -1506,18 +1523,20 @@
 				                            <td>{{ $req->layers_a}}</td>
 				                            <td>{{ round($req->cons_actual,3)}}</td>
 				                            <td class="
-					                            @if ($req->priority == 6) ts_priority
+					                            @if ($req->priority == 7) tt_priority
+					                            @elseif ($req->priority == 6) ts_priority
 					                            @elseif ($req->priority == 5) ss_priority
 					                            @elseif ($req->priority == 4) fs_priority
 					                            @elseif ($req->priority == 3) top_priority
 							        	    	@elseif ($req->priority == 2) high_priority
 							        	    	@endif
 							        	    	">
-							        	    	@if ($req->priority == 6)3rd shift
+							        	    	@if ($req->priority == 7)Test
+							        	    	@elseif ($req->priority == 6)3rd shift
 							        	    	@elseif ($req->priority == 5)2nd shift
 							        	    	@elseif ($req->priority == 4)1st shift
 							        	    	@elseif ($req->priority == 3)Top
-							        	    	@elseif ($req->priority == 2)High
+							        	    	@elseif ($req->priority == 2)Flash
 						        	    		@elseif ($req->priority == 1)Normal
 							        	    	@endif</td>
 				                            <td>
@@ -1623,16 +1642,17 @@
 				@foreach ($sp0_req_time as  $key => $sp0_req_time_line)
 					<ul style="padding: 0;margin: 0;list-style: none;">
 						<li> 
-							@if ($key == 6) 3rd shift
+								@if ($key == 7) Test
+								@elseif ($key == 6) 3rd shift
 			        	    	@elseif ($key == 5) 2nd shift
 			        	    	@elseif ($key == 4) 1st shift
 			        	    	@elseif ($key == 3) Top
-			        	    	@elseif ($key == 2) High
+			        	    	@elseif ($key == 2) Flash
 		        	    		@elseif ($key == 1) Normal
 			        	    @endif
 			        	    &nbsp;&nbsp;&nbsp;&nbsp;
 							@if ($sp0_req_time_line == 0 )
-								00.00 min
+								00 min
 							@else
 								{{ $sp0_req_time_line }} min
 							@endif
@@ -1644,7 +1664,8 @@
 			<ul id="sortable0" class="connectedSortable_ul_1">
             	@foreach ($sp0 as $req0)
             	    <li class="ui-state-default
-            	    @if ($req0->priority == 6) ts_priority
+            	    @if ($req0->priority == 7) tt_priority
+            	    @elseif ($req0->priority == 6) ts_priority
             	    @elseif ($req0->priority == 5) ss_priority
             	    @elseif ($req0->priority == 4) fs_priority
             	    @elseif ($req0->priority == 3) top_priority
@@ -1656,24 +1677,26 @@
             	    	<big>Gbin: {{$req0->g_bin}}</big><br />
             	    	Material: {{$req0->material}}<br />
             	    	Dye lot: {{$req0->dye_lot}}<br /> 
-            	    	Color: {{$req0->color_desc}}<br /> 
+            	    	Color: {{$req0->color_desc}} / {{$req0->color}}<br /> 
             	    	Skeda: {{$req0->skeda}}<br /> 
             	    	Spreading method: {{$req0->spreading_method}}<br /> 
             	    	Width theor usable: {{round($req0->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req0->layers_a,0)}}<br />
             	    	Cons actual: {{round($req0->cons_actual,3)}}<br />
             	    	Priority: 
-            	    			@if ($req0->priority == 6) 3rd shift
+            	    			@if ($req0->priority == 7) Test
+            	    			@elseif ($req0->priority == 6) 3rd shift
 			        	    	@elseif ($req0->priority == 5) 2nd shift
 			        	    	@elseif ($req0->priority == 4) 1st shift
 			        	    	@elseif ($req0->priority == 3) Top
-			        	    	@elseif ($req0->priority == 2) High
+			        	    	@elseif ($req0->priority == 2) Flash
 		        	    		@elseif ($req0->priority == 1) Normal
 			        	    	@endif
 			        	    	<br />
             	    	Marker: {{$req0->marker_name}}<br />
             	    	Marker length: {{round($req0->marker_length,3)}}<br /> 
             	    	Marker width: {{round($req0->marker_width,0)}}<br />
+            	    	Mattress pcs: {{ round($req0->pro_pcs_actual,0)}}<br />
             	    	Comment office: {{$req0->comment_office}}<br />
             	    	<b>Status: {{$req0->status }}<br />
             	    	Dest: {{$req0->destination}}<br />
@@ -1688,11 +1711,11 @@
 
             	    	Req. time: 
             	    	@if ($req0->average_of_min_per_meter_minm_c != 0) 
-            	    		{{ round($req0->average_of_min_per_meter_minm_c*$req0->cons_actual,2) }}
+            	    		{{ round($req0->average_of_min_per_meter_minm_c*$req0->cons_actual,0) }}
             	    	@elseif ($req0->average_of_min_per_meter_minm_m != 0)  
-            	    		{{ round($req0->average_of_min_per_meter_minm_m*$req0->cons_actual,2) }}
+            	    		{{ round($req0->average_of_min_per_meter_minm_m*$req0->cons_actual,0) }}
             	    	@else 
-            	    		{{ round($req0->average_of_min_per_meter_minm_all*$req0->cons_actual,2) }}
+            	    		{{ round($req0->average_of_min_per_meter_minm_all*$req0->cons_actual,0) }}
             	    	@endif
 
             	    	 min<b />
@@ -1711,16 +1734,17 @@
 				@foreach ($sp1_req_time as  $key => $sp1_req_time_line)
 					<ul style="padding: 0;margin: 0;list-style: none;">
 						<li> 
-							@if ($key == 6) 3rd shift
+								@if ($key == 7) Test
+								@elseif ($key == 6) 3rd shift
 			        	    	@elseif ($key == 5) 2nd shift
 			        	    	@elseif ($key == 4) 1st shift
 			        	    	@elseif ($key == 3) Top
-			        	    	@elseif ($key == 2) High
+			        	    	@elseif ($key == 2) Flash
 		        	    		@elseif ($key == 1) Normal
 			        	    @endif
 			        	    &nbsp;&nbsp;&nbsp;&nbsp;
 							@if ($sp1_req_time_line == 0 )
-								00.00 min
+								00 min
 							@else
 								{{ $sp1_req_time_line }} min
 							@endif
@@ -1733,7 +1757,8 @@
 			<ul id="sortable2" class="connectedSortable_ul_1">
             	@foreach ($sp1 as $req1)
             	    <li class="ui-state-default
-            	    @if ($req1->priority == 6) ts_priority
+            	    @if ($req1->priority == 7) tt_priority
+            	    @elseif ($req1->priority == 6) ts_priority
             	    @elseif ($req1->priority == 5) ss_priority
             	    @elseif ($req1->priority == 4) fs_priority
             	    @elseif ($req1->priority == 3) top_priority
@@ -1745,24 +1770,26 @@
             	    	<big>Gbin: {{$req1->g_bin}}</big><br />
             	    	Material: {{$req1->material}}<br />
             	    	Dye lot: {{$req1->dye_lot}}<br /> 
-            	    	Color: {{$req1->color_desc}}<br /> 
+            	    	Color: {{$req1->color_desc}} / {{$req1->color}}<br /> 
             	    	Skeda: {{$req1->skeda}}<br /> 
             	    	Spreading method: {{$req1->spreading_method}}<br /> 
             	    	Width theor usable: {{round($req1->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req1->layers_a,0)}}<br />
             	    	Cons actual: {{round($req1->cons_actual,3)}}<br />
             	    	Priority: 
-            	    			@if ($req1->priority == 6) 3rd shift
+            	    			@if ($req1->priority == 7) Test
+            	    			@elseif ($req1->priority == 6) 3rd shift
 			        	    	@elseif ($req1->priority == 5) 2nd shift
 			        	    	@elseif ($req1->priority == 4) 1st shift
 			        	    	@elseif ($req1->priority == 3) Top
-			        	    	@elseif ($req1->priority == 2) High
+			        	    	@elseif ($req1->priority == 2) Flash
 		        	    		@elseif ($req1->priority == 1) Normal
 			        	    	@endif
 			        	    	<br />
             	    	Marker: {{$req1->marker_name}}<br />
             	    	Marker length: {{round($req1->marker_length,3)}}<br /> 
             	    	Marker width: {{round($req1->marker_width,0)}}<br />
+            	    	Mattress pcs: {{round($req1->pro_pcs_actual,0)}}<br />
             	    	Comment office: {{$req1->comment_office}}<br />
             	    	<b>Status: {{$req1->status }}<br />
             	    	Dest: {{$req1->destination}} <br />
@@ -1778,11 +1805,11 @@
 
             	    	Req. time: 
             	    	@if ($req1->average_of_min_per_meter_minm_c != 0) 
-            	    		{{ round($req1->average_of_min_per_meter_minm_c*$req1->cons_actual,2) }}
+            	    		{{ round($req1->average_of_min_per_meter_minm_c*$req1->cons_actual,0) }}
             	    	@elseif ($req1->average_of_min_per_meter_minm_m != 0)  
-            	    		{{ round($req1->average_of_min_per_meter_minm_m*$req1->cons_actual,2) }}
+            	    		{{ round($req1->average_of_min_per_meter_minm_m*$req1->cons_actual,0) }}
             	    	@else 
-            	    		{{ round($req1->average_of_min_per_meter_minm_all*$req1->cons_actual,2) }}
+            	    		{{ round($req1->average_of_min_per_meter_minm_all*$req1->cons_actual,0) }}
             	    	@endif
 
             	    	 min<b />
@@ -1801,16 +1828,17 @@
 				@foreach ($sp2_req_time as  $key => $sp2_req_time_line)
 					<ul style="padding: 0;margin: 0;list-style: none;">
 						<li> 
-							@if ($key == 6) 3rd shift
+								@if ($key == 7) Test
+								@elseif ($key == 6) 3rd shift
 			        	    	@elseif ($key == 5) 2nd shift
 			        	    	@elseif ($key == 4) 1st shift
 			        	    	@elseif ($key == 3) Top
-			        	    	@elseif ($key == 2) High
+			        	    	@elseif ($key == 2) Flash
 		        	    		@elseif ($key == 1) Normal
 			        	    @endif
 			        	    &nbsp;&nbsp;&nbsp;&nbsp;
 							@if ($sp2_req_time_line == 0 )
-								00.00 min
+								00 min
 							@else
 								{{ $sp2_req_time_line }} min
 							@endif
@@ -1822,7 +1850,8 @@
 			<ul id="sortable3" class="connectedSortable_ul_1">
             	@foreach ($sp2 as $req2)
             	    <li class="ui-state-default
-            	     @if ($req2->priority == 6) ts_priority
+            	    @if ($req2->priority == 7) tt_priority
+            	    @elseif ($req2->priority == 6) ts_priority
             	    @elseif ($req2->priority == 5) ss_priority
             	    @elseif ($req2->priority == 4) fs_priority
             	    @elseif ($req2->priority == 3) top_priority
@@ -1834,23 +1863,26 @@
             	    	<big>Gbin: {{$req2->g_bin}}</big><br />
             	    	Material: {{$req2->material}}<br />
             	    	Dye lot: {{$req2->dye_lot}}<br /> 
-            	    	Color: {{$req2->color_desc}}<br /> 
+            	    	Color: {{$req2->color_desc}} / {{$req2->color}}<br /> 
             	    	Skeda: {{$req2->skeda}}<br /> 
             	    	Spreading method: {{$req2->spreading_method}}<br /> 
             	    	Width theor usable: {{round($req2->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req2->layers_a,0)}}<br />
             	    	Cons actual: {{round($req2->cons_actual,3)}}<br />
-            	    	Priority: @if ($req2->priority == 6) 3rd shift
+            	    	Priority:
+            	    			@if ($req2->priority == 7) Test
+            	    			@elseif ($req2->priority == 6) 3rd shift
 			        	    	@elseif ($req2->priority == 5) 2nd shift
 			        	    	@elseif ($req2->priority == 4) 1st shift
 			        	    	@elseif ($req2->priority == 3) Top
-			        	    	@elseif ($req2->priority == 2) High
+			        	    	@elseif ($req2->priority == 2) Flash
 		        	    		@elseif ($req2->priority == 1) Normal
 			        	    	@endif
 			        	    	<br />
             	    	Marker: {{$req2->marker_name}}<br /> 
             	    	Marker length: {{round($req2->marker_length,3)}}<br /> 
             	    	Marker width: {{round($req2->marker_width,0)}}<br /> 
+            	    	Mattress pcs: {{round($req2->pro_pcs_actual,0)}}<br />
             	    	Comment office: {{$req2->comment_office}}<br />
             	    	<b>Status: {{$req2->status }}<br />
             	    	Dest: {{$req2->destination}}<br />
@@ -1865,11 +1897,11 @@
 
             	    	Req. time: 
             	    	@if ($req2->average_of_min_per_meter_minm_c != 0) 
-            	    		{{ round($req2->average_of_min_per_meter_minm_c*$req2->cons_actual,2) }}
+            	    		{{ round($req2->average_of_min_per_meter_minm_c*$req2->cons_actual,0) }}
             	    	@elseif ($req2->average_of_min_per_meter_minm_m != 0)  
-            	    		{{ round($req2->average_of_min_per_meter_minm_m*$req2->cons_actual,2) }}
+            	    		{{ round($req2->average_of_min_per_meter_minm_m*$req2->cons_actual,0) }}
             	    	@else 
-            	    		{{ round($req2->average_of_min_per_meter_minm_all*$req2->cons_actual,2) }}
+            	    		{{ round($req2->average_of_min_per_meter_minm_all*$req2->cons_actual,0) }}
             	    	@endif
 
             	    	 min<b />
@@ -1889,16 +1921,17 @@
 				@foreach ($sp3_req_time as  $key => $sp3_req_time_line)
 					<ul style="padding: 0;margin: 0;list-style: none;">
 						<li> 
-							@if ($key == 6) 3rd shift
+							@if ($key == 7) Test
+								@elseif ($key == 6) 3rd shift
 			        	    	@elseif ($key == 5) 2nd shift
 			        	    	@elseif ($key == 4) 1st shift
 			        	    	@elseif ($key == 3) Top
-			        	    	@elseif ($key == 2) High
+			        	    	@elseif ($key == 2) Flash
 		        	    		@elseif ($key == 1) Normal
 			        	    @endif
 			        	    &nbsp;&nbsp;&nbsp;&nbsp;
 							@if ($sp3_req_time_line == 0 )
-								00.00 min
+								00 min
 							@else
 								{{ $sp3_req_time_line }} min
 							@endif
@@ -1910,7 +1943,8 @@
 			<ul id="sortable4" class="connectedSortable_ul_1">
             	@foreach ($sp3 as $req3)
             	    <li class="ui-state-default
-            	     @if ($req3->priority == 6) ts_priority
+            	    @if ($req3->priority == 7) tt_priority
+            	    @elseif ($req3->priority == 6) ts_priority
             	    @elseif ($req3->priority == 5) ss_priority
             	    @elseif ($req3->priority == 4) fs_priority
             	    @elseif ($req3->priority == 3) top_priority
@@ -1922,23 +1956,26 @@
             	    	<big>Gbin: {{$req3->g_bin}}</big><br />
             	    	Material: {{$req3->material}}<br />
             	    	Dye lot: {{$req3->dye_lot}}<br /> 
-            	    	Color: {{$req3->color_desc}}<br /> 
+            	    	Color: {{$req3->color_desc}} / {{$req3->color}}<br />  
             	    	Skeda: {{$req3->skeda}}<br /> 
             	    	Spreading method: {{$req3->spreading_method}}<br /> 
             	    	Width theor usable: {{round($req3->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req3->layers_a,0)}}<br />
             	    	Cons actual: {{round($req3->cons_actual,3)}}<br /> 
-            	    	Priority: @if ($req3->priority == 6) 3rd shift
+            	    	Priority:
+            	    	 		@if ($req3->priority == 7) Test
+            	    	 		@elseif ($req3->priority == 6) 3rd shift
 			        	    	@elseif ($req3->priority == 5) 2nd shift
 			        	    	@elseif ($req3->priority == 4) 1st shift
 			        	    	@elseif ($req3->priority == 3) Top
-			        	    	@elseif ($req3->priority == 2) High
+			        	    	@elseif ($req3->priority == 2) Flash
 		        	    		@elseif ($req3->priority == 1) Normal
 			        	    	@endif
 			        	    	<br />
             	    	Marker: {{$req3->marker_name}}<br /> 
             	    	Marker length: {{round($req3->marker_length,3)}}<br /> 
             	    	Marker width: {{round($req3->marker_width,0)}}<br /> 
+            	    	Mattress pcs: {{round($req3->pro_pcs_actual,0)}}<br />
             	    	Comment office: {{$req3->comment_office}}<br />
             	    	<b>Status: {{$req3->status }}<br />
             	    	Dest: {{$req3->destination}}<br />
@@ -1953,11 +1990,11 @@
 
             	    	Req. time: 
             	    	@if ($req3->average_of_min_per_meter_minm_c != 0) 
-            	    		{{ round($req3->average_of_min_per_meter_minm_c*$req3->cons_actual,2) }}
+            	    		{{ round($req3->average_of_min_per_meter_minm_c*$req3->cons_actual,0) }}
             	    	@elseif ($req3->average_of_min_per_meter_minm_m != 0)  
-            	    		{{ round($req3->average_of_min_per_meter_minm_m*$req3->cons_actual,2) }}
+            	    		{{ round($req3->average_of_min_per_meter_minm_m*$req3->cons_actual,0) }}
             	    	@else 
-            	    		{{ round($req3->average_of_min_per_meter_minm_all*$req3->cons_actual,2) }}
+            	    		{{ round($req3->average_of_min_per_meter_minm_all*$req3->cons_actual,0) }}
             	    	@endif
 
             	    	 min<b />
@@ -1976,16 +2013,17 @@
 				@foreach ($sp4_req_time as  $key => $sp4_req_time_line)
 					<ul style="padding: 0;margin: 0;list-style: none;">
 						<li> 
-							@if ($key == 6) 3rd shift
+								@if ($key == 7) Test
+								@elseif ($key == 6) 3rd shift
 			        	    	@elseif ($key == 5) 2nd shift
 			        	    	@elseif ($key == 4) 1st shift
 			        	    	@elseif ($key == 3) Top
-			        	    	@elseif ($key == 2) High
+			        	    	@elseif ($key == 2) Flash
 		        	    		@elseif ($key == 1) Normal
 			        	    @endif
 			        	    &nbsp;&nbsp;&nbsp;&nbsp;
 							@if ($sp4_req_time_line == 0 )
-								00.00 min
+								00 min
 							@else
 								{{ $sp4_req_time_line }} min
 							@endif
@@ -1997,7 +2035,8 @@
 			<ul id="sortable5" class="connectedSortable_ul_1">
             	@foreach ($sp4 as $req4)
             	    <li class="ui-state-default
-            	      @if ($req4->priority == 6) ts_priority
+            	    @if ($req4->priority == 7) tt_priority
+            	    @elseif ($req4->priority == 6) ts_priority
             	    @elseif ($req4->priority == 5) ss_priority
             	    @elseif ($req4->priority == 4) fs_priority
             	    @elseif ($req4->priority == 3) top_priority
@@ -2009,23 +2048,26 @@
             	    	<big>Gbin: {{$req4->g_bin}}</big><br />
             	    	Material: {{$req4->material}}<br />
             	    	Dye lot: {{$req4->dye_lot}}<br /> 
-            	    	Color: {{$req4->color_desc}}<br /> 
+            	    	Color: {{$req4->color_desc}} / {{$req4->color}}<br /> 
             	    	Skeda: {{$req4->skeda}}<br /> 
             	    	Spreading method: {{$req4->spreading_method}}<br /> 
             	    	Width theor usable: {{round($req4->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req4->layers_a,0)}}<br />
             	    	Cons actual: {{round($req4->cons_actual,3)}}<br /> 
-            	    	Priority: @if ($req4->priority == 6) 3rd shift
+            	    	Priority:
+            	    			@if ($req4->priority == 7) Test
+            	    			@elseif ($req4->priority == 6) 3rd shift
 			        	    	@elseif ($req4->priority == 5)2nd shift
 			        	    	@elseif ($req4->priority == 4)1st shift
 			        	    	@elseif ($req4->priority == 3)Top
-			        	    	@elseif ($req4->priority == 2)High
+			        	    	@elseif ($req4->priority == 2)Flash
 		        	    		@elseif ($req4->priority == 1)Normal
 			        	    	@endif
 			        	    	<br />
             	    	Marker: {{$req4->marker_name}}<br /> 
             	    	Marker length: {{round($req4->marker_length,3)}}<br /> 
             	    	Marker width: {{round($req4->marker_width,0)}}<br /> 
+            	    	Mattress pcs: {{round($req4->pro_pcs_actual,0)}}<br />
             	    	Comment office: {{$req4->comment_office}}<br />
             	    	<b>Status: {{$req4->status }}<br />
             	    	Dest: {{$req4->destination}}<br />
@@ -2040,11 +2082,11 @@
 
             	    	Req. time: 
             	    	@if ($req4->average_of_min_per_meter_minm_c != 0) 
-            	    		{{ round($req4->average_of_min_per_meter_minm_c*$req4->cons_actual,2) }}
+            	    		{{ round($req4->average_of_min_per_meter_minm_c*$req4->cons_actual,0) }}
             	    	@elseif ($req4->average_of_min_per_meter_minm_m != 0)  
-            	    		{{ round($req4->average_of_min_per_meter_minm_m*$req4->cons_actual,2) }}
+            	    		{{ round($req4->average_of_min_per_meter_minm_m*$req4->cons_actual,0) }}
             	    	@else 
-            	    		{{ round($req4->average_of_min_per_meter_minm_all*$req4->cons_actual,2) }}
+            	    		{{ round($req4->average_of_min_per_meter_minm_all*$req4->cons_actual,0) }}
             	    	@endif
 
             	    	 min<b />
@@ -2059,20 +2101,21 @@
 		<div class="col-md-1 8musketara" style="width: 12.499999995%;text-align: center;">
 			<span style="font-size: x-large"><b>MS 1</b>&nbsp;&nbsp;&nbsp;</span> ({{round($ms1_m,2)}} m)
 			<br><br>
-			<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
+			<!-- <div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
 				@foreach ($ms1_req_time as  $key => $ms1_req_time_line)
 					<ul style="padding: 0;margin: 0;list-style: none;">
 						<li> 
-							@if ($key == 6) 3rd shift
+								@if ($key == 7) Test
+								@elseif ($key == 6) 3rd shift
 			        	    	@elseif ($key == 5) 2nd shift
 			        	    	@elseif ($key == 4) 1st shift
 			        	    	@elseif ($key == 3) Top
-			        	    	@elseif ($key == 2) High
+			        	    	@elseif ($key == 2) Flash
 		        	    		@elseif ($key == 1) Normal
 			        	    @endif
 			        	    &nbsp;&nbsp;&nbsp;&nbsp;
 							@if ($ms1_req_time_line == 0 )
-								00.00 min
+								00 min
 							@else
 								{{ $ms1_req_time_line }} min
 							@endif
@@ -2080,11 +2123,12 @@
 						</li>
 					</ul>
 				@endforeach
-			</div>
+			</div> -->
 			<ul id="sortable6" class="connectedSortable_ul_1">
             	@foreach ($ms1 as $req5)
             	    <li class="ui-state-default
-            	     @if ($req5->priority == 6) ts_priority
+            	    @if ($req5->priority == 7) tt_priority
+            	    @elseif ($req5->priority == 6) ts_priority
             	    @elseif ($req5->priority == 5) ss_priority
             	    @elseif ($req5->priority == 4) fs_priority
             	    @elseif ($req5->priority == 3) top_priority
@@ -2096,27 +2140,30 @@
             	    	<big>Gbin: {{$req5->g_bin}}</big><br />
             	    	Material: {{$req5->material}}<br />
             	    	Dye lot: {{$req5->dye_lot}}<br /> 
-            	    	Color: {{$req5->color_desc}}<br /> 
+            	    	Color: {{$req5->color_desc}} / {{$req5->color}}<br /> 
             	    	Skeda: {{$req5->skeda}}<br /> 
             	    	Spreading method: {{$req5->spreading_method}}<br /> 
             	    	Width theor usable: {{round($req5->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req5->layers_a,0)}}<br />
             	    	Cons actual: {{round($req5->cons_actual,3)}}<br /> 
-            	    	Priority: @if ($req5->priority == 6) 3rd shift
+            	    	Priority:
+            	    			@if ($req5->priority == 7) Test
+            	    			@elseif ($req5->priority == 6) 3rd shift
 			        	    	@elseif ($req5->priority == 5)2nd shift
 			        	    	@elseif ($req5->priority == 4)1st shift
 			        	    	@elseif ($req5->priority == 3)Top
-			        	    	@elseif ($req5->priority == 2)High
+			        	    	@elseif ($req5->priority == 2)Flash
 		        	    		@elseif ($req5->priority == 1)Normal
 			        	    	@endif
 			        	    	<br />
             	    	Marker: {{$req5->marker_name}}<br /> 
             	    	Marker length: {{round($req5->marker_length,3)}}<br /> 
             	    	Marker width: {{round($req5->marker_width,0)}}<br /> 
+            	    	Mattress pcs: {{round($req5->pro_pcs_actual,0)}}<br />
             	    	Comment office: {{$req5->comment_office}}<br />
             	    	<b>Status: {{$req5->status }}<br />
             	    	Dest: {{$req5->destination}}<br />
-            	    	@if ($req5->average_of_min_per_meter_minm_c != 0) 
+            	    	<!-- @if ($req5->average_of_min_per_meter_minm_c != 0) 
             	    		Spread SMV (by cat): {{ round($req5->average_of_min_per_meter_minm_c,2) }}
             	    	@elseif ($req5->average_of_min_per_meter_minm_m != 0)  
             	    		Spread SMV (by mat): {{ round($req5->average_of_min_per_meter_minm_m,2) }}
@@ -2127,13 +2174,13 @@
 
             	    	Req. time: 
             	    	@if ($req5->average_of_min_per_meter_minm_c != 0) 
-            	    		{{ round($req5->average_of_min_per_meter_minm_c*$req5->cons_actual,2) }}
+            	    		{{ round($req5->average_of_min_per_meter_minm_c*$req5->cons_actual,0) }}
             	    	@elseif ($req5->average_of_min_per_meter_minm_m != 0)  
-            	    		{{ round($req5->average_of_min_per_meter_minm_m*$req5->cons_actual,2) }}
+            	    		{{ round($req5->average_of_min_per_meter_minm_m*$req5->cons_actual,0) }}
             	    	@else 
-            	    		{{ round($req5->average_of_min_per_meter_minm_all*$req5->cons_actual,2) }}
+            	    		{{ round($req5->average_of_min_per_meter_minm_all*$req5->cons_actual,0) }}
             	    	@endif
-            	    	 min<b />
+            	    	 min --><b />
             	    	">
             	    	<span class="">{{$req5->g_bin}}<br><a href="{{ url('edit_mattress_line/'.$req5->id) }}">{{$req5->mattress}}</a></span>
 
@@ -2148,7 +2195,8 @@
 			<ul id="sortable7" class="connectedSortable_ul_1">
             	@foreach ($ms2 as $req6)
             	    <li class="ui-state-default
-            	     @if ($req6->priority == 6) ts_priority
+            	    @if ($req6->priority == 7) tt_priority
+            	    @elseif ($req6->priority == 6) ts_priority
             	    @elseif ($req6->priority == 5) ss_priority
             	    @elseif ($req6->priority == 4) fs_priority
             	    @elseif ($req6->priority == 3) top_priority
@@ -2159,17 +2207,19 @@
             	    	<big>Gbin: {{$req6->g_bin}}</big><br />
             	    	Material: {{$req6->material}}<br />
             	    	Dye lot: {{$req6->dye_lot}}<br /> 
-            	    	Color: {{$req6->color_desc}}<br /> 
+            	    	Color: {{$req6->color_desc}} / {{$req6->color}}<br /> 
             	    	Skeda: {{$req6->skeda}}<br /> 
             	    	Spreading method: {{$req6->spreading_method}}<br /> 
             	    	Width theor usable: {{round($req6->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req6->layers_a,0)}}<br />
             	    	Cons actual: {{round($req6->cons_actual,3)}}<br />
-            	    	Priority: @if ($req6->priority == 6) 3rd shift
+            	    	Priority: 
+            	    			@if ($req6->priority == 7) Test
+            	    			@elseif ($req6->priority == 6) 3rd shift
 			        	    	@elseif ($req6->priority == 5)2nd shift
 			        	    	@elseif ($req6->priority == 4)1st shift
 			        	    	@elseif ($req6->priority == 3)Top
-			        	    	@elseif ($req6->priority == 2)High
+			        	    	@elseif ($req6->priority == 2)Flash
 		        	    		@elseif ($req6->priority == 1)Normal
 			        	    	@endif
 			        	    	<br />
@@ -2189,20 +2239,21 @@
 		<div class="col-md-1 8musketara" style="width: 12.499999995%;text-align: center;">
 			<span style="font-size: x-large"><b>TUB</b>&nbsp;&nbsp;&nbsp;</span> ({{round($tub_m,2)}} kg)
 			<br><br>
-			<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
+			<!-- <div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
 				@foreach ($tub_req_time as  $key => $tub_req_time_line)
 					<ul style="padding: 0;margin: 0;list-style: none;">
 						<li> 
-							@if ($key == 6) 3rd shift
+								@if ($key == 7) Test
+								@elseif ($key == 6) 3rd shift
 			        	    	@elseif ($key == 5) 2nd shift
 			        	    	@elseif ($key == 4) 1st shift
 			        	    	@elseif ($key == 3) Top
-			        	    	@elseif ($key == 2) High
+			        	    	@elseif ($key == 2) Flash
 		        	    		@elseif ($key == 1) Normal
 			        	    @endif
 			        	    &nbsp;&nbsp;&nbsp;&nbsp;
 							@if ($tub_req_time_line == 0 )
-								00.00 min
+								00 min
 							@else
 								{{ $tub_req_time_line }} min
 							@endif
@@ -2210,11 +2261,12 @@
 						</li>
 					</ul>
 				@endforeach
-			</div>
+			</div> -->
 			<ul id="sortable8" class="connectedSortable_ul_1" style='background-color:#8fe3a266; !important'>
             	@foreach ($tub as $req7)
             	    <li class="ui-state-default
-            	     @if ($req7->priority == 6) ts_priority
+            	    @if ($req7->priority == 7) tt_priority
+            	    @elseif ($req7->priority == 6) ts_priority
             	    @elseif ($req7->priority == 5) ss_priority
             	    @elseif ($req7->priority == 4) fs_priority
             	    @elseif ($req7->priority == 3) top_priority
@@ -2226,27 +2278,30 @@
             	    	<big>Gbin: {{$req7->g_bin}}</big><br />
             	    	Material: {{$req7->material}}<br />
             	    	Dye lot: {{$req7->dye_lot}}<br /> 
-            	    	Color: {{$req7->color_desc}}<br /> 
+            	    	Color: {{$req7->color_desc}} / {{$req7->color}}<br /> 
             	    	Skeda: {{$req7->skeda}}<br /> 
             	    	Spreading method: {{$req7->spreading_method}}<br /> 
             	    	Width theor usable: {{round($req7->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req7->layers_a,0)}}<br />
             	    	Cons actual: {{round($req7->cons_actual,3)}}<br /> 
-            	    	Priority: @if ($req7->priority == 6) 3rd shift
+            	    	Priority:
+            	    			@if ($req7->priority == 7) Test
+            	    			@elseif ($req7->priority == 6) 3rd shift
 			        	    	@elseif ($req7->priority == 5)2nd shift
 			        	    	@elseif ($req7->priority == 4)1st shift
 			        	    	@elseif ($req7->priority == 3)Top
-			        	    	@elseif ($req7->priority == 2)High
+			        	    	@elseif ($req7->priority == 2)Flash
 		        	    		@elseif ($req7->priority == 1)Normal
 			        	    	@endif
 			        	    	<br />
             	    	Marker: {{$req7->marker_name}}<br /> 
             	    	Marker length: {{round($req7->marker_length,3)}}<br /> 
-            	    	Marker width: {{round($req7->marker_width,0)}}<br /> 
+            	    	Marker width: {{round($req7->marker_width,0)}}<br />
+            	    	Mattress pcs: {{round($req7->pro_pcs_actual,0)}}<br />
             	    	Comment office: {{$req7->comment_office}}<br />
             	    	<b>Status: {{$req7->status }}<br />
             	    	Dest: {{$req7->destination}}<br />
-            	    	@if ($req7->average_of_min_per_meter_minm_c != 0) 
+            	    	<!-- @if ($req7->average_of_min_per_meter_minm_c != 0) 
             	    		Spread SMV (by cat): {{ round($req7->average_of_min_per_meter_minm_c,2) }}
             	    	@elseif ($req7->average_of_min_per_meter_minm_m != 0)  
             	    		Spread SMV (by mat): {{ round($req7->average_of_min_per_meter_minm_m,2) }}
@@ -2257,13 +2312,13 @@
 
             	    	Req. time: 
             	    	@if ($req7->average_of_min_per_meter_minm_c != 0) 
-            	    		{{ round($req7->average_of_min_per_meter_minm_c*$req7->cons_actual,2) }}
+            	    		{{ round($req7->average_of_min_per_meter_minm_c*$req7->cons_actual,0) }}
             	    	@elseif ($req7->average_of_min_per_meter_minm_m != 0)  
-            	    		{{ round($req7->average_of_min_per_meter_minm_m*$req7->cons_actual,2) }}
+            	    		{{ round($req7->average_of_min_per_meter_minm_m*$req7->cons_actual,0) }}
             	    	@else 
-            	    		{{ round($req7->average_of_min_per_meter_minm_all*$req7->cons_actual,2) }}
+            	    		{{ round($req7->average_of_min_per_meter_minm_all*$req7->cons_actual,0) }}
             	    	@endif
-            	    	 min<b />
+            	    	 min --><b />
             	    	">
             	    	<span class="">{{$req7->g_bin}}<br><a href="{{ url('edit_mattress_line/'.$req7->id) }}">{{$req7->mattress}}</a></span>
 
@@ -2275,11 +2330,12 @@
 		<div class="col-md-1 8musketara" style="width: 12.499999995%;text-align: center;">
 			<span style="font-size: x-large"><b>MM 1</b>&nbsp;&nbsp;&nbsp;</span> ({{round($mm1_m,2)}} parts)
 			<br><br>
-			<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
+			<!-- <div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
 				@foreach ($mm1_req_time as  $key => $mm1_req_time_line)
 					<ul style="padding: 0;margin: 0;list-style: none;">
 						<li> 
-							@if ($key == 6) 3rd shift
+								@if ($key == 7) Test
+								@elseif ($key == 6) 3rd shift
 			        	    	@elseif ($key == 5) 2nd shift
 			        	    	@elseif ($key == 4) 1st shift
 			        	    	@elseif ($key == 3) Top
@@ -2288,7 +2344,7 @@
 			        	    @endif
 			        	    &nbsp;&nbsp;&nbsp;&nbsp;
 							@if ($mm1_req_time_line == 0 )
-								00.00 min
+								00 min
 							@else
 								{{ $mm1_req_time_line }} min
 							@endif
@@ -2296,11 +2352,12 @@
 						</li>
 					</ul>
 				@endforeach
-			</div>
+			</div> -->
 			<ul id="sortable9" class="connectedSortable_ul_1">
             	@foreach ($mm1 as $req8)
             	    <li class="ui-state-default
-            	      @if ($req8->priority == 6) ts_priority
+            	    @if ($req8->priority == 7) tt_priority
+            	    @elseif ($req8->priority == 6) ts_priority
             	    @elseif ($req8->priority == 5) ss_priority
             	    @elseif ($req8->priority == 4) fs_priority
             	    @elseif ($req8->priority == 3) top_priority
@@ -2312,27 +2369,30 @@
             	    	<big>Gbin: {{$req8->g_bin}}</big><br />
             	    	Material: {{$req8->material}}<br />
             	    	Dye lot: {{$req8->dye_lot}}<br /> 
-            	    	Color: {{$req8->color_desc}}<br /> 
+            	    	Color: {{$req8->color_desc}} / {{$req8->color}}<br /> 
             	    	Skeda: {{$req8->skeda}}<br /> 
             	    	Spreading method: {{$req8->spreading_method}}<br /> 
             	    	Width theor usable: {{round($req8->width_theor_usable,3)}}<br /> 
             	    	Layers: {{round($req8->layers_a,0)}}<br />
             	    	Cons actual: {{round($req8->cons_actual,3)}}<br /> 
-            	    	Priority: @if ($req8->priority == 6) 3rd shift
+            	    	Priority: 
+            	    			@if ($req8->priority == 7) Test
+            	    			@elseif ($req8->priority == 6) 3rd shift
 			        	    	@elseif ($req8->priority == 5) 2nd shift
 			        	    	@elseif ($req8->priority == 4) 1st shift
 			        	    	@elseif ($req8->priority == 3) Top
-			        	    	@elseif ($req8->priority == 2) High
+			        	    	@elseif ($req8->priority == 2) Flash
 		        	    		@elseif ($req8->priority == 1) Normal
 			        	    	@endif
 			        	    	<br />
             	    	Marker: {{$req8->marker_name}}<br /> 
             	    	Marker length: {{round($req8->marker_length,3)}}<br /> 
             	    	Marker width: {{round($req8->marker_width,0)}}<br />
+            	    	Mattress pcs: {{round($req8->pro_pcs_actual,0)}}<br />
             	    	Comment office: {{$req8->comment_office}}<br />
             	    	<b>Status: {{$req8->status }}<br />
             	    	Dest: {{$req8->destination}}<br />
-            	    	@if ($req8->average_of_min_per_meter_minm_c != 0) 
+            	    	<!-- @if ($req8->average_of_min_per_meter_minm_c != 0) 
             	    		Spread SMV (by cat): {{ round($req8->average_of_min_per_meter_minm_c,2) }}
             	    	@elseif ($req8->average_of_min_per_meter_minm_m != 0)  
             	    		Spread SMV (by mat): {{ round($req8->average_of_min_per_meter_minm_m,2) }}
@@ -2343,13 +2403,13 @@
 
             	    	Req. time: 
             	    	@if ($req8->average_of_min_per_meter_minm_c != 0) 
-            	    		{{ round($req8->average_of_min_per_meter_minm_c*$req8->cons_actual,2) }}
+            	    		{{ round($req8->average_of_min_per_meter_minm_c*$req8->cons_actual,0) }}
             	    	@elseif ($req8->average_of_min_per_meter_minm_m != 0)  
-            	    		{{ round($req8->average_of_min_per_meter_minm_m*$req8->cons_actual,2) }}
+            	    		{{ round($req8->average_of_min_per_meter_minm_m*$req8->cons_actual,0) }}
             	    	@else 
-            	    		{{ round($req8->average_of_min_per_meter_minm_all*$req8->cons_actual,2) }}
+            	    		{{ round($req8->average_of_min_per_meter_minm_all*$req8->cons_actual,0) }}
             	    	@endif
-            	    	 min<b />
+            	    	 min --><b />
             	    	">
             	    	<span class="">{{$req8->g_bin}}<br><a href="{{ url('edit_mattress_line/'.$req8->id) }}">{{$req8->mattress}}</a></span>
 

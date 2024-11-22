@@ -30,6 +30,13 @@ class Change extends Migration {
     		// $table->integer('position')->nullable();
     		// $table->dropColumn('position');
     		// $table->integer('pre_position')->nullable();
+
+    		// First remove nullable
+            // $table->string('id_status')->nullable(false)->change();
+
+            // Then, add the unique constraint
+            // $table->unique('id_status');
+
     		
 		});
 
@@ -70,6 +77,7 @@ class Change extends Migration {
 			// $table->dropColumn('damaged_pcs');
 			// $table->integer('num_of_cut_problems')->nullable();
 			// $table->float('req_time')->nullable();
+			// $table->string('mandatory_to_ins')->nullable();
 
 		});
 
@@ -149,7 +157,36 @@ class Change extends Migration {
             // $table->string('spreading_profile')->nullable();
             
         });
+
+        Schema::table('inbound_deliveries', function($table) 
+		{
+            // $table->string('reserve_status')->nullable();
+            // $table->dropColumn('reserve_status');
+            // $table->string('type')->nullable();
+            
+        });
+
+        Schema::table('paspuls', function($table) 
+		{
+            // $table->float('rewound_length_p')->nullable();
+            
+        });
         
+        Schema::table('paspul_lines', function($table) 
+		{
+            // $table->string('id_status')->nullable(); 
+
+            // First remove nullable
+            // $table->string('id_status')->nullable(false)->change();
+
+            // Then, add the unique constraint
+            // $table->unique('id_status');
+			// OR
+            // ALTER TABLE [cutting].[dbo].[paspul_lines]
+			// ADD CONSTRAINT UQ_id_status UNIQUE ([id_status]);
+            
+        });
+
 
 	}
 

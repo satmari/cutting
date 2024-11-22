@@ -1,6 +1,7 @@
 @extends('app')
 
 @section('content')
+
 <div class="container-fluid">
     <div class="row">
         <div class="text-center">
@@ -9,7 +10,7 @@
 		            	<div class="panel-heading">
 		            		<a href="{{url('/o_roll_table')}}" class="btn btn-warning btn-xs center-blo ck">Table</a>
 		            		&nbsp;&nbsp;&nbsp;&nbsp;
-		            		<a href="{{url('/o_roll_table_all')}}" class="btn btn-success btn-xs center-blo ck">Log table</a>
+		            		<a href="{{url('/o_roll_table_all')}}" class="btn btn-success btn-xs center-blo ck">Log table (last 60 days)</a>
 		            		
 		            		 
 

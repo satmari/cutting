@@ -29,7 +29,7 @@
                             
                             Priority: <b>
                                 @if ($priority == 3)Top
-                                @elseif ($priority == 2)High
+                                @elseif ($priority == 2)Flash
                                 @elseif ($priority == 1)Normal
                                 @endif
                             </b><br>

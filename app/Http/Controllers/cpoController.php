@@ -60,34 +60,39 @@ class cpoController extends Controller {
 
 		$operator = Session::get('operator');
 		
-		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT
-				g_bin
-				,part 
-				,style
-				,size
-				,bundle
-				,(SELECT TOP 1 operator FROM [part_lines] WHERE part_id = id ORDER BY created_at desc) as last_operator
-		FROM [parts]
-		GROUP BY 
-			g_bin,
-			part,
-			style,
-			size,
-			bundle
-		"));
+		// $data = DB::connection('sqlsrv')->select(DB::raw("SELECT
+		// 		g_bin
+		// 		,part 
+		// 		,style
+		// 		,size
+		// 		,bundle
+		// 		,(SELECT TOP 1 operator FROM [part_lines] WHERE part_id = id ORDER BY created_at desc) as last_operator
+		// FROM [parts]
+		// GROUP BY 
+		// 	g_bin,
+		// 	part,
+		// 	style,
+		// 	size,
+		// 	bundle
+		// "));
 
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				      p.[g_bin],
-				      p.[style],
-				      s.[status],
-				      s.[comment]
-				FROM [cutting].[dbo].[parts] as p
-				LEFT JOIN [cutting].[dbo].[part_g_bin_statuses] as s ON s.[g_bin] = p.[g_bin]
-				WHERE (s.[status] != 'Ready for production' AND s.[status] != 'Not checked') OR s.[status] is NULL
-				GROUP BY	p.[g_bin],
-							p.[style],
-							s.[status],
-							s.[comment]
+			      p.[g_bin],
+			      p.[style],
+			      s.[status],
+			      s.[comment],
+			      (SELECT [mandatory_to_ins] FROM [cutting].[dbo].[mattress_details] as d
+				  JOIN [cutting].[dbo].[mattresses] as m ON m.id = d.mattress_id
+				  WHERE m.g_bin = p.g_bin) as [mandatory_to_ins]
+			FROM [cutting].[dbo].[parts] as p
+			LEFT JOIN [cutting].[dbo].[part_g_bin_statuses] as s ON s.[g_bin] = p.[g_bin]
+			
+			WHERE (s.[status] != 'Ready for production' AND s.[status] != 'Not checked') OR s.[status] is NULL
+			GROUP BY	p.[g_bin],
+						p.[style],
+						s.[status],
+						s.[comment]
+			ORDER BY [mandatory_to_ins] desc
 		"));
 
 		// dd($data);
@@ -149,7 +154,10 @@ class cpoController extends Controller {
 				      p.[g_bin],
 				      p.[style],
 				      s.[status],
-				      s.[comment]
+				      s.[comment],
+				      (SELECT [mandatory_to_ins] FROM [cutting].[dbo].[mattress_details] as d
+				  		JOIN [cutting].[dbo].[mattresses] as m ON m.id = d.mattress_id
+				  		WHERE m.g_bin = p.g_bin) as [mandatory_to_ins]
 				FROM [cutting].[dbo].[parts] as p
 				LEFT JOIN [cutting].[dbo].[part_g_bin_statuses] as s ON s.[g_bin] = p.[g_bin]
 				WHERE s.[status] = 'Ready for production' OR s.[status] = 'Not checked'
@@ -479,14 +487,14 @@ class cpoController extends Controller {
 		// dd($data);
 		if (isset($data[0]->part_id)) {
 			$id = $data[0]->part_id;
-			$comment = $data[0]->comment;
+			// $comment = $data[0]->comment;
 
 		} else {
 			$id = '';
-			$comment = '';
+			// $comment = '';
 		}
 		
-		return view('cpo.cpo_line_table', compact('id','g_bin','style','size','bundle','part','comment','data'));
+		return view('cpo.cpo_line_table', compact('id','g_bin','style','size','bundle','part','data'));
 
 	}
 
@@ -508,10 +516,10 @@ class cpoController extends Controller {
 		$size = $data[0]->size;
 		$bundle = $data[0]->bundle;
 		$part = $data[0]->part;
-		$comment = $data[0]->comment;
+		// $comment = $data[0]->comment;
 
 
-		return view('cpo.cpo_line_table', compact('id','g_bin','style','size','bundle','part','comment','data'));
+		return view('cpo.cpo_line_table', compact('id','g_bin','style','size','bundle','part','data'));
 
 	}
 
@@ -528,9 +536,9 @@ class cpoController extends Controller {
 		$size = $input['size'];
 		$bundle = $input['bundle'];
 		$part = $input['part'];
-		$comment = $input['comment'];
+		// $comment = $input['comment'];
 
-		return view('cpo.cpo_new_check_layers', compact('g_bin','style','size','bundle','part','comment'));
+		return view('cpo.cpo_new_check_layers', compact('g_bin','style','size','bundle','part'));
 
 	}
 
@@ -545,7 +553,7 @@ class cpoController extends Controller {
 		$size = $input['size'];
 		$bundle = $input['bundle'];
 		$part = $input['part'];
-		$comment = $input['comment'];
+		// $comment = $input['comment'];
 
 		$layer = (int)$input['layer'];
 		$length = (float)$input['length'];
@@ -589,77 +597,88 @@ class cpoController extends Controller {
 		if (isset($data[0]->part_id)) {
 			//exist part 
 
-			$table = parts::findOrFail($data[0]->part_id);
-			$table->comment = $comment;
-			$table->save();
+			try {
+				// $table = parts::findOrFail($data[0]->part_id);
+				// $table->comment = $comment;
+				// $table->save();
 
 
-			//add lines
-			$table_lines = new part_line;
+				//add lines
+				$table_lines = new part_line;
 
-			$table_lines->part_id = $data[0]->part_id;
-			$table_lines->part = $data[0]->part;
-			$table_lines->g_bin = $g_bin;
-			$table_lines->style = $style;
-			$table_lines->size = $size;
-			$table_lines->bundle = $bundle;
+				$table_lines->part_id = $data[0]->part_id;
+				$table_lines->part = $data[0]->part;
+				$table_lines->g_bin = $g_bin;
+				$table_lines->style = $style;
+				$table_lines->size = $size;
+				$table_lines->bundle = $bundle;
 
-			$table_lines->layer = $layer;
-			$table_lines->length = $length;
-			$table_lines->width = $width;
-			$table_lines->operator = Session::get('operator');
-			$table_lines->device = $device;
+				$table_lines->layer = $layer;
+				$table_lines->length = $length;
+				$table_lines->width = $width;
+				$table_lines->operator = Session::get('operator');
+				$table_lines->device = $device;
 
-			$table_lines->key_part_line =  strval($g_bin).'-'.strval($style).'-'.strval($size).'-'.strval($bundle).'-'.strval($part).'-'.strval($layer);
-			// dd($table_lines->key_part_line);
-			// dd('stop');
+				$table_lines->key_part_line =  strval($g_bin).'-'.strval($style).'-'.strval($size).'-'.strval($bundle).'-'.strval($part).'-'.strval($layer);
+				// dd($table_lines->key_part_line);
+				// dd('stop');
 
-			$table_lines->save();
+				$table_lines->save();
+
+			} catch (\Illuminate\Database\QueryException $e) {
+				dd('Problem to save, probably is diplicated. Ne moze da se sacuva, verovatno je duplirana kombinacija (g_bin,bundle,part,layer)');
+			}
 
 		} else {
 			// does not exist
 
 			// $part = $g_bin."-".$style."-".$size."-".$bundle."-".$part;
 			// add header
-			$table = new parts;
 
-			$table->part = $part;
-			$table->g_bin = $g_bin;
-			$table->style = $style;
-			$table->size = $size;
-			$table->bundle = $bundle;
-			$table->length_mode;
-			$table->width_mode; 
-			$table->comment = $comment;
-			$table->key_part =  strval($g_bin).'-'.strval($style).'-'.strval($size).'-'.strval($bundle).'-'.strval($part);
+			try {
+				$table = new parts;
 
-			$table->save();
+				$table->part = $part;
+				$table->g_bin = $g_bin;
+				$table->style = $style;
+				$table->size = $size;
+				$table->bundle = $bundle;
+				$table->length_mode;
+				$table->width_mode; 
+				// $table->comment = $comment;
+				$table->key_part =  strval($g_bin).'-'.strval($style).'-'.strval($size).'-'.strval($bundle).'-'.strval($part);
 
-			//add lines
-			$table_lines = new part_line;
+				$table->save();
 
-			$table_lines->part_id = $table->id;
-			$table_lines->part = $table->part;
-			$table_lines->g_bin = $g_bin;
-			$table_lines->style = $style;
-			$table_lines->size = $size;
-			$table_lines->bundle = $bundle;
+				//add lines
+				$table_lines = new part_line;
 
-			$table_lines->layer = $layer;
-			$table_lines->length = $length;
-			$table_lines->width = $width;
-			$table_lines->operator = Session::get('operator');
-			$table_lines->device = $device;
+				$table_lines->part_id = $table->id;
+				$table_lines->part = $table->part;
+				$table_lines->g_bin = $g_bin;
+				$table_lines->style = $style;
+				$table_lines->size = $size;
+				$table_lines->bundle = $bundle;
 
-			$table_lines->key_part_line =  strval($g_bin).'-'.strval($style).'-'.strval($size).'-'.strval($bundle).'-'.strval($part).'-'.strval($layer);
+				$table_lines->layer = $layer;
+				$table_lines->length = $length;
+				$table_lines->width = $width;
+				$table_lines->operator = Session::get('operator');
+				$table_lines->device = $device;
 
-			
-			$table_lines->save();
+				$table_lines->key_part_line =  strval($g_bin).'-'.strval($style).'-'.strval($size).'-'.strval($bundle).'-'.strval($part).'-'.strval($layer);
+
+				
+				$table_lines->save();
 
 
-			// $table->length_mode;
-			// $table->width_mode;
-			// $table->save();
+				// $table->length_mode;
+				// $table->width_mode;
+				// $table->save();
+
+			} catch (\Illuminate\Database\QueryException $e) {
+				dd('Problem to save, probably is diplicated. Ne moze da se sacuva, verovatno je duplirana kombinacija (g_bin,bundle,part,layer)');
+			}
 
 		}
 
@@ -680,7 +699,7 @@ class cpoController extends Controller {
 			$id = '';
 		}
 			
-		return view('cpo.cpo_line_table', compact('id','g_bin','style','size','bundle','part','comment','data'));
+		return view('cpo.cpo_line_table', compact('id','g_bin','style','size','bundle','part','data'));
 
 	}
 
@@ -703,9 +722,9 @@ class cpoController extends Controller {
 		$layer = $data[0]->layer;
 		$length = $data[0]->length;
 		$width = $data[0]->width;
-		$comment = $data[0]->comment;
+		// $comment = $data[0]->comment;
 
-		return view('cpo.cpo_edit_check_layers', compact('id','layer','length','width','comment'));
+		return view('cpo.cpo_edit_check_layers', compact('id','layer','length','width'));
 
 	}
 
@@ -729,24 +748,22 @@ class cpoController extends Controller {
 		$layer = (int)$input['layer'];
 		$length = (float)$input['length'];
 		$width = (float)$input['width'];
-		$comment = $input['comment'];
+		// $comment = $input['comment'];
 
 
 		//add lines
 		$table_lines = part_line::findOrFail($id);
-
 		$table_lines->layer = $layer;
 		$table_lines->length = $length;
 		$table_lines->width = $width;
 		$table_lines->operator = Session::get('operator');
 		$table_lines->device = $device;
 		$table_lines->key_part_line =  strval($table_lines->g_bin).'-'.strval($table_lines->style).'-'.strval($table_lines->size).'-'.strval($table_lines->bundle).'-'.strval($table_lines->part).'-'.strval($layer);
-
 		$table_lines->save();
 
 		$table = parts::findOrFail($table_lines->part_id);
-		$table->comment = $comment;
-		$table->save();
+		// $table->comment = $comment;
+		// $table->save();
 
 
 		$g_bin = $table->g_bin;
@@ -766,14 +783,20 @@ class cpoController extends Controller {
 						pl.[part] = '".$part."'  
 			"));
 					
-		return view('cpo.cpo_line_table', compact('id','g_bin','style','size','bundle','part','comment','data'));
+		return view('cpo.cpo_line_table', compact('id','g_bin','style','size','bundle','part','data'));
 
 	}
 
+
+// GBIN STATUS
 	public function set_status_g_bin($g_bin) {
 		// dd($g_bin);
 
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT id,comment,status
+					/*,(SELECT [mandatory_to_ins] FROM [cutting].[dbo].[mattress_details] as d
+				  		JOIN [cutting].[dbo].[mattresses] as m ON m.id = d.mattress_id
+				  		WHERE m.g_bin = '".$g_bin."') as [mandatory_to_ins]
+				  	*/
 	  			FROM part_g_bin_statuses
 	  			WHERE g_bin = '".$g_bin."'
 			"));
@@ -787,8 +810,19 @@ class cpoController extends Controller {
 			$status = '';
 		}
 
+		$mandatory_to_ins = DB::connection('sqlsrv')->select(DB::raw("
+			SELECT [mandatory_to_ins] FROM [cutting].[dbo].[mattress_details] as d
+			JOIN [cutting].[dbo].[mattresses] as m ON m.id = d.mattress_id
+			WHERE m.g_bin = '".$g_bin."'
+			"));
+		
+		if (isset($mandatory_to_ins[0]->mandatory_to_ins)) {
+			$mandatory_to_ins = $mandatory_to_ins[0]->mandatory_to_ins;
+		}
+		// dd($mandatory_to_ins);
+
 		// dd($status);
-		return view('cpo.set_status_g_bin', compact('g_bin','comment','status'));
+		return view('cpo.set_status_g_bin', compact('g_bin','comment','status','mandatory_to_ins'));
 	}
 
 	public function set_status_g_bin_post(Request $request) {
@@ -821,6 +855,7 @@ class cpoController extends Controller {
 		$g_bin = $input['g_bin'];
 		$status = $input['status'];
 		$comment = $input['comment'];
+		// dd($comment);
 
 		$check = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM part_g_bin_statuses 
 			WHERE  g_bin = '".$g_bin."'
@@ -834,7 +869,7 @@ class cpoController extends Controller {
 	  				operator = '".$operator."',
 	  				device = '".$device."'
 
-	  			WHERE g_bin = '".$g_bin."';
+	  				WHERE g_bin = '".$g_bin."';
 			"));	
 
 		} else {

@@ -27,12 +27,15 @@
                             Skeda type: <b>{{ $skeda_item_type}} </b><br>
                             Rewinding method: <b>{{ $rewinding_method}} </b><br>
                             
-                            Priority: <b>
-                                @if ($priority == 3)Top
-                                @elseif ($priority == 2)High
-                                @elseif ($priority == 1)Normal
-                                @endif
-                            </b><br>
+                             Priority: <b>
+                                        @if ($priority == 7)Test
+                                        @elseif ($priority == 6)3rd shift
+                                        @elseif ($priority == 5)2nd shift
+                                        @elseif ($priority == 4)1st shift
+                                        @elseif ($priority == 3)Top
+                                        @elseif ($priority == 2)Flash
+                                        @elseif ($priority == 1)Normal </b><br>
+                                        @endif
                             
                             @if($call_shift_manager == 1)
                              Call shift manager: <b>Yes</b> 

@@ -4,6 +4,41 @@
 
 {{ header( "refresh:60;url=/cutting/spreader" ) }}
 
+
+
+<style>
+  .progress-container {
+    width: 100%;
+    height: 30px;
+    background-color: #ddd;
+    position: relative;
+    display: flex;
+  }
+ 
+  .progress-bar {
+    height: 100%;
+    background-color: #4CAF50;
+    text-align: center;
+    line-height: 30px;
+    color: white;
+  }
+ 
+  .checkpoint {
+    position: absolute;
+    height: 60%;
+    width: 2px;
+    background-color: black;
+  }
+ 
+  .checkpoint-label {
+    position: absolute;
+    top: 16px;
+    transform: translateX(-50%);
+    font-size: 12px;
+  }
+</style>
+
+
 <div class="container-fluid">
     <div class="row">
         <div class="text-center">
@@ -22,13 +57,51 @@
 			            			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 			            			Efficiency2: &nbsp; <big><b>{{ $eff2}} </b></big>
 			            		</span>
+			            		
 			                </div>
 		                @else
 			                <div class="input-group">
 			            		<span class="input-group-addon">
 			            			Efficiency: &nbsp; &nbsp; <big><b>{{ $eff}} </b></big>
 			            		</span>
-			                </div>
+			            		
+			            		
+			            		<!-- <div> -->
+			            			<!-- <div class="progress-container">
+									<div id="progress-bar" class="progress-bar">0m</div>
+									<div class="checkpoint" style="left: 60%;"></div>
+									<div class="checkpoint-label" style="left: 60%;">3000m</div>
+									<div class="checkpoint" style="left: 70%;"></div>
+									<div class="checkpoint-label" style="left: 70%;">3500m</div>
+									<div class="checkpoint" style="left: 80%;"></div>
+									<div class="checkpoint-label" style="left: 80%;">4000m</div>
+									<div class="checkpoint" style="left: 90%;"></div>
+									<div class="checkpoint-label" style="left: 90%;">4500m</div>
+									<div class="checkpoint" style="left: 100%;"></div>
+									<div class="checkpoint-label" style="left: 100%;">5000m</div>
+									</div> -->
+
+									<script>
+									  function updateProgressBar(meters) {
+									  	// console.log('test');
+									    // const progressBar = document.getElementById('progress-bar');
+									    // let percentage = (meters / 5000) * 100;
+									    // if (percentage > 100) {
+									      // percentage = 100;
+									    // }
+									    // progressBar.style.width = percentage + '%';
+									    // progressBar.innerText = meters + 'm';
+									  }
+									 
+									    // Example usage with a value from PHP
+									  <?php
+									    // $metersDone = (int)$eff; // Example value from PHP
+									    // echo "updateProgressBar($metersDone);";
+									  ?>
+
+									</script>
+				            		<!-- </div> -->
+				                </div>
 		                @endif
 
 		        	 	<div class="input-group"> <span class="input-group-addon">Filter</span>
@@ -153,18 +226,20 @@
 			                        <td>{{ $req->bottom_paper}}</td>
 			                        <td>{{ $req->overlapping}}</td>
 		                            <td class="
-			                            @if ($req->priority == 6) ts_priority
+			                            @if ($req->priority == 7) tt_priority
+			                            @elseif ($req->priority == 6) ts_priority
 			                            @elseif ($req->priority == 5) ss_priority
 			                            @elseif ($req->priority == 4) fs_priority
 			                            @elseif ($req->priority == 3) top_priority
 					        	    	@elseif ($req->priority == 2) high_priority
 					        	    	@endif
 					        	    	">
-					        	    	@if ($req->priority == 6)3rd shift
+					        	    	@if ($req->priority == 7)Test
+					        	    	@elseif ($req->priority == 6)3rd shift
 					        	    	@elseif ($req->priority == 5)2nd shift
 					        	    	@elseif ($req->priority == 4)1st shift
 					        	    	@elseif ($req->priority == 3)Top
-					        	    	@elseif ($req->priority == 2)High
+					        	    	@elseif ($req->priority == 2)Flash
 				        	    		@elseif ($req->priority == 1)Normal
 					        	    	@endif</td>
 		                            <td>{{ $req->status}}</td>

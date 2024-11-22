@@ -16,7 +16,7 @@
 						size:<b><big>{{$size}}</big></b>, 
 						bundle:<b><big>{{$bundle}}</big></b>, 
 						part:<b><big>{{$part}}</big></b>
-						<br>comment:<b><big>{{$comment}}</big></b>
+						
 						<!-- <br> -->
 						<br>
 						<!-- <a href="javascript:history.go(-1)">Go Back</a> -->
@@ -37,7 +37,7 @@
 							{!! Form::hidden('size', $size, ['class' => 'form-control']) !!}
 							{!! Form::hidden('bundle', $bundle, ['class' => 'form-control']) !!}
 							{!! Form::hidden('part', $part, ['class' => 'form-control']) !!}
-							{!! Form::hidden('comment', $comment, ['class' => 'form-control']) !!}
+							
 
 							{!! Form::submit('Add new layer line', ['class' => 'btn btn-xs btn-success']) !!}
 							@include('errors.list')

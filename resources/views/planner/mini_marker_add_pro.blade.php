@@ -1,6 +1,7 @@
 @extends('app')
 
 @section('content')
+
 <div class="container container-table">
 	<div class="row vertical-center-row">
 		<div class="text-center col-md-12 col-md-offset-1">

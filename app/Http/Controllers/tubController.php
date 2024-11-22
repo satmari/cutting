@@ -18,6 +18,7 @@ use App\mattress_pro;
 use App\o_roll;
 use App\material_requests;
 use App\material_request_phases;
+use App\tubolare_weight;
 
 use DB;
 
@@ -1350,4 +1351,78 @@ class tubController extends Controller {
 		return redirect('/request_material_table');
 	}
 
+	public function tubolare_weight() {
+
+		return view('tub.tubolare_weight');
+
+	}
+
+	public function tubolare_weight_box_post(Request $request) {
+		//
+		// $this->validate($request, ['sap_location1' => 'required']);
+		$input = $request->all(); 
+		// dd($input);
+
+		if (!isset($input['box'])) {
+			// dd('please scan or insert box barcode 0');
+			$danger = "please scan or insert box barcode";
+			return view('tub.tubolare_weight',compact('danger'));
+
+		} elseif ($input['box'] == "") {
+			// dd('please scan or insert box barcode 1');
+			$danger = "please scan or insert box barcode";
+			return view('tub.tubolare_weight',compact('danger'));
+
+		} elseif (strlen($input['box']) != 20) {
+			// dd('please scan or insert box barcode 2');
+			$danger = "barcode must be 20 chars";
+			return view('tub.tubolare_weight',compact('danger'));
+		}
+
+		$box = $input['box'];
+		// dd($box);
+
+		return view('tub.tubolare_weight_box', compact('box'));
+
+	}
+
+	public function tubolare_weight_box_weight_post(Request $request) {
+		//
+		// $this->validate($request, ['sap_location1' => 'required']);
+		$input = $request->all(); 
+		// dd($input);
+		$box = $input['box'];
+
+		if (!isset($input['weight'])) {
+			// dd('please scan or insert weight 0');
+			$danger = "please insert weight";
+			return view('tub.tubolare_weight_box',compact('danger','box'));
+
+		} elseif ((float)$input['weight'] <= 0) {
+			// dd('please scan or insert weight 1');
+			$danger = "please insert weight";
+			return view('tub.tubolare_weight_box',compact('danger','box'));
+		}
+
+		$weight = (float)$input['weight'];
+		
+		// dd($weight);
+
+		$table = new tubolare_weight;
+		$table->box = $box;
+		$table->weight = $weight;
+		$table->save();
+
+		$success = 'Successfuly saved: '.$box;
+		return view('tub.tubolare_weight', compact('success'));
+
+	}
+
+	public function tubolare_weight_table(){
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM tubolare_weights
+			ORDER BY id desc"));
+
+		return view('tub.tubolare_weight_table', compact('data'));
+	}
+	
 }

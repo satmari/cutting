@@ -193,6 +193,9 @@ Route::post('postImportMaterials', 'importController@postImportMaterials');
 Route::post('postImport_marker_status', 'importController@postImport_marker_status');
 Route::post('postImport_style_parts', 'importController@postImport_style_parts');
 
+Route::get('import2', 'import2Controller@index');
+Route::post('postImport_by', 'import2Controller@postImport_by');
+
 Route::get('wastage_table_import','importController@index');
 Route::post('postImportWastage_report','importController@postImportWastage_report');
 Route::post('postImport_marker','importController@postImport_marker');
@@ -270,6 +273,8 @@ Route::post('posts/reposition7', [ 'uses' => 'plannerController@reposition7', 'a
 Route::post('posts/reposition8', [ 'uses' => 'plannerController@reposition8', 'as' => 'posts.reposition8' ]);
 Route::post('posts/reposition9', [ 'uses' => 'plannerController@reposition9', 'as' => 'posts.reposition9' ]);
 Route::post('posts/reposition_pas', [ 'uses' => 'plannerController@reposition_pas', 'as' => 'posts.reposition_pas' ]);
+Route::post('posts/reposition_p_1', [ 'uses' => 'plannerController@reposition_p_1', 'as' => 'posts.reposition_p_1' ]);
+Route::post('posts/reposition_p_2', [ 'uses' => 'plannerController@reposition_p_2', 'as' => 'posts.reposition_p_2' ]);
 
 Route::get('plan_mattress_line/{id}', 'plannerController@plan_mattress_line');
 Route::post('plan_mattress_line_confirm', 'plannerController@plan_mattress_line_confirm');
@@ -310,17 +315,29 @@ Route::post('o_roll_scan_post', 'plannerController@o_roll_scan_post');
 Route::get('plan_paspul/{location}', 'plannerController@plan_paspul');
 Route::get('plan_paspul_line/{id}', 'plannerController@plan_paspul_line');
 Route::post('plan_paspul_line_confirm', 'plannerController@plan_paspul_line_confirm');
+
+Route::get('plan_paspul_line1/{id}', 'plannerController@plan_paspul_line1');
+Route::post('plan_paspul_line_confirm1', 'plannerController@plan_paspul_line_confirm1');
+
 Route::get('remove_paspul_line/{id}', 'plannerController@remove_paspul_line');
 Route::post('paspul_delete_confirm', 'plannerController@paspul_delete_confirm');
+
+Route::get('remove_paspul_roll_line/{id}', 'plannerController@remove_paspul_roll_line');
+Route::post('paspul_delete_roll_confirm', 'plannerController@paspul_delete_roll_confirm');
+
 Route::get('edit_paspul_line/{id}', 'plannerController@edit_paspul');
 Route::post('edit_paspul_line_confirm', 'plannerController@edit_paspul_confirm');
+Route::get('edit_paspul_roll_line/{id}', 'plannerController@edit_paspul_roll_line');
+Route::post('edit_paspul_roll_line_confirm', 'plannerController@edit_paspul_roll_line_confirm');
 
 Route::get('paspul_change_kotur_qty/{id}', 'plannerController@paspul_change_kotur_qty');
 Route::post('paspul_pco1_planner_confirm', 'plannerController@paspul_pco1_planner_confirm');
 Route::get('paspul_stock', 'plannerController@paspul_stock');
 Route::get('paspul_change_q/{id}', 'plannerController@paspul_change_q');
+
 Route::get('paspul_delete_line/{id}', 'plannerController@paspul_delete_line');
 Route::post('paspul_delete_line_confirm', 'plannerController@paspul_delete_line_confirm');
+
 Route::post('paspul_change_q_post', 'plannerController@paspul_change_q_post');
 Route::get('paspul_stock_log', 'plannerController@paspul_stock_log');
 Route::get('paspul_change_log_q/{id}', 'plannerController@paspul_change_log_q');
@@ -345,6 +362,14 @@ Route::post('print_mattress_multiple_sm_post', 'plannerController@print_mattress
 Route::post('print_mattress_multiple_mm_post', 'plannerController@print_mattress_multiple_mm_post');
 Route::post('print_mattress_multiple_sm_complete', 'plannerController@print_mattress_multiple_sm_complete');
 Route::post('print_mattress_multiple_mm_complete', 'plannerController@print_mattress_multiple_mm_complete');
+
+Route::get('skeda_comments', 'plannerController@skeda_comments');
+Route::get('skeda_comments_add', 'plannerController@skeda_comments_add');
+Route::post('skeda_comment_post', 'plannerController@skeda_comment_post');
+Route::get('skeda_comment_edit/{id}', 'plannerController@skeda_comment_edit');
+Route::post('skeda_comment_edit_post', 'plannerController@skeda_comment_edit_post');
+Route::post('skeda_comment_delete', 'plannerController@skeda_comment_delete');
+
 
 // Spreader
 Route::get('spreader', 'spreaderController@index');
@@ -374,6 +399,7 @@ Route::get('request_material_table', 'spreaderController@request_material_table'
 Route::get('request_material_delete/{id}', 'spreaderController@request_material_delete');
 Route::get('request_material_delete_confirm/{id}', 'spreaderController@request_material_delete_confirm');
 
+
 // CUT
 Route::get('cutter', 'cutterController@index');
 Route::get('operator_login_cut', 'cutterController@operator_login');
@@ -384,6 +410,7 @@ Route::post('mattress_cut_post', 'cutterController@mattress_cut_post');
 Route::get('other_functions_cut/{id}', 'cutterController@other_functions');
 Route::post('add_operator_comment_cut', 'cutterController@add_operator_comment');
 
+
 // PACK
 Route::get('pack', 'packController@index');
 Route::get('operator_login_pack', 'packController@operator_login');
@@ -393,6 +420,7 @@ Route::get('mattress_pack_m/{id}', 'packController@mattress_pack_m');
 Route::get('mattress_pack_confirm/{id}', 'packController@mattress_pack_confirm');
 Route::get('other_functions_pack/{id}', 'packController@other_functions');
 
+
 // PLOT
 Route::get('plot', 'plotController@index');
 Route::get('operator_login_plot', 'plotController@operator_login');
@@ -400,12 +428,14 @@ Route::get('operator_logout_plot', 'plotController@operator_logout');
 Route::get('mattress_plot/{id}', 'plotController@mattress_plot');
 Route::get('mattress_plot_confirm/{id}', 'plotController@mattress_plot_confirm');
 
+
 // PSO
 Route::get('pso', 'psoController@index');
 Route::get('operator_login_pso', 'psoController@operator_login');
 Route::get('operator_logout_pso', 'psoController@operator_logout');
 Route::get('mattress_pso/{id}', 'psoController@mattress_pso');
 Route::get('mattress_pso_confirm/{id}', 'psoController@mattress_pso_confirm');
+
 
 // PRW
 Route::get('prw', 'prwController@index');
@@ -418,10 +448,14 @@ Route::get('prw1', 'prwController@index1');
 Route::get('paspul_prw1/{id}', 'prwController@paspul_prw1');
 Route::post('paspul_prw1_confirm', 'prwController@paspul_prw1_confirm');
 Route::get('finish_rewound/{id}', 'prwController@finish_rewound');
-
 Route::get('request_material_p/{id}', 'prwController@request_material');
 Route::post('request_material_p_insert', 'prwController@request_material_insert');
 // Route::get('request_material_p_table', 'prwController@request_material_table');
+
+Route::get('prw2', 'prwController@index2');
+Route::get('paspul_prw2/{id}', 'prwController@paspul_prw2');
+Route::post('paspul_prw2_confirm', 'prwController@paspul_prw2_confirm');
+
 
 // PCO
 Route::get('pco', 'pcoController@index');
@@ -436,6 +470,12 @@ Route::get('pco1', 'pcoController@index1');
 Route::get('paspul_pco1/{id}', 'pcoController@paspul_pco1');
 Route::post('paspul_pco1_confirm', 'pcoController@paspul_pco1_confirm');
 
+Route::get('pco2', 'pcoController@index2');
+Route::get('paspul_pco2/{id}', 'pcoController@paspul_pco2');
+Route::post('paspul_pco2_confirm', 'pcoController@paspul_pco2_confirm');
+
+
+
 // LR
 Route::get('lr', 'lrController@index');
 Route::get('operator_login_lr', 'lrController@operator_login');
@@ -447,6 +487,8 @@ Route::post('o_roll_insert_parts', 'lrController@o_roll_insert_parts');
 Route::get('o_roll_print', 'lrController@o_roll_print');
 Route::post('o_roll_print_confirm', 'lrController@o_roll_print_confirm');
 Route::post('o_roll_print_confirm_print', 'lrController@o_roll_print_confirm_print');
+
+
 
 // TUB
 Route::get('tub', 'tubController@index');
@@ -465,6 +507,13 @@ Route::post('spread_mattress_tub_complete_post', 'tubController@spread_mattress_
 
 Route::get('request_material_t/{id}', 'tubController@request_material');
 Route::post('request_material_t_insert', 'tubController@request_material_insert');
+
+Route::get('tubolare_weight', 'tubController@tubolare_weight');
+Route::post('tubolare_weight_box_post', 'tubController@tubolare_weight_box_post');
+Route::post('tubolare_weight_box_weight_post', 'tubController@tubolare_weight_box_weight_post');
+Route::get('tubolare_weight_table', 'tubController@tubolare_weight_table');
+
+
 
 // PSS
 Route::get('pss', 'pssController@index');
@@ -485,12 +534,10 @@ Route::post('table_u_cons_add_post', 'pssController@table_u_cons_add_post');
 Route::get('table_u_cons_change/{id}', 'pssController@table_u_cons_change');
 Route::post('table_u_cons_change_post', 'pssController@table_u_cons_change_post');
 
-
 // Route::get('print_paspul_label/{id}', 'pssController@print_paspul_label');
 // Route::post('print_paspul_label_post', 'pssController@print_paspul_label_post');
 Route::get('print_paspul_label1/{id}', 'pssController@print_paspul_label1');
 Route::post('print_paspul_label1_post', 'pssController@print_paspul_label1_post');
-
 
 Route::get('paspul_loc_to_loc_su_from', 'pssController@paspul_loc_to_loc_su_from');
 Route::post('paspul_loc_to_loc_su_from_post', 'pssController@paspul_loc_to_loc_su_from_post');
@@ -527,6 +574,8 @@ Route::post('paspul_location_edit_post', 'plannerController@paspul_location_edit
 Route::post('postImport_papsul_stock', 'importController@postImport_papsul_stock');
 Route::post('postReturn_papsul_stock', 'importController@postReturn_papsul_stock');
 
+
+
 // PSK
 Route::get('psk', 'pskController@index');
 
@@ -559,6 +608,7 @@ Route::post('paspul_ret_ki_to_su_from_post', 'pskController@paspul_ret_ki_to_su_
 Route::post('paspul_ret_ki_to_su_pas_post', 'pskController@paspul_ret_ki_to_su_pas_post');
 Route::post('paspul_ret_ki_to_su_qty_post', 'pskController@paspul_ret_ki_to_su_qty_post');
 Route::post('paspul_ret_ki_to_su_op_post', 'pskController@paspul_ret_ki_to_su_op_post');
+
 
 
 // PSZ
@@ -662,6 +712,28 @@ Route::get('recap_by_skeda_paspul', 'plannerController@recap_by_skeda_paspul');
 Route::post('recap_by_skeda_paspul_post', 'plannerController@recap_by_skeda_paspul_post');
 Route::get('recap_by_g_bin_mattress', 'plannerController@recap_by_g_bin_mattress');
 Route::post('recap_by_g_bin_mattress_post', 'plannerController@recap_by_g_bin_mattress_post');
+
+// Skeda Reservation
+Route::get('inbound_delivery_index', 'magacinController@inbound_delivery_index');
+Route::get('inbound_delivery_table_wh', 'magacinController@inbound_delivery_table_wh');
+Route::get('inbound_delivery_import', 'magacinController@inbound_delivery_import');
+Route::post('postImportInbound_delivery','importController@postImportInbound_delivery');
+
+Route::get('fabric_reservation', 'plannerController@fabric_reservation');
+
+Route::get('inbound_delivery_table', 'plannerController@inbound_delivery_table');
+Route::get('reserve_material_table', 'plannerController@reserve_material_table');
+Route::get('reserve_material/{id}', 'plannerController@reserve_material');
+Route::post('reserve_material_post', 'plannerController@reserve_material_post');
+
+Route::get('fabric_reservation_table', 'plannerController@fabric_reservation_table');
+
+Route::get('update_skeda_status', 'plannerController@update_skeda_status');
+Route::get('declare_leftover/{id}', 'plannerController@declare_leftover');
+Route::get('declare_no_leftover/{id}', 'plannerController@declare_no_leftover');
+Route::post('declare_leftover_post', 'plannerController@declare_leftover_post');
+
+Route::get('leftover_table', 'plannerController@leftover_table');
 
 Route::get('/', 'HomeController@index');
 Route::get('home', 'HomeController@index');

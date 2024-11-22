@@ -63,7 +63,7 @@
 		                    		<th>Part</th>
 		                            <th>MODE Length</th>
 		                            <th>MODE Width</th>
-		                            <th>Comment</th>
+		                            <!-- <th>Comment</th> -->
 		                            <th></th>
 		                    	</tr>
 		                    </thead> 
@@ -79,7 +79,7 @@
 		                        	<td>{{ round($req->length_mode,2)}}</td>
 		                        	<td>{{ round($req->width_mode,2)}}</td>
 		                        	
-		                        	<td>{{ $req->comment}}</td>
+		                        	<!-- <td>{{ $req->comment}}</td> -->
 		                        	<td><a href="{{ url('cpo_check_edit/'.$req->id) }}" class="btn btn-warning btn-xs center-bl ock">Edit line</a></td>
 				                </tr>
 		                    @endforeach

@@ -133,7 +133,7 @@
 
                         <br>
                         <label>Marker creation type</label>
-                        {!! Form::select('creation_type', array(''=>'', 'Local 8min'=>'Local 8min', 'Local 12min' => 'Local 12min', 'Local manually' => 'Local manually', 'Cloud fast' => 'Cloud fast', 'Cloud std 1h' => 'Cloud std 1h', 'Cloud std 4h' => 'Cloud std 4h', 'Cloud std 12h' => 'Cloud std 12h'), null, array('class' => 'form-control', 'autofocus' => 'autofocus')) !!} 
+                        {!! Form::select('creation_type', array(''=>'', 'Local 8min'=>'Local 8min', 'Local 12min' => 'Local 12min', 'Local manually' => 'Local manually', 'Cloud fast' => 'Cloud fast', 'Cloud std 1h' => 'Cloud std 1h', 'Cloud std 4h' => 'Cloud std 4h', 'Cloud std 12h' => 'Cloud std 12h','FLEX NEST' => 'FLEX NEST'), null, array('class' => 'form-control', 'autofocus' => 'autofocus')) !!} 
 
 
                         <hr>

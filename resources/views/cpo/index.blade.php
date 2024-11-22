@@ -64,6 +64,7 @@
 			                       		<!-- <th>Bundle</th> -->
 			                       		<!-- <th>Last modification by</th> -->
 			                       		<th>G bin comment</th>
+			                       		<th>Mandatory</th>
 			                       		<th>Status</th>
 			                       		<th></th>
 			                    	</tr>
@@ -71,11 +72,15 @@
 			                    <tbody class="con nectedSortable_table searchable">
 
 			                    @foreach ($data as $req)
-			                        <tr>
-			                            
+			                        <tr style="
+			                        	@if ($req->mandatory_to_ins == 'YES')
+											 color:red !important;font-weight: 700;
+										@endif>
+										">
 			                            <td>{{ $req->g_bin }}</td>
 			                            <td>{{ $req->style }}</td>
 			                            <td>{{ $req->comment }}</td>
+			                            <td>{{ $req->mandatory_to_ins}}</td>
 			                            @if ($req->status == NULL)
 			                          	  	<td>Missing</td>	
 			                            @else

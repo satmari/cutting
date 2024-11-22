@@ -16,6 +16,7 @@
 	<link href="{{ asset('/css/choosen.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/bootstrap.min.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/bootstrap-table.css') }}" rel='stylesheet' type='text/css'>
+	<link href="{{ asset('/css/select2.min.css') }}" rel='stylesheet' type='text/css'>
 	<!-- <link rel="manifest" href="{{ asset('/css/manifest.json') }}"> -->
 	
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -72,6 +73,9 @@
 						<ul class="nav navbar-nav">
 							<li><a href="{{ url('/wastage_wh') }}">TPP wastage (wh)</a></li>
 						</ul>
+						<ul class="nav navbar-nav">
+							<li><a href="{{ url('/inbound_delivery_index') }}">Inbound deliveries</a></li>
+						</ul>
 					@endif
 
 					<!-- admin -->
@@ -121,6 +125,8 @@
 									<li><a href="{{ url('paspul_bin') }}">Paspul bin (excel)</a></li>
 									<li role="separator" class="divider"></li>
 									<li><a href="{{ url('consumption_sap') }}">Consumption SAP</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('skeda_comments') }}">Skeda comments</a></li>
 								</ul>
 							</li>
 							<li><a href="{{ url('import') }}">Import</a></li>
@@ -183,6 +189,8 @@
 									<li><a href="{{ url('paspul_locations') }}">Paspul locations</a></li>
 									<li role="separator" class="divider"></li>
 									<li><a href="{{ url('consumption_sap') }}">Consumption SAP</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('skeda_comments') }}">Skeda comments</a></li>
 								</ul>
 							</li>
 							<li><a href="{{ url('import') }}">Import</a></li>
@@ -218,6 +226,7 @@
 								</ul>
 							</li>
 							<li><a href="{{ url('cpo') }}">Cut parts inspection</a></li>
+							<li><a href="{{ url('fabric_reservation') }}">Fabric reservation</a></li>
 							
 						</ul>
 					@endif
@@ -417,6 +426,7 @@
 						<ul class="nav navbar-nav">
 							<!-- <li><a href="{{ url('#') }}">TUB test</a></li> -->
 							<li><a href="{{ url('request_material_table') }}">Material Request table</a></li>
+							<li><a href="{{ url('tubolare_weight') }}">Tubolare scan</a></li>
 						@if (isset($operators))
 							<li>
 								@if (!isset($operator))
@@ -886,6 +896,7 @@
 	<script src="{{ asset('/js/FileSaver.min.js') }}" type="text/javascript" ></script>
 	
 	<script src="{{ asset('/js/choosen.js') }}" type="text/javascript" ></script>
+	<script src="{{ asset('/js/select2.min.js') }}" type="text/javascript" ></script>
 	
 	<!-- // <script src="{{ asset('/js/bootstrap-table-export.js') }}" type="text/javascript" ></script> -->
 	<!-- // <script src="{{ asset('/js/bootstrap-table.js') }}" type="text/javascript" ></script> -->
@@ -1027,10 +1038,30 @@ $(function() {
 
 });
 </script>
+<script type="text/javascript">
+		$(document).ready(function() {
+			
+			$("#select2").select2({
+			  
+			});
+			$("#select3").select2({
+			  
+			});
+			$("#select4").select2({
+			  
+			});
+			$("#select5").select2({
+			  
+			});
+			$("#select6").select2({
+			  
+			});
+		});
+</script>
 <script>
   $(document).ready(function() {
 
-  	$("#sortable0 ,#sortable1 , #sortable2 , #sortable3 , #sortable4 , #sortable5, #sortable6, #sortable7, #sort_able8, #sort_able9" ).sortable({
+  	$("#sortable0 ,#sortable1 , #sortable2 , #sortable3 , #sortable4 , #sortable5, #sortable6, #sortable7, #sort_able8, #sort_able9, #sortable_p_1, #sortable_p_2" ).sortable({
     	connectWith: ".connectedSortable_ul_1",
     	dropOnEmpty: true
     }).disableSelection();
@@ -1265,6 +1296,37 @@ $(function() {
     	}
     });
 
+    $('#sortable_p_1').sortable({
+        // axis: 'y',
+        update: function (event, ui) {
+            var data = $(this).sortable('serialize');
+            console.log("position changed p 1");
+            // console.log(data);
+            // POST to server using $.post or $.ajax
+          	  $.ajax({
+          	      data: data,
+          	      type: 'POST',
+          	      url: '{{ route('posts.reposition_p_1') }}'
+         	});
+    	}
+    });
+
+    $('#sortable_p_2').sortable({
+    	
+   		update: function (event, ui) {
+            var data = $(this).sortable('serialize');
+            console.log("position changed p 2");
+            // console.log(data);
+            // POST to server using $.post or $.ajax
+          	$.ajax({
+          	      data: data,
+          	      type: 'POST',
+          	      url: '{{ route('posts.reposition_p_2') }}'
+         	});
+    	}
+		    
+    });
+
 
 	$('.connectedSortable_ul_1 li').tooltip({
 	    track: true
@@ -1306,6 +1368,12 @@ $(function() {
   		console.log("trdt");
 	});
 
+	// In your Javascript (external .js resource or <script> tag)
+	$(document).ready(function() {
+		$('.js-example-basic-single').select2();
+	});
+
+
 });
 </script>
 <script>
@@ -1313,6 +1381,7 @@ $(function() {
 	  window.history.back();
 	}
 </script>
+
 
 </body>
 </html>

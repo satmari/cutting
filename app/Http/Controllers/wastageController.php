@@ -87,8 +87,8 @@ class wastageController extends Controller {
 		$material_data = DB::connection('sqlsrv6')->select(DB::raw("SELECT 
   		    DISTINCT c.material as tpp_material
       		FROM [posummary].[dbo].[pro] as p
-  			LEFT JOIN [172.27.161.221\GPD].[trebovanje].[dbo].[sap_coois] as c ON c.po = p.pro --and (c.wc = 'WC02A' or c.wc = 'WC02M')
-  			JOIN [172.27.161.221\GPD].[cutting].[dbo].[tpp_materials] as t ON t.tpp_material = c.material
+  			LEFT JOIN [trebovanje].[dbo].[sap_coois] as c ON c.po = p.pro --and (c.wc = 'WC02A' or c.wc = 'WC02M')
+  			JOIN [cutting].[dbo].[tpp_materials] as t ON t.tpp_material = c.material
   			WHERE  p.skeda = '".$skeda."' "));
 		// dd($material_data);
 
@@ -183,8 +183,8 @@ class wastageController extends Controller {
 		$material_data = DB::connection('sqlsrv6')->select(DB::raw("SELECT 
   		    DISTINCT c.material as tpp_material
       		FROM [posummary].[dbo].[pro] as p
-  			LEFT JOIN [172.27.161.221\GPD].[trebovanje].[dbo].[sap_coois] as c ON c.po = p.pro --and (c.wc = 'WC02A' or c.wc = 'WC02M')
-  			JOIN [172.27.161.221\GPD].[cutting].[dbo].[tpp_materials] as t ON t.tpp_material = c.material
+  			LEFT JOIN [trebovanje].[dbo].[sap_coois] as c ON c.po = p.pro --and (c.wc = 'WC02A' or c.wc = 'WC02M')
+  			JOIN [cutting].[dbo].[tpp_materials] as t ON t.tpp_material = c.material
   			WHERE  p.pro = '".$pro."' "));
 		// dd($material_data);
 

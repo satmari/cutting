@@ -6,11 +6,11 @@
     <div class="row vertical-center-row">
         <div class="text-center col-md-2 col-md-offset-5">
             <div class="panel panel-default">
-				<div class="panel-heading">Delete paspul roll</div>
+				<div class="panel-heading">Delete paspul</div>
 				<!-- <br> -->
 					
 					<div class="alert alert-warning" role="alert">
-					 	Are you sure to delete paspul roll?
+					 	Are you sure to delete paspul?
 					</div>
 					
 					{!! Form::open(['method'=>'POST', 'url'=>'/paspul_delete_confirm']) !!}

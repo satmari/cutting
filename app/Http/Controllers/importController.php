@@ -45,8 +45,11 @@ use App\skeda_ratio_import;
 use App\cutting_smv_by_category;
 use App\cutting_smv_by_material;
 
+use App\inbound_delivery;
+
 use App\User;
 use DB;
+use DateTime;
 
 class importController extends Controller {
 
@@ -1274,7 +1277,7 @@ class importController extends Controller {
 								$table1->operator2;
 
 								$table1->date = date('Y-m-d H:i:s');
-
+								$table1->id_status = $table1->paspul_roll_id.'-'.$table1->status;
 								$table1->save();
 
 								$pa_success = $pa_success + 1;
@@ -2949,6 +2952,8 @@ class importController extends Controller {
 						$ploce = round((float)$row['ploce'],3);
 						$total_cons = round((float)$row['total_cons'],3);
 
+						// solve problem with duplicated lines
+
 						$table = new bom_cons;
 						$table->order = $order;
 						$table->style = $style;
@@ -3039,6 +3044,48 @@ class importController extends Controller {
 						$size_34 = round((float)$row['size_34'],2);
 
 						
+						$check_if_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [skeda_ratio_imports]
+							WHERE skeda = '".$skeda."' AND 
+
+								  size_xs = '".$size_xs."' AND 
+								  size_s = '".$size_s."' AND 
+								  size_m = '".$size_m."' AND 
+								  size_l = '".$size_l."' AND 
+								  size_xl = '".$size_xl."' AND 
+							   	  size_xxl = '".$size_xxl."' AND 
+							      size_sm = '".$size_sm."' AND 
+								  size_ml = '".$size_ml."' AND 
+							 	  size_xssho = '".$size_xssho."' AND 
+								  size_ssho = '".$size_ssho."' AND 
+							      size_msho = '".$size_msho."' AND 
+							 	  size_lsho = '".$size_lsho."' AND 
+							 	  size_tu = '".$size_tu."' AND 
+								  size_2y = '".$size_2y."' AND 
+								  size_3_4y = '".$size_3_4y."' AND 
+								  size_5_6y = '".$size_5_6y."' AND 
+								  size_7_8y = '".$size_7_8y."' AND 
+								  size_9_10y = '".$size_9_10y."' AND 
+								  size_11_12y = '".$size_11_12y."' AND 
+								  size_2 = '".$size_2."' AND 
+								  size_3 = '".$size_3."' AND 
+								  size_4 = '".$size_4."' AND 
+								  size_5 = '".$size_5."' AND 
+								  size_6 = '".$size_6."' AND 
+								  size_12 = '".$size_12."' AND 
+								  size_34 = '".$size_34."' 
+
+
+							"));
+
+						// dd($check_if_exist);
+
+						if (isset($check_if_exist[0]->id)) {
+
+							
+							continue;
+						} 
+
+
 						$table = new skeda_ratio_import;
 						
 						$table->skeda = $skeda;
@@ -3168,6 +3215,78 @@ class importController extends Controller {
 	    dd('Succesfuly imported!');
 		// return redirect('/');
 	}
+
+	public function postImportInbound_delivery(Request $request) {
+		$getSheetName = Excel::load(Request::file('file14'))->getSheetNames();
+		// dd($getSheetName);
+
+		// dd($request->request->get('import_date'));
+		// $order_group_macro = Request::get('order_group_macro');
+		// $order_group = Request::get('order_group');
+
+		// dd($order_group);
+
+		// dd($import_date);
+		// dd(Request::all());
+
+		// $import_date = $request->input('import_date');
+		// dd($import_date);
+
+
+	    foreach($getSheetName as $sheetName)
+	    {
+            Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file14'))->chunk(10000, function ($reader)
+            {
+                $readerarray = $reader->toArray();
+                // var_dump($readerarray);
+                // $head = $reader->getHeading();
+                // $head = $reader->first()->keys()->toArray();
+                // dd($head);
+
+                // DB::table('cutting_smv_by_categories')->truncate();
+
+                foreach($readerarray as $row)
+                {
+                	// dd($row);
+
+                	$document_no = trim($row['document_no']);
+                	             	
+    				$excelDate2 = $row['posting_date'];
+            		$baseDate2 = new DateTime('1899-12-30'); // Adjusted base date for Excel
+					$excelDateTime2 = $baseDate2->modify("+{$excelDate2} days");
+					$phpDate2 = $excelDateTime2->format('Y-m-d');
+            		$posting_date = $phpDate2;
+        			// dd($posting_date);
+
+        			$material = trim($row['material']);
+                	$bagno = trim($row['bagno']);
+
+                	$qty_received_m = round((float)$row['qty_received_m'],1);
+                	// dd($qty_received_m);
+
+                	$preforigin = trim($row['preforigin']);
+
+                	$table = new inbound_delivery;
+					$table->document_no = $document_no;
+					$table->posting_date = $posting_date;
+					$table->material = $material;
+					$table->bagno = $bagno;
+					$table->qty_received_m = $qty_received_m;
+					$table->preforigin = $preforigin;
+					$table->reserve_status = 'Not Reserved';
+					$table->save();
+
+
+                }
+            });
+
+	        
+	    }
+	    dd('Succesfuly imported!');
+		// return redirect('/');
+	}
+
+	
 
 
 

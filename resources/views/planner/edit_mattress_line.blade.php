@@ -62,6 +62,7 @@
                             <tr><td>Marker width</td><td><b>{{ round($marker_width,3) }} </b></td></tr>
                             <tr><td>TPP mat. keep wastage</td><td><b>@if ($tpp_mat_keep_wastage == 0) NO @else YES @endif</b></td></tr>
                             <tr><td>TPA number</td><td><b>{{ $tpa_number }} </b></td></tr>
+                            <tr><td>Mandatory to inspect </td><td><b>{{ $mandatory_to_ins }} </b></td></tr>
                             @if ($location == 'MM1')
                                 <tr><td>Layer limit</td><td><b>{{ $layer_limit }} </b></td></tr>
                             @endif
@@ -105,7 +106,7 @@
                         <div class="panel-body">
                         <p>Priority: <span style="color:red;">*</span></p>
                             <!-- {!! Form::number('priority', $priority, ['class' => 'form-control']) !!} -->
-                            {!! Form::select('priority', array('1'=>'Normal','2'=>'High','3'=>'Top','4'=>'1st shift','5'=>'2nd shift','6'=>'3rd shift'), $priority, array('class' => 'form-control', 'disabled')) !!} 
+                            {!! Form::select('priority', array('1'=>'Normal','2'=>'Flash','3'=>'Top','4'=>'1st shift','5'=>'2nd shift','6'=>'3rd shift','7'=>'Test'), $priority, array('class' => 'form-control', 'disabled')) !!} 
                         </div>
 
                         <div class="panel-body">
@@ -163,7 +164,7 @@
                         <div class="panel-body">
                         <p>Priority: <span style="color:red;">*</span></p>
                             <!-- {!! Form::number('priority', $priority, ['class' => 'form-control']) !!} -->
-                            {!! Form::select('priority', array('1'=>'Normal','2'=>'High','3'=>'Top','4'=>'1st shift','5'=>'2nd shift','6'=>'3rd shift'), $priority, array('class' => 'form-control')) !!} 
+                            {!! Form::select('priority', array('1'=>'Normal','2'=>'Flash','3'=>'Top','4'=>'1st shift','5'=>'2nd shift','6'=>'3rd shift','7'=>'Test'), $priority, array('class' => 'form-control')) !!} 
                         </div>
 
                         <div class="panel-body">

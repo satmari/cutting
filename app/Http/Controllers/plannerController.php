@@ -30,6 +30,11 @@ use App\print_mini_mattress;
 
 use App\paspul_location;
 
+use App\skeda_comments;
+use App\inbound_delivery;
+use App\fabric_reservation;
+use App\leftover_table;
+
 // use DB;
 use Illuminate\Support\Facades\DB;
 use App\User;
@@ -581,10 +586,11 @@ class plannerController extends Controller {
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
+		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
 		      ,m4.[status]
 		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
 		      ,(SELECT 
-					(x.average_of_min_per_meter_minm)
+					TOP 1 x.average_of_min_per_meter_minm
 				
 					FROM (
 						SELECT 
@@ -593,7 +599,7 @@ class plannerController extends Controller {
 						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
 						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
 						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+						FROM [cutting_smv_by_categories]) as x
 					WHERE	x.spreading_method = (SELECT 
 												CASE 
 												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
@@ -604,19 +610,25 @@ class plannerController extends Controller {
 							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
 			 	) as average_of_min_per_meter_minm_c,
 			 	(SELECT 
-						average_of_min_per_meter_minm
-					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+						TOP 1 average_of_min_per_meter_minm
+					  FROM [cutting_smv_by_materials]
 					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
 			 	) as average_of_min_per_meter_minm_m,
-				 (SELECT 
+				(SELECT 
 						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+				FROM [pro_skedas] as t1
+				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+				WHERE t3.id = m1.id)
+				as color
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
 			  WHERE m4.[location] = 'SP0' AND m4.[active] = 1 
-			  ORDER BY m1.[skeda] asc"));
+			  ORDER BY m2.[priority] desc, m1.[skeda] asc"));
 
 			$sp0_req_time = [];
 			foreach ($sp0 as $line) {
@@ -624,25 +636,25 @@ class plannerController extends Controller {
 				if ($line->average_of_min_per_meter_minm_c != 0) {
 					// dd('test');
 			        if (array_key_exists($line->priority, $sp0_req_time)) {
-			            $sp0_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $sp0_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        } else { 
-			            $sp0_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $sp0_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        }
 
 				} else if ($line->average_of_min_per_meter_minm_m != 0) {
 
 					if (array_key_exists($line->priority, $sp0_req_time)) {
-			            $sp0_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $sp0_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        } else { 
-			            $sp0_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $sp0_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        }
 
 				} else {
 
 					if (array_key_exists($line->priority, $sp0_req_time)) {
-			            $sp0_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $sp0_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        } else {
-			            $sp0_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $sp0_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        }
 
 				}
@@ -684,10 +696,11 @@ class plannerController extends Controller {
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
+		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
 		      ,m4.[status]
 		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
 		      ,(SELECT 
-					(x.average_of_min_per_meter_minm)
+					TOP 1 x.average_of_min_per_meter_minm
 				
 					FROM (
 						SELECT 
@@ -696,7 +709,7 @@ class plannerController extends Controller {
 						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
 						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
 						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+						FROM [cutting_smv_by_categories]) as x
 					WHERE	x.spreading_method = (SELECT 
 												CASE 
 												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
@@ -707,13 +720,19 @@ class plannerController extends Controller {
 							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
 			 	) as average_of_min_per_meter_minm_c,
 			 	(SELECT 
-						average_of_min_per_meter_minm
-					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+						TOP 1 average_of_min_per_meter_minm
+					  FROM [cutting_smv_by_materials]
 					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
 			 	) as average_of_min_per_meter_minm_m,
-				 (SELECT 
+				(SELECT 
 						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+				FROM [pro_skedas] as t1
+				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+				WHERE t3.id = m1.id)
+				as color
 
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
@@ -731,25 +750,25 @@ class plannerController extends Controller {
 				if ($line->average_of_min_per_meter_minm_c != 0) {
 					// dd('test');
 			        if (array_key_exists($line->priority, $sp1_req_time)) {
-			            $sp1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $sp1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        } else { 
-			            $sp1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $sp1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        }
 
 				} else if ($line->average_of_min_per_meter_minm_m != 0) {
 
 					if (array_key_exists($line->priority, $sp1_req_time)) {
-			            $sp1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $sp1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        } else { 
-			            $sp1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $sp1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        }
 
 				} else {
 
 					if (array_key_exists($line->priority, $sp1_req_time)) {
-			            $sp1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $sp1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        } else {
-			            $sp1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $sp1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        }
 
 				}
@@ -792,10 +811,11 @@ class plannerController extends Controller {
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
+		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
 		      ,m4.[status]
 		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
 		      ,(SELECT 
-					(x.average_of_min_per_meter_minm)
+					TOP 1 x.average_of_min_per_meter_minm
 				
 					FROM (
 						SELECT 
@@ -804,7 +824,7 @@ class plannerController extends Controller {
 						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
 						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
 						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+						FROM [cutting_smv_by_categories]) as x
 					WHERE	x.spreading_method = (SELECT 
 												CASE 
 												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
@@ -815,13 +835,19 @@ class plannerController extends Controller {
 							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
 			 	) as average_of_min_per_meter_minm_c,
 			 	(SELECT 
-						average_of_min_per_meter_minm
-					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+						TOP 1 average_of_min_per_meter_minm
+					  FROM [cutting_smv_by_materials]
 					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
 			 	) as average_of_min_per_meter_minm_m,
-				 (SELECT 
+				(SELECT 
 						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+				FROM [pro_skedas] as t1
+				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+				WHERE t3.id = m1.id)
+				as color
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -835,25 +861,25 @@ class plannerController extends Controller {
 				if ($line->average_of_min_per_meter_minm_c != 0) {
 					// dd('test');
 			        if (array_key_exists($line->priority, $sp2_req_time)) {
-			            $sp2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $sp2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        } else { 
-			            $sp2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $sp2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        }
 
 				} else if ($line->average_of_min_per_meter_minm_m != 0) {
 
 					if (array_key_exists($line->priority, $sp2_req_time)) {
-			            $sp2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $sp2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        } else { 
-			            $sp2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $sp2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        }
 
 				} else {
 
 					if (array_key_exists($line->priority, $sp2_req_time)) {
-			            $sp2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $sp2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        } else {
-			            $sp2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $sp2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        }
 
 				}
@@ -894,10 +920,11 @@ class plannerController extends Controller {
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
+		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
 		      ,m4.[status]
 		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
 		      ,(SELECT 
-					(x.average_of_min_per_meter_minm)
+					TOP 1 x.average_of_min_per_meter_minm
 				
 					FROM (
 						SELECT 
@@ -906,7 +933,7 @@ class plannerController extends Controller {
 						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
 						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
 						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+						FROM [cutting_smv_by_categories]) as x
 					WHERE	x.spreading_method = (SELECT 
 												CASE 
 												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
@@ -917,13 +944,19 @@ class plannerController extends Controller {
 							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
 			 	) as average_of_min_per_meter_minm_c,
 			 	(SELECT 
-						average_of_min_per_meter_minm
-					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+						TOP 1 average_of_min_per_meter_minm
+					  FROM [cutting_smv_by_materials]
 					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
 			 	) as average_of_min_per_meter_minm_m,
-				 (SELECT 
+				(SELECT 
 						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+				FROM [pro_skedas] as t1
+				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+				WHERE t3.id = m1.id)
+				as color
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -937,25 +970,25 @@ class plannerController extends Controller {
 				if ($line->average_of_min_per_meter_minm_c != 0) {
 					// dd('test');
 			        if (array_key_exists($line->priority, $sp3_req_time)) {
-			            $sp3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $sp3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        } else { 
-			            $sp3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $sp3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        }
 
 				} else if ($line->average_of_min_per_meter_minm_m != 0) {
 
 					if (array_key_exists($line->priority, $sp3_req_time)) {
-			            $sp3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $sp3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        } else { 
-			            $sp3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $sp3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        }
 
 				} else {
 
 					if (array_key_exists($line->priority, $sp3_req_time)) {
-			            $sp3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $sp3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        } else {
-			            $sp3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $sp3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        }
 
 				}
@@ -996,10 +1029,11 @@ class plannerController extends Controller {
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
+		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
 		      ,m4.[status]
 		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
 		      ,(SELECT 
-					(x.average_of_min_per_meter_minm)
+					TOP 1 x.average_of_min_per_meter_minm
 				
 					FROM (
 						SELECT 
@@ -1008,7 +1042,7 @@ class plannerController extends Controller {
 						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
 						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
 						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+						FROM [cutting_smv_by_categories]) as x
 					WHERE	x.spreading_method = (SELECT 
 												CASE 
 												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
@@ -1019,13 +1053,19 @@ class plannerController extends Controller {
 							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
 			 	) as average_of_min_per_meter_minm_c,
 			 	(SELECT 
-						average_of_min_per_meter_minm
-					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+						TOP 1 average_of_min_per_meter_minm
+					  FROM [cutting_smv_by_materials]
 					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
 			 	) as average_of_min_per_meter_minm_m,
-				 (SELECT 
+				(SELECT 
 						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+				FROM [pro_skedas] as t1
+				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+				WHERE t3.id = m1.id)
+				as color
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -1040,25 +1080,25 @@ class plannerController extends Controller {
 				if ($line->average_of_min_per_meter_minm_c != 0) {
 					// dd('test');
 			        if (array_key_exists($line->priority, $sp4_req_time)) {
-			            $sp4_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $sp4_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        } else { 
-			            $sp4_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $sp4_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        }
 
 				} else if ($line->average_of_min_per_meter_minm_m != 0) {
 
 					if (array_key_exists($line->priority, $sp4_req_time)) {
-			            $sp4_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $sp4_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        } else { 
-			            $sp4_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $sp4_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        }
 
 				} else {
 
 					if (array_key_exists($line->priority, $sp4_req_time)) {
-			            $sp4_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $sp4_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        } else {
-			            $sp4_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $sp4_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        }
 
 				}
@@ -1099,10 +1139,11 @@ class plannerController extends Controller {
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
+		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
 		      ,m4.[status]
 		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
 		      ,(SELECT 
-					(x.average_of_min_per_meter_minm)
+					TOP 1 x.average_of_min_per_meter_minm
 				
 					FROM (
 						SELECT 
@@ -1111,7 +1152,7 @@ class plannerController extends Controller {
 						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
 						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
 						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+						FROM [cutting_smv_by_categories]) as x
 					WHERE	x.spreading_method = (SELECT 
 												CASE 
 												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
@@ -1122,13 +1163,19 @@ class plannerController extends Controller {
 							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
 			 	) as average_of_min_per_meter_minm_c,
 			 	(SELECT 
-						average_of_min_per_meter_minm
-					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+						TOP 1 average_of_min_per_meter_minm
+					  FROM [cutting_smv_by_materials]
 					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
 			 	) as average_of_min_per_meter_minm_m,
-				 (SELECT 
+				(SELECT 
 						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+				FROM [pro_skedas] as t1
+				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+				WHERE t3.id = m1.id)
+				as color
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -1142,25 +1189,25 @@ class plannerController extends Controller {
 				if ($line->average_of_min_per_meter_minm_c != 0) {
 					// dd('test');
 			        if (array_key_exists($line->priority, $ms1_req_time)) {
-			            $ms1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $ms1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        } else { 
-			            $ms1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $ms1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        }
 
 				} else if ($line->average_of_min_per_meter_minm_m != 0) {
 
 					if (array_key_exists($line->priority, $ms1_req_time)) {
-			            $ms1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $ms1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        } else { 
-			            $ms1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $ms1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        }
 
 				} else {
 
 					if (array_key_exists($line->priority, $ms1_req_time)) {
-			            $ms1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $ms1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        } else {
-			            $ms1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $ms1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        }
 				}
 			}
@@ -1200,10 +1247,11 @@ class plannerController extends Controller {
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
+		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
 		      ,m4.[status]
 		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
 		      ,(SELECT 
-					(x.average_of_min_per_meter_minm)
+					TOP 1 x.average_of_min_per_meter_minm
 				
 					FROM (
 						SELECT 
@@ -1212,7 +1260,7 @@ class plannerController extends Controller {
 						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
 						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
 						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+						FROM [cutting_smv_by_categories]) as x
 					WHERE	x.spreading_method = (SELECT 
 												CASE 
 												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
@@ -1223,13 +1271,20 @@ class plannerController extends Controller {
 							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
 			 	) as average_of_min_per_meter_minm_c,
 			 	(SELECT 
-						average_of_min_per_meter_minm
-					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+						TOP 1 average_of_min_per_meter_minm
+					  FROM [cutting_smv_by_materials]
 					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
 			 	) as average_of_min_per_meter_minm_m,
-				 (SELECT 
+				(SELECT 
 						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+				FROM [pro_skedas] as t1
+				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+				WHERE t3.id = m1.id)
+				as color
+
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -1243,25 +1298,25 @@ class plannerController extends Controller {
 				if ($line->average_of_min_per_meter_minm_c != 0) {
 					// dd('test');
 			        if (array_key_exists($line->priority, $ms2_req_time)) {
-			            $ms2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $ms2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        } else { 
-			            $ms2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $ms2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        }
 
 				} else if ($line->average_of_min_per_meter_minm_m != 0) {
 
 					if (array_key_exists($line->priority, $ms2_req_time)) {
-			            $ms2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $ms2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        } else { 
-			            $ms2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $ms2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        }
 
 				} else {
 
 					if (array_key_exists($line->priority, $ms2_req_time)) {
-			            $ms2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $ms2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        } else {
-			            $ms2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $ms2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        }
 				}
 			}
@@ -1301,10 +1356,11 @@ class plannerController extends Controller {
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
+		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
 		      ,m4.[status]
 		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
 		      ,(SELECT 
-					(x.average_of_min_per_meter_minm)
+					TOP 1 x.average_of_min_per_meter_minm
 				
 					FROM (
 						SELECT 
@@ -1313,7 +1369,7 @@ class plannerController extends Controller {
 						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
 						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
 						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+						FROM [cutting_smv_by_categories]) as x
 					WHERE	x.spreading_method = (SELECT 
 												CASE 
 												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
@@ -1324,13 +1380,20 @@ class plannerController extends Controller {
 							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
 			 	) as average_of_min_per_meter_minm_c,
 			 	(SELECT 
-						average_of_min_per_meter_minm
-					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+						TOP 1 average_of_min_per_meter_minm
+					  FROM [cutting_smv_by_materials]
 					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
 			 	) as average_of_min_per_meter_minm_m,
-				 (SELECT 
+				(SELECT 
 						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+				FROM [pro_skedas] as t1
+				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+				WHERE t3.id = m1.id)
+				as color
+
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -1344,25 +1407,25 @@ class plannerController extends Controller {
 				if ($line->average_of_min_per_meter_minm_c != 0) {
 					// dd('test');
 			        if (array_key_exists($line->priority, $ms3_req_time)) {
-			            $ms3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $ms3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        } else { 
-			            $ms3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $ms3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        }
 
 				} else if ($line->average_of_min_per_meter_minm_m != 0) {
 
 					if (array_key_exists($line->priority, $ms3_req_time)) {
-			            $ms3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $ms3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        } else { 
-			            $ms3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $ms3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        }
 
 				} else {
 
 					if (array_key_exists($line->priority, $ms3_req_time)) {
-			            $ms3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $ms3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        } else {
-			            $ms3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $ms3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        }
 				}
 			}
@@ -1402,10 +1465,11 @@ class plannerController extends Controller {
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
+		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
 		      ,m4.[status]
 		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
 		      ,(SELECT 
-					(x.average_of_min_per_meter_minm)
+					TOP 1 x.average_of_min_per_meter_minm
 				
 					FROM (
 						SELECT 
@@ -1414,7 +1478,7 @@ class plannerController extends Controller {
 						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
 						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
 						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+						FROM [cutting_smv_by_categories]) as x
 					WHERE	x.spreading_method = (SELECT 
 												CASE 
 												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
@@ -1425,13 +1489,19 @@ class plannerController extends Controller {
 							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
 			 	) as average_of_min_per_meter_minm_c,
 			 	(SELECT 
-						average_of_min_per_meter_minm
-					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+						TOP 1 average_of_min_per_meter_minm
+					  FROM [cutting_smv_by_materials]
 					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
 			 	) as average_of_min_per_meter_minm_m,
-				 (SELECT 
+				(SELECT 
 						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+				FROM [pro_skedas] as t1
+				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+				WHERE t3.id = m1.id)
+				as color
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -1445,25 +1515,25 @@ class plannerController extends Controller {
 				if ($line->average_of_min_per_meter_minm_c != 0) {
 					// dd('test');
 			        if (array_key_exists($line->priority, $tub_req_time)) {
-			            $tub_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $tub_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        } else { 
-			            $tub_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $tub_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        }
 
 				} else if ($line->average_of_min_per_meter_minm_m != 0) {
 
 					if (array_key_exists($line->priority, $tub_req_time)) {
-			            $tub_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $tub_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        } else { 
-			            $tub_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $tub_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        }
 
 				} else {
 
 					if (array_key_exists($line->priority, $tub_req_time)) {
-			            $tub_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $tub_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        } else {
-			            $tub_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $tub_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        }
 				}
 			}
@@ -1503,10 +1573,11 @@ class plannerController extends Controller {
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
+		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
 		      ,m4.[status]
 		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
 		      ,(SELECT 
-					(x.average_of_min_per_meter_minm)
+					TOP 1 x.average_of_min_per_meter_minm
 				
 					FROM (
 						SELECT 
@@ -1515,7 +1586,7 @@ class plannerController extends Controller {
 						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
 						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
 						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting].[dbo].[cutting_smv_by_categories]) as x
+						FROM [cutting_smv_by_categories]) as x
 					WHERE	x.spreading_method = (SELECT 
 												CASE 
 												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
@@ -1526,13 +1597,19 @@ class plannerController extends Controller {
 							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
 			 	) as average_of_min_per_meter_minm_c,
 			 	(SELECT 
-						average_of_min_per_meter_minm
-					  FROM [cutting].[dbo].[cutting_smv_by_materials]
+						TOP 1 average_of_min_per_meter_minm
+					  FROM [cutting_smv_by_materials]
 					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
 			 	) as average_of_min_per_meter_minm_m,
-				 (SELECT 
+				(SELECT 
 						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting].[dbo].[cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all
+				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+				FROM [pro_skedas] as t1
+				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+				WHERE t3.id = m1.id)
+				as color
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -1546,25 +1623,25 @@ class plannerController extends Controller {
 				if ($line->average_of_min_per_meter_minm_c != 0) {
 					// dd('test');
 			        if (array_key_exists($line->priority, $mm1_req_time)) {
-			            $mm1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $mm1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        } else { 
-			            $mm1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,2);
+			            $mm1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
 			        }
 
 				} else if ($line->average_of_min_per_meter_minm_m != 0) {
 
 					if (array_key_exists($line->priority, $mm1_req_time)) {
-			            $mm1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $mm1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        } else { 
-			            $mm1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,2);
+			            $mm1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
 			        }
 
 				} else {
 
 					if (array_key_exists($line->priority, $mm1_req_time)) {
-			            $mm1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $mm1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        } else {
-			            $mm1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,2);
+			            $mm1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
 			        }
 
 				}
@@ -1905,7 +1982,35 @@ class plannerController extends Controller {
         }
     }
 
+    public function reposition_p_1() {
+	    $i = 0;
+
+        if (isset($_POST['NS'] )) {
+        	foreach ($_POST['NS'] as $value) {
+	            // Execute statement:
+	            // UPDATE [Table] SET [Position] = $i WHERE [EntityId] = $value $operator = Session::get('operator');
+	            $i++;
+	            DB::table('paspul_rewounds')->where('id', '=', $value)->update([ 'position' => $i ]);
+        	}	
+        }
+	}
+
+	public function reposition_p_2() {
+	    $i = 0;
+
+        if (isset($_POST['PRW'] )) {
+        	foreach ($_POST['PRW'] as $value) {
+	            // Execute statement:
+	            // UPDATE [Table] SET [Position] = $i WHERE [EntityId] = $value $operator = Session::get('operator');
+	            $i++;
+	            DB::table('paspul_rewounds')->where('id', '=', $value)->update([ 'position' => $i ]);
+	            
+        	}	
+        }
+	}
+
 //MATTRESS
+
 	public function plan_mattress_line ($id) {
 
 		// dd($id);
@@ -2018,6 +2123,7 @@ class plannerController extends Controller {
 		$id = $input['id'];
 		$mattress = $input['mattress'];
 		$pcs_bundle = (int)$input['pcs_bundle'];
+		$mandatory_to_ins = $input['mandatory_to_ins'];
 		$priority = (int)$input['priority'];
 		$comment_office = $input['comment_office'];
 		$bottom_paper = $input['bottom_paper'];
@@ -2124,6 +2230,7 @@ class plannerController extends Controller {
 			// $table1->tpp_mat_keep_wastage = $tpp_mat_keep_wastage;
 			$table1->bottom_paper = $bottom_paper;
 			$table1->comment_office = $comment_office;
+			$table1->mandatory_to_ins = $mandatory_to_ins;
 			$table1->save();
 		}
 		catch (\Illuminate\Database\QueryException $e) {
@@ -2469,7 +2576,6 @@ class plannerController extends Controller {
 		return view('planner.split_mattress',compact('id','mattress_id_orig','mattress_orig','g_bin_orig','marker_name_orig', 
 				'marker_id_orig','marker_width','marker_length','requested_width','requested_length','comment_operator'
 				,'markers','width_theor_usable'));
-
 	}
 
 	public function split_mattress_post(Request $request) {
@@ -2898,7 +3004,6 @@ class plannerController extends Controller {
 		$table_update->save();
 
 		return Redirect::to('/plan_mattress/TO_SPLIT');
-
 	}
 
 	public function edit_mattress($id) {
@@ -2943,6 +3048,7 @@ class plannerController extends Controller {
 		      ,m2.[tpa_number]
 		      ,m2.[layer_limit]
 		      ,m2.[req_time]
+		      ,m2.[mandatory_to_ins]
 		      --,'|'
 		      ,m3.[marker_id]
 		      ,m3.[marker_name]
@@ -3047,6 +3153,7 @@ class plannerController extends Controller {
 		$pcs_bundle = $data[0]->pcs_bundle;
 		$priority = $data[0]->priority;
 		$call_shift_manager = $data[0]->call_shift_manager;
+		$mandatory_to_ins = $data[0]->mandatory_to_ins;
 		// $call_shift_manager = 1;
 		$test_marker = $data[0]->test_marker;
 		$tpp_mat_keep_wastage = $data[0]->tpp_mat_keep_wastage;
@@ -3064,11 +3171,10 @@ class plannerController extends Controller {
 			$data2 = DB::connection('sqlsrv')->select(DB::raw("SELECT [o_roll],[no_of_joinings],[g_bin]
 				FROM  [o_rolls]
 				WHERE mattress_id_new = '".$id."' "));
-			return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','data2','layer_limit','cut_operator','cut_date','sp_operator','sp_date','req_time'));
+			return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','data2','layer_limit','cut_operator','cut_date','sp_operator','sp_date','req_time','mandatory_to_ins'));
 		}
 
-		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','cut_operator','cut_date','sp_operator','sp_date','req_time','layer_limit'));
-
+		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','cut_operator','cut_date','sp_operator','sp_date','req_time','layer_limit','mandatory_to_ins'));
 	}
 
 	public function correct_location($id) {
@@ -3610,6 +3716,7 @@ class plannerController extends Controller {
 	}
 
 //LR ROLL
+
 	public function o_roll_table() {
 
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -3625,7 +3732,8 @@ class plannerController extends Controller {
 
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			*
-		  FROM [o_rolls] "));	
+		  FROM [o_rolls]
+		  WHERE updated_at >= DATEADD(day, -60, GETDATE()) "));	
 		// dd($data);
 
 		return view('planner.o_roll_table', compact('data'));
@@ -3692,10 +3800,10 @@ class plannerController extends Controller {
 
 		$id = $find_lr[0]->id;
 		return view('planner.o_roll_return_confirm', compact('id'));
-
 	}
 
 //MINI MATTRESS
+
 	public function plan_mini_marker() {
 
 		$work_place = "PLANNER";
@@ -4536,100 +4644,10 @@ class plannerController extends Controller {
 			}
 		}
 
-		if ($location == 'PCO') {
-			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+		if ($location == 'BOARD') {
+			// dd("test");
 
-				  p1.[id]
-			      ,p1.[paspul_rewound_roll]
-			      ,p1.[rewound_length_partialy]
-			      ,p1.[kotur_partialy]
-			      ,p1.[paspul_roll_id]
-			      ,p1.[status]
-
-			      ,p1.[sap_su]
-			      ,p1.[material]
-			      ,p1.[color_desc]
-			      ,p1.[dye_lot]
-			      ,p1.[paspul_type]
-
-			      ,p1.[width]
-			      ,p1.[kotur_width]
-			      ,p1.[kotur_width_without_tension]
-			      ,p1.[kotur_planned]
-			      -- ,p1.[kotur_actual]
-			      ,p1.[rewound_length]
-			      --,p1.[rewound_length_a]
-
-			      ,p1.[pasbin]
-			      ,p1.[skeda_item_type]
-			      ,p1.[skeda]
-			      ,p1.[skeda_status]
-
-			      ,p1.[rewound_roll_unit_of_measure]
-			      ,p1.[position]
-			      ,p1.[priority]
-			      ,p1.[comment_office]
-			      ,p1.[comment_operator]
-			      ,p1.[call_shift_manager]
-			      ,p1.[rewinding_method]
-			      ,p1.[tpa_number]
-			      ,p1.[created_at]
-			      ,p1.[updated_at]
-
-			  FROM [paspul_rewounds] as p1
-			  WHERE status = 'TO_CUT'
-			  ORDER BY p1.[priority] desc, p1.[paspul_rewound_roll] asc"));
-			// dd($data);
-
-
-		} elseif ($location == 'COMPLETED') {
-			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-
-				  p1.[id]
-			      ,p1.[paspul_rewound_roll]
-			      ,p1.[rewound_length_partialy]
-			      ,p1.[kotur_partialy]
-			      ,p1.[paspul_roll_id]
-			      ,p1.[status]
-
-			      ,p1.[sap_su]
-			      ,p1.[material]
-			      ,p1.[color_desc]
-			      ,p1.[dye_lot]
-			      ,p1.[paspul_type]
-
-			      ,p1.[width]
-			      ,p1.[kotur_width]
-			      ,p1.[kotur_width_without_tension]
-			      ,p1.[kotur_planned]
-			      -- ,p1.[kotur_actual]
-			      ,p1.[rewound_length]
-			      --,p1.[rewound_length_a]
-
-			      ,p1.[pasbin]
-			      ,p1.[skeda_item_type]
-			      ,p1.[skeda]
-			      ,p1.[skeda_status]
-
-			      ,p1.[rewound_roll_unit_of_measure]
-			      ,p1.[position]
-			      ,p1.[priority]
-			      ,p1.[comment_office]
-			      ,p1.[comment_operator]
-			      ,p1.[call_shift_manager]
-			      ,p1.[rewinding_method]
-			      ,p1.[tpa_number]
-			      ,p1.[created_at]
-			      ,p1.[updated_at]
-
-			  FROM [paspul_rewounds] as p1
-			  WHERE status = 'COMPLETED' and p1.[updated_at] > DATEADD(day,-30,GETDATE())
-			  ORDER BY p1.[updated_at] desc"));
-			// dd($data);
-		} else {
-
-
-			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			$p_ns = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 
 				  p1.[id]
 			      ,p1.[paspul_roll]
@@ -4646,6 +4664,7 @@ class plannerController extends Controller {
 			      ,p1.[kotur_actual]
 			      ,p1.[rewound_length]
 			      ,p1.[rewound_length_a]
+			      ,p1.[rewound_length_p]
 
 			      ,p1.[pasbin]
 			      ,p1.[skeda_item_type]
@@ -4670,21 +4689,383 @@ class plannerController extends Controller {
 			      ,p2.[operator1]
 			      ,p2.[operator2]
 
-			      ,(SELECT SUM([rewound_length_partialy]) FROM [cutting].[dbo].[paspul_rewounds]
+			      ,(SELECT SUM([rewound_length_partialy]) FROM [paspul_rewounds]
 					WHERE [paspul_roll_id] = p1.[id]) as rewound_sum
+				  ,(SELECT TOP 1 pc.[mtr_per_pcs] FROM [paspul_stock_u_cons] as  pc
+				  	WHERE pc.[skeda] = p1.[skeda] and pc.[paspul_type] = p1.[paspul_type]) as unit_cons
+ 
+			  FROM [paspuls] as p1
+			  LEFT JOIN [paspul_lines] as p2 ON p2.[paspul_roll_id] = p1.[id]
+			  WHERE p2.[location] = 'NOT_SET' AND p2.[active] = '1' 
+			  ORDER BY p1.[position] asc"));
+				
+			$pros= '';
+			$skus= '';
+			$sku_s= '';
+			$location_all= '';
+
+			for ($i=0; $i < count($p_ns) ; $i++) { 
+				
+				$id = $p_ns[$i]->id;
+				
+				$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					ps.[pro]
+					,ps.[style_size]
+					,ps.[sku]
+					,po.[location_all]
+					--,*
+				  FROM  [pro_skedas] as ps 
+				  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+				WHERE ps.[skeda] = '".$p_ns[$i]->skeda."' "));
+				// dd($prom);
+
+				for ($x=0; $x < count($prom); $x++) { 
+
+					$pros .= $prom[$x]->pro." ";
+					$skus .= $prom[$x]->style_size." ";
+					$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+					$sku_s .= $test." ";
+					// $sku_s .= $prom[$x]->sku." ";
+					if ($prom[$x]->location_all == 'Valy') {
+						$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+					} else {
+						$location_all .= $prom[$x]->location_all." ";
+					}
+				}
+
+				$p_ns[$i]->pro = trim($pros);
+				$p_ns[$i]->style_size = trim($skus);
+				$p_ns[$i]->sku = trim($sku_s);
+				$p_ns[$i]->location_all = trim($location_all);
+				$pros = '';
+				$skus = '';
+				$sku_s = '';
+				$location_all = '';
+
+			}
+
+
+			$p_prw = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+
+				  p1.[id]
+			      ,p1.[paspul_rewound_roll]
+			      ,p1.[rewound_length_partialy]
+			      ,p1.[kotur_partialy]
+			      ,p1.[paspul_roll]
+			      ,p1.[paspul_roll_id]
+			      ,p1.[status]
+
+			      ,p1.[sap_su]
+			      ,p1.[material]
+			      ,p1.[color_desc]
+			      ,p1.[dye_lot]
+			      ,p1.[paspul_type]
+
+			      ,p1.[width]
+			      ,p1.[kotur_width]
+			      ,p1.[kotur_width_without_tension]
+			      ,p1.[kotur_planned]
+			      -- ,p1.[kotur_actual]
+			      ,p1.[rewound_length]
+
+			      ,p1.[pasbin]
+			      ,p1.[skeda_item_type]
+			      ,p1.[skeda]
+			      ,p1.[skeda_status]
+
+			      ,p1.[rewound_roll_unit_of_measure]
+			      ,p1.[position]
+			      ,p1.[priority]
+			      ,p1.[comment_office]
+			      ,p1.[comment_operator]
+			      ,p1.[call_shift_manager]
+			      ,p1.[rewinding_method]
+			      ,p1.[tpa_number]
+			      ,p1.[created_at]
+			      ,p1.[updated_at]
+
+			      ,(SELECT SUM([rewound_length_partialy]) FROM [paspul_rewounds]
+					WHERE [paspul_roll_id] = p1.[paspul_roll_id]) as rewound_sum
+				  ,(SELECT TOP 1 pc.[mtr_per_pcs] FROM [paspul_stock_u_cons] as  pc
+				  	WHERE pc.[skeda] = p1.[skeda] and pc.[paspul_type] = p1.[paspul_type]) as unit_cons
+
+				
+
+
+			  FROM [paspul_rewounds] as p1
+			  WHERE p1.[status] = 'TO_REWIND'
+			  ORDER BY p1.[position] asc, p1.[priority] desc, p1.[paspul_rewound_roll] asc"));
+
+			$pros= '';
+			$skus= '';
+			$sku_s= '';
+			$location_all= '';
+
+			for ($i=0; $i < count($p_prw) ; $i++) { 
+				
+				$id = $p_prw[$i]->id;
+				
+				$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					ps.[pro]
+					,ps.[style_size]
+					,ps.[sku]
+					,po.[location_all]
+					--,*
+				  FROM  [pro_skedas] as ps 
+				  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+				WHERE ps.[skeda] = '".$p_prw[$i]->skeda."' "));
+				// dd($prom);
+
+				for ($x=0; $x < count($prom); $x++) { 
+
+					$pros .= $prom[$x]->pro." ";
+					$skus .= $prom[$x]->style_size." ";
+					$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+					$sku_s .= $test." ";
+					// $sku_s .= $prom[$x]->sku." ";
+					if ($prom[$x]->location_all == 'Valy') {
+						$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+					} else {
+						$location_all .= $prom[$x]->location_all." ";
+					}
+				}
+
+				$p_prw[$i]->pro = trim($pros);
+				$p_prw[$i]->style_size = trim($skus);
+				$p_prw[$i]->sku = trim($sku_s);
+				$p_prw[$i]->location_all = trim($location_all);
+				$pros = '';
+				$skus = '';
+				$sku_s = '';
+				$location_all = '';
+			}
+
+
+			return view('planner.plan_paspul', compact('p_ns','p_prw','location','operator','operators'));
+
+		} elseif ($location == 'PRW') {
+
+			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+
+				  p1.[id]
+			      ,p1.[paspul_rewound_roll]
+			      ,p1.[rewound_length_partialy]
+			      ,p1.[kotur_partialy]
+			      ,p1.[paspul_roll]
+			      ,p1.[paspul_roll_id]
+			      ,p1.[status]
+
+			      ,p1.[sap_su]
+			      ,p1.[material]
+			      ,p1.[color_desc]
+			      ,p1.[dye_lot]
+			      ,p1.[paspul_type]
+
+			      ,p1.[width]
+			      ,p1.[kotur_width]
+			      ,p1.[kotur_width_without_tension]
+			      ,p1.[kotur_planned]
+			      -- ,p1.[kotur_actual]
+			      ,p1.[rewound_length]
+
+			      ,p1.[pasbin]
+			      ,p1.[skeda_item_type]
+			      ,p1.[skeda]
+			      ,p1.[skeda_status]
+
+			      ,p1.[rewound_roll_unit_of_measure]
+			      ,p1.[position]
+			      ,p1.[priority]
+			      ,p1.[comment_office]
+			      ,p1.[comment_operator]
+			      ,p1.[call_shift_manager]
+			      ,p1.[rewinding_method]
+			      ,p1.[tpa_number]
+			      ,p1.[created_at]
+			      ,p1.[updated_at]
+
+			      ,(SELECT SUM([rewound_length_partialy]) FROM [paspul_rewounds]
+					WHERE [paspul_roll_id] = p1.[paspul_roll_id]) as rewound_sum
+
+
+			  FROM [paspul_rewounds] as p1
+			  WHERE status = 'TO_REWIND'
+			  ORDER BY p1.[priority] desc, p1.[paspul_rewound_roll] asc"));
+			// dd($data);
+		
+		} elseif ($location == 'PCO') {
+
+			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+
+				  p1.[id]
+			      ,p1.[paspul_rewound_roll]
+			      ,p1.[rewound_length_partialy]
+			      ,p1.[kotur_partialy]
+			      ,p1.[paspul_roll_id]
+			      ,p1.[status]
+
+			      ,p1.[sap_su]
+			      ,p1.[material]
+			      ,p1.[color_desc]
+			      ,p1.[dye_lot]
+			      ,p1.[paspul_type]
+
+			      ,p1.[width]
+			      ,p1.[kotur_width]
+			      ,p1.[kotur_width_without_tension]
+			      ,p1.[kotur_planned]
+			      -- ,p1.[kotur_actual]
+			      ,p1.[rewound_length]
+			      
+			      ,p1.[pasbin]
+			      ,p1.[skeda_item_type]
+			      ,p1.[skeda]
+			      ,p1.[skeda_status]
+
+			      ,p1.[rewound_roll_unit_of_measure]
+			      ,p1.[position]
+			      ,p1.[priority]
+			      ,p1.[comment_office]
+			      ,p1.[comment_operator]
+			      ,p1.[call_shift_manager]
+			      ,p1.[rewinding_method]
+			      ,p1.[tpa_number]
+			      ,p1.[created_at]
+			      ,p1.[updated_at]
+
+			  FROM [paspul_rewounds] as p1
+			  WHERE status = 'TO_CUT'
+			  ORDER BY p1.[priority] desc, p1.[paspul_rewound_roll] asc"));
+			// dd($data);
+		
+		} elseif ($location == 'COMPLETED') {
+
+			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+
+				  p1.[id]
+			      ,p1.[paspul_rewound_roll]
+			      ,p1.[rewound_length_partialy]
+			      ,p1.[kotur_partialy]
+			      ,p1.[paspul_roll_id]
+			      ,p1.[status]
+
+			      ,p1.[sap_su]
+			      ,p1.[material]
+			      ,p1.[color_desc]
+			      ,p1.[dye_lot]
+			      ,p1.[paspul_type]
+
+			      ,p1.[width]
+			      ,p1.[kotur_width]
+			      ,p1.[kotur_width_without_tension]
+			      ,p1.[kotur_planned]
+			      -- ,p1.[kotur_actual]
+			      ,p1.[rewound_length]
+
+			      ,p1.[pasbin]
+			      ,p1.[skeda_item_type]
+			      ,p1.[skeda]
+			      ,p1.[skeda_status]
+
+			      ,p1.[rewound_roll_unit_of_measure]
+			      ,p1.[position]
+			      ,p1.[priority]
+			      ,p1.[comment_office]
+			      ,p1.[comment_operator]
+			      ,p1.[call_shift_manager]
+			      ,p1.[rewinding_method]
+			      ,p1.[tpa_number]
+			      ,p1.[created_at]
+			      ,p1.[updated_at]
+
+			  FROM [paspul_rewounds] as p1
+			  WHERE status = 'COMPLETED' and p1.[updated_at] > DATEADD(day,-30,GETDATE())
+			  ORDER BY p1.[updated_at] desc"));
+			// dd($data);
+		
+		} else {
+
+			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+
+				  p1.[id]
+			      ,p1.[paspul_roll]
+			      ,p1.[sap_su]
+			      ,p1.[material]
+			      ,p1.[color_desc]
+			      ,p1.[dye_lot]
+			      ,p1.[paspul_type]
+
+			      ,p1.[width]
+			      ,p1.[kotur_width]
+			      ,p1.[kotur_width_without_tension]
+			      ,p1.[kotur_planned]
+			      ,p1.[kotur_actual]
+			      ,p1.[rewound_length]
+			      ,p1.[rewound_length_a]
+			      ,p1.[rewound_length_p]
+
+			      ,p1.[pasbin]
+			      ,p1.[skeda_item_type]
+			      ,p1.[skeda]
+			      ,p1.[skeda_status]
+
+			      ,p1.[rewound_roll_unit_of_measure]
+			      ,p1.[position]
+			      ,p1.[priority]
+			      ,p1.[comment_office]
+			      ,p1.[comment_operator]
+			      ,p1.[call_shift_manager]
+			      ,p1.[rewinding_method]
+			      ,p1.[tpa_number]
+			      ,p1.[created_at]
+			      ,p1.[updated_at]
+
+			      ,p2.[status]
+			      ,p2.[location]
+			      ,p2.[device]
+			      ,p2.[active]
+			      ,p2.[operator1]
+			      ,p2.[operator2]
+
+			      ,(SELECT SUM([rewound_length_partialy]) FROM [paspul_rewounds]
+					WHERE [paspul_roll_id] = p1.[id]) as rewound_sum
+
+				  ,(SELECT SUM(r5.pro_pcs_actual)
+					FROM [mattresses] as r1
+					--JOIN [mattress_details] as r2 ON r2.mattress_id = r1.id
+					JOIN [mattress_phases] as r3 ON r3.mattress_id = r1.id AND r3.[active] = 1
+					--JOIN [mattress_pros] as r4 ON r4.mattress_id = r1.id
+					JOIN [mattress_pros] as r5 ON r5.mattress_id = r1.id
+
+					WHERE (r3.[status] = 'TO_LOAD' OR r3.[status] = 'TO_SPREAD')
+					AND r1.skeda_item_type != 'MB' AND r1.skeda_item_type != 'MW' --AND r1.skeda_item_type != 'MM'
+					AND r3.[location] != 'SP0'
+					AND r1.skeda = p1.[skeda] AND r1.dye_lot = p1.[dye_lot]) as sum_pcs_load_spread_by_lot_skeda
+
+				  ,(SELECT SUM(r5.pro_pcs_actual)
+					FROM [mattresses] as r1
+					--JOIN [mattress_details] as r2 ON r2.mattress_id = r1.id
+					JOIN [mattress_phases] as r3 ON r3.mattress_id = r1.id AND r3.[active] = 1
+					--JOIN [mattress_pros] as r4 ON r4.mattress_id = r1.id
+					JOIN [mattress_pros] as r5 ON r5.mattress_id = r1.id
+
+					WHERE (r3.[status] = 'TO_CUT' OR r3.[status] = 'COMPLETED')
+					AND r1.skeda_item_type != 'MB' AND r1.skeda_item_type != 'MW' --AND r1.skeda_item_type != 'MM'
+					AND r3.[location] != 'SP0'
+					AND r1.skeda = p1.[skeda] AND r1.dye_lot = p1.[dye_lot]) as sum_pcs_cut_comp_by_lot_skeda
 
 			  FROM [paspuls] as p1
 			  LEFT JOIN [paspul_lines] as p2 ON p2.[paspul_roll_id] = p1.[id]
-			  WHERE p2.[location] = '".$location."' AND p2.[active] = '1' 
+			  WHERE p2.[location] = '".$location."' AND p2.[active] = '1'  and p1.[updated_at] > DATEADD(day,-30,GETDATE())
 			  ORDER BY p1.[position] asc"));
-		}
-
 		
+		}
 
 		$pros= '';
 		$skus= '';
 		$sku_s= '';
 		$location_all= '';
+
 		for ($i=0; $i < count($data) ; $i++) { 
 			
 			$id = $data[$i]->id;
@@ -4727,6 +5108,8 @@ class plannerController extends Controller {
 		return view('planner.plan_paspul', compact('data','location','operator','operators'));
 	}
 
+	// ne koristi se
+	/*
 	public function plan_paspul_line ($id) {
 
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -4835,8 +5218,134 @@ class plannerController extends Controller {
 		return view('planner.plan_paspul_line', compact( 'id','paspul_roll','pasbin','skeda_item_type','priority','comment_office','call_shift_manager','rewinding_method',
 			'material','dye_lot','color_desc','skeda', 'skeda_item_type','paspul_roll_id', 'tpa_number',
 			'bin'));
-	}	
+	}
+	*/
 
+	public function plan_paspul_line1 ($id) {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+
+			  p1.[id]
+		      ,p1.[paspul_roll]
+		      ,p1.[sap_su]
+		      ,p1.[material]
+		      ,p1.[color_desc]
+		      ,p1.[dye_lot]
+		      ,p1.[paspul_type]
+
+		      ,p1.[width]
+		      ,p1.[kotur_width]
+		      ,p1.[kotur_width_without_tension]
+		      ,p1.[kotur_planned]
+		      ,p1.[kotur_actual]
+		      ,p1.[rewound_length]
+		      ,p1.[rewound_length_a]
+		      ,p1.[rewound_length_p]
+
+		      ,p1.[pasbin]
+		      ,p1.[skeda_item_type]
+		      ,p1.[skeda]
+		      ,p1.[skeda_status]
+
+		      ,p1.[rewound_roll_unit_of_measure]
+		      ,p1.[position]
+		      ,p1.[priority]
+		      ,p1.[comment_office]
+		      ,p1.[comment_operator]
+		      ,p1.[call_shift_manager]
+		      ,p1.[rewinding_method]
+		      ,p1.[tpa_number]
+
+		      ,p1.[created_at]
+		      ,p1.[updated_at]
+		      --,'|'
+		      ,p2.[paspul_roll_id]
+		      ,p2.[status]
+		      ,p2.[location]
+		      ,p2.[device]
+		      ,p2.[active]
+		      ,p2.[operator1]
+		      ,p2.[operator2]
+
+		      -- ,(SELECT SUM([rewound_length_partialy]) as rewound_sum FROM [paspul_rewounds] WHERE [paspul_roll_id] =  p1.[id]) as rewound_sum
+		      ,(SELECT TOP 1 pc.[mtr_per_pcs] FROM [paspul_stock_u_cons] as  pc
+				  	WHERE pc.[skeda] = p1.[skeda] and pc.[paspul_type] = p1.[paspul_type]) as unit_cons
+
+		  FROM [paspuls] as p1
+		  LEFT JOIN [paspul_lines] as p2 ON p2.[paspul_roll_id] = p1.[id] and p2.[active] = 1 
+		  WHERE p1.[id] = '".$id."' "));
+		// dd($data);
+	
+		$paspul_roll_id = $data[0]->id;
+		$paspul_roll = $data[0]->paspul_roll;
+		$pasbin = $data[0]->pasbin;
+		$skeda_item_type = $data[0]->skeda_item_type;
+		$priority = $data[0]->priority;
+		$comment_office = $data[0]->comment_office;
+		$call_shift_manager = $data[0]->call_shift_manager;
+		$rewinding_method = $data[0]->rewinding_method;
+
+		$material = $data[0]->material;
+		$dye_lot = $data[0]->dye_lot;
+		$color_desc = $data[0]->color_desc;
+		$skeda = $data[0]->skeda;
+		$skeda_item_type = $data[0]->skeda_item_type;
+		$tpa_number = $data[0]->tpa_number;
+		$rewound_length   = $data[0]->rewound_length;
+		$rewound_length_a = $data[0]->rewound_length_a;
+		$rewound_length_p = $data[0]->rewound_length_p;
+		// $rewound_sum = (float)$data[0]->rewound_sum;
+
+		$rewound_roll_unit_of_measure = $data[0]->rewound_roll_unit_of_measure;
+		$unit_cons = $data[0]->unit_cons;
+		$kotur_actual = $data[0]->kotur_actual;
+
+		$skeda_to_find = substr($skeda, 0, 12);
+		// dd($skeda_to_find);
+
+		// $pasbin = 'PAS0000001'; //auto assign ???????????????????????
+		$pas_bin_find = DB::connection('sqlsrv')->select(DB::raw("SELECT pas_bin , adez_bin 
+		FROM paspul_bins
+		WHERE skeda like '".$skeda_to_find."%'
+		ORDER BY id desc"));
+		// dd($pas_bin_find);
+
+		if (isset($pas_bin_find[0])) {
+			$pas_bin = $pas_bin_find[0]->pas_bin;
+			$adez_bin = $pas_bin_find[0]->adez_bin;
+		} else {
+			$pas_bin = '';
+			$adez_bin = '';
+		}
+
+		if ($skeda_item_type == 'PA') {
+			if (($pas_bin == '') AND ($adez_bin == '')) {
+				// dd("pas_bin is empty for this skeda");
+				$msg = 'Can not find paspul bin or adez bin for this skeda and skeda_type PA , please insert it in paspul_bin table!';
+				return view('planner.error',compact('msg'));
+			}	
+
+			$bin[]='';
+			if ($pas_bin != '') {
+				array_push($bin, $pas_bin);	
+			}
+			if ($adez_bin != '') {
+				array_push($bin, $adez_bin);	
+			}
+			// dd(array_filter($bin));
+			$bin = array_filter($bin);
+			$bin = array_values($bin);
+
+		} else {
+			$bin[] = '';
+		}
+		
+		return view('planner.plan_paspul_line1', compact( 'id','paspul_roll','paspul_roll_id','pasbin','skeda_item_type','priority','comment_office','call_shift_manager','rewinding_method',
+			'material','dye_lot','color_desc','skeda', 'skeda_item_type', 'tpa_number',
+			'bin','pasbin','rewound_length','rewound_length_a',/*'rewound_sum',*/'rewound_length_p','rewound_roll_unit_of_measure','unit_cons','kotur_actual'));
+	}
+
+	/*
 	public function plan_paspul_line_confirm(Request $request) {
 
 		$this->validate($request, ['id'=>'required']);
@@ -4916,13 +5425,12 @@ class plannerController extends Controller {
 
 		//$position = 0; // auto ??????????????????????????????????????
 		$position = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 position 
-		FROM 
-		(
-		SELECT position 
-		FROM  [paspuls] as p
-		JOIN  [paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND active = '1'
-		WHERE pl.[location] = '".$location."'
-		) SQ
+		FROM 		(
+			SELECT position 
+			FROM  [paspuls] as p
+			JOIN  [paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND active = '1'
+			WHERE pl.[location] = '".$location."'
+			) SQ
 		ORDER BY position desc"));
 
 		if (isset($position[0])) {
@@ -4949,49 +5457,35 @@ class plannerController extends Controller {
 		// dd("Stop");
 		// try {
 
-			$find_all_papul_lines = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				[id], [paspul_roll], [paspul_roll_id]
-			FROM [paspul_lines] WHERE [paspul_roll_id] = '".$id."' AND active = 1"));
+			// $find_all_papul_lines = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			// 	[id], [paspul_roll], [paspul_roll_id]
+			// FROM [paspul_lines] WHERE [paspul_roll_id] = '".$id."' AND active = 1"));
 		
-			if (isset($find_all_papul_lines[0])) {
-				$paspul_roll = $find_all_papul_lines[0]->paspul_roll;
-				// dd($find_all_papul_lines);
+			// if (isset($find_all_papul_lines[0])) {
+			// 	$paspul_roll = $find_all_papul_lines[0]->paspul_roll;
+			// 	// dd($find_all_papul_lines);
 
-				for ($i=0; $i < count($find_all_papul_lines); $i++) {
+			// 	for ($i=0; $i < count($find_all_papul_lines); $i++) {
 
-					$table3 = paspul_line::findOrFail($find_all_papul_lines[$i]->id);
-					$table3->active = 0;
-					$table3->save();
-				}
-			}
+			// 		$table3 = paspul_line::findOrFail($find_all_papul_lines[$i]->id);
+			// 		$table3->active = 0;
+			// 		$table3->save();
+			// 	}
+			// }
 
+			$paspul_lines_not_active = DB::connection('sqlsrv')->update(DB::raw("
+				UPDATE [paspul_lines]
+				SET active = 0, id_status = ''+cast([paspul_roll_id] as varchar )+'-'+[status]
+				WHERE [paspul_roll_id] = '".$id."' AND active = 1
+			"));
+
+			
 			$table = paspul::findOrFail($id);
-
-			// $table->paspul_roll = $paspul_roll;
-			// $table->sap_su = $sap_su;
-			// $table->material = $material;
-			// $table->color_desc = $color_desc;
-			// $table->dye_lot = $dye_lot;
-			// $table->paspul_type = $paspul_type;
-			// $table->width = $width;
-			// $table->kotur_width = $kotur_width;
-			// $table->kotur_width_without_tension = $kotur_width_without_tension;
-			// $table->kotur_planned = $koturi_planned;
-			// $table->kotur_actual;
-			// $table->rewound_length = $rewound_length;
-			// $table->rewound_length_a = $rewound_length_a;
-
 			$table->pasbin = $pas_bin;
-			// $table->skeda_item_type = $skeda_item_type;
-			// $table->skeda = $skeda;
-			// $table->skeda_status = $skeda_status;
-			// $table->rewound_roll_unit_of_measure = $rewound_roll_unit_of_measure;
 			$table->position = $position;
 			$table->priority = $priority;
 			$table->comment_office = $comment_office;
-			// $table->comment_operator = $comment_operator;
 			$table->call_shift_manager = $call_shift_manager;
-			// $table->rewinding_method = $rewinding_method;
 			$table->save();
 
 			// reorder position of NOT_SET
@@ -5028,7 +5522,9 @@ class plannerController extends Controller {
 			$table_p->active = $active;
 			$table_p->operator1 = Session::get('operator');
 			$table_p->operator2;
+			$table_p->id_status = $table_p->paspul_roll_id.'-'.$table_p->status;
 			$table_p->date = $date;
+
 			$table_p->save();
 
 		// }
@@ -5038,6 +5534,289 @@ class plannerController extends Controller {
 
 		return redirect('/plan_paspul/NOT_SET');
 	}
+	*/
+
+	public function plan_paspul_line_confirm1(Request $request) {
+
+		// $this->validate($request, ['id'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+		
+		$paspul_roll_id = $input['paspul_roll_id'];
+		$paspul_roll = $input['paspul_roll'];
+		$priority = $input['priority'];
+		$comment_office = $input['comment_office'];
+		$skeda = $input['skeda'];
+		$skeda_item_type = $input['skeda_item_type'];
+
+		if (isset($input['final_roll'])) {
+			$final_roll = 'YES';
+		} else {
+			$final_roll = 'NO';
+		}
+
+		if ($skeda_item_type == "PA") {
+			if (isset($input['bin'])) {
+				$pas_bin = $input['bin'];
+			}else if (isset($input['bins'])) {
+				$pas_bin = $input['bins'][0];
+			} else {
+				$msg ='Pas bin must be selected!';
+				return view('planner.error',compact('msg'));
+			}	
+		} else {
+			$pas_bin = '';
+		}
+		
+		// dd($pas_bin);
+
+		$rewound_length_partialy = (float)$input['rewound_length_partialy'];
+		
+		if ($rewound_length_partialy < 0) {
+			dd("rewound_length_partialy must be > 0");
+		}
+
+		// verify userId
+		if (Auth::check())
+		{
+		    $userId = Auth::user()->id;
+		    $device = Auth::user()->name;
+		} else {
+			// dd('User is not autenticated');
+			$msg ='User is not autenticated';
+			return view('prw.error',compact('msg'));
+		}
+
+		// find new child roll
+		$no_of_paspul_rewound_rolls = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT([paspul_rewound_roll]) as no
+		FROM [paspul_rewounds]
+		WHERE [paspul_roll] = '".$paspul_roll."' "));
+
+		$number = (int)$no_of_paspul_rewound_rolls[0]->no;
+		$no = $number + 1;
+		$no = str_pad($no, 2, '0', STR_PAD_LEFT);
+		// dd($no);
+
+		// $find_sum_rewound_length_partialy = DB::connection('sqlsrv')->select(DB::raw("SELECT SUM([rewound_length_partialy]) as rewound_sum
+		// FROM [paspul_rewounds]
+		// WHERE [paspul_roll] = '".$paspul_roll."' "));
+		// $rewound_length_all = round($find_sum_rewound_length_partialy[0]->rewound_sum,2) + round($rewound_length_partialy,2);
+		// // dd($rewound_length_all);
+
+		// $find_rewound_length_planned = DB::connection('sqlsrv')->select(DB::raw("SELECT rewound_length_p
+		// FROM [paspuls]
+		// WHERE [id] = '".$paspul_roll_id."' "));
+		// $rewound_length_p = round($find_rewound_length_planned[0]->rewound_length_p,2);
+		// dd($rewound_length_p);
+
+		// if ($rewound_length_all > $rewound_length_p) {
+		// 	dd("sum of already rewound_length plus new rewound_length is more than rewound length");
+		// }
+		
+
+		// save planned length to father
+		$table = paspul::findOrFail($paspul_roll_id);
+		$still_possible_to_plan = (float)$table->rewound_length - (float)$table->rewound_length_p;
+		
+		if ($still_possible_to_plan < $rewound_length_partialy) {
+			dd('you can not plan more length then is avilable ('.$still_possible_to_plan.' meters)');
+
+		} 
+		// dd($still_possible_to_plan);
+
+		if ($still_possible_to_plan == $rewound_length_partialy ) {
+			$final_roll = 'YES';
+		}
+
+		if ($final_roll == 'YES') {
+				
+			// save to paspul father 
+			 	$location = "PRW";
+				//$position = 0; // auto ??????????????????????????????????????
+				$position = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 position 
+				FROM 
+				(
+				SELECT position 
+				FROM [paspuls] as p
+				JOIN [paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND active = '1'
+				WHERE pl.[location] = '".$location."'
+				) SQ
+				ORDER BY position desc"));
+
+				if (isset($position[0])) {
+					$position = (int)$position[0]->position;
+				} else {
+					$position = 0;
+				}
+				$position = $position + 1;
+
+				//-----
+				$status = 'TO_REWIND';
+				$location = 'PRW'; 
+				$device = strtoupper($device); //null or insert  
+				$active = 1;
+				$operator1 = Session::get('operator');
+				$operator2;
+				//-----
+				
+				$paspul_lines_not_active = DB::connection('sqlsrv')->update(DB::raw("
+					UPDATE [paspul_lines]
+					SET active = 0, id_status = ''+cast([paspul_roll_id] as varchar )+'-'+[status]
+					WHERE [paspul_roll_id] = '".$paspul_roll_id."' AND active = 1
+				"));
+
+				// sum all rewound_length_partialy for all rolls
+				$find_rewound_length_partialy = DB::connection('sqlsrv')->select(DB::raw("SELECT SUM([rewound_length_partialy]) as rewound_sum
+				FROM [paspul_rewounds]
+				WHERE [paspul_roll_id] = '".$paspul_roll_id."' "));
+				$rewound_length_a = (int)$find_rewound_length_partialy[0]->rewound_sum + (int)$rewound_length_partialy;
+
+				$table = paspul::findOrFail($paspul_roll_id);
+				$table->rewound_length_a = $rewound_length_a;
+				$table->position = $position;
+				$table->pasbin = $pas_bin;
+				$table->comment_office = $comment_office;
+				$table->priority = $priority;
+				$table->save();
+
+				// reorder position of PRW
+				$reorder_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+						p.[id], p.[paspul_roll], p.[position], 
+						pl.[location], pl.[active], pl.[paspul_roll_id]
+					 FROM [paspuls] as p
+					 INNER JOIN [paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND pl.[active] = 1
+					 WHERE pl.[location] = 'PRW'
+					 ORDER BY p.[position] asc"));
+				// dd($reorder_position);
+
+				if (isset($reorder_position[0])) {
+					for ($i=0; $i < count($reorder_position); $i++) { 
+
+						$table1 = paspul::findOrFail($reorder_position[$i]->id);
+						$table1->position = $i+1;
+						$table1->save();
+					}
+				}
+
+				if ((date('H') >= 0) AND (date('H') < 6)) {
+				   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
+				} else {
+					$date = date('Y-m-d H:i:s');
+				}
+
+				$table_p = new paspul_line;
+				$table_p->paspul_roll_id = $table->id;
+				$table_p->paspul_roll = $table->paspul_roll;
+				$table_p->status = $status;
+				$table_p->location = $location;
+				$table_p->device = $device;
+				$table_p->active = $active;
+				$table_p->operator1 = Session::get('operator');
+				$table_p->operator2;
+				$table_p->date = $date;
+				$table_p->id_status = $table_p->paspul_roll_id.'-'.$table_p->status;
+				$table_p->save();
+			//	
+
+			// save to paspul_rewound
+				$rewound_roll_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				 		COUNT(p.[id]) as no
+				 	FROM [paspul_rewounds] as p
+				 	WHERE p.[status] = 'TO_REWIND'
+				 	"));
+				$number = (int)$rewound_roll_position[0]->no;
+				$rewound_roll_position = $number + 1;
+
+				if ($rewound_length_partialy > 0) {
+					$table_r = new paspul_rewound;
+					$table_r->paspul_rewound_roll = $table->paspul_roll."-".$no;
+					$table_r->rewound_length_partialy = $rewound_length_partialy;
+					$table_r->kotur_partialy;
+					$table_r->status = "TO_REWIND";
+					$table_r->paspul_roll_id = $paspul_roll_id;
+					$table_r->paspul_roll = $table->paspul_roll;
+					$table_r->sap_su = $table->sap_su;
+					$table_r->material = $table->material;
+					$table_r->color_desc = $table->color_desc;
+					$table_r->dye_lot = $table->dye_lot;
+					$table_r->paspul_type = $table->paspul_type;
+					$table_r->width = $table->width;
+					$table_r->kotur_width = $table->kotur_width;
+					$table_r->kotur_width_without_tension = $table->kotur_width_without_tension;
+					$table_r->kotur_planned = $table->kotur_planned;
+					// $table_r->kotur_actual = $table->kotur_actual;
+					$table_r->rewound_length = $table->rewound_length;
+					
+					$table_r->pasbin = $pas_bin;
+					$table_r->skeda_item_type = $table->skeda_item_type;
+					$table_r->skeda = $table->skeda;
+					$table_r->skeda_status = $table->skeda_status;
+					$table_r->rewound_roll_unit_of_measure = $table->rewound_roll_unit_of_measure;
+					$table_r->position = $rewound_roll_position;
+					$table_r->priority = $priority;
+					$table_r->comment_office = $comment_office;
+					$table_r->comment_operator = $table->comment_operator;
+					$table_r->call_shift_manager = $table->call_shift_manager;
+					$table_r->rewinding_method = $table->rewinding_method;
+					$table_r->tpa_number = $table->tpa_number;
+					$table_r->save();			
+				}				
+			//
+				
+		} else {
+
+			// save to paspul_rewound
+				$rewound_roll_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				 		COUNT(p.[id]) as no
+				 	FROM [paspul_rewounds] as p
+				 	WHERE p.[status] = 'TO_REWIND'
+				 	"));
+				$number = (int)$rewound_roll_position[0]->no;
+				$rewound_roll_position = $number + 1;
+
+				if ($rewound_length_partialy > 0) {
+					$table_r = new paspul_rewound;
+					$table_r->paspul_rewound_roll = $table->paspul_roll."-".$no;
+					$table_r->rewound_length_partialy = $rewound_length_partialy;
+					$table_r->kotur_partialy;
+					$table_r->status = "TO_REWIND";
+					$table_r->paspul_roll_id = $paspul_roll_id;
+					$table_r->paspul_roll = $table->paspul_roll;
+					$table_r->sap_su = $table->sap_su;
+					$table_r->material = $table->material;
+					$table_r->color_desc = $table->color_desc;
+					$table_r->dye_lot = $table->dye_lot;
+					$table_r->paspul_type = $table->paspul_type;
+					$table_r->width = $table->width;
+					$table_r->kotur_width = $table->kotur_width;
+					$table_r->kotur_width_without_tension = $table->kotur_width_without_tension;
+					$table_r->kotur_planned = $table->kotur_planned;
+					// $table_r->kotur_actual = $table->kotur_actual;
+					$table_r->rewound_length = $table->rewound_length;
+					$table_r->pasbin = $pas_bin;
+					$table_r->skeda_item_type = $table->skeda_item_type;
+					$table_r->skeda = $table->skeda;
+					$table_r->skeda_status = $table->skeda_status;
+					$table_r->rewound_roll_unit_of_measure = $table->rewound_roll_unit_of_measure;
+					$table_r->position = $rewound_roll_position;
+					$table_r->priority = $priority;
+					$table_r->comment_office = $comment_office;
+					$table_r->comment_operator = $table->comment_operator;
+					$table_r->call_shift_manager = $table->call_shift_manager;
+					$table_r->rewinding_method = $table->rewinding_method;
+					$table_r->tpa_number = $table->tpa_number;
+					$table_r->save();			
+				}				
+			//
+		}
+
+		$table_f = paspul::findOrFail($paspul_roll_id);
+		$table_f->rewound_length_p = (float)$table_f->rewound_length_p + $rewound_length_partialy;
+		$table_f->save();
+		
+
+		return redirect('/plan_paspul/BOARD');
+	}
 
 	public function remove_paspul_line($id) {
 		// dd($id);
@@ -5046,6 +5825,116 @@ class plannerController extends Controller {
 	}
 
 	public function paspul_delete_confirm(Request $request) {
+
+		$this->validate($request, ['id'=>'required']);
+		$input = $request->all(); // 
+		// dd($input);
+		
+		$id = $input['id'];
+		// dd($id);
+
+		if (Auth::check())
+		{
+		    $userId = Auth::user()->id;
+		    $device = Auth::user()->name;
+		} else {
+			// dd('User is not autenticated');
+			$msg ='User is not autenticated';
+			return view('planner.error',compact('msg'));
+		}
+
+		// check if exist child
+		$check_if_is_planned = DB::connection('sqlsrv')->select(DB::raw("SELECT id 
+		FROM paspuls
+		WHERE id = '".$id."' AND
+			  rewound_length_p is NOT null "));
+		// dd($check_if_is_planned);
+
+		if (isset($check_if_is_planned[0]->id)) {
+			dd('You can not delete paspul because already has planned qty');
+		}
+		// dd('continue');
+
+		// new position
+		$position = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 position 
+		FROM (
+			SELECT position 
+				FROM  [paspuls] as p
+				JOIN  [paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND active = '1'
+			WHERE pl.[location] = 'DELETED' ) SQ
+		ORDER BY position desc"));
+		// dd($position[0]->position);
+
+		if (isset($position[0]->position)) {
+			$position = $position[0]->position;
+		} else {
+			$position = 0;
+		}
+
+		$paspul_lines_not_active = DB::connection('sqlsrv')->update(DB::raw("
+			UPDATE [paspul_lines]
+			SET active = 0, id_status = ''+cast([paspul_roll_id] as varchar )+'-'+[status]
+			WHERE [paspul_roll_id] = '".$id."' AND active = 1
+		"));
+
+		$table = paspul::findOrFail($id);
+		$table->position = $position+1;
+		$table->save();
+
+		$location = 'NOT_SET';
+
+		// reorder position of location
+		$reorder_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				p.[id], p.[paspul_roll], p.[position], 
+				pl.[location], pl.[active], pl.[paspul_roll_id]
+			 FROM [paspuls] as p
+			 INNER JOIN [paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND pl.[active] = 1
+			 WHERE pl.[location] = '".$location."'
+			 ORDER BY p.[position] asc"));
+		// dd($reorder_position);
+
+		if (isset($reorder_position[0])) {
+			for ($i=0; $i < count($reorder_position); $i++) { 
+
+				$table1 = paspul::findOrFail($reorder_position[$i]->id);
+				$table1->position = $i+1;
+				$table1->save();
+			}
+		}
+
+		$status = "DELETED";
+		$location = "DELETED";
+		$active = 1;
+
+		if ((date('H') >= 0) AND (date('H') < 6)) {
+		   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
+		} else {
+			$date = date('Y-m-d H:i:s');
+		}
+
+		$table_p = new paspul_line;
+		$table_p->paspul_roll_id = $table->id;
+		$table_p->paspul_roll = $table->paspul_roll;
+		$table_p->status = $status;
+		$table_p->location = $location;
+		$table_p->device = $device;
+		$table_p->active = $active;
+		$table_p->operator1 = Session::get('operator');
+		$table_p->operator2;
+		$table_p->date = $date;
+		$table_p->id_status = $table_p->paspul_roll_id.'-'.$table_p->status;
+		$table_p->save();
+
+		return redirect('/plan_paspul/NOT_SET');
+	}
+	
+	public function remove_paspul_roll_line($id) {
+		// dd($id);
+
+		return view('planner.paspul_delete_roll_confirm', compact( 'id'));
+	}
+
+	public function paspul_delete_roll_confirm(Request $request) {
 
 		$this->validate($request, ['id'=>'required']);
 		$input = $request->all(); // change use (delete or comment user Requestl; )
@@ -5064,114 +5953,182 @@ class plannerController extends Controller {
 			return view('planner.error',compact('msg'));
 		}
 
-		// new position
-		$position = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 position 
-		FROM 
-		(
-		SELECT position 
-		FROM  [paspuls] as p
-		JOIN  [paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND active = '1'
-		WHERE pl.[location] = 'DELETED'
-		) SQ
-		ORDER BY position desc"));
-		// dd($position[0]->position);
+		$table =  DB::connection('sqlsrv')->select(DB::raw("SELECT pr.[id]
+      			,pr.[paspul_rewound_roll]
+      			,pr.[paspul_roll_id]
+      			,pr.[paspul_roll]
+	  			,pl.[status]
+	  			,pl.[location]
+	  			,p.[rewound_length]
+	  			,p.[rewound_length_p]
+			FROM [paspul_rewounds] as pr
+			JOIN [paspul_lines] as pl ON pl.[paspul_roll_id] = pr.[paspul_roll_id] AND pl.[active] = 1
+			JOIN [paspuls] as p ON p.[id] = pr.[paspul_roll_id]
+			WHERE pr.[id] = '".$id."' "));
+		// dd($table);
 
-		if (isset($position[0]->position)) {
-			$position = $position[0]->position;
+		$paspul_roll_id = $table[0]->paspul_roll_id;
+		$paspul_rewound_roll_id = $table[0]->id;
+		$location = $table[0]->location;
+
+		$still_possible_to_plan = (float)$table[0]->rewound_length - (float)$table[0]->rewound_length_p;
+		// dd($still_possible_to_plan);
+
+		$if_is_last_roll = DB::connection('sqlsrv')->select(DB::raw("SELECT id
+				FROM [paspul_rewounds]
+				WHERE [paspul_roll_id] = '".$paspul_roll_id."' 
+				AND status = 'TO_REWIND' 
+				AND id not in ('".$paspul_rewound_roll_id."') "));
+				
+		if (isset($if_is_last_roll[0]->id)) {
+			$last_roll = 'NO';  //no
 		} else {
-			$position = 0;
+			$last_roll = 'YES'; //yes
 		}
-		// dd($position);
-		// dd($id);
+		// dd($last_roll);
 
-		// set all to 0
-		$find_all_papul_lines = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				[id], [paspul_roll], [paspul_roll_id], [location]
-			FROM [paspul_lines] WHERE [paspul_roll_id] = '".$id."' AND active = 1"));
-		// dd($find_all_papul_lines);
+		if (($still_possible_to_plan == 0) AND ($last_roll == 'YES')) {
+			// dd('update father and son');
 
-			if (isset($find_all_papul_lines[0])) {
-				$paspul_roll = $find_all_papul_lines[0]->paspul_roll;
-				$location = $find_all_papul_lines[0]->location;
-				// dd($find_all_papul_lines);
+			// save to paspul father
+				$location = "PCO";
+				//$position = 0; // 
+				$position = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 position 
+				FROM 
+				(
+				SELECT position 
+				FROM [paspuls] as p
+				JOIN [paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND active = '1'
+				WHERE pl.[location] = '".$location."'
+				) SQ
+				ORDER BY position desc"));
 
-				for ($i=0; $i < count($find_all_papul_lines); $i++) {
-
-					$table3 = paspul_line::findOrFail($find_all_papul_lines[$i]->id);
-					$table3->active = 0;
-					$table3->save();
+				if (isset($position[0])) {
+					$position = (int)$position[0]->position;
+				} else {
+					$position = 0;
 				}
-			}
+				$position = $position + 1;
 
-			$table = paspul::findOrFail($id);
-			// $table->paspul_roll = $paspul_roll;
-			// $table->sap_su = $sap_su;
-			// $table->material = $material;
-			// $table->color_desc = $color_desc;
-			// $table->dye_lot = $dye_lot;
-			// $table->paspul_type = $paspul_type;
-			// $table->width = $width;
-			// $table->kotur_width = $kotur_width;
-			// $table->kotur_width_without_tension = $kotur_width_without_tension;
-			// $table->kotur_planned = $koturi_planned;
-			// $table->kotur_actual;
-			// $table->rewound_length = $rewound_length;
-			// $table->rewound_length_a = $rewound_length_a;
-			// $table->pasbin = $pas_bin;
-			// $table->skeda_item_type = $skeda_item_type;
-			// $table->skeda = $skeda;
-			// $table->skeda_status = $skeda_status;
-			// $table->rewound_roll_unit_of_measure = $rewound_roll_unit_of_measure;
-			$table->position = $position+1;
-			// $table->priority = $priority;
-			// $table->comment_office = $comment_office;
-			// $table->comment_operator = $comment_operator;
-			// $table->call_shift_manager = $call_shift_manager;
-			// $table->rewinding_method = $rewinding_method;
-			$table->save();
+				//-----
+				$status = 'TO_CUT';
+				$location = 'PCO';
+				$device = strtoupper($device); //null or insert  
+				$active = 1;
+				$operator1 = Session::get('operator');
+				$operator2;
+				//-----
+				
+				$paspul_lines_not_active = DB::connection('sqlsrv')->update(DB::raw("
+					UPDATE [paspul_lines]
+					SET active = 0, id_status = ''+cast([paspul_roll_id] as varchar )+'-'+[status]
+					WHERE [paspul_roll_id] = '".$paspul_roll_id."' AND active = 1
+				"));
 
-			// reorder position of location
-			$reorder_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-					p.[id], p.[paspul_roll], p.[position], 
-					pl.[location], pl.[active], pl.[paspul_roll_id]
-				 FROM [paspuls] as p
-				 INNER JOIN [paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND pl.[active] = 1
-				 WHERE pl.[location] = '".$location."'
-				 ORDER BY p.[position] asc"));
-			// dd($reorder_position);
+				$rewound_length_partialy = 0;
+				$kotur_partialy = 0;
 
-			if (isset($reorder_position[0])) {
-				for ($i=0; $i < count($reorder_position); $i++) { 
+				// sum rewound_length_partialy for all rolls
+				$find_rewound_length_partialy = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+						SUM([rewound_length_partialy]) as rewound_sum
+				FROM [paspul_rewounds]
+				WHERE [paspul_roll_id] = '".$paspul_roll_id."'  AND
+					id != '".$paspul_rewound_roll_id."'"));
+				// dd($find_rewound_length_partialy);
+				$rewound_length_a = (float)$find_rewound_length_partialy[0]->rewound_sum + (float)$rewound_length_partialy;
+				// dd($rewound_length_a);
+				
+				$table = paspul::findOrFail($paspul_roll_id);
+				$table->rewound_length_a = $rewound_length_a;
+				$table->position = $position;
+				$table->save();
 
-					$table1 = paspul::findOrFail($reorder_position[$i]->id);
-					$table1->position = $i+1;
-					$table1->save();
+				// reorder position of PCO
+				$reorder_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+						p.[id], p.[paspul_roll], p.[position], 
+						pl.[location], pl.[active], pl.[paspul_roll_id]
+					 FROM [paspuls] as p
+					 INNER JOIN [paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND pl.[active] = 1
+					 WHERE pl.[location] = 'PCO'
+					 ORDER BY p.[position] asc"));
+				// dd($reorder_position);
+
+				if (isset($reorder_position[0])) {
+					for ($i=0; $i < count($reorder_position); $i++) { 
+						$table1 = paspul::findOrFail($reorder_position[$i]->id);
+						$table1->position = $i+1;
+						$table1->save();
+					}
 				}
-			}
 
-			$status = "DELETED";
-			$location = "DELETED";
-			$active = 1;
+				if ((date('H') >= 0) AND (date('H') < 6)) {
+				   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
+				} else {
+					$date = date('Y-m-d H:i:s');
+				}
 
-			if ((date('H') >= 0) AND (date('H') < 6)) {
-			   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
-			} else {
-				$date = date('Y-m-d H:i:s');
-			}
+				$table_p = new paspul_line;
+				$table_p->paspul_roll_id = $table->id;
+				$table_p->paspul_roll = $table->paspul_roll;
+				$table_p->status = $status;
+				$table_p->location = $location;
+				$table_p->device = $device;
+				$table_p->active = $active;
+				$table_p->operator1 = Session::get('operator');
+				$table_p->operator2;
+				$table_p->date = $date;
+				$table_p->id_status = $table_p->paspul_roll_id.'-'.$table_p->status;
+				$table_p->save();
+			//
 
-			$table_p = new paspul_line;
-			$table_p->paspul_roll_id = $table->id;
-			$table_p->paspul_roll = $table->paspul_roll;
-			$table_p->status = $status;
-			$table_p->location = $location;
-			$table_p->device = $device;
-			$table_p->active = $active;
-			$table_p->operator1 = Session::get('operator');
-			$table_p->operator2;
-			$table_p->date = $date;
-			$table_p->save();
-	
-		return redirect('/plan_paspul/NOT_SET');
+
+			// save to paspul_rewound
+				$rewound_roll_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				 		COUNT(p.[id]) as no
+				 	FROM [paspul_rewounds] as p
+				 	WHERE p.[status] = 'COMPLETED'
+				 	"));
+
+				$number = (int)$rewound_roll_position[0]->no;
+				$rewound_roll_position = $number + 1;
+				// dd($rewound_roll_position);
+
+				$table_r = paspul_rewound::findOrFail($paspul_rewound_roll_id);
+				$table_r->rewound_length_partialy = $rewound_length_partialy;
+				$table_r->kotur_partialy = $kotur_partialy;
+				$table_r->status = "COMPLETED";
+				$table_r->position = $rewound_roll_position; 
+				$table_r->save();
+			//
+
+		} else {
+			// dd('son');
+			// save to paspul_rewound
+				$rewound_roll_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				 		COUNT(p.[id]) as no
+				 	FROM [paspul_rewounds] as p
+				 	WHERE p.[status] = 'COMPLETED'
+				 	"));
+
+				$number = (int)$rewound_roll_position[0]->no;
+				$rewound_roll_position = $number + 1;
+				// dd($rewound_roll_position);
+
+				$rewound_length_partialy = 0;
+				$kotur_partialy = 0;
+
+				$table_r = paspul_rewound::findOrFail($paspul_rewound_roll_id);
+				$table_r->rewound_length_partialy = $rewound_length_partialy;
+				$table_r->kotur_partialy = $kotur_partialy;
+				$table_r->status = "COMPLETED";
+				$table_r->position = $rewound_roll_position; 
+				$table_r->save();
+			//
+
+		}
+
+		
+		return redirect('/plan_paspul/PRW');
 	}
 
 	public function edit_paspul ($id) {
@@ -5315,26 +6272,7 @@ class plannerController extends Controller {
 		
 		$table = paspul::findOrFail($id);
 
-		// $table->paspul_roll = $paspul_roll;
-		// $table->sap_su = $sap_su;
-		// $table->material = $material;
-		// $table->color_desc = $color_desc;
 		$table->dye_lot = $dye_lot;
-		// $table->paspul_type = $paspul_type;
-		// $table->width = $width;
-		// $table->kotur_width = $kotur_width;
-		// $table->kotur_width_without_tension = $kotur_width_without_tension;
-		// $table->kotur_planned = $koturi_planned;
-		// $table->kotur_actual;
-		// $table->rewound_length = $rewound_length;
-		// $table->rewound_length_a = $rewound_length_a;
-
-		// $table->pasbin = $pas_bin;
-		// $table->skeda_item_type = $skeda_item_type;
-		// $table->skeda = $skeda;
-		// $table->skeda_status = $skeda_status;
-		// $table->rewound_roll_unit_of_measure = $rewound_roll_unit_of_measure;
-		// $table->position = $position;
 		$table->priority = $priority;
 		$table->comment_office = $comment_office;
 		// $table->comment_operator = $comment_operator;
@@ -5343,6 +6281,125 @@ class plannerController extends Controller {
 		$table->save();
 
 		return redirect('/plan_paspul/'.$location);
+	}
+
+	public function edit_paspul_roll_line($id) {
+		// dd($id);
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+
+				  p1.[id]
+			      ,p1.[paspul_rewound_roll]
+			      ,p1.[rewound_length_partialy]
+			      ,p1.[kotur_partialy]
+			      ,p1.[paspul_roll]
+			      ,p1.[paspul_roll_id]
+			      ,p1.[status]
+
+			      ,p1.[sap_su]
+			      ,p1.[material]
+			      ,p1.[color_desc]
+			      ,p1.[dye_lot]
+			      ,p1.[paspul_type]
+
+			      ,p1.[width]
+			      ,p1.[kotur_width]
+			      ,p1.[kotur_width_without_tension]
+			      ,p1.[kotur_planned]
+			      -- ,p1.[kotur_actual]
+			      ,p1.[rewound_length]
+			      --,p1.[rewound_length_a]
+
+			      ,p1.[pasbin]
+			      ,p1.[skeda_item_type]
+			      ,p1.[skeda]
+			      ,p1.[skeda_status]
+
+			      ,p1.[rewound_roll_unit_of_measure]
+			      ,p1.[position]
+			      ,p1.[priority]
+			      ,p1.[comment_office]
+			      ,p1.[comment_operator]
+			      ,p1.[call_shift_manager]
+			      ,p1.[rewinding_method]
+			      ,p1.[tpa_number]
+			      ,p1.[created_at]
+			      ,p1.[updated_at]
+
+			      ,(SELECT SUM([rewound_length_partialy]) FROM [paspul_rewounds]
+					WHERE [paspul_roll_id] = p1.[paspul_roll_id]) as rewound_sum
+				  ,(SELECT TOP 1 pc.[mtr_per_pcs] FROM [paspul_stock_u_cons] as  pc
+				  	WHERE pc.[skeda] = p1.[skeda] and pc.[paspul_type] = p1.[paspul_type]) as unit_cons
+
+			  FROM [paspul_rewounds] as p1
+			  WHERE p1.[id] = '".$id."' "));
+		
+		// dd($data);
+
+		$paspul_rewound_roll = $data[0]->paspul_rewound_roll;
+		$material = $data[0]->material;
+		$dye_lot = $data[0]->dye_lot;
+		$color_desc = $data[0]->color_desc;
+		$skeda = $data[0]->skeda;
+		$skeda_item_type = $data[0]->skeda_item_type;
+		$tpa_number = $data[0]->tpa_number;
+		$rewinding_method = $data[0]->rewinding_method;
+		$rewound_length_partialy = $data[0]->rewound_length_partialy;
+		$rewound_roll_unit_of_measure = $data[0]->rewound_roll_unit_of_measure;
+		$unit_cons = $data[0]->unit_cons;
+		$kotur_partialy = $data[0]->kotur_partialy;
+		$kotur_planned = $data[0]->kotur_planned;
+		$pasbin = $data[0]->pasbin;
+
+		$priority = $data[0]->priority;
+		$call_shift_manager = $data[0]->call_shift_manager;
+		$comment_office = $data[0]->comment_office;
+
+
+		return view('planner.edit_paspul_roll_line', compact( 'id','paspul_rewound_roll','material','dye_lot','color_desc','skeda','skeda_item_type','tpa_number',
+			'rewinding_method','rewound_length_partialy','rewound_roll_unit_of_measure','unit_cons','kotur_partialy','kotur_planned',
+			'priority','call_shift_manager','comment_office','pasbin'));
+	}
+
+	public function edit_paspul_roll_line_confirm(Request $request) {
+
+		$this->validate($request, ['id'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+		
+		$id = $input['id'];
+		$paspul_rewound_roll = $input['paspul_rewound_roll'];
+
+		$priority = $input['priority'];
+		$comment_office = $input['comment_office'];
+
+		if (isset($input['call_shift_manager'])) {
+			$call_shift_manager = (int)$input['call_shift_manager'];
+		} else {
+			$call_shift_manager = 0;
+		}
+		
+				
+		//// verify userId
+		if (Auth::check())
+		{
+		    $userId = Auth::user()->id;
+		    $device = Auth::user()->name;
+		} else {
+			// dd('User is not autenticated');
+			$msg ='User is not autenticated';
+			return view('planner.error',compact('msg'));
+		}
+
+		
+		$table = paspul_rewound::findOrFail($id);
+		$table->priority = $priority;
+		$table->comment_office = $comment_office;
+		$table->call_shift_manager = $call_shift_manager;
+		
+		$table->save();
+
+		return redirect('/plan_paspul/BOARD');
 	}
 
 	public function paspul_change_kotur_qty($id) {
@@ -5567,9 +6624,9 @@ class plannerController extends Controller {
 						as FG_qty,
 					l.plant
 					
-			  	FROM [cutting].[dbo].[paspul_stocks] as s 
-			  	LEFT JOIN [cutting].[dbo].[paspul_stock_u_cons] as k ON k.skeda = s.skeda and k.paspul_type = s.paspul_type
-				LEFT JOIN [cutting].[dbo].[paspul_locations] as l ON l.[location] = s.[location] 
+			  	FROM [paspul_stocks] as s 
+			  	LEFT JOIN [paspul_stock_u_cons] as k ON k.skeda = s.skeda and k.paspul_type = s.paspul_type
+				LEFT JOIN [paspul_locations] as l ON l.[location] = s.[location] 
 				ORDER BY l.[location] asc
 			 "));
 		// dd($data);
@@ -5638,8 +6695,8 @@ class plannerController extends Controller {
 		}
 	
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT s.* ,k.[unit_cons], s.[fg_color_code], l.[plant] FROM paspul_stocks as s 
-			LEFT JOIN [cutting].[dbo].[paspul_stock_by_keys] as k ON k.[pas_key] = s.[pas_key]
-			LEFT JOIN [cutting].[dbo].[paspul_locations] as l ON l.[location] = s.[location] 
+			LEFT JOIN [paspul_stock_by_keys] as k ON k.[pas_key] = s.[pas_key]
+			LEFT JOIN [paspul_locations] as l ON l.[location] = s.[location] 
 			ORDER BY l.[location] asc
 			 "));
 		// dd($data);
@@ -5649,7 +6706,7 @@ class plannerController extends Controller {
 	public function paspul_stock_log () {
 
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * 
-			FROM [cutting].[dbo].[paspul_stock_logs]
+			FROM [paspul_stock_logs]
 			WHERE [created_at] > DATEADD(day,-30,GETDATE()) 
 			ORDER BY [created_at] desc"));
 		// dd($data);
@@ -5920,8 +6977,8 @@ class plannerController extends Controller {
 		return redirect('/paspul_stock');
 	}
 
-
 //PRINTING
+
 	public function print_mattress ($id) {
 
 		return view('planner.print_mattress_confirm', compact( 'id'));
@@ -6545,8 +7602,8 @@ class plannerController extends Controller {
 		$t->save();
 
 		return redirect('/');
-
 	}
+
 	public function print_mattress_multiple () {
 
 		return view('planner.print_mattress_multiple');
@@ -7568,8 +8625,8 @@ class plannerController extends Controller {
 		return redirect('/');
 	}
 
-
 //SEARCH
+
 	public function recap_by_skeda_mattress(){
 
 		return view('planner.recap_by_skeda_mattress');
@@ -8077,4 +9134,468 @@ class plannerController extends Controller {
 		return Redirect::to('/paspul_locations');
 	}
 
-}
+//SKEDA COMMENTS
+	public function skeda_comments(){
+
+		// dd('tt');
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+				  FROM [skeda_comments] ORDER BY created_at desc"));
+		// dd($data);
+		
+		return view('planner.skeda_comments', compact('data'));	
+	}
+
+	public function skeda_comments_add() {
+
+		return view('planner.skeda_comments_add');
+	}
+
+	public function skeda_comment_post(Request $request) {
+
+		$this->validate($request, ['skeda'=>'required','comment'=>'required']);
+		$input = $request->all(); 
+
+		$skeda = trim($input['skeda']);
+		$comment = trim($input['comment']);
+		$operator = Session::get('operator');
+		// dd($comment);
+
+		$table = new skeda_comments;
+		$table->skeda = $skeda;
+		$table->comment = $comment;
+		$table->operator = $operator;
+		$table->save();
+
+		return Redirect::to('/skeda_comments');
+	}
+
+	public function skeda_comment_edit ($id) {
+
+		$skeda_comment = skeda_comments::findOrFail($id);	
+		return view('planner.skeda_comments_edit', compact('skeda_comment'));
+	}
+
+	public function skeda_comment_edit_post (Request $request) {
+
+		$this->validate($request, ['skeda'=>'required','comment'=>'required']);
+		$input = $request->all(); 
+		// dd($input);
+
+		$id = trim($input['id']);
+		// dd($id);
+		$skeda = trim($input['skeda']);
+		$comment = trim($input['comment']);
+		$operator = Session::get('operator');
+		// dd($comment);
+
+		$table = skeda_comments::findOrFail($id);
+		$table->skeda = $skeda;
+		$table->comment = $comment;
+		$table->operator = $operator;
+		$table->save();
+
+		return Redirect::to('/skeda_comments');
+	}
+
+	public function skeda_comment_delete (Request $request) {
+
+		// $this->validate($request, ['skeda'=>'required','comment'=>'required']);
+		$input = $request->all(); 
+		
+		$id = trim($input['id']);
+		$delete = skeda_comments::where('id', $id)->delete();
+		
+		return Redirect::to('/skeda_comments');
+	}
+
+//FABRIC RESERVATION
+	public function fabric_reservation() {
+
+		return view('planner.fabric_reservation');
+	}
+
+	public function inbound_delivery_table() {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT i.*
+			,(SELECT SUM(r.[qty_reserved_m]) FROM fabric_reservations as r
+				WHERE r.[material] = i.[material] 
+					AND r.[bagno] = i.[bagno] 
+					AND r.[document_no] = i.[document_no]) as qty_reserved_m
+			
+			FROM [inbound_deliveries] as i 
+			WHERE i.[reserve_status] != 'Reserved'
+			ORDER BY i.id asc"));		
+		// dd($data);
+		return view('planner.inbound_delivery_table', compact('data'));
+	}
+
+	public function leftover_table() {
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+				  FROM [fabric_reservations]
+				  WHERE skeda_status = 'Leftover to Check'
+				  ORDER BY id asc"));
+		// dd($data);
+		return view('planner.leftover_table', compact('data'));
+	}
+
+	public function fabric_reservation_table() {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+				  FROM [fabric_reservations]
+				  WHERE (skeda_status = 'Bagno Still in Use' ) OR (skeda_status = 'Active' )
+				  ORDER BY id asc"));
+		// dd($data);
+		return view('planner.fabric_reservation_table', compact('data'));
+	}
+
+	public function reserve_material($id) {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT i.*
+			,(SELECT r.qty_reserved_m FROM fabric_reservations as r
+				WHERE r.material = i.material 
+					AND r.bagno = i.bagno 
+					AND r.document_no = i.document_no) as qty_reserved_m 
+				FROM [inbound_deliveries] as i
+				WHERE i.id = '".$id."' "));
+
+		$skedas = DB::connection('sqlsrv6')->select(DB::raw("
+					SELECT		
+						distinct [skeda]
+						--,[skeda_status] 
+					FROM [pro] 
+					
+					where 
+						([skeda_status] is NULL OR [skeda_status] = '') AND
+						skeda != '' AND LEN([skeda]) >= 12
+					
+				   "));
+		// dd($skedas);
+
+		// dd($inbound_delivery_line[0]);
+		return view('planner.fabric_reservation_material_add_info', compact('data','skedas'));
+	}
+
+	public function reserve_material_post(Request $request) {
+
+		$this->validate($request, ['skeda'=>'required','skeda_mat'=>'required','reserved_qty'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl;)
+		// dd($input);
+
+		$id = $input['id'];
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+				  FROM [inbound_deliveries] 
+				  WHERE id = '".$id."' 
+				  AND (reserve_status='Not Reserved' OR reserve_status='Partially Reserved') 
+				  "));
+		if (!isset($data[0]->id)) {
+			dd('status of inbound line should be NOT Reserved OR Partially Reserved');
+		}
+		// dd($data);
+
+		$qty_reserved_m = round((float)$input['reserved_qty'],1);
+		// dd($qty_reserved_m);
+		// dd($data[0]->qty_received_m);
+		// dd(round((float)$data[0]->qty_received_m,1));
+		// dd(round($qty_reserved_m,1));
+
+		if (round($qty_reserved_m,1) > round((float)$data[0]->qty_received_m,1))  {
+			 dd('you can not reserved more than received1');
+		}
+
+		$skeda = $input['skeda'].$input['skeda_mat'];
+		$document_no = $data[0]->document_no;
+		$reservation_date = date('Y-m-d');
+		$material = $data[0]->material;
+		$bagno = $data[0]->bagno;
+		$preforigin = $data[0]->preforigin;
+		$inbd_id = $data[0]->id;
+		$qty_reserved_m;
+
+		// reservation status
+		// Active
+		// $chec_if_material_is
+		$skeda_status = 'Active';
+
+		/*
+		$posum_skeda_status = DB::connection('sqlsrv6')->select(DB::raw("SELECT		
+			[skeda_status]
+			--,[skeda_status]
+			FROM [pro]
+			WHERE LEFT([skeda], 12) = LEFT('".$skeda."', 12) "));
+		$posum_skeda_status = $posum_skeda_status[0]->skeda_status;
+
+		// dd($posum_skeda_status);
+		if (($posum_skeda_status == NULL) OR ($posum_skeda_status == '')) {
+			$skeda_status = 'Active';
+		} else {
+
+			$check_if_mat_b_alredy_reserved = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+				  FROM [fabric_reservations] 
+				  WHERE material = '".$material."' AND bagno = '".$bagno."' 
+				  AND skeda_status != 'Complete'
+				  
+				  "));
+			// dd(empty($check_if_mat_b_alredy_reserved));
+
+			if (!empty($check_if_mat_b_alredy_reserved) == TRUE) {
+				// someting already reserved for this material and bagno
+				// set Still in Use
+				// dd('someting already reserved for this material and bagno');
+				$skeda_status = 'Still in Use';
+			} else {
+				// nothnig reserved
+				// set Leftover to Check
+				// dd('nothnig reserved');
+				$skeda_status = 'Leftover to Check';
+			}
+		}
+		// dd($skeda_status);
+		*/
+
+		$comment = trim($input['comment']);
+		$operator = Session::get('operator');
+
+		$check_if_alredy_reserved_on_skeda = DB::connection('sqlsrv')->select(DB::raw("SELECT id
+				  FROM [fabric_reservations] 
+				  WHERE material = '".$material."' AND
+				  		bagno = '".$bagno."' AND 
+				  		document_no = '".$document_no."' AND
+				  		skeda = '".$skeda."' 
+				  "));
+		// dd($check_if_alredy_reserved_on_skeda);
+
+		if (isset($check_if_alredy_reserved_on_skeda[0]->id)) {
+
+
+			$table = fabric_reservation::findOrFail($check_if_alredy_reserved_on_skeda[0]->id);
+			$table->skeda = $skeda;
+			$table->reservation_date = $reservation_date;
+			// $table->document_no = $document_no;
+			// $table->material = $material;
+			// $table->bagno = $bagno;
+			// $table->preforigin = $preforigin;
+
+			if (($table->qty_reserved_m + round($qty_reserved_m,1)) > round((float)$data[0]->qty_received_m,1)) {
+			 	dd('you can not reserved more than received for this inbound line');
+			}
+
+			$table->qty_reserved_m = $table->qty_reserved_m + round($qty_reserved_m,1);
+			$table->skeda_status = $skeda_status;
+			$table->operator = $operator;
+			$table->comment = $comment;
+			$table->inbd_id = $inbd_id;	
+			$table->save();
+
+
+		} else {
+
+			$table = new fabric_reservation;
+			$table->skeda = $skeda;
+			$table->reservation_date = $reservation_date;
+			$table->document_no = $document_no;
+			$table->material = $material;
+			$table->bagno = $bagno;
+			$table->preforigin = $preforigin;
+			$table->qty_reserved_m = $qty_reserved_m;
+			$table->skeda_status = $skeda_status;
+			$table->operator = $operator;
+			$table->comment = $comment;		
+			$table->inbd_id = $inbd_id;		
+			$table->save();
+
+		}
+
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT i.*
+			,(SELECT SUM(r.[qty_reserved_m]) FROM fabric_reservations as r
+				WHERE r.[material] = i.[material] 
+					AND r.[bagno] = i.[bagno] 
+					AND r.[document_no] = i.[document_no]) as qty_reserved_m
+			
+			FROM [inbound_deliveries] as i 
+			WHERE i.[id] = '".$id."'
+			ORDER BY i.id asc"));		
+		// dd($data);
+		if (isset($data[0]->id)) {
+			
+			$table1 = inbound_delivery::findOrFail($id);	
+
+			$qty_reserved_m_all = $data[0]->qty_reserved_m;
+
+			if ($qty_reserved_m_all == $table1->qty_received_m ) {
+				$table1->reserve_status = 'Reserved';
+			} elseif ($qty_reserved_m_all < $table1->qty_received_m) {
+				$table1->reserve_status = 'Partially Reserved';
+			} else {
+				dd('error');
+			}
+			$table1->save();
+		}
+		
+		return redirect('inbound_delivery_table');
+	}
+
+	public function update_skeda_status() {
+
+		$all_reservations = DB::connection('sqlsrv')->select(DB::raw("SELECT *	
+			FROM [fabric_reservations]
+			WHERE [skeda_status] != 'Completed' "));
+		// dd($all_reservations);
+
+		foreach ($all_reservations as $line) {
+			
+			// reservation status
+			// Active
+			// $chec_if_material_is
+			$posum_skeda_status = DB::connection('sqlsrv6')->select(DB::raw("SELECT		
+				[skeda_status]
+				--,[skeda_status]
+				FROM [pro]
+				WHERE LEFT([skeda], 12) = LEFT('".$line->skeda."', 12) "));
+			$posum_skeda_status = $posum_skeda_status[0]->skeda_status;
+			// dd($posum_skeda_status);
+
+
+			if (($posum_skeda_status == NULL) OR (trim($posum_skeda_status == ''))) {
+				$skeda_status = 'Active';
+			} else {
+				// sekda_status = Done;
+
+				$check_if_mat_b_alredy_reserved = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+					  FROM [fabric_reservations] 
+					  WHERE material = '".$line->material."' AND bagno = '".$line->bagno."' 
+					  AND skeda_status = 'Active'
+					  AND id NOT IN ('".$line->id."')
+					  "));
+				// dd($check_if_mat_b_alredy_reserved);
+				
+				// if ($line->bagno == '240512') {
+				// 	dd(!empty($check_if_mat_b_alredy_reserved));
+				// }
+				
+
+				if (!empty($check_if_mat_b_alredy_reserved) == TRUE) {
+					// someting already reserved for this material and bagno
+					// set Still in Use
+					// dd('someting already reserved for this material and bagno');
+					$skeda_status = 'Still in Use';
+				} else {
+					// nothnig reserved
+					// set Leftover to Check
+					// dd('nothnig reserved');
+					$skeda_status = 'Leftover to Check';
+				}
+			}
+			// dd($skeda_status);
+
+			$table = fabric_reservation::findOrFail($line->id);
+			$table->skeda_status = $skeda_status;
+			$table->save();
+
+		}
+		return redirect('fabric_reservation_table');
+	}
+
+	public function declare_no_leftover($id) {
+		// dd($id);
+
+		$skeda_status = 'Completed';
+
+		$table = fabric_reservation::findOrFail($id);
+		$table->skeda_status = $skeda_status;
+		$table->save();
+
+		return redirect('fabric_reservation_table');
+	}
+
+	public function declare_leftover($id) {
+		// dd($id);
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+				FROM [fabric_reservations]
+				WHERE id = '".$id."' "));
+		// dd($data);
+
+		return view('planner.declare_leftover', compact('data'));
+	}
+
+	public function declare_leftover_post(Request $request) {
+
+		$this->validate($request, ['leftover_qty'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl;)
+		// dd($input);
+
+		$id = $input['id'];
+		$leftover_qty = $input['leftover_qty'];
+
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+				FROM [fabric_reservations]
+				WHERE id = '".$id."' "));
+
+		// dd($data);
+
+		$skeda = $data[0]->skeda;
+		$reservation_date = $data[0]->reservation_date;
+		$document_no = $data[0]->document_no;
+		$material = $data[0]->material;
+		$bagno = $data[0]->bagno;
+		$preforigin = $data[0]->preforigin;
+		$qty_reserved_m = round((float)$data[0]->qty_reserved_m,2);
+		$qty_leftover_m = round((float)$leftover_qty,2);
+		
+		$operator = Session::get('operator');
+		$comment = trim($input['comment']);
+		
+		$frez_id = $id;
+		$inbd_id = $data[0]->inbd_id;
+
+		// dd($document_no.'-Leftover');
+
+		// save in leftover table
+		$table = new leftover_table;
+		$table->skeda = $skeda;
+		$table->reservation_date = $reservation_date;
+		$table->document_no = $document_no;
+		$table->material = $material;
+		$table->bagno = $bagno;
+		$table->preforigin = $preforigin;
+		$table->qty_reserved_m = $qty_reserved_m;
+		$table->qty_leftover_m = $qty_leftover_m;
+		$table->operator = $operator;
+		$table->comment = $comment;		
+		$table->frez_id = $frez_id;		
+		$table->inbd_id = $inbd_id;		
+		$table->save();
+
+		// save in inbound table
+		$find = inbound_delivery::findOrFail($inbd_id);
+		$posting_date = $find->posting_date;
+		$reserve_status = "Not Reserved";
+		$qty_received_m = $qty_leftover_m;
+		$type = "Leftover";
+		
+		$table1 = new inbound_delivery;
+		$table1->document_no = $document_no.'-Leftover';
+		$table1->posting_date = $posting_date;
+		$table1->material = $material;
+		$table1->bagno = $bagno;
+		$table1->qty_received_m = $qty_received_m;
+		$table1->preforigin = $preforigin;
+		$table1->reserve_status = $reserve_status;
+		$table1->type = $type;
+		$table1->save();
+
+		// update fabric reservation table
+		$skeda_status = 'Completed';
+		$table2 = fabric_reservation::findOrFail($id);
+		$table2->skeda_status = $skeda_status;
+		$table2->save();
+
+		return redirect('fabric_reservation_table');
+	}
+
+
+	
+}	
+

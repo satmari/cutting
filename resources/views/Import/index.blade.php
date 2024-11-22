@@ -40,6 +40,21 @@
 						@include('errors.list')
 					{!! Form::close() !!}
 				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">Import Inbound Delivery table</div>
+					<p></p>
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImportInbound_delivery']]) !!}
+					
+						<div class="panel-body">
+							{!! Form::file('file14', ['class' => 'center-block']) !!}
+						</div>
+						<div class="panel-body">
+							{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
+						</div>
+						@include('errors.list')
+					{!! Form::close() !!}
+				</div>
 				@endif
 
 				@if(Auth::check() && (Auth::user()->name == 'admin') OR (Auth::user()->name == 'planner'))
@@ -88,7 +103,7 @@
 					{!! Form::close() !!}
 				</div>
 
-				<div class="panel panel-default">
+				<!-- <div class="panel panel-default">
 					<div class="panel-heading">Import Consumption (Excel file)</div>
 					
 					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImport_consumption']]) !!}
@@ -101,7 +116,7 @@
 						</div>
 						@include('errors.list')
 					{!! Form::close() !!}
-				</div>
+				</div> -->
 
 				<div class="panel panel-default">
 					<div class="panel-heading">Marker - change status (Excel file)</div>
@@ -124,7 +139,7 @@
 				OR Auth::user()->name == 'PSK1' OR Auth::user()->name == 'PSK2' OR Auth::user()->name == 'PSK3'
 				OR Auth::user()->name == 'PSZ1' OR Auth::user()->name == 'PSZ2' OR Auth::user()->name == 'PSZ3'))
 				<div class="panel panel-default">
-					<div class="panel-heading"><b><big>Import paspul stock</big></b> with Excel file</div>
+					<div class="panel-heading">Import paspul stock (Excel file)</div>
 					<p>Note: Excel file should contian:
 					skeda,	type,	dye lot,	length,	location,	kotur qty,	uom (meter/ploce),	kotur width,	material
 					</p>
@@ -141,7 +156,7 @@
 				</div>
 
 				<div class="panel panel-default">
-					<div class="panel-heading"><b><big>Return paspul from line</big></b> with Excel file</div>
+					<div class="panel-heading">Return paspul from line (Excel file)</div>
 					<p>Note: Excel file should contian:
 					skeda,	type,	dye lot,	length,	location, kotur qty,	uom (meter/ploce),	kotur width,	material
 					</p>
@@ -151,7 +166,7 @@
 							{!! Form::file('file9', ['class' => 'center-block']) !!}
 						</div>
 						<div class="panel-body">
-							{!! Form::submit('Import', ['class' => 'btn btn-danger center-block']) !!}
+							{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
 						</div>
 						@include('errors.list')
 					{!! Form::close() !!}
@@ -162,7 +177,7 @@
 				@if(Auth::check() && (Auth::user()->name == 'admin') OR (Auth::user()->name == 'planner'))				
 
 				<div class="panel panel-default">
-					<div class="panel-heading"><b><big>Style parts import</big></b> with Excel file</div>
+					<div class="panel-heading">Style parts import (Excel file)</div>
 					<p>Note: Excel file should contian:
 					Style,	Part
 					</p>
@@ -179,7 +194,7 @@
 				</div>
 
 				<div class="panel panel-default">
-					<div class="panel-heading">Import BOM cons</div>
+					<div class="panel-heading">Import BOM cons (Excel file)</div>
 					</p>
 					{!! Form::open(['files'=>True, 'method'=>'POST', 'action'=>['importController@bom_cons_post']]) !!}
 					
@@ -194,7 +209,7 @@
 				</div>
 
 				<div class="panel panel-default">
-					<div class="panel-heading">Import Skeda ratios</div>
+					<div class="panel-heading">Import Skeda ratios (Excel file)</div>
 					</p>
 					{!! Form::open(['files'=>True, 'method'=>'POST', 'action'=>['importController@skeda_ratio_post']]) !!}
 					
@@ -209,7 +224,7 @@
 				</div>
 
 				<div class="panel panel-default">
-					<div class="panel-heading">Import cutting SMV</div>
+					<div class="panel-heading">Import cutting SMV (Excel file)</div>
 					</p>
 					{!! Form::open(['files'=>True, 'method'=>'POST', 'action'=>['importController@bom_cutting_smv_post']]) !!}
 					

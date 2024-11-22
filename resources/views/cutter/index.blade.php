@@ -57,7 +57,7 @@
 		                            <!-- <th >SKU</th> -->
 		                            <th >Material</th>
 		                            <th >Dye Lot</th>
-		                            <th >Color Desc</th>
+		                            <th >Color </th>
 		                            <!-- <th >Skeda</th> -->
 		                            <!-- <th >Planned Cons [m]</th> -->
 		                            <!-- <th >Spreading Method</th> -->
@@ -100,7 +100,7 @@
 		                            {{--<td style="width: 120px;">{{ $req->sku}}</td>--}}
 		                            <td>{{ $req->material}}</td>
 		                            <td>{{ $req->dye_lot}}</td>
-		                            <td>{{ $req->color_desc}}</td>
+		                            <td>{{ $req->color_desc}} / {{ $req->fg_color_code}}</td>
 
 		                            @if ($req->all_pro_for_main_plant == 1)
 		                            	<td>YES</td>
@@ -109,18 +109,20 @@
 		                            @endif
 		                            
 		                           <td class="
-			                            @if ($req->priority == 6) ts_priority
+			                            @if ($req->priority == 7) tt_priority
+			                            @elseif ($req->priority == 6) ts_priority
 			                            @elseif ($req->priority == 5) ss_priority
 			                            @elseif ($req->priority == 4) fs_priority
 			                            @elseif ($req->priority == 3) top_priority
 					        	    	@elseif ($req->priority == 2) high_priority
 					        	    	@endif
 					        	    	">
-					        	    	@if ($req->priority == 6)3rd shift
+					        	    	@if ($req->priority == 7)Test
+					        	    	@elseif ($req->priority == 6)3rd shift
 					        	    	@elseif ($req->priority == 5)2nd shift
 					        	    	@elseif ($req->priority == 4)1st shift
 					        	    	@elseif ($req->priority == 3)Top
-					        	    	@elseif ($req->priority == 2)High
+					        	    	@elseif ($req->priority == 2)Flash
 				        	    		@elseif ($req->priority == 1)Normal
 					        	    	@endif</td>
 		                            <td>{{ $req->status}}</td>

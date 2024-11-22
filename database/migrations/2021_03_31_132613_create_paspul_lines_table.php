@@ -29,6 +29,8 @@ class CreatePaspulLinesTable extends Migration {
 
 			$table->dateTime('date')->nullable();
 
+			$table->string('id_status')->nullable(); // added 
+
 			$table->timestamps();
 		});
 	}

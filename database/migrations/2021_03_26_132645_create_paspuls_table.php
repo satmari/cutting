@@ -30,7 +30,7 @@ class CreatePaspulsTable extends Migration {
 			$table->float('kotur_actual')->nullable();
 			$table->float('rewound_length');
 			$table->float('rewound_length_a')->nullable();
-			
+
 			$table->string('pasbin');
 			$table->string('skeda_item_type');
 			$table->string('skeda');
@@ -44,6 +44,8 @@ class CreatePaspulsTable extends Migration {
 
 			$table->string('rewinding_method')->nullable();
 			$table->string('tpa_number')->nullable();
+
+			$table->float('rewound_length_p')->nullable();
 			
 			$table->timestamps();
 		});

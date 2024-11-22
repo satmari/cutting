@@ -37,7 +37,7 @@
 					 	</td>
 
 					 	<td style="width:10%">
-					 		<input type="number" class="" name="paspul_qty" size="" min="1" max="100" value="">  
+					 		<input type="number" class="" name="paspul_qty" size="" min="1" max="1000" value="">  
 					 	</td>
 					 	<td style="width:35%">
 					 		<input type="text" class="" name="paspul_comment" size="40" min="1" max="100" value=""> 
@@ -50,7 +50,7 @@
 					 	</td>
 
 					 	<td style="width:10%">
-					 		<input type="number" class="" name="other_qty" size="" min="1" max="100" value="">  
+					 		<input type="number" class="" name="other_qty" size="" min="1" max="1000" value="">  
 					 	</td>
 					 	<td style="width:35%">
 					 		<input type="text" class="" name="other_comment" size="40" min="1" max="100" value=""> 
@@ -92,7 +92,7 @@
   						 	</td>
 
   						 	<td style="width:10%">
-  						 		<input type="number" class="" name="qty[]" size="" min="1" max="100" value="">  
+  						 		<input type="number" class="" name="qty[]" size="" min="1" max="1000" value="">  
   						 	</td>
   						 	<td style="width:35%">
   						 		<input type="text" class="" name="comment[]" size="40" min="1" max="100" value=""> 

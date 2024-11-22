@@ -102,6 +102,8 @@ class cutterController extends Controller {
 		      ,m4.[active]
 		      ,m4.[operator1]
 		      ,m4.[operator2]
+
+		      ,(SELECT TOP 1 SUBSTRING(sku,9,5) FROM [pro_skedas] WHERE skeda = m1.[skeda]) as fg_color_code
 		      --,'|'
 		      -- ,m5.[style_size]
 		      -- ,m5.[pro_id]

@@ -37,613 +37,613 @@ class reservationController extends Controller {
 	public function hu_list() // ne koristi se
 	{
 		//
-		$data = DB::connection('sqlsrv1')->select(DB::raw("SELECT  [HU No_] as hu,
-		 [Item No_] as item, 
-		 [Father HU No_] as father_hu,
-		 [Variant Code] as variant, 
-		 --[Status] as status, 
-		 (CASE WHEN [Status] = '0' THEN 'Open' END) AS status,
-		 [Balance] as balance, 
-		 [Quantity] as qty, 
-		 [Batch_Dye lot] as batch,
-		 [Document No_] as document,
-		 [Bin Code] as bin,
-		 --[Location Barcode],
-		 (SELECT TOP 1 [Cell Code] FROM [Gordon_LIVE].[dbo].[GORDON\$WMS Storage Location] WHERE [Location Barcode] = [Barcode No_]) as location
-  		FROM [Gordon_LIVE].[dbo].[GORDON\$Handling Unit]
+		// $data = DB::connection('sqlsrv1')->select(DB::raw("SELECT  [HU No_] as hu,
+		//  [Item No_] as item, 
+		//  [Father HU No_] as father_hu,
+		//  [Variant Code] as variant, 
+		//  --[Status] as status, 
+		//  (CASE WHEN [Status] = '0' THEN 'Open' END) AS status,
+		//  [Balance] as balance, 
+		//  [Quantity] as qty, 
+		//  [Batch_Dye lot] as batch,
+		//  [Document No_] as document,
+		//  [Bin Code] as bin,
+		//  --[Location Barcode],
+		//  (SELECT TOP 1 [Cell Code] FROM [Gordon_LIVE].[dbo].[GORDON\$WMS Storage Location] WHERE [Location Barcode] = [Barcode No_]) as location
+  // 		FROM [Gordon_LIVE].[dbo].[GORDON\$Handling Unit]
   
-  		WHERE [Status] = 0 and Balance <> 0 and [HU No_] not like 'NOT%' and [HU No_] <> ''
-  		GROUP BY [HU No_], [Father HU No_] ,[Item No_], [Variant Code], [Status], [Balance], [Quantity], [Batch_Dye lot], [Document No_], [Bin Code], [Location Barcode]
-  		ORDER BY [Item No_], [Variant Code]"));
+  // 		WHERE [Status] = 0 and Balance <> 0 and [HU No_] not like 'NOT%' and [HU No_] <> ''
+  // 		GROUP BY [HU No_], [Father HU No_] ,[Item No_], [Variant Code], [Status], [Balance], [Quantity], [Batch_Dye lot], [Document No_], [Bin Code], [Location Barcode]
+  // 		ORDER BY [Item No_], [Variant Code]"));
 
-		$count_hu = DB::connection('sqlsrv1')->select(DB::raw("SELECT COUNT([HU No_]) as count_hu
-  		FROM [Gordon_LIVE].[dbo].[GORDON\$Handling Unit]
-   		WHERE Status = 0 and Balance <> 0 and [HU No_] not like 'NOT%' "));
+		// $count_hu = DB::connection('sqlsrv1')->select(DB::raw("SELECT COUNT([HU No_]) as count_hu
+  // 		FROM [Gordon_LIVE].[dbo].[GORDON\$Handling Unit]
+  //  		WHERE Status = 0 and Balance <> 0 and [HU No_] not like 'NOT%' "));
 		
 		
-		if (isset($count_hu[0])) {
-			$count = $count_hu[0]->count_hu;
-		} else {
-			$count = "0";
-		}
+		// if (isset($count_hu[0])) {
+		// 	$count = $count_hu[0]->count_hu;
+		// } else {
+		// 	$count = "0";
+		// }
 
-		// dd($data);
-  		// return view('reservations.hu_list', compact('data', 'count'));
+		// // dd($data);
+  // 		// return view('reservations.hu_list', compact('data', 'count'));
   		
-  		if (isset($data[0])) {
+  // 		if (isset($data[0])) {
 			
-  			// dd($data);
-  			temp_table_hu::truncate();
+  // 			// dd($data);
+  // 			temp_table_hu::truncate();
 
-			for ($i=0; $i < count($data); $i++) { 
+		// 	for ($i=0; $i < count($data); $i++) { 
 							
-				// dd($data[$i]->hu);
-				// dd(floatval(round($data[$i]->balance,2)));
+		// 		// dd($data[$i]->hu);
+		// 		// dd(floatval(round($data[$i]->balance,2)));
 
-				try {
-					$table = new temp_table_hu;
+		// 		try {
+		// 			$table = new temp_table_hu;
 
-					$table->hu = $data[$i]->hu;
-					$table->father_hu = $data[$i]->father_hu;
-					$table->item = $data[$i]->item;
-					$table->variant = $data[$i]->variant;
-					$table->status = $data[$i]->status;
-					$table->balance = floatval(round($data[$i]->balance,2));
-					$table->batch = $data[$i]->batch;
-					$table->document = $data[$i]->document;
-					$table->bin = $data[$i]->bin;
-					$table->location = $data[$i]->location;
+		// 			$table->hu = $data[$i]->hu;
+		// 			$table->father_hu = $data[$i]->father_hu;
+		// 			$table->item = $data[$i]->item;
+		// 			$table->variant = $data[$i]->variant;
+		// 			$table->status = $data[$i]->status;
+		// 			$table->balance = floatval(round($data[$i]->balance,2));
+		// 			$table->batch = $data[$i]->batch;
+		// 			$table->document = $data[$i]->document;
+		// 			$table->bin = $data[$i]->bin;
+		// 			$table->location = $data[$i]->location;
 					
-					$table->save();
-				}
-				catch (\Illuminate\Database\QueryException $e) {
-					return view('reservations.error');
-				}
-			}			
+		// 			$table->save();
+		// 		}
+		// 		catch (\Illuminate\Database\QueryException $e) {
+		// 			return view('reservations.error');
+		// 		}
+		// 	}			
 
-		} else {
+		// } else {
 			
-			$msg = "No HU in HU table";
-			return view('reservations.error',compact('msg'));
-		}
+		// 	$msg = "No HU in HU table";
+		// 	return view('reservations.error',compact('msg'));
+		// }
 
-		// return view('reservations.hu_list', compact('data', 'count'));
-		return view('reservations.hu_imported', compact('count'));
-		// return Redirect::to('/');
+		// // return view('reservations.hu_list', compact('data', 'count'));
+		// return view('reservations.hu_imported', compact('count'));
+		// // return Redirect::to('/');
 	}
 
 	public function update_reservation_table_old() // ne koristi se
 	{
 
 		// update temp table
-		$data = DB::connection('sqlsrv1')->select(DB::raw("SELECT  u.[HU No_] as hu,
-		 u.[Item No_] as item, 
-		 u.[Father HU No_] as father_hu,
-		 u.[Variant Code] as variant, 
-		 --[Status] as status, 
-		 (CASE WHEN u.[Status] = '0' THEN 'Open' END) AS status,
-		 u.[Balance] as balance, 
-		 u.[Quantity] as qty, 
-		 u.[Batch_Dye lot] as batch,
-		 u.[Document No_] as document,
-		 u.[Bin Code] as bin,
-		 --[Location Barcode],
-		 (SELECT TOP 1 temp.[Quantity] FROM [Gordon_LIVE].[dbo].[GORDON\$Handling Unit] as temp WHERE temp.[HU No_] = u.[HU No_] ORDER BY temp.[Entry No_] asc) as original_qty,
-		 (SELECT TOP 1 [Cell Code] FROM [Gordon_LIVE].[dbo].[GORDON\$WMS Storage Location] WHERE [Location Barcode] = [Barcode No_]) as location
-  		FROM [Gordon_LIVE].[dbo].[GORDON\$Handling Unit] as u
+		// $data = DB::connection('sqlsrv1')->select(DB::raw("SELECT  u.[HU No_] as hu,
+		//  u.[Item No_] as item, 
+		//  u.[Father HU No_] as father_hu,
+		//  u.[Variant Code] as variant, 
+		//  --[Status] as status, 
+		//  (CASE WHEN u.[Status] = '0' THEN 'Open' END) AS status,
+		//  u.[Balance] as balance, 
+		//  u.[Quantity] as qty, 
+		//  u.[Batch_Dye lot] as batch,
+		//  u.[Document No_] as document,
+		//  u.[Bin Code] as bin,
+		//  --[Location Barcode],
+		//  (SELECT TOP 1 temp.[Quantity] FROM [Gordon_LIVE].[dbo].[GORDON\$Handling Unit] as temp WHERE temp.[HU No_] = u.[HU No_] ORDER BY temp.[Entry No_] asc) as original_qty,
+		//  (SELECT TOP 1 [Cell Code] FROM [Gordon_LIVE].[dbo].[GORDON\$WMS Storage Location] WHERE [Location Barcode] = [Barcode No_]) as location
+  // 		FROM [Gordon_LIVE].[dbo].[GORDON\$Handling Unit] as u
   
-  		WHERE u.[Status] = 0 and u.Balance <> 0 and u.[HU No_] not like 'NOT%' and u.[HU No_] <> ''
-  		GROUP BY u.[HU No_], u.[Father HU No_] ,u.[Item No_], u.[Variant Code], u.[Status], u.[Balance], u.[Quantity], u.[Batch_Dye lot], u.[Document No_], u.[Bin Code], u.[Location Barcode]
-  		ORDER BY u.[Item No_], u.[Variant Code]"));
+  // 		WHERE u.[Status] = 0 and u.Balance <> 0 and u.[HU No_] not like 'NOT%' and u.[HU No_] <> ''
+  // 		GROUP BY u.[HU No_], u.[Father HU No_] ,u.[Item No_], u.[Variant Code], u.[Status], u.[Balance], u.[Quantity], u.[Batch_Dye lot], u.[Document No_], u.[Bin Code], u.[Location Barcode]
+  // 		ORDER BY u.[Item No_], u.[Variant Code]"));
 
-		if (isset($data[0])) {
+		// if (isset($data[0])) {
 			
-  			// dd($data);
-  			temp_table_hu::truncate();
+  // 			// dd($data);
+  // 			temp_table_hu::truncate();
 
-			for ($i=0; $i < count($data); $i++) { 
+		// 	for ($i=0; $i < count($data); $i++) { 
 							
-				// dd($data[$i]->hu);
-				// dd(floatval(round($data[$i]->balance,2)));
+		// 		// dd($data[$i]->hu);
+		// 		// dd(floatval(round($data[$i]->balance,2)));
 
-				try {
-					$table = new temp_table_hu;
+		// 		try {
+		// 			$table = new temp_table_hu;
 
-					$table->hu = $data[$i]->hu;
-					$table->father_hu = $data[$i]->father_hu;
-					$table->item = $data[$i]->item;
-					$table->variant = $data[$i]->variant;
-					$table->status = $data[$i]->status;
-					$table->balance = floatval(round($data[$i]->balance,2));
-					$table->batch = $data[$i]->batch;
-					$table->document = $data[$i]->document;
-					$table->bin = $data[$i]->bin;
-					$table->location = $data[$i]->location;
+		// 			$table->hu = $data[$i]->hu;
+		// 			$table->father_hu = $data[$i]->father_hu;
+		// 			$table->item = $data[$i]->item;
+		// 			$table->variant = $data[$i]->variant;
+		// 			$table->status = $data[$i]->status;
+		// 			$table->balance = floatval(round($data[$i]->balance,2));
+		// 			$table->batch = $data[$i]->batch;
+		// 			$table->document = $data[$i]->document;
+		// 			$table->bin = $data[$i]->bin;
+		// 			$table->location = $data[$i]->location;
 
-					$table->original_qty = floatval(round($data[$i]->original_qty,2));
+		// 			$table->original_qty = floatval(round($data[$i]->original_qty,2));
 					
-					$table->save();
-				}
-				catch (\Illuminate\Database\QueryException $e) {
-					return view('reservations.error');
-				}
-			}			
+		// 			$table->save();
+		// 		}
+		// 		catch (\Illuminate\Database\QueryException $e) {
+		// 			return view('reservations.error');
+		// 		}
+		// 	}			
 
-		} else {
+		// } else {
 			
-			$msg = "No HU in HU table";
-			return view('reservations.error',compact('msg'));
-		}
+		// 	$msg = "No HU in HU table";
+		// 	return view('reservations.error',compact('msg'));
+		// }
 
 
-		// from temp table to reservation table
-		$temp_table_hu = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM temp_table_hus ORDER BY id"));
-		// dd($temp_table_hu);
-		// dd($temp_table_hu[0]->id);
+		// // from temp table to reservation table
+		// $temp_table_hu = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM temp_table_hus ORDER BY id"));
+		// // dd($temp_table_hu);
+		// // dd($temp_table_hu[0]->id);
 
-		if (isset($temp_table_hu[0]->id)) {
+		// if (isset($temp_table_hu[0]->id)) {
 
-			$update_count = 0;
-			$add_count = 0;
+		// 	$update_count = 0;
+		// 	$add_count = 0;
 
-			for ($i=0; $i < count($temp_table_hu) ; $i++) { 
-				// sleep(1);
+		// 	for ($i=0; $i < count($temp_table_hu) ; $i++) { 
+		// 		// sleep(1);
 
-				$res_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE hu = '".$temp_table_hu[$i]->hu."' "));
+		// 		$res_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE hu = '".$temp_table_hu[$i]->hu."' "));
 				
-				if (isset($res_table[0]->id)) {
+		// 		if (isset($res_table[0]->id)) {
 					
-					$table = Reservation::findOrFail($res_table[0]->id);
+		// 			$table = Reservation::findOrFail($res_table[0]->id);
 					
-					try {
+		// 			try {
 						
-						// $table->hu = $temp_table_hu[$i]->hu;
-						$table->father_hu = $temp_table_hu[$i]->father_hu;
-						$table->item = $temp_table_hu[$i]->item;
-						$table->variant = $temp_table_hu[$i]->variant;
-						$table->status = $temp_table_hu[$i]->status;
-						$table->balance = $temp_table_hu[$i]->balance;
-						$table->batch = $temp_table_hu[$i]->batch;
-						$table->document = $temp_table_hu[$i]->document;
-						$table->bin = $temp_table_hu[$i]->bin;
-						$table->location = $temp_table_hu[$i]->location;	
+		// 				// $table->hu = $temp_table_hu[$i]->hu;
+		// 				$table->father_hu = $temp_table_hu[$i]->father_hu;
+		// 				$table->item = $temp_table_hu[$i]->item;
+		// 				$table->variant = $temp_table_hu[$i]->variant;
+		// 				$table->status = $temp_table_hu[$i]->status;
+		// 				$table->balance = $temp_table_hu[$i]->balance;
+		// 				$table->batch = $temp_table_hu[$i]->batch;
+		// 				$table->document = $temp_table_hu[$i]->document;
+		// 				$table->bin = $temp_table_hu[$i]->bin;
+		// 				$table->location = $temp_table_hu[$i]->location;	
 
-						$table->original_qty = floatval(round($temp_table_hu[$i]->original_qty,2));
+		// 				$table->original_qty = floatval(round($temp_table_hu[$i]->original_qty,2));
 									
-						$table->save();
-					}
-					catch (\Illuminate\Database\QueryException $e) {
-						return view('reservations.error');			
-					}
+		// 				$table->save();
+		// 			}
+		// 			catch (\Illuminate\Database\QueryException $e) {
+		// 				return view('reservations.error');			
+		// 			}
 
-					$update_count = $update_count + 1;
+		// 			$update_count = $update_count + 1;
 
-				} else {
+		// 		} else {
 
 
-					try {
-						$table = new Reservation;
+		// 			try {
+		// 				$table = new Reservation;
 					
-						$table->hu = $temp_table_hu[$i]->hu;
-						$table->father_hu = $temp_table_hu[$i]->father_hu;
-						$table->item = $temp_table_hu[$i]->item;
-						$table->variant = $temp_table_hu[$i]->variant;
-						$table->status = $temp_table_hu[$i]->status;
-						$table->balance = $temp_table_hu[$i]->balance;
-						$table->batch = $temp_table_hu[$i]->batch;
-						$table->document = $temp_table_hu[$i]->document;
-						$table->bin = $temp_table_hu[$i]->bin;
-						$table->location = $temp_table_hu[$i]->location;
+		// 				$table->hu = $temp_table_hu[$i]->hu;
+		// 				$table->father_hu = $temp_table_hu[$i]->father_hu;
+		// 				$table->item = $temp_table_hu[$i]->item;
+		// 				$table->variant = $temp_table_hu[$i]->variant;
+		// 				$table->status = $temp_table_hu[$i]->status;
+		// 				$table->balance = $temp_table_hu[$i]->balance;
+		// 				$table->batch = $temp_table_hu[$i]->batch;
+		// 				$table->document = $temp_table_hu[$i]->document;
+		// 				$table->bin = $temp_table_hu[$i]->bin;
+		// 				$table->location = $temp_table_hu[$i]->location;
 						
-						$table->res_status = "NO";
+		// 				$table->res_status = "NO";
 
-						$table->original_qty = floatval(round($temp_table_hu[$i]->original_qty,2));
+		// 				$table->original_qty = floatval(round($temp_table_hu[$i]->original_qty,2));
 
-						$table->save();
-					}
-					catch (\Illuminate\Database\QueryException $e) {
-						return view('reservations.error');			
-					}
+		// 				$table->save();
+		// 			}
+		// 			catch (\Illuminate\Database\QueryException $e) {
+		// 				return view('reservations.error');			
+		// 			}
 
-					$add_count = $add_count + 1;
-				}
+		// 			$add_count = $add_count + 1;
+		// 		}
 
-			}
+		// 	}
 
-		}
-
-
-		// from reservation table to temp table
-		$reservation_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE status = 'Open' ORDER BY id"));
-		// dd($reservation_table);
-
-		if (isset($reservation_table[0]->id)) {
-
-			$consumed_count = 0;
-
-			for ($i=0; $i < count($reservation_table) ; $i++) {
-
-				$temp_table = DB::connection('sqlsrv')->select(DB::raw("SELECT hu FROM temp_table_hus WHERE hu = '".$reservation_table[$i]->hu."' "));
-
-				// dD($temp_table);
+		// }
 
 
-				if (isset($temp_table[0]->hu)) {
+		// // from reservation table to temp table
+		// $reservation_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE status = 'Open' ORDER BY id"));
+		// // dd($reservation_table);
 
-					// dd($temp_table[0]->hu);
+		// if (isset($reservation_table[0]->id)) {
 
-				} else {
+		// 	$consumed_count = 0;
 
-					// $reservation_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations ORDER BY id"));
+		// 	for ($i=0; $i < count($reservation_table) ; $i++) {
 
-					$table = Reservation::findOrFail($reservation_table[$i]->id);
+		// 		$temp_table = DB::connection('sqlsrv')->select(DB::raw("SELECT hu FROM temp_table_hus WHERE hu = '".$reservation_table[$i]->hu."' "));
+
+		// 		// dD($temp_table);
+
+
+		// 		if (isset($temp_table[0]->hu)) {
+
+		// 			// dd($temp_table[0]->hu);
+
+		// 		} else {
+
+		// 			// $reservation_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations ORDER BY id"));
+
+		// 			$table = Reservation::findOrFail($reservation_table[$i]->id);
 					
-					try {
+		// 			try {
 						
-						// $table->hu = $temp_table_hu[$i]->hu;
-						// $table->item = $temp_table_hu[$i]->item;
-						// $table->variant = $temp_table_hu[$i]->variant;
-						$table->status = "Consumed";
-						// $table->balance = $temp_table_hu[$i]->balance;
-						// $table->batch = $temp_table_hu[$i]->batch;
-						// $table->document = $temp_table_hu[$i]->document;
-						// $table->bin = $temp_table_hu[$i]->bin;
-						// $table->location = $temp_table_hu[$i]->location;		
+		// 				// $table->hu = $temp_table_hu[$i]->hu;
+		// 				// $table->item = $temp_table_hu[$i]->item;
+		// 				// $table->variant = $temp_table_hu[$i]->variant;
+		// 				$table->status = "Consumed";
+		// 				// $table->balance = $temp_table_hu[$i]->balance;
+		// 				// $table->batch = $temp_table_hu[$i]->batch;
+		// 				// $table->document = $temp_table_hu[$i]->document;
+		// 				// $table->bin = $temp_table_hu[$i]->bin;
+		// 				// $table->location = $temp_table_hu[$i]->location;		
 
-						// $table->original_qty = floatval(round($temp_table_hu[$i]->original_qty,2));
+		// 				// $table->original_qty = floatval(round($temp_table_hu[$i]->original_qty,2));
 									
-						$table->save();
-					}
-					catch (\Illuminate\Database\QueryException $e) {
-						return view('reservations.error');
-					}
+		// 				$table->save();
+		// 			}
+		// 			catch (\Illuminate\Database\QueryException $e) {
+		// 				return view('reservations.error');
+		// 			}
 
-					$consumed_count = $consumed_count + 1;
-				}
+		// 			$consumed_count = $consumed_count + 1;
+		// 		}
 
-			}
+		// 	}
 
-		}
+		// }
 
 
-		$reservation_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE status = 'Open' and hu != father_hu ORDER BY id"));
+		// $reservation_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE status = 'Open' and hu != father_hu ORDER BY id"));
 		
-		//check if partialy consumed (new) rolls should keep reservation from father
-		if (isset($reservation_table[0]->id)) {
+		// //check if partialy consumed (new) rolls should keep reservation from father
+		// if (isset($reservation_table[0]->id)) {
 
-			$reserved_by_father = 0;
+		// 	$reserved_by_father = 0;
 
-			for ($i=0; $i < count($reservation_table) ; $i++) {
+		// 	for ($i=0; $i < count($reservation_table) ; $i++) {
 
-				if ($reservation_table[$i]->hu != $reservation_table[$i]->father_hu) {
-					// dd($reservation_table[$i]->hu);
+		// 		if ($reservation_table[$i]->hu != $reservation_table[$i]->father_hu) {
+		// 			// dd($reservation_table[$i]->hu);
 
-					$res_table_father = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE res_status = 'YES' and hu = '".$reservation_table[$i]->father_hu."' "));
-					// dd($res_table_father[0]);
+		// 			$res_table_father = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE res_status = 'YES' and hu = '".$reservation_table[$i]->father_hu."' "));
+		// 			// dd($res_table_father[0]);
 					
-					if (isset($res_table_father[0]->id)) {
-						// dd($res_table_father);
+		// 			if (isset($res_table_father[0]->id)) {
+		// 				// dd($res_table_father);
 
-							// var_dump($res_table_father);
-							// var_dump($reservation_table);
-							// dd("stop");
-
-							
-							$table = Reservation::findOrFail($reservation_table[$i]->id);
-							
-							// dd($table);
-							// dd("0hu: ".$reservation_table[$i]->hu." , 0fhu: ".$reservation_table[$i]->father_hu." ,1hu: ".$table->hu." , 1fhu: ".$table->father_hu." ,father hu: ".$res_table_father[0]->hu." , father fhu: ".$res_table_father[0]->hu);
-
-							try {
-
-								$table->res_po = $res_table_father[0]->res_po;
-								$table->res_qty = $reservation_table[$i]->balance;
-								$table->res_date = $res_table_father[0]->res_date;
-								$table->res_status = 'YES';
-
-								$table->save();
-							}
-							catch (\Illuminate\Database\QueryException $e) {
-								return view('reservations.error');
-							}
+		// 					// var_dump($res_table_father);
+		// 					// var_dump($reservation_table);
+		// 					// dd("stop");
 
 							
+		// 					$table = Reservation::findOrFail($reservation_table[$i]->id);
+							
+		// 					// dd($table);
+		// 					// dd("0hu: ".$reservation_table[$i]->hu." , 0fhu: ".$reservation_table[$i]->father_hu." ,1hu: ".$table->hu." , 1fhu: ".$table->father_hu." ,father hu: ".$res_table_father[0]->hu." , father fhu: ".$res_table_father[0]->hu);
 
-							// Update Father HU reserved qty if hu was splited
-							// $father = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE res_status = 'YES' and hu = '".$reservation_table[$i]->father_hu."' "));
-							$table_f = Reservation::findOrFail($res_table_father[0]->id);
+		// 					try {
 
-							// dd($table_f);
+		// 						$table->res_po = $res_table_father[0]->res_po;
+		// 						$table->res_qty = $reservation_table[$i]->balance;
+		// 						$table->res_date = $res_table_father[0]->res_date;
+		// 						$table->res_status = 'YES';
+
+		// 						$table->save();
+		// 					}
+		// 					catch (\Illuminate\Database\QueryException $e) {
+		// 						return view('reservations.error');
+		// 					}
+
+							
+
+		// 					// Update Father HU reserved qty if hu was splited
+		// 					// $father = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE res_status = 'YES' and hu = '".$reservation_table[$i]->father_hu."' "));
+		// 					$table_f = Reservation::findOrFail($res_table_father[0]->id);
+
+		// 					// dd($table_f);
 										
-							try {
+		// 					try {
 
-								// $table_f->res_po = $res_table_father[0]->res_po;
-								$table_f->res_qty = $res_table_father[0]->res_qty - $reservation_table[$i]->balance;
-								// $table_f->res_date = $res_table_father[0]->res_date;
-								// $table_f->res_status = 'YES';
+		// 						// $table_f->res_po = $res_table_father[0]->res_po;
+		// 						$table_f->res_qty = $res_table_father[0]->res_qty - $reservation_table[$i]->balance;
+		// 						// $table_f->res_date = $res_table_father[0]->res_date;
+		// 						// $table_f->res_status = 'YES';
 
-								// $table_f->save();
-							}
-							catch (\Illuminate\Database\QueryException $e) {
-								return view('reservations.error');
-							}
+		// 						// $table_f->save();
+		// 					}
+		// 					catch (\Illuminate\Database\QueryException $e) {
+		// 						return view('reservations.error');
+		// 					}
 			
 							
 
-							$reserved_by_father = $reserved_by_father + 1;
-					} 	
-				}
-			}
-		}
+		// 					$reserved_by_father = $reserved_by_father + 1;
+		// 			} 	
+		// 		}
+		// 	}
+		// }
 
-		$unreserved_hu = 0; 
-		$unreserved_mt = 0; 
+		// $unreserved_hu = 0; 
+		// $unreserved_mt = 0; 
 
 
-		return view('reservations.hu_updated', compact('update_count','add_count','consumed_count','reserved_by_father', 'unreserved_hu', 'unreserved_mt'));
-		// return Redirect::to('/');
+		// return view('reservations.hu_updated', compact('update_count','add_count','consumed_count','reserved_by_father', 'unreserved_hu', 'unreserved_mt'));
+		// // return Redirect::to('/');
 	}
 
 	public function update_reservation_table()
 	{
-		// update temp table
-		$data = DB::connection('sqlsrv1')->select(DB::raw("SELECT  u.[HU No_] as hu,
-		 u.[Item No_] as item, 
-		 u.[Father HU No_] as father_hu,
-		 u.[Variant Code] as variant, 
-		 --[Status] as status, 
-		 (CASE WHEN u.[Status] = '0' THEN 'Open' END) AS status,
-		 u.[Balance] as balance, 
-		 u.[Quantity] as qty, 
-		 u.[Batch_Dye lot] as batch,
-		 u.[Document No_] as document,
-		 u.[Bin Code] as bin,
-		 --[Location Barcode],
-		 (SELECT TOP 1 temp.[Quantity] FROM [Gordon_LIVE].[dbo].[GORDON\$Handling Unit] as temp WHERE temp.[HU No_] = u.[HU No_] ORDER BY temp.[Entry No_] asc) as original_qty,
-		 (SELECT TOP 1 [Cell Code] FROM [Gordon_LIVE].[dbo].[GORDON\$WMS Storage Location] WHERE [Location Barcode] = [Barcode No_]) as location
-  		FROM [Gordon_LIVE].[dbo].[GORDON\$Handling Unit] as u
+		// // update temp table
+		// $data = DB::connection('sqlsrv1')->select(DB::raw("SELECT  u.[HU No_] as hu,
+		//  u.[Item No_] as item, 
+		//  u.[Father HU No_] as father_hu,
+		//  u.[Variant Code] as variant, 
+		//  --[Status] as status, 
+		//  (CASE WHEN u.[Status] = '0' THEN 'Open' END) AS status,
+		//  u.[Balance] as balance, 
+		//  u.[Quantity] as qty, 
+		//  u.[Batch_Dye lot] as batch,
+		//  u.[Document No_] as document,
+		//  u.[Bin Code] as bin,
+		//  --[Location Barcode],
+		//  (SELECT TOP 1 temp.[Quantity] FROM [Gordon_LIVE].[dbo].[GORDON\$Handling Unit] as temp WHERE temp.[HU No_] = u.[HU No_] ORDER BY temp.[Entry No_] asc) as original_qty,
+		//  (SELECT TOP 1 [Cell Code] FROM [Gordon_LIVE].[dbo].[GORDON\$WMS Storage Location] WHERE [Location Barcode] = [Barcode No_]) as location
+  // 		FROM [Gordon_LIVE].[dbo].[GORDON\$Handling Unit] as u
   
-  		WHERE u.[Status] = 0 and u.Balance <> 0 and u.[HU No_] not like 'NOT%' and u.[HU No_] <> ''
-  		GROUP BY u.[HU No_], u.[Father HU No_] ,u.[Item No_], u.[Variant Code], u.[Status], u.[Balance], u.[Quantity], u.[Batch_Dye lot], u.[Document No_], u.[Bin Code], u.[Location Barcode]
-  		ORDER BY u.[Item No_], u.[Variant Code]"));
+  // 		WHERE u.[Status] = 0 and u.Balance <> 0 and u.[HU No_] not like 'NOT%' and u.[HU No_] <> ''
+  // 		GROUP BY u.[HU No_], u.[Father HU No_] ,u.[Item No_], u.[Variant Code], u.[Status], u.[Balance], u.[Quantity], u.[Batch_Dye lot], u.[Document No_], u.[Bin Code], u.[Location Barcode]
+  // 		ORDER BY u.[Item No_], u.[Variant Code]"));
 
-		if (isset($data[0])) {
+		// if (isset($data[0])) {
 			
-  			// dd($data);
-  			temp_table_hu::truncate();
+  // 			// dd($data);
+  // 			temp_table_hu::truncate();
 
-			for ($i=0; $i < count($data); $i++) { 
+		// 	for ($i=0; $i < count($data); $i++) { 
 							
-				// dd($data[$i]->hu);
-				// dd(floatval(round($data[$i]->balance,2)));
+		// 		// dd($data[$i]->hu);
+		// 		// dd(floatval(round($data[$i]->balance,2)));
 
-				try {
-					$table = new temp_table_hu;
+		// 		try {
+		// 			$table = new temp_table_hu;
 
-					$table->hu = $data[$i]->hu;
-					$table->father_hu = $data[$i]->father_hu;
-					$table->item = $data[$i]->item;
-					$table->variant = $data[$i]->variant;
-					$table->status = $data[$i]->status;
-					$table->balance = floatval(round($data[$i]->balance,2));
-					$table->batch = $data[$i]->batch;
-					$table->document = $data[$i]->document;
-					$table->bin = $data[$i]->bin;
-					$table->location = $data[$i]->location;
+		// 			$table->hu = $data[$i]->hu;
+		// 			$table->father_hu = $data[$i]->father_hu;
+		// 			$table->item = $data[$i]->item;
+		// 			$table->variant = $data[$i]->variant;
+		// 			$table->status = $data[$i]->status;
+		// 			$table->balance = floatval(round($data[$i]->balance,2));
+		// 			$table->batch = $data[$i]->batch;
+		// 			$table->document = $data[$i]->document;
+		// 			$table->bin = $data[$i]->bin;
+		// 			$table->location = $data[$i]->location;
 
-					$table->original_qty = floatval(round($data[$i]->original_qty,2));
+		// 			$table->original_qty = floatval(round($data[$i]->original_qty,2));
 					
-					$table->save();
-				}
-				catch (\Illuminate\Database\QueryException $e) {
-					return view('reservations.error');
-				}
-			}			
+		// 			$table->save();
+		// 		}
+		// 		catch (\Illuminate\Database\QueryException $e) {
+		// 			return view('reservations.error');
+		// 		}
+		// 	}			
 
-		} else {
+		// } else {
 			
-			$msg = "No HU in HU table";
-			return view('reservations.error',compact('msg'));
-		}
-		//
+		// 	$msg = "No HU in HU table";
+		// 	return view('reservations.error',compact('msg'));
+		// }
+		// //
 
-		//Update and consume hus
-		$reservation_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations ORDER BY id"));
+		// //Update and consume hus
+		// $reservation_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations ORDER BY id"));
 
-		$update_count = 0;
-		$consumed_count = 0;
+		// $update_count = 0;
+		// $consumed_count = 0;
 
-		if (isset($reservation_table[0]->id)) {
+		// if (isset($reservation_table[0]->id)) {
 			
-			for ($i=0; $i < count($reservation_table) ; $i++) { 
+		// 	for ($i=0; $i < count($reservation_table) ; $i++) { 
 				
-				if ($reservation_table[$i]->status == "Open") {
+		// 		if ($reservation_table[$i]->status == "Open") {
 				
-					$temp_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM temp_table_hus WHERE hu = '".$reservation_table[$i]->hu."' "));
+		// 			$temp_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM temp_table_hus WHERE hu = '".$reservation_table[$i]->hu."' "));
 
-					if (isset($temp_table[0]->id)) {
+		// 			if (isset($temp_table[0]->id)) {
 
-						$table = Reservation::findOrFail($reservation_table[$i]->id);
+		// 				$table = Reservation::findOrFail($reservation_table[$i]->id);
 						
-						try {
+		// 				try {
 							
-							// $table->hu = $temp_table_hu[$i]->hu;
-							$table->father_hu = $temp_table[0]->father_hu;
-							$table->item = $temp_table[0]->item;
-							$table->variant = $temp_table[0]->variant;
-							$table->status = $temp_table[0]->status;
-							$table->balance = $temp_table[0]->balance;
-							$table->batch = $temp_table[0]->batch;
-							$table->document = $temp_table[0]->document;
-							$table->bin = $temp_table[0]->bin;
-							$table->location = $temp_table[0]->location;	
+		// 					// $table->hu = $temp_table_hu[$i]->hu;
+		// 					$table->father_hu = $temp_table[0]->father_hu;
+		// 					$table->item = $temp_table[0]->item;
+		// 					$table->variant = $temp_table[0]->variant;
+		// 					$table->status = $temp_table[0]->status;
+		// 					$table->balance = $temp_table[0]->balance;
+		// 					$table->batch = $temp_table[0]->batch;
+		// 					$table->document = $temp_table[0]->document;
+		// 					$table->bin = $temp_table[0]->bin;
+		// 					$table->location = $temp_table[0]->location;	
 
-							// $table->original_qty = floatval(round($temp_table[0]->original_qty,2));
+		// 					// $table->original_qty = floatval(round($temp_table[0]->original_qty,2));
 										
-							$table->save();
+		// 					$table->save();
 
-							$update_count = $update_count + 1;
-						}
-						catch (\Illuminate\Database\QueryException $e) {
-							$msg = "Error: Update hu, update";
-							return view('reservations.errorm',compact('msg'));
-						}
+		// 					$update_count = $update_count + 1;
+		// 				}
+		// 				catch (\Illuminate\Database\QueryException $e) {
+		// 					$msg = "Error: Update hu, update";
+		// 					return view('reservations.errorm',compact('msg'));
+		// 				}
 
-					} else {
+		// 			} else {
 
-						$table = Reservation::findOrFail($reservation_table[$i]->id);
+		// 				$table = Reservation::findOrFail($reservation_table[$i]->id);
 						
-						try {
+		// 				try {
 							
-							// $table->hu = $temp_table_hu[$i]->hu;
-							// $table->father_hu = $temp_table[0]->father_hu;
-							// $table->item = $temp_table[0]->item;
-							// $table->variant = $temp_table[0]->variant;
-							$table->status = "Consumed";
-							$table->balance = 0;
-							// $table->batch = $temp_table[0]->batch;
-							// $table->document = $temp_table[0]->document;
-							// $table->bin = $temp_table[0]->bin;
-							// $table->location = $temp_table[0]->location;	
+		// 					// $table->hu = $temp_table_hu[$i]->hu;
+		// 					// $table->father_hu = $temp_table[0]->father_hu;
+		// 					// $table->item = $temp_table[0]->item;
+		// 					// $table->variant = $temp_table[0]->variant;
+		// 					$table->status = "Consumed";
+		// 					$table->balance = 0;
+		// 					// $table->batch = $temp_table[0]->batch;
+		// 					// $table->document = $temp_table[0]->document;
+		// 					// $table->bin = $temp_table[0]->bin;
+		// 					// $table->location = $temp_table[0]->location;	
 
-							// $table->original_qty = floatval(round($temp_table[0]->original_qty,2));
+		// 					// $table->original_qty = floatval(round($temp_table[0]->original_qty,2));
 										
-							$table->save();
+		// 					$table->save();
 							
-							$consumed_count = $consumed_count + 1;
+		// 					$consumed_count = $consumed_count + 1;
 
-						}
-						catch (\Illuminate\Database\QueryException $e) {
-							$msg = "Error: Update hu, consumed";
-							return view('reservations.errorm',compact('msg'));
-						}
-					}
-				}
-			} 
-		}
+		// 				}
+		// 				catch (\Illuminate\Database\QueryException $e) {
+		// 					$msg = "Error: Update hu, consumed";
+		// 					return view('reservations.errorm',compact('msg'));
+		// 				}
+		// 			}
+		// 		}
+		// 	} 
+		// }
 
 
-		//Add new hus
-		$temp_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM temp_table_hus ORDER BY id"));
+		// //Add new hus
+		// $temp_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM temp_table_hus ORDER BY id"));
 
-		$add_count = 0;
-		$reserved_by_father = 0;
+		// $add_count = 0;
+		// $reserved_by_father = 0;
 
-		if (isset($temp_table[0]->id)) {
+		// if (isset($temp_table[0]->id)) {
 
-			for ($i=0; $i < count($temp_table) ; $i++) {
+		// 	for ($i=0; $i < count($temp_table) ; $i++) {
 			
-				$reservation_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE hu = '".$temp_table[$i]->hu."' "));
+		// 		$reservation_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE hu = '".$temp_table[$i]->hu."' "));
 
-				if (isset($reservation_table[0]->id)) {			
-					// exist, do noting
+		// 		if (isset($reservation_table[0]->id)) {			
+		// 			// exist, do noting
 
-				} else {
+		// 		} else {
 
-					try {
-						$table = new Reservation;
+		// 			try {
+		// 				$table = new Reservation;
 					
-						$table->hu = $temp_table[$i]->hu;
-						$table->father_hu = $temp_table[$i]->father_hu;
-						$table->item = $temp_table[$i]->item;
-						$table->variant = $temp_table[$i]->variant;
-						$table->status = $temp_table[$i]->status;
-						$table->balance = $temp_table[$i]->balance;
-						$table->batch = $temp_table[$i]->batch;
-						$table->document = $temp_table[$i]->document;
-						$table->bin = $temp_table[$i]->bin;
-						$table->location = $temp_table[$i]->location;
+		// 				$table->hu = $temp_table[$i]->hu;
+		// 				$table->father_hu = $temp_table[$i]->father_hu;
+		// 				$table->item = $temp_table[$i]->item;
+		// 				$table->variant = $temp_table[$i]->variant;
+		// 				$table->status = $temp_table[$i]->status;
+		// 				$table->balance = $temp_table[$i]->balance;
+		// 				$table->batch = $temp_table[$i]->batch;
+		// 				$table->document = $temp_table[$i]->document;
+		// 				$table->bin = $temp_table[$i]->bin;
+		// 				$table->location = $temp_table[$i]->location;
 						
-						// $table->original_qty = floatval(round($temp_table[$i]->original_qty,2));
+		// 				// $table->original_qty = floatval(round($temp_table[$i]->original_qty,2));
 
-						$table->res_status = "NO";
+		// 				$table->res_status = "NO";
 
-						$table->save();
+		// 				$table->save();
 
-						$add_count = $add_count + 1;
+		// 				$add_count = $add_count + 1;
 
-					}
-					catch (\Illuminate\Database\QueryException $e) {
-						$msg = "Error: Add new";
-						return view('reservations.errorm',compact('msg'));
-					}
+		// 			}
+		// 			catch (\Illuminate\Database\QueryException $e) {
+		// 				$msg = "Error: Add new";
+		// 				return view('reservations.errorm',compact('msg'));
+		// 			}
 
-					// check if is father?
+		// 			// check if is father?
 					
-					if ($temp_table[$i]->hu == $temp_table[$i]->father_hu) {
-						// original hu, do nothing
-					} else {
+		// 			if ($temp_table[$i]->hu == $temp_table[$i]->father_hu) {
+		// 				// original hu, do nothing
+		// 			} else {
 
 
-						$reservation_table_father = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE hu = '".$temp_table[$i]->father_hu."' "));					
+		// 				$reservation_table_father = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations WHERE hu = '".$temp_table[$i]->father_hu."' "));					
 
-						if (isset($reservation_table_father[0]->id)) {
-							// father found
+		// 				if (isset($reservation_table_father[0]->id)) {
+		// 					// father found
 
-							if ($reservation_table_father[0]->status == "Consumed") {
-								// fatehr was partialy consumed, reserve son on same po from father
+		// 					if ($reservation_table_father[0]->status == "Consumed") {
+		// 						// fatehr was partialy consumed, reserve son on same po from father
 
-								if ($reservation_table_father[0]->res_status == 'YES') {
+		// 						if ($reservation_table_father[0]->res_status == 'YES') {
 									
-									try {
+		// 							try {
 
-										$table->res_po = $reservation_table_father[0]->res_po;
-										$table->res_log_id = $reservation_table_father[0]->res_log_id;
-										$table->res_date = $reservation_table_father[0]->res_date;
-										$table->res_status = "YES";
+		// 								$table->res_po = $reservation_table_father[0]->res_po;
+		// 								$table->res_log_id = $reservation_table_father[0]->res_log_id;
+		// 								$table->res_date = $reservation_table_father[0]->res_date;
+		// 								$table->res_status = "YES";
 
-										$table->save();
+		// 								$table->save();
 
-										$reserved_by_father = $reserved_by_father + 1;
-									}
-									catch (\Illuminate\Database\QueryException $e) {
-										$msg = "Error: Reserve from father";
-										return view('reservations.errorm', compact('msg'));
-									}
+		// 								$reserved_by_father = $reserved_by_father + 1;
+		// 							}
+		// 							catch (\Illuminate\Database\QueryException $e) {
+		// 								$msg = "Error: Reserve from father";
+		// 								return view('reservations.errorm', compact('msg'));
+		// 							}
 
-								}
+		// 						}
 
-							} else {
-								// father hu was split
-							}
+		// 					} else {
+		// 						// father hu was split
+		// 					}
 
-						} else {
-							// father not found, do nothing
-						}
-					}
-				}
-			}
-		}
+		// 				} else {
+		// 					// father not found, do nothing
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// }
 
-		$unreserved_hu = 0;
-		$unreserved_mt = 0;
+		// $unreserved_hu = 0;
+		// $unreserved_mt = 0;
 
-		return view('reservations.hu_updated', compact('update_count','add_count','consumed_count','reserved_by_father', 'unreserved_hu', 'unreserved_mt'));
-		// return Redirect::to('/');
+		// return view('reservations.hu_updated', compact('update_count','add_count','consumed_count','reserved_by_father', 'unreserved_hu', 'unreserved_mt'));
+		// // return Redirect::to('/');
 	}	
 
 	public function update_reservation_table_oposite() // ne koristi se
 	{
-		$reservation_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations ORDER BY id"));
+		// $reservation_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM reservations ORDER BY id"));
 
-		for ($i=0; $i < count($reservation_table) ; $i++) {
+		// for ($i=0; $i < count($reservation_table) ; $i++) {
 
-			$data = DB::connection('sqlsrv1')->select(DB::raw("SELECT TOP 1 [Quantity] as original_qty FROM [Gordon_LIVE].[dbo].[GORDON\$Handling Unit] WHERE [HU No_] = '".$reservation_table[$i]->hu."' ORDER BY [Entry No_] asc"));
+		// 	$data = DB::connection('sqlsrv1')->select(DB::raw("SELECT TOP 1 [Quantity] as original_qty FROM [Gordon_LIVE].[dbo].[GORDON\$Handling Unit] WHERE [HU No_] = '".$reservation_table[$i]->hu."' ORDER BY [Entry No_] asc"));
 
-			// dd($data[0]->original_qty);
+		// 	// dd($data[0]->original_qty);
 
-			$table = Reservation::findOrFail($reservation_table[$i]->id);
-			try {
+		// 	$table = Reservation::findOrFail($reservation_table[$i]->id);
+		// 	try {
 
-				// $table->original_qty = $data[0]->original_qty; 
-				$table->original_qty = floatval(round($data[0]->original_qty,2));
-				// $table->save();
-			}
-			catch (\Illuminate\Database\QueryException $e) {
-				return view('reservations.error');
-			}
+		// 		// $table->original_qty = $data[0]->original_qty; 
+		// 		$table->original_qty = floatval(round($data[0]->original_qty,2));
+		// 		// $table->save();
+		// 	}
+		// 	catch (\Illuminate\Database\QueryException $e) {
+		// 		return view('reservations.error');
+		// 	}
 
-		}
+		// }
 	}
 
 	public function reserv_mat()

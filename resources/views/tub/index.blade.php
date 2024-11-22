@@ -135,18 +135,20 @@
 			                        <td>{{ $req->bottom_paper}}</td>
 			                        <td>{{ $req->overlapping}}</td>
 		                            <td class="
-			                            @if ($req->priority == 6) ts_priority
+			                            @if ($req->priority == 7) tt_priority
+			                            @elseif ($req->priority == 6) ts_priority
 			                            @elseif ($req->priority == 5) ss_priority
 			                            @elseif ($req->priority == 4) fs_priority
 			                            @elseif ($req->priority == 3) top_priority
 					        	    	@elseif ($req->priority == 2) high_priority
 					        	    	@endif
 					        	    	">
-					        	    	@if ($req->priority == 6)3rd shift
+					        	    	@if ($req->priority == 7)Test
+					        	    	@elseif ($req->priority == 6)3rd shift
 					        	    	@elseif ($req->priority == 5)2nd shift
 					        	    	@elseif ($req->priority == 4)1st shift
 					        	    	@elseif ($req->priority == 3)Top
-					        	    	@elseif ($req->priority == 2)High
+					        	    	@elseif ($req->priority == 2)Flash
 				        	    		@elseif ($req->priority == 1)Normal
 					        	    	@endif</td>
 		                            <td>{{ $req->status}}</td>

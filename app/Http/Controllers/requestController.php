@@ -175,7 +175,7 @@ class requestController extends Controller {
 		$bagno = $input['bagno'];
 		$qty = (int)$input['qty'];
 
-		$check_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT DISTINCT (CASE WHEN po like '%-%' THEN substring(po, 1,6) ELSE substring (po, 4,6) END) as po, fg
+		$check_po = DB::connection('sqlsrv4')->select(DB::raw("SELECT DISTINCT (CASE WHEN po like '%-%' THEN substring(po, 1,6) ELSE substring (po, 4,6) END) as po, fg
 		FROM [trebovanje].[dbo].[sap_coois] WHERE po like '%".$po."%' AND substring(fg,14,5) = '".$size."' "));
 		// dd($check_po);
 
@@ -289,7 +289,7 @@ class requestController extends Controller {
 		$po = $input['po'];
 		$size = $input['size'];
 		
-		$check_po = DB::connection('sqlsrv1')->select(DB::raw("SELECT DISTINCT (CASE WHEN po like '%-%' THEN substring(po, 1,6) ELSE substring (po, 4,6) END) as po
+		$check_po = DB::connection('sqlsrv4')->select(DB::raw("SELECT DISTINCT (CASE WHEN po like '%-%' THEN substring(po, 1,6) ELSE substring (po, 4,6) END) as po
 		FROM [trebovanje].[dbo].[sap_coois] WHERE po like '%".$po."%' AND substring(fg,14,5) = '".$size."' "));
 		// dd($check_po);
 

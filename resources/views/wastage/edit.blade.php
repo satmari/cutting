@@ -17,7 +17,7 @@
 				
 				<div class="panel-body">
 					<span>Weight:</span>
-					{!! Form::input('number', 'weight', round($wastage_line->weight,2), ['class' => 'form-control']) !!}
+					{!! Form::input('number', 'weight', round($wastage_line->weight,2), ['class' => 'form-control','step' => '0.01']) !!}
 				</div>
 				<div class="panel-body">
 					<span>Reported to logistic:</span>

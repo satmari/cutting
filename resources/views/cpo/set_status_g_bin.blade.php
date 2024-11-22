@@ -18,7 +18,13 @@
 						<input name="_token" type="hidden" value="{!! csrf_token() !!}" />
 
 						{!! Form::hidden('g_bin', $g_bin, ['class' => 'form-control']) !!}
-						
+							
+							@if ($mandatory_to_ins == 'YES')
+								<div class="alert alert-danger" role="alert">
+							  	Mandatory to inspect, Not checked status is not available.
+								</div>
+							@endif
+
 	                        <div class="panel-body">
 								<span>Status: <span style="color:red;">*</span></span>
 								<div class="col">
@@ -42,12 +48,14 @@
 						    					<option value="Ready for production">Ready for production</option>
 						    				@endif
 
-						    				@if ($status == 'Not checked')
+						    				@if ($mandatory_to_ins == 'YES')
+						    				@else
+						    					@if ($status == 'Not checked')
 						    					
-						    				@else 
-						    					<option value="Not checked">Not checked</option>
+							    				@else 
+						    						<option value="Not checked">Not checked</option>
+						    					@endif
 						    				@endif
-
 					    					
 					    			</select>
 						  		</div>

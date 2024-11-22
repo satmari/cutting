@@ -38,10 +38,7 @@
 		                    {!! Form::input('number', 'width', '', ['class' => 'form-control','step'=>'0.01','required'=>'required']) !!}
 		                </div>
 
-		                <div class="panel-body">
-							<p>Comment:</p>
-		               		{!! Form::textarea('comment', $comment , ['class' => 'form-control', 'rows' => 2]) !!}
-						</div>
+		               
 
 						<br>
 						<br>

@@ -43,7 +43,7 @@
 			                       <tr>
 			                    		<th >Position</th>
 			                            <th >Paspul roll</th>
-			                            <th >SAP SU</th>
+			                            <!-- <th >SAP SU</th> -->
 			                            <th >Rewound length</th>
 			                            <th >Still to rewound</th>
 			                            <th >Rewound %</th>
@@ -65,7 +65,9 @@
 			                            <th >Skeda</th>
 			                            <th >Bin</th>
 			                            <th >Priority</th>
-			                            <th >Rewinding method</th>
+			                            <!-- <th >Rewinding method</th> -->
+			                            <th>Planned pcs</th>
+			                            <th>Cut pcs</th>
 			                            
 			                            <th></th>
 			                            
@@ -89,7 +91,7 @@
 			                            
 			                            <td>{{ $req->position}}</td>
 			                            <td>{{ $req->paspul_roll}}</td>
-			                            <td>{{ $req->sap_su}}</td>
+			                            {{-- <td>{{ $req->sap_su}}</td> --}}
 			                            <td><big><b>{{ round($req->rewound_length_a,3) }}</b></big></td>
 			                            <td><big><b>{{ round($req->rewound_length_a-$req->rewound_sum,3) }}</b></big></td>
 			                            <td><big><b>{{ round($req->rewound_sum / $req->rewound_length_a *100,0) }} %</b></big></td>
@@ -110,21 +112,25 @@
 			                            <td>{{ $req->skeda }}</td>
 			                            <td>{{ $req->pasbin }}</td>
 			                            <td class="
-				                            @if ($req->priority == 6) ts_priority
+				                            @if ($req->priority == 7) tt_priority
+				                            @elseif ($req->priority == 6) ts_priority
 				                            @elseif ($req->priority == 5) ss_priority
 				                            @elseif ($req->priority == 4) fs_priority
 				                            @elseif ($req->priority == 3) top_priority
 						        	    	@elseif ($req->priority == 2) high_priority
 						        	    	@endif
 						        	    	">
-						        	    	@if ($req->priority == 6)3rd shift
+						        	    	@if ($req->priority == 7)Test
+						        	    	@elseif ($req->priority == 6)3rd shift
 						        	    	@elseif ($req->priority == 5)2nd shift
 						        	    	@elseif ($req->priority == 4)1st shift
 						        	    	@elseif ($req->priority == 3)Top
-						        	    	@elseif ($req->priority == 2)High
+						        	    	@elseif ($req->priority == 2)Flash
 					        	    		@elseif ($req->priority == 1)Normal
 						        	    	@endif</td>
-						        	    <td>{{ $req->rewinding_method}}</td>
+						        	    {{--<td>{{ $req->rewinding_method}}</td>--}}
+						        	    <td>{{ round($req->sum_pcs_load_spread_by_lot_skeda,0) }}</td>
+						        	    <td>{{ round($req->sum_pcs_cut_comp_by_lot_skeda,0) }}</td>
 										<td>
 											<a href="{{ url('paspul_prw1/'.$req->id) }}" class="btn btn-danger btn-xs center-block">
 											Rewound paspul roll</a><br>

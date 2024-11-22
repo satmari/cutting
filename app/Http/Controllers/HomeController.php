@@ -120,7 +120,8 @@ class HomeController extends Controller {
 			    // dd("PRW");
 			    // $msg = "Hi MS";
 			  	// return redirect('/prw');
-			  	return redirect('/prw1');
+			  	// return redirect('/prw1');
+			  	return redirect('/prw2');
 		 	}
 
 		 	if ($user->is('PCO')) { 
