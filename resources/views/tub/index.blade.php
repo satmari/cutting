@@ -226,6 +226,10 @@
 			                        	<b>Comment operator:</b>
 			                        	<i>{{ $req->comment_operator }}</i><br>
 			                        	@endif
+			                        	@if ($req->standard_comment != '')
+					                    <b>Material comment :</b>
+					                    <i>{{ $req->standard_comment }}</i><br>
+					                    @endif
 			                        	
 			                        </td>
 			                        <td  colspan="2" style="padding: 1px; text-align: left;">

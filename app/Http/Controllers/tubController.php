@@ -111,6 +111,8 @@ class tubController extends Controller {
 		      -- ,m5.[pro_pcs_planned]
 		      -- ,m5.[pro_pcs_actual]
 		      ,ms.[g_bin_orig]
+
+		      ,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 		      
 		  FROM [mattresses] as m1
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
@@ -998,6 +1000,7 @@ class tubController extends Controller {
 				m.[spreading_method], m.[g_bin], m.[material], m.[width_theor_usable],
 				mm.[marker_length], 
 				mf.[layers_after_cs], mf.[layers_before_cs], mf.[id] as effid
+
 			FROM [mattress_details] as d
 			INNER JOIN [mattress_phases] as p ON p.[mattress_id] = d.[mattress_id] AND p.[active] = 1
 			INNER JOIN [mattresses] as m ON m.[id] = d.[mattress_id]
@@ -1075,6 +1078,24 @@ class tubController extends Controller {
 				$table_update_2->save();
 
 				
+				// marttres_pro update new
+				$find_all_mattress_pro = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+				FROM [mattress_pros] WHERE [mattress_id] = '".$id."' "));
+				// dd($find_all_mattress_pro);
+				// dd($layers_a);
+				// dd($layers_partial);
+
+				for ($a=0; $a < count($find_all_mattress_pro); $a++) { 
+					// dd($find_all_mattress_pro[$a]->id);
+
+					$table_update_mattress_pro = mattress_pro::findOrFail($find_all_mattress_pro[$a]->id);
+					$table_update_mattress_pro->pro_pcs_actual = $table_update_mattress_pro->pro_pcs_layer * $layers_a;
+					// $table_update_mattress_pro->pro_pcs_actual = $table_update_mattress_pro->pro_pcs_layer * ((float)$layers_before_cs + (float)$layers_after_cs);
+					$table_update_mattress_pro->save();	
+				}
+				// dd('Stop');
+				
+
 				$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
 					SET NOCOUNT ON;
 					UPDATE [mattress_phases]
@@ -1164,29 +1185,11 @@ class tubController extends Controller {
 					// dd($find_all_mattress_pro[$a]->id);
 
 					$table_update_mattress_pro = mattress_pro::findOrFail($find_all_mattress_pro[$a]->id);
-					$table_update_mattress_pro->pro_pcs_actual = ($table_update_mattress_pro->pro_pcs_layer * $layers_a) + (int)$layers_partial;
-					// dd($table_update_mattress_pro->pro_pcs_actual);
+					//$table_update_mattress_pro->pro_pcs_actual = ($table_update_mattress_pro->pro_pcs_layer * $layers_a) + (int)$layers_partial;
+					$table_update_mattress_pro->pro_pcs_actual = $table_update_mattress_pro->pro_pcs_layer * $layers_a;
 					$table_update_mattress_pro->save();	
 				}
 				// dd('Stop');
-
-				// mattress_phasess
-				// all mattress_phases for this mattress set to NOT ACTIVE
-				// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				// 		[id], [mattress] 
-				// FROM [mattress_phases] WHERE [mattress_id] = '".$id."' AND [active] = 1"));
-				
-				// if (isset($find_all_mattress_phasses[0])) {
-				// 	$mattress = $find_all_mattress_phasses[0]->mattress;
-
-				// 	// dd($find_all_mattress_phasses);
-				// 	for ($o=0; $o < count($find_all_mattress_phasses); $o++) { 
-
-				// 			$table3_aa = mattress_phases::findOrFail($find_all_mattress_phasses[$o]->id);
-				// 			$table3_aa->active = 0;
-				// 			$table3_aa->save();
-				// 	}
-				// }
 
 				$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
 					SET NOCOUNT ON;

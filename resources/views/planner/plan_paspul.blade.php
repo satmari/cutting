@@ -354,7 +354,7 @@
 												<a href="{{ url('edit_paspul_roll_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit paspul roll</a>
 												<br>
 
-												<a href="{{ url('remove_paspul_roll_line/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Delete</a>
+												<a href="{{ url('remove_paspul_roll_line/'.$req->id) }}" class="btn btn-danger btn-xs center-block" disabled>Delete</a>
 											</td>
 
 				                        </tr>

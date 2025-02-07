@@ -8,17 +8,24 @@
                 <div class="panel-heading">Options:</div>
                 
                 <div class="panel-body">
-                    <div class="">
+                    
                         <a href="{{url('/inbound_delivery_import')}}" class="btn btn-danger center-block">
                             Import Inbound Delivery</a>
-                    </div>
+                    
                 </div>
                 <hr>
                 <div class="panel-body">
-                    <div class="">
+                    
                         <a href="{{url('/inbound_delivery_table_wh')}}" class="btn btn-success center-block">
                             Inbound Delivery Table (last 60 days)</a>
-                    </div>
+                    
+                </div>
+                <hr>
+                <div class="panel-body">
+                      
+                        <a href="{{url('leftover_table')}}" class="btn btn-info center-block">
+                            Leftover Queue</a>
+                      
                 </div>
                 
             </div>

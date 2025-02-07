@@ -238,6 +238,21 @@
 				{!! Form::close() !!}
 				</div>
 
+				<div class="panel panel-default">
+					<div class="panel-heading">Import <big>TUBOLARE</big> SMV (Excel file)</div>
+					</p>
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'action'=>['importController@bom_cutting_tubolare_smv_post']]) !!}
+					
+					<div class="panel-body">
+						{!! Form::file('file15', ['class' => 'center-block']) !!}
+					</div>
+					<div class="panel-body">
+						{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
+					</div>
+					@include('errors.list')
+				{!! Form::close() !!}
+				</div>
+
 				@endif
 
 			@endif

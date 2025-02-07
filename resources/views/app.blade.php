@@ -4,7 +4,15 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Cutting App</title>
+	@if (config('app.global_variable') == 'gordon')
+	<title>Cutting App - Gordon</title>
+	@else
+	<title>Cutting App - Fiorano</title>
+	@endif
+		
+	
+	<!-- global variable: {{ config('app.global_variable') }} -->
+	
 
 	<!-- <link href="{{ asset('/css/app.css') }}" rel="stylesheet"> -->
 	<!-- <link href="{{ asset('/css/css.css') }}" rel="stylesheet"> -->
@@ -37,16 +45,24 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				@if(Auth::check() AND (Auth::user()->level() >= 5 OR Auth::user()->level() == 3 OR Auth::user()->level() == 1 OR Auth::user()->level() == 20))
+				@if (config('app.global_variable') == 'gordon')
+					@if(Auth::check() AND (Auth::user()->level() >= 5 OR Auth::user()->level() == 3 OR Auth::user()->level() == 1 OR Auth::user()->level() == 20))
+					@else
+					<a class="navbar-brand" href="http://172.27.161.171/preparation"><b>Preparation</b></a>
+					<a class="navbar-brand" href="#">|</a>
+					<a class="navbar-brand" href="http://172.27.161.171/trebovanje"><b>Trebovanje</b></a>
+					<a class="navbar-brand" href="#">|</a>
+					<a class="navbar-brand" href="http://172.27.161.171/downtime"><b>Downtime</b></a>
+					<a class="navbar-brand" href="#">|</a>
+					@endif
 				@else
-				<a class="navbar-brand" href="http://172.27.161.171/preparation"><b>Preparation</b></a>
-				<a class="navbar-brand" href="#">|</a>
-				<a class="navbar-brand" href="http://172.27.161.171/trebovanje"><b>Trebovanje</b></a>
-				<a class="navbar-brand" href="#">|</a>
-				<a class="navbar-brand" href="http://172.27.161.171/downtime"><b>Downtime</b></a>
-				<a class="navbar-brand" href="#">|</a>
 				@endif
-				<a class="navbar-brand" href="http://172.27.161.171/cutting"><b>Cutting</b></a>
+
+				@if (config('app.global_variable') == 'gordon')
+					<a class="navbar-brand" href="{{ url('/') }}"><b>Cutting</b></a>
+				@else
+					<a class="navbar-brand" href="{{ url('/') }}"><b>Cutting F</b></a>
+				@endif
 				<a class="navbar-brand" href="#">|</a>
 			</div>
 
@@ -70,6 +86,22 @@
 					@endif
 
 					@if(Auth::user()->name == 'magacin')
+						<ul class="nav navbar-nav">
+							<!-- <li><a href="{{ url('#') }}">Planner </a></li> -->
+							@if (isset($operators))
+							<li>
+								
+	                        </li>
+							@else
+								@if(Session::has('operator'))
+								<li>
+									<br>
+			                        <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
+			                        </strong>
+		                        </li>
+		                        @endif
+		                    @endif
+						</ul>
 						<ul class="nav navbar-nav">
 							<li><a href="{{ url('/wastage_wh') }}">TPP wastage (wh)</a></li>
 						</ul>
@@ -127,6 +159,8 @@
 									<li><a href="{{ url('consumption_sap') }}">Consumption SAP</a></li>
 									<li role="separator" class="divider"></li>
 									<li><a href="{{ url('skeda_comments') }}">Skeda comments</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('material_comment_table') }}">Material comments</a></li>
 								</ul>
 							</li>
 							<li><a href="{{ url('import') }}">Import</a></li>
@@ -134,7 +168,7 @@
 							<li><a href="{{ url('print_mattress_multiple') }}">Print nalog</a></li>
 							<li><a href="{{ url('plan_mattress/BOARD') }}"><b><sapn style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;">Plan mattress</span></b></a></li>
 							<li><a href="{{ url('plan_mini_marker') }}"><b><sapn style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;">Plan mini-mattress</span></b></a></li>
-							<li><a href="{{ url('plan_paspul/NOT_SET') }}"><b><sapn style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;">Plan paspul</span></b></a></li>
+							<li><a href="{{ url('plan_paspul/BOARD') }}"><b><sapn style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;">Plan paspul</span></b></a></li>
 							<li><a href="{{ url('papsul_stock') }}"><b><sapn style="color: white;">Paspul stock</span></b></a></li>
 						</ul>
 					@endif
@@ -191,6 +225,8 @@
 									<li><a href="{{ url('consumption_sap') }}">Consumption SAP</a></li>
 									<li role="separator" class="divider"></li>
 									<li><a href="{{ url('skeda_comments') }}">Skeda comments</a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('material_comment_table') }}">Material standard comments</a></li>
 								</ul>
 							</li>
 							<li><a href="{{ url('import') }}">Import</a></li>
@@ -198,7 +234,7 @@
 							<li><a href="{{ url('print_mattress_multiple') }}">Print nalog</a></li>
 							<li><a href="{{ url('plan_mattress/BOARD') }}"><b><sapn style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;">Plan mattress</span></b></a></li>
 							<li><a href="{{ url('plan_mini_marker') }}"><b><sapn style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;">Plan mini-mattress</span></b></a></li>
-							<li><a href="{{ url('plan_paspul/NOT_SET') }}"><b><sapn style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;">Plan paspul</span></b></a></li>
+							<li><a href="{{ url('plan_paspul/BOARD') }}"><b><sapn style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;">Plan paspul</span></b></a></li>
 							
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Paspul stock<span class="caret"></span></a>

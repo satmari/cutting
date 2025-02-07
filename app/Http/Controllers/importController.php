@@ -44,6 +44,7 @@ use App\skeda_ratio_import;
 
 use App\cutting_smv_by_category;
 use App\cutting_smv_by_material;
+use App\cutting_tubolare_smv;
 
 use App\inbound_delivery;
 
@@ -244,8 +245,6 @@ class importController extends Controller {
 
 										}
 
-							
-
 
 						// Remove po from local db 
 						$data = DB::connection('sqlsrv')->select(DB::raw("SELECT id, po FROM consumptions WHERE po = '".$po."' "));
@@ -256,10 +255,7 @@ class importController extends Controller {
 							$l = Consumption::findOrFail($data[0]->id);
 					    	$l->delete();									
 						}
-						
 
-
-						
 	                }
 
 	            });
@@ -643,7 +639,7 @@ class importController extends Controller {
 
    			$st = explode('_', $model);
 			if (isset($st[1])) {
-				$style = $st[1];	
+				$style = $st[1];
 			} else {
 				$style = "";
 			}
@@ -688,7 +684,6 @@ class importController extends Controller {
    			// $line = [$style_size =>$qty];
 	   		array_push( $a , $line );
 	   		array_push( $mv , $line_mv );
-
 
    		} else {
 
@@ -852,7 +847,7 @@ class importController extends Controller {
 	}
 
 	public function postImport_skeda(Request $request) {
-		// dd("sss");
+		// dd("test");
 		$work_place = "PLANNER";
 		$operators = DB::connection('sqlsrv')->select(DB::raw("SELECT [id]
 		      ,[operator]
@@ -870,16 +865,15 @@ class importController extends Controller {
 		}
 
 		$getSheetName = Excel::load(Request::file('file4'))->getSheetNames();
-	    
+	    // dd($getSheetName);
+
 		$pro = '';
 		Session::set('pro', null);
 
-		// $msg[] = '';
-	    foreach($getSheetName as $sheetName) {
+		foreach($getSheetName as $sheetName) {
 
 	        if ($sheetName == 'PRO') {
-	        	Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file4'))->chunk(5000, function ($reader)
-	            {
+	        	Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file4'))->chunk(5000, function ($reader) {
 	                $readerarray = $reader->toArray();
 	                // dd($readerarray);
 	                // foreach(array_slice($readerarray,1) as $row)
@@ -889,7 +883,7 @@ class importController extends Controller {
 	                $pro_success = 0;
 	                $pro_error = 0;
 	                
-	                foreach($readerarray as $row){
+	                foreach($readerarray as $row) {
 						$pro_lines = $pro_lines + 1;
 
 						$pro_id = $row['pro_id'];
@@ -1038,13 +1032,10 @@ class importController extends Controller {
 	                $pro_exist = 0;
 	                $pro_success = 0;
 	                $pro_error = 0;
-
 	            });
 
 	        } elseif ($sheetName == 'PAS') {
-	        	Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file4'))->chunk(5000, function ($reader)
-	        
-	            {
+	        	Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file4'))->chunk(5000, function ($reader) {
 	                $readerarray = $reader->toArray();
 	                //var_dump($readerarray);
 	                // foreach(array_slice($readerarray,1) as $row)
@@ -1054,8 +1045,7 @@ class importController extends Controller {
 	                $pa_success = 0;
 	                $pa_error = 0;
 
-	                foreach($readerarray as $row)
-	                {
+	                foreach($readerarray as $row) {
 	                	$pa_lines = $pa_lines + 1;
 						// print_r('PAS');
 						// dd($row);
@@ -1283,7 +1273,6 @@ class importController extends Controller {
 								$pa_success = $pa_success + 1;
 							}
 							catch (\Illuminate\Database\QueryException $e) {
-
 								// error
 
 								$pa_err = $paspul_roll.'|';
@@ -1322,6 +1311,9 @@ class importController extends Controller {
 	                $m_exist = 0;
 	                $m_success = 0;
 	                $m_error = 0;
+
+	    			// $mattress_pro_array[] = '';
+					// $mattress_style_size_array[] = '';
 
 	                foreach($readerarray as $row) {
 
@@ -1423,9 +1415,8 @@ class importController extends Controller {
 													// dd('update cons_planned_new: '. $cons_planned_new. ' kg');
 													print_r('update cons_planned for: '.$update_mattress->mattress.' = '. $cons_planned_new. ' kg <br>');
 													
-	
 												} else {
-													// dd($update_mattress_markers->marker_name_orig);
+													
 													dd('For mattress '.$update_mattress->mattress.' , fabric consumption doesnt exist in settings - fabric');
 												}
 
@@ -1457,9 +1448,10 @@ class importController extends Controller {
 
 										} else {
 											// dd($marker_name);
-											dd($update_mattress_markers->marker_name_orig);
+											// dd($update_mattress_markers->marker_name_orig);
 											dd('For mattress '.$update_mattress->mattress.' , marker_name is different than existing');
 										}
+
 									} else {
 										dd('For mattress '.$update_mattress->mattress.' , skeda_item_type is different than existing');
 									}
@@ -1478,6 +1470,12 @@ class importController extends Controller {
 							// dd('ss');
 							// mattresses
 							$g_bin; //not mandatory / progressive 
+
+							//  Gordon / Fiorano / Adrianatex
+							// if (isset($row['sap_bin'])) {
+							// 	$g_bin = $row['sap_bin'];
+							// }
+
 							$material = $row['material'];
 							$dye_lot = $row['dye_lot'];
 							$color_desc = $row['color_desc'];
@@ -1489,7 +1487,7 @@ class importController extends Controller {
 
 							// mattress_details
 							$layers = (float)$row['layers'];
-							$layers_a = $layers; 
+							$layers_a = $layers;
 							$length_mattress = round((float)$row['length_mattress'],3);
 							// dd($length_mattress);
 							
@@ -1638,7 +1636,9 @@ class importController extends Controller {
 							// mattress_markers
 							$marker_name = trim($row['marker_name']);
 
-							$find_in_marker_headers = DB::connection('sqlsrv')->select(DB::raw("SELECT id,marker_length,marker_width,min_length FROM marker_headers WHERE marker_name = '".$marker_name."' AND status = 'ACTIVE' "));
+							$find_in_marker_headers = DB::connection('sqlsrv')->select(DB::raw("SELECT id,marker_length,marker_width,min_length FROM marker_headers 
+								WHERE marker_name = '".$marker_name."' AND status = 'ACTIVE' "));
+
 					   		if (!isset($find_in_marker_headers[0])) {
 
 					   			if (($skeda_item_type == 'MW') OR ($skeda_item_type == 'MB')){
@@ -1694,6 +1694,8 @@ class importController extends Controller {
 							$operator1 = Session::get('operator');
 							$operator2;
 
+							// change in future 
+
 							// mattress_pros
 							$find_in_marker_lines = DB::connection('sqlsrv')->select(DB::raw("SELECT style_size, pcs_on_layer FROM marker_lines WHERE marker_name = '".$marker_name."' "));
 							// dd($find_in_marker_lines);
@@ -1744,10 +1746,11 @@ class importController extends Controller {
 								} else {
 									// dd('Stop');
 						   			$mattress_pro_array[] = '';
+						   			// $mattress_style_size_array[] = '';
 
 							   		foreach ($find_in_marker_lines as $line) {
 							   			$style_size = $line->style_size;
-							   			$pro_pcs_layer = $line->pcs_on_layer;
+							   			$pro_pcs_layer = (float)$line->pcs_on_layer;
 							   			// dd($style_size);
 							   			// print_r($style_size."<br>");
 							   			// dd($skeda);
@@ -1797,6 +1800,7 @@ class importController extends Controller {
 								   			// print_r('insert:'.$pro_id.'#'.$style_size.'#'.$pro_pcs_layer);
 								   			// print_r('<br>');
 								   			array_push($mattress_pro_array, $pro_id.'#'.$style_size.'#'.$pro_pcs_layer);
+								   			// array_push($mattress_style_size_array, $style_size.'#'.$pro_pcs_layer);
 							   			}
 							   		}
 						   		}
@@ -1821,7 +1825,11 @@ class importController extends Controller {
 					    		try {
 									$table0 = new mattress;
 									$table0->mattress = $mattress;
-									// $table->g_bin;
+									// $table0->g_bin;
+									if (isset($row['sap_bin'])) {
+										// $g_bin = $row['sap_bin'];
+										$table0->g_bin = $row['sap_bin'];
+									}
 									$table0->material = $material;
 									$table0->dye_lot = $dye_lot;
 									$table0->color_desc = $color_desc;
@@ -2003,6 +2011,10 @@ class importController extends Controller {
 
 									$table0->mattress = $mattress;
 									// $table0->g_bin;
+									if (isset($row['sap_bin'])) {
+										// $g_bin = $row['sap_bin'];
+										$table0->g_bin = $row['sap_bin'];
+									}
 									$table0->material = $material;
 									$table0->dye_lot = $dye_lot;
 									$table0->color_desc = $color_desc;
@@ -2146,6 +2158,9 @@ class importController extends Controller {
 								// print_r('<br>');
 								// print_r('<br>');
 
+								//////////////// this will be changed
+
+
 								$mattress_pro_array = array_filter($mattress_pro_array);
 								for ($i=1; $i <= count($mattress_pro_array) ; $i++) {
 									// print_r('i: '.$i);
@@ -2187,10 +2202,15 @@ class importController extends Controller {
 										continue;
 									}
 								}
+
+								/////////////////////
+
+
 								$mattress_pro_array = '';
 								$m_success = $m_success + 1;
 
 							}
+					    
 					    }
 	                }
 
@@ -2204,11 +2224,122 @@ class importController extends Controller {
 	                $m_success = 0;
 	                $m_error = 0;
 	                // dd($m_lines);
+
 	            });
 
+			} elseif ($sheetName == 'MPO') {
+				Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file4'))->chunk(5000, function ($reader) {
+	                $readerarray = $reader->toArray();
+
+	                $mp_lines = 0;
+	                $mp_exist = 0;
+	                $mp_success = 0;
+	                $mp_error = 0;
+
+	                // dd($mattress_pro_array);
+	                // dd($mattress_style_size_array);
+
+
+
+	                foreach($readerarray as $row) {
+	                	// dd($row);
+	                	$mp_lines = $mp_lines + 1;
+
+	                	$mattress_data = mattress::where('mattress', $row['mattress'])->firstOrFail();
+	                	$mattress_id = $mattress_data->id;
+	                	$skeda = $mattress_data->skeda;
+	                	$mattress = $row['mattress'];
+	                	$style_size = $row['style_size'];
+	                	$pro = $row['pro'];
+	                	
+	                	$pro_data =  DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM pro_skedas 
+								WHERE pro = '".$pro."' AND
+									skeda = '".$skeda."' AND 
+									style_size = '".$style_size."' 
+									"));
+
+	                	if (!isset($pro_data[0]->id)) {
+	                		var_dump('mp_error: pro: '.$pro.', with style_size: '.$style_size.' doesnt exist in pro table</br>');
+	                		$mp_error = $mp_error + 1;
+	                		continue;
+
+	                	} else {
+	                		$pro_id = $pro_data[0]->pro_id;
+	                	}
+	                	// var_dump($pro_data->pro_id);
+	                	
+
+	                	$pro_details_data = mattress_details::where('id', $mattress_id)->firstOrFail();
+	                	// dd($pro_details_data);
+	                	$layers_a = $pro_details_data->layers_a;
+
+	                	$pro_pcs_layer = (float)$row['pro_pcs_layer'];
+	                	// var_dump($pro_pcs_layer);
+	                	
+	     				$if_exist_mattress_pro = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM mattress_pros 
+								WHERE mattress_id = '".$mattress_id."' AND
+									mattress = '".$mattress."' AND 
+									style_size = '".$style_size."' AND 
+									pro_id = '".$pro_id."' 
+									"));
+						// dd($if_exist_mattress_pro);
+
+						if (!isset($if_exist_mattress_pro[0]->id)) {
+
+							try {
+
+								$table4 = new mattress_pro;
+								$table4->mattress_id = $mattress_id;
+								$table4->mattress = $mattress;
+								$table4->style_size = $style_size;
+								$table4->pro_id = $pro_id;
+								$table4->pro_pcs_layer = $pro_pcs_layer;
+								$table4->pro_pcs_planned = $table4->pro_pcs_layer * (float)$layers_a;
+								$table4->pro_pcs_actual = $table4->pro_pcs_layer * (float)$layers_a;
+								$table4->save();
+
+								$mp_success = $mp_success + 1;
+
+							} catch (\Illuminate\Database\QueryException $e) {
+
+								dd('problem to save in mattress_pro');
+
+							}
+
+						} else {
+
+							$table5 = mattress_pro::findOrFail($if_exist_mattress_pro[0]->id);
+							$table5->mattress_id = $mattress_id;
+							$table5->mattress = $mattress;
+							$table5->style_size = $style_size;
+							$table5->pro_id = $pro_id;
+							$table5->pro_pcs_layer = $pro_pcs_layer;
+							$table5->pro_pcs_planned = $table5->pro_pcs_layer * (float)$layers_a;
+							$table5->pro_pcs_actual = $table5->pro_pcs_layer * (float)$layers_a;
+							$table5->save();
+
+							$mp_exist = $mp_exist + 1;
+						}
+
+						
+
+
+	                }
+
+	                Session::set('mp_lines', $mp_lines);
+					Session::set('mp_exist', $mp_exist);
+					Session::set('mp_success', $mp_success);
+					Session::set('mp_error', $mp_error);
+
+					$mp_lines = 0;
+	                $mp_exist = 0;
+	                $mp_success = 0;
+	                $mp_error = 0;
+	            });
 			}
 	    }
 	    
+	// ERROR HANDLING
 	    // Error on PRO 
 		    $pro_lines = Session::get('pro_lines');
 		    $pro_exist = Session::get('pro_exist');
@@ -2245,7 +2376,7 @@ class importController extends Controller {
 			Session::set('pro_error', NULL);
 		//
 
-		// Error on PA (paspul)
+		// Error on PAS (paspul)
 		    $pa_lines = Session::get('pa_lines');
 		    $pa_exist = Session::get('pa_exist');
 		    $pa_success = Session::get('pa_success');
@@ -2281,7 +2412,7 @@ class importController extends Controller {
 			Session::set('pa_error', NULL);
 		//
 
-		// Error on M (mattress)
+		// Error on MAT (mattress)
 
 			$m_lines = Session::get('m_lines');
 		    $m_exist = Session::get('m_exist');
@@ -2352,6 +2483,31 @@ class importController extends Controller {
 			Session::set('m_exist', NULL);
 			Session::set('m_success', NULL);
 			Session::set('m_error', NULL);
+		//
+
+
+		// Error on MP (mattress pro)
+			$mp_lines = Session::get('mp_lines');
+		    $mp_exist = Session::get('mp_exist');
+		    $mp_success = Session::get('mp_success');
+		    $mp_error = Session::get('mp_error');
+
+		    print_r('<br>');
+		    print_r('Mattress PRO table:');
+		    print_r('<br>');
+		    print_r('-	total lines: '.$mp_lines);
+		    print_r('<br>');
+		    print_r('-	already exist (update): '.$mp_exist);
+		    print_r('<br>');
+		    print_r('-	successfuly imported: '.$mp_success);
+		    print_r('<br>');
+		    print_r('-	errors: '.$mp_error);
+		    print_r('<br>');
+
+		    Session::set('mp_lines', NULL);
+			Session::set('mp_exist', NULL);
+			Session::set('mp_success', NULL);
+			Session::set('mp_error', NULL);
 		//
 	}
 
@@ -3216,6 +3372,67 @@ class importController extends Controller {
 		// return redirect('/');
 	}
 
+	public function bom_cutting_tubolare_smv_post(Request $request) {
+		$getSheetName = Excel::load(Request::file('file15'))->getSheetNames();
+		// dd($getSheetName);
+
+		// dd($request->request->get('import_date'));
+		// $order_group_macro = Request::get('order_group_macro');
+		// $order_group = Request::get('order_group');
+
+		// dd($order_group);
+
+		// dd($import_date);
+		// dd(Request::all());
+
+		// $import_date = $request->input('import_date');
+		// dd($import_date);
+
+	    foreach($getSheetName as $sheetName) {
+
+	        if ($sheetName == 'Final Combined Table') {
+
+	            Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file15'))->chunk(10000, function ($reader)
+	            {
+	                $readerarray = $reader->toArray();
+	                // var_dump($readerarray);
+	                // $head = $reader->getHeading();
+	                // $head = $reader->first()->keys()->toArray();
+	                // dd($head);
+
+	                DB::table('cutting_tubolare_smvs')->truncate();
+
+	                foreach($readerarray as $row)
+	                {
+	                	// dd($row);
+
+	                	
+	                	$material = trim($row['material']);
+	                	$layers_group = trim($row['layers_group']);
+	                	$material_group = trim($row['material_group']);
+	                	$average_min_per_meter = round($row['average_min_per_meter'],3);
+	                	$average_min_per_layer = round($row['average_min_per_layer'],3);
+
+	                	$table = new cutting_tubolare_smv;
+						$table->material = $material;
+						$table->layers_group = $layers_group;
+						$table->material_group = $material_group;
+						$table->average_min_per_meter = $average_min_per_meter;
+						$table->average_min_per_layer = $average_min_per_layer;
+						$table->save();
+
+
+	                }
+	            });
+
+	        } else {
+	        	// dd('error: problem to read Excel sheet name');
+	        }
+	    }
+	    dd('Succesfuly imported!');
+		// return redirect('/');
+	}
+
 	public function postImportInbound_delivery(Request $request) {
 		$getSheetName = Excel::load(Request::file('file14'))->getSheetNames();
 		// dd($getSheetName);
@@ -3243,8 +3460,6 @@ class importController extends Controller {
                 // $head = $reader->first()->keys()->toArray();
                 // dd($head);
 
-                // DB::table('cutting_smv_by_categories')->truncate();
-
                 foreach($readerarray as $row)
                 {
                 	// dd($row);
@@ -3265,6 +3480,25 @@ class importController extends Controller {
                 	// dd($qty_received_m);
 
                 	$preforigin = trim($row['preforigin']);
+
+                	// dd($bagno);
+
+                	$check_if_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [inbound_deliveries]
+							WHERE 	document_no = '".$document_no."' AND 
+									material = '".$material."' AND
+									bagno = '".$bagno."' AND
+									preforigin = '".$preforigin."' 
+									"));
+
+                	// dd($check_if_exist);
+
+                	if (isset($check_if_exist[0]->id)) {
+						
+						echo "Error: line with document_no: ".$document_no." , material: ".$material." , bagno: ".$bagno." ,preforigin: ".$preforigin." ";
+						echo "<br>";
+						continue;
+					} 
+
 
                 	$table = new inbound_delivery;
 					$table->document_no = $document_no;

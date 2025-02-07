@@ -96,6 +96,7 @@ class packController extends Controller {
 		      ,m4.[active]
 		      ,m4.[operator1]
 		      ,m4.[operator2]
+		      --,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 		      --,'|'
 		      -- ,m5.[style_size]
 		      -- ,m5.[pro_id]
@@ -230,22 +231,6 @@ class packController extends Controller {
 		$table2_update->position = $position;
 		$table2_update->save();
 
-		// all mattress_phases for this mattress set to NOT ACTIVE
-		// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-		// 		id, mattress 
-		// 	FROM [mattress_phases] WHERE mattress_id = '".$id."' AND active = 1"));
-		
-		// if (isset($find_all_mattress_phasses[0])) {
-		// 	$mattress = $find_all_mattress_phasses[0]->mattress;
-
-		// 	// dd($find_all_mattress_phasses);
-		// 	for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
-				
-		// 			$table3 = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
-		// 			$table3->active = 0;
-		// 			$table3->save();
-		// 	}	
-		// }
 
 		$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
 			SET NOCOUNT ON;

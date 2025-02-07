@@ -3,6 +3,8 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
+// use Illuminate\Support\Facades\Schema;
+
 class Change extends Migration {
 
 	/**
@@ -70,6 +72,8 @@ class Change extends Migration {
     		
     		// $table->dateTime('date')->nullable();
     		// $table->integer('damaged_pcs')->nullable(); //added later
+    		// $table->float('pcs_on_layer')->change(); // Change column to FLOAT
+
 		});
 
 		Schema::table('mattress_details', function($table)
@@ -78,6 +82,11 @@ class Change extends Migration {
 			// $table->integer('num_of_cut_problems')->nullable();
 			// $table->float('req_time')->nullable();
 			// $table->string('mandatory_to_ins')->nullable();
+			// $table->dropColumn('requested_length');
+			// $table->float('requested_length')->nullable();
+
+			// $table->float('cutter_shrink_x')->nullable();
+			// $table->float('cutter_shrink_y')->nullable();
 
 		});
 
@@ -117,6 +126,13 @@ class Change extends Migration {
 		Schema::table('marker_headers', function($table)
 		{
 			// $table->string('creation_type')->nullable();
+			
+		});
+
+		Schema::table('marker_lines', function($table)
+		{
+			// $table->string('key_part')->integer(false)->float(true)->change();
+			 // $table->float('pcs_on_layer')->change(); // Change column to FLOAT
 			
 		});
 

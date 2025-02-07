@@ -77,6 +77,15 @@
                         </tbody>     
                     </table>
 
+                <div class="panel-body">
+                    <p>Cutter shrink X:</p>
+                    {!! Form::input('number', 'cutter_shrink_x', round($cutter_shrink_x,2), ['class' => 'form-control','step' => '0.01']) !!}
+                </div>  
+                <div class="panel-body">
+                    <p>Cutter shrink Y:</p>
+                    {!! Form::input('number', 'cutter_shrink_y', round($cutter_shrink_y,2), ['class' => 'form-control','step' => '0.01']) !!}
+                </div>  
+
 				<div class="panel-body">
 	                <p>Comment operator:</p>
 	            	{!! Form::textarea('comment_operator', $comment_operator , ['class' => 'form-control', 'rows' => 2]) !!}

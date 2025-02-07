@@ -11,6 +11,11 @@
                     <br>
                     <a href="{{url('/inbound_delivery_import')}}" class="btn btn-danger cent er-block btn-xs">
                             Import Inbound Delivery</a>
+                    <div class="panel-body">
+                       <p>
+                           <a href="{{url('leftover_table')}}" class="btn btn-info center-blo ck"><b>Leftover Queue</b></a>
+                       </p>
+                    </div>
                 </div>
 
                 <div class="input-group"> <span class="input-group-addon">Filter</span>

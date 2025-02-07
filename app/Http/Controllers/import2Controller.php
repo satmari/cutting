@@ -16,11 +16,9 @@ use Illuminate\Support\Facades\Redirect;
 use Maatwebsite\Excel\Facades\Excel;
 use Request;
 
-use App\Consumption;
-
-
 use App\User;
 use DB;
+use DateTime;
 
 class import2Controller extends Controller {
 
@@ -31,21 +29,25 @@ class import2Controller extends Controller {
 
 	public function postImport_by(Request $request) {
 
+		// dd('test');
 		$getSheetName = Excel::load(Request::file('file1'))->getSheetNames();
-	    
-	    foreach($getSheetName as $sheetName)
-	    {
+	    // dd($getSheetName);
+
+	    foreach($getSheetName as $sheetName) {
+
 	        // DB::table('tpp_materils')->truncate();
 	        Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file1'))->chunk(5000, function ($reader)
-	            
-	            {
+	            {	
 	                $readerarray = $reader->toArray();
-	                //var_dump($readerarray);
+	                // dd($readerarray);
+
 	                foreach($readerarray as $row)
 	                {
-						// dd($row);
-						$id = $row['id'];
-						$comment = $row['comment'];
+						dd($row);
+						$inbd_id = $row['inbd_id'];
+						$real_doc_no = $row['real_doc_no'];
+						$id = (int)$row['id'];
+						
 						// dd($comment);
 
 						// $userbulk = new tpp_material;
@@ -53,8 +55,8 @@ class import2Controller extends Controller {
 						// $userbulk->save();
 
 						$sql2 = DB::connection('sqlsrv')->update(DB::raw("
-								UPDATE [cutting].[dbo].[part_g_bin_statuses]
-								SET [comment] = '".$comment."'
+								UPDATE [cutting].[dbo].[fabric_reservations]
+								SET [document_no] = '".$real_doc_no."'
 								WHERE id = '".$id."'
 							"));	 
 						
@@ -63,7 +65,7 @@ class import2Controller extends Controller {
 	            });
 	    }
 	    dd('Finished');
-		return redirect('/');
+		// return redirect('/');
 	}
 
 

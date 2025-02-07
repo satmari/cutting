@@ -1,7 +1,8 @@
 <?php
 
 return [
-
+	
+	'global_variable' => env('APP_GLOBAL_VARIABLE'),
 	/*
 	|--------------------------------------------------------------------------
 	| Application Debug Mode
@@ -208,5 +209,8 @@ return [
         'Excel' 	=> 'Maatwebsite\Excel\Facades\Excel',
         'Table'     => 'Gbrock\Table\Facades\Table',      	
 	],
+
+
+	
 
 ];

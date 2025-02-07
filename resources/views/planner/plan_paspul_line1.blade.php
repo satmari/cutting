@@ -75,16 +75,20 @@
                         @endif
 
                         
-
                         <div class="panel-body">
                         <p>Priority: <span style="color:red;">*</span></p>
                             <!-- {!! Form::number('priority', $priority, ['class' => 'form-control']) !!} -->
-                            {!! Form::select('priority', array('1'=>'Normal','2'=>'Flash','3'=>'Top','4'=>'1st shift','5'=>'2nd shift','6'=>'3rd shift','7'=>'Test'), 1, array('class' => 'form-control')) !!} 
+                            {!! Form::select('priority', array('1'=>'Normal','2'=>'Flash','3'=>'Top','4'=>'1st shift','5'=>'2nd shift','6'=>'3rd shift','7'=>'Test'), $priority, array('class' => 'form-control')) !!} 
                         </div>
 
                         <div class="panel-body">
                         <p>Comment office: <!-- <span style="color:red;">*</span> --></p>
                             {!! Form::text('comment_office', $comment_office, ['class' => 'form-control']) !!}
+                        </div>
+
+                        <div class="panel-body">
+                        <p>Dye lot: <!-- <span style="color:red;">*</span> --></p>
+                            {!! Form::text('dye_lot', $dye_lot, ['class' => 'form-control']) !!}
                         </div>
 
                         <table style="width:100%">
@@ -97,8 +101,15 @@
                             </td>
                         </tr>
                         </table>
+                        
+                        <br>
+
+
+                        <button type="submit" name="action" value="save" class="btn btn-success center-block">Save</button>
                         <hr>
                         <br>
+
+
                         
                         <div style="border-style: solid;border-width: 5px;border-color:orange; border-image: linear-gradient(45deg, yellow 25%, black 25%, black 50%, yellow 50%, yellow 75%, black 75%) 10;">
                             <table class="table" style="  border-collapse: collapse;width: 100%;">
@@ -155,10 +166,11 @@
                 
                         </tr>
                         </table>
-                        <hr>
+                        <br>
 
                         <br>
-                        {!! Form::submit('Create', ['class' => 'btn  btn-success center-block']) !!}
+                        <!-- {!! Form::submit('Create', ['class' => 'btn  btn-success center-block']) !!}\ -->
+                        <button type="submit" name="action" value="plan" class="btn btn-success center-block">Plan paspul</button>
                         <br>
                         @include('errors.list')
 

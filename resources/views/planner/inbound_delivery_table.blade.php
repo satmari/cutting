@@ -28,7 +28,7 @@
 		                    <input id="filter" type="text" class="form-control" placeholder="Type here...">
 		                </div>
 
-		                <table class="table table-striped table-bordered tableFixHead" id="table-draggable2" id="sort" 
+		                <table class="table table-striped table-bordered tableFi xHead" id="sort" 
 		                >
 		                <!--
 		                data-export-types="['excel']"

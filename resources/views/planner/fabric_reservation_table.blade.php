@@ -64,12 +64,12 @@
 		                            <th data-sortable="true"><a href="{{ url('update_skeda_status') }}" class="btn btn-primary btn-xs center-bl ock">Update status</a></th>
 		                            <th data-sortable="true">Operator</th>
 		                            <th data-sortable="true">Comment</th>
-		                            <!-- <th></th> -->
+		                            <th></th>
 
 		                            
 		                    	</tr>
 		                    </thead> 
-		                    <tbody class="connectedSortable_t able searchable">
+		                    <tbody class="connectedSortable_table searchable">
 		                    @foreach ($data as $req)
 		                        <tr class="ss">
 		                            <td>{{ $req->skeda}}</td>
@@ -82,6 +82,7 @@
 		                            <td>{{ $req->skeda_status}}</td>
 		                            <td>{{ $req->operator}}</td>
 		                            <td>{{ $req->comment}}</td>
+		                            <td><a href="{{ url('delete_reservation_q/'.$req->id) }}" class="btn btn-danger btn-xs">Delete</a></td>
 		                            
 		                           <!--  @if ($req->skeda_status == 'Leftover to Check')
 	                            		<td>

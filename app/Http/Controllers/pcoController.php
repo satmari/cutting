@@ -495,6 +495,8 @@ class pcoController extends Controller {
 		      ,p1.[created_at]
 		      ,p1.[updated_at]
 
+		      ,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(p1.[material],0,12)) as standard_comment
+
 		  FROM [paspul_rewounds] as p1
 		  WHERE status = 'TO_CUT'
 		  ORDER BY p1.[priority] desc, p1.[paspul_rewound_roll] asc"));
@@ -626,6 +628,8 @@ class pcoController extends Controller {
 		      ,p1.[tpa_number]
 		      ,p1.[created_at]
 		      ,p1.[updated_at]
+
+		      ,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(p1.[material],0,12)) as standard_comment
 
 		  FROM [paspul_rewounds] as p1
 		  WHERE status = 'TO_CUT' and p1.[id] = '".$id."'
@@ -1060,6 +1064,8 @@ class pcoController extends Controller {
 		      ,p1.[created_at]
 		      ,p1.[updated_at]
 
+		      ,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(p1.[material],0,12)) as standard_comment
+
 		  FROM [paspul_rewounds] as p1
 		  WHERE status = 'TO_CUT'
 		  ORDER BY p1.[priority] desc, p1.[paspul_rewound_roll] asc"));
@@ -1191,6 +1197,8 @@ class pcoController extends Controller {
 		      ,p1.[tpa_number]
 		      ,p1.[created_at]
 		      ,p1.[updated_at]
+
+		      ,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(p1.[material],0,12)) as standard_comment
 
 		  FROM [paspul_rewounds] as p1
 		  WHERE status = 'TO_CUT' and p1.[id] = '".$id."'

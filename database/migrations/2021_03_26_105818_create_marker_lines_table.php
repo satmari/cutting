@@ -22,7 +22,7 @@ class CreateMarkerLinesTable extends Migration {
 			$table->string('style');
 			$table->string('size');
 			$table->string('style_size');
-			$table->integer('pcs_on_layer');
+			$table->float('pcs_on_layer');
 			$table->string('comment')->nullable();
 
 			$table->timestamps();

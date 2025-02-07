@@ -32,6 +32,9 @@ class magacinController extends Controller {
 	public function inbound_delivery_table_wh() {
 		//
 		// dd('test');
+		$operator = 'Bojan Kramli';
+		Session::set('operator', $operator);
+		
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM inbound_deliveries
 			WHERE created_at >= DATEADD(DAY, -60, GETDATE()) "));
 		// dd($data);
@@ -46,6 +49,7 @@ class magacinController extends Controller {
 		return view('Import.index');
 	}
 
+	
 
 
 }

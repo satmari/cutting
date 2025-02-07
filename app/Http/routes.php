@@ -122,12 +122,10 @@ Route::get('req_lost_table', 'requestController@req_lost_table');
 Route::get('req_lost_table_history', 'requestController@req_lost_table_history');
 Route::get('req_lost_table_history_line', 'requestController@req_lost_table_history_line');
 
-//http://172.27.161.171/cutting/bb/519205
 Route::get('/bb/{line}/{id}','cut_pcsController@req_cut_part');
 Route::post('requeststore_cut_part', 'cut_pcsController@requeststore_cut_part');
 Route::get('req_extrabb_table', 'requestController@req_extrabb_table');
 Route::get('req_extrabb_table_history', 'requestController@req_extrabb_table_history');
-//http://172.27.161.171/cutting/req_extrabb_line_history/S-A01
 Route::get('req_extrabb_line_history/{line}','cut_pcsController@req_extrabb_line_history');
 
 // Wastage
@@ -207,7 +205,7 @@ Route::post('bom_cons_post', 'importController@bom_cons_post');
 Route::post('skeda_ratio_post', 'importController@skeda_ratio_post');
 
 Route::post('bom_cutting_smv_post', 'importController@bom_cutting_smv_post');
-
+Route::post('bom_cutting_tubolare_smv_post', 'importController@bom_cutting_tubolare_smv_post');
 
 
 // Cutting XML
@@ -291,6 +289,9 @@ Route::get('correct_location/{id}', 'plannerController@correct_location');
 Route::post('edit_mattress_line_confirm', 'plannerController@edit_mattress_confirm');
 Route::get('edit_layers_a/{id}', 'plannerController@edit_layers_a');
 Route::post('edit_layers_a_confirm', 'plannerController@edit_layers_a_confirm');
+Route::get('change_marker_all/{id}', 'plannerController@change_marker_all');
+Route::post('change_marker_all_post', 'plannerController@change_marker_all_post');
+Route::post('change_marker_all_post_check', 'plannerController@change_marker_all_post_check');
 
 Route::get('update_all_pro_actual', 'plannerController@update_all_pro_actual');
 
@@ -327,6 +328,7 @@ Route::post('paspul_delete_roll_confirm', 'plannerController@paspul_delete_roll_
 
 Route::get('edit_paspul_line/{id}', 'plannerController@edit_paspul');
 Route::post('edit_paspul_line_confirm', 'plannerController@edit_paspul_confirm');
+
 Route::get('edit_paspul_roll_line/{id}', 'plannerController@edit_paspul_roll_line');
 Route::post('edit_paspul_roll_line_confirm', 'plannerController@edit_paspul_roll_line_confirm');
 
@@ -409,6 +411,8 @@ Route::get('mattress_cut/{id}', 'cutterController@mattress_cut');
 Route::post('mattress_cut_post', 'cutterController@mattress_cut_post');
 Route::get('other_functions_cut/{id}', 'cutterController@other_functions');
 Route::post('add_operator_comment_cut', 'cutterController@add_operator_comment');
+Route::get('change_all_marker_request/{id}', 'cutterController@change_all_marker_request');
+Route::post('change_all_marker_request_post', 'cutterController@change_all_marker_request_post');
 
 
 // PACK
@@ -727,6 +731,9 @@ Route::get('reserve_material/{id}', 'plannerController@reserve_material');
 Route::post('reserve_material_post', 'plannerController@reserve_material_post');
 
 Route::get('fabric_reservation_table', 'plannerController@fabric_reservation_table');
+Route::get('delete_reservation_q/{id}', 'plannerController@delete_reservation_q');
+Route::get('delete_reservation/{id}', 'plannerController@delete_reservation');
+
 
 Route::get('update_skeda_status', 'plannerController@update_skeda_status');
 Route::get('declare_leftover/{id}', 'plannerController@declare_leftover');
@@ -734,6 +741,14 @@ Route::get('declare_no_leftover/{id}', 'plannerController@declare_no_leftover');
 Route::post('declare_leftover_post', 'plannerController@declare_leftover_post');
 
 Route::get('leftover_table', 'plannerController@leftover_table');
+
+// Material comment
+Route::get('material_comment_table', 'plannerController@material_comment_table');
+Route::get('material_comment_new', 'plannerController@material_comment_new');
+Route::post('material_comment_new_post', 'plannerController@material_comment_new_post');
+Route::get('material_comment_edit/{id}', 'plannerController@material_comment_edit');
+Route::post('material_comment_edit_post', 'plannerController@material_comment_edit_post');
+Route::post('material_comment_delete_post', 'plannerController@material_comment_delete_post');
 
 Route::get('/', 'HomeController@index');
 Route::get('home', 'HomeController@index');

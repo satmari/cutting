@@ -21,6 +21,7 @@
     text-align: center;
     line-height: 30px;
     color: white;
+    font-size: 20px;
   }
  
   .checkpoint {
@@ -61,42 +62,63 @@
 			                </div>
 		                @else
 			                <div class="input-group">
-			            		<span class="input-group-addon">
+			            		<!-- <span class="input-group-addon">
 			            			Efficiency: &nbsp; &nbsp; <big><b>{{ $eff}} </b></big>
-			            		</span>
-			            		
-			            		
-			            		<!-- <div> -->
-			            			<!-- <div class="progress-container">
+			            		</span> -->
+									
+									@if( $isSaturday == True)
+
+									<div class="progress-container">
 									<div id="progress-bar" class="progress-bar">0m</div>
+									<div class="checkpoint-label" style="left: 2%;color:red">Saturday</div>
+									<div class="checkpoint" style="left: 44%;"></div>
+									<div class="checkpoint-label" style="left: 44%;color:red">2200m = 100 RSD</div>
+									<div class="checkpoint" style="left: 52%;"></div>
+									<div class="checkpoint-label" style="left: 52%;color:red">2600m = 200 RSD</div>
 									<div class="checkpoint" style="left: 60%;"></div>
-									<div class="checkpoint-label" style="left: 60%;">3000m</div>
-									<div class="checkpoint" style="left: 70%;"></div>
-									<div class="checkpoint-label" style="left: 70%;">3500m</div>
-									<div class="checkpoint" style="left: 80%;"></div>
-									<div class="checkpoint-label" style="left: 80%;">4000m</div>
-									<div class="checkpoint" style="left: 90%;"></div>
-									<div class="checkpoint-label" style="left: 90%;">4500m</div>
+									<div class="checkpoint-label" style="left: 60%;color:red">3000m = 400 RSD</div>
+									<div class="checkpoint" style="left: 68%;"></div>
+									<div class="checkpoint-label" style="left: 68%;color:red">3400m = 800 RSD</div>
 									<div class="checkpoint" style="left: 100%;"></div>
-									<div class="checkpoint-label" style="left: 100%;">5000m</div>
-									</div> -->
+									<div class="checkpoint-label" style="left: 100%;"></div>
+
+									@else
+
+									<div class="progress-container">
+									<div id="progress-bar" class="progress-bar">0m</div>
+									<div class="checkpoint" style="left: 52%;"></div>
+									<div class="checkpoint-label" style="left: 52%;">2600m = 100 RSD</div>
+									<div class="checkpoint" style="left: 60%;"></div>
+									<div class="checkpoint-label" style="left: 60%;">3000m = 200 RSD</div>
+									<div class="checkpoint" style="left: 70%;"></div>
+									<div class="checkpoint-label" style="left: 70%;">3500m = 400 RSD</div>
+									<div class="checkpoint" style="left: 78%;"></div>
+									<div class="checkpoint-label" style="left: 78%;">3900m = 800 RSD</div>
+									<div class="checkpoint" style="left: 100%;"></div>
+									<div class="checkpoint-label" style="left: 100%;"></div>
+
+									@endif
+			            		
+			            			<!-- <div> -->
+			            			
+									<!-- </div> -->
 
 									<script>
 									  function updateProgressBar(meters) {
 									  	// console.log('test');
-									    // const progressBar = document.getElementById('progress-bar');
-									    // let percentage = (meters / 5000) * 100;
-									    // if (percentage > 100) {
-									      // percentage = 100;
-									    // }
-									    // progressBar.style.width = percentage + '%';
-									    // progressBar.innerText = meters + 'm';
+									    const progressBar = document.getElementById('progress-bar');
+									    let percentage = (meters / 5000) * 100;
+									    if (percentage > 100) {
+									      percentage = 100;
+									    }
+									    progressBar.style.width = percentage + '%';
+									    progressBar.innerText = meters + 'm';
 									  }
 									 
 									    // Example usage with a value from PHP
 									  <?php
-									    // $metersDone = (int)$eff; // Example value from PHP
-									    // echo "updateProgressBar($metersDone);";
+									    $metersDone = (int)$eff; // Example value from PHP
+									    echo "updateProgressBar($metersDone);";
 									  ?>
 
 									</script>
@@ -325,6 +347,10 @@
 			                        	<b>Comment operator:</b>
 			                        	<i>{{ $req->comment_operator }}</i><br>
 			                        	@endif
+										@if ($req->standard_comment != '')
+					                    <b>Material comment :</b>
+					                    <i>{{ $req->standard_comment }}</i><br>
+					                    @endif
 			                        	
 			                        </td>
 			                        <td  colspan="2" style="padding: 1px; text-align: left;">

@@ -1212,6 +1212,7 @@ class prwController extends Controller {
 			      ,p1.[updated_at]
 
 			      --,(SELECT SUM([rewound_length_partialy]) FROM [paspul_rewounds] WHERE [paspul_roll_id] = p1.[paspul_roll_id]) as rewound_sum
+			      ,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(p1.[material],0,12)) as standard_comment
 
 
 			  FROM [paspul_rewounds] as p1

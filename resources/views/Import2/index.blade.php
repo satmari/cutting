@@ -10,13 +10,13 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">Import (Excel file)</div>
 
-					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImport_by']]) !!}
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['postImport_by']]) !!}
 					
 						<div class="panel-body">
 							{!! Form::file('file1', ['class' => 'center-block']) !!}
 						</div>
 						<div class="panel-body">
-							{!! Form::submit('Import Items', ['class' => 'btn btn-warning center-block']) !!}
+							{!! Form::submit('Import', ['class' => 'btn btn-warning center-block']) !!}
 						</div>
 						@include('errors.list')
 					{!! Form::close() !!}

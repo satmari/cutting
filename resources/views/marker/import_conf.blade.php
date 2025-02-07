@@ -5,8 +5,10 @@
     <div class="row">
         <div class="text-center">
             <div class="panel panel-default col-md-4 col-md-offset-4">
-                <div class="panel-heading">Import marker: <big><b>{{ $marker_name }}</b></big></div>
-              
+                <div class="panel-heading">Import marker: <big><b>{{ $marker_name }}</b></big>
+                    <p>Plant: {{ config('app.global_variable') }}</p>
+                </div>
+                
                 <!-- <div class="input-group"> <span class="input-group-addon">Filter</span>
                     <input id="filter" type="text" class="form-control" placeholder="Type here...">
                 </div> -->
@@ -84,7 +86,6 @@
                         <p>angles:              <b>{{ $angles }}</b></p>
                         <p>notches:             <b>{{ $notches}}</b></p>
                         <p>total_pcs:           <b>{{ $total_pcs}}</b></p>
-
                         <p>variant_model:       <b>{{ $variant_model}}</b></p>
                         <p>key:                 <b>{{ $key}}</b></p>
 
@@ -96,8 +97,7 @@
                         </table>
                         </span>
 
-                        <table class="table table-s triped table-bordered" id="sort" 
-                        >
+                        <table class="table table-s triped table-bordered" id="sort">
                             <thead>
                                 <tr>            
                                     <th><b>Style</b></th>
@@ -107,24 +107,19 @@
                             </thead>
                             <!-- <tbody class="searchable"> -->
                             <br>
-
                             @foreach ($data as $req1)
                                 <tr>
                                      <td>
                                         <input type="string" style="width: 100%;" class="btn check" name="style[]" value="{{ $req1['style'] }}">
-
                                     </td>
                                      <td>
                                         <input type="string" style="width: 100%;" class="btn check" name="size[]" value="{{ $req1['size'] }}">  
-
                                     </td>
                                     <td>
                                         <input type="string" style="width: 100%;" class="btn check" name="qty[]" value="{{ $req1['qty'] }}">  
-
                                     </td>
                                 </tr>
                             @endforeach
-                             
                             </tbody>     
                         </table>
                         <br>

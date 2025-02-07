@@ -53,6 +53,11 @@ class CreateMattressDetailsTable extends Migration {
 
 			$table->string('mandatory_to_ins')->nullable();
 
+			$table->integer('requested_length')->nullable();
+
+			$table->float('cutter_shrink_x')->nullable();
+			$table->float('cutter_shrink_y')->nullable();
+
 			$table->timestamps();
 		});
 	}

@@ -138,8 +138,10 @@
 									<td>
 										@if ($req->status == "TO_CUT")
 											<a href="{{ url('mattress_to_cut/'.$req->id) }}" class="btn btn-info btn-xs center-block">On cutter</a>
-										@else ($req->status == "ON_CUT")
+										@elseif($req->status == "ON_CUT")
 											<a href="{{ url('mattress_cut/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Cut mattress</a>
+										@else ($req->status == "TO_CHANGE")
+											<a href="{{ url('mattress_to_cut/'.$req->id) }}" class="btn btn-info btn-xs center-block" disabled>On cutter</a>
 										@endif
 										
 									</td>
@@ -150,15 +152,10 @@
 									</td> -->
 									<td>
 										<a href="{{ url('other_functions_cut/'.$req->id) }}" class="btn btn-default btn-xs center-block">Other functions</a>
-										<!-- <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#exampleModalCenter" data-id="{{ $req->id }}" data-value="{{ $req->comment_operator }}" data-push="{{ $req->status}}">
-  											Other functions
-										</button> -->
-										<!-- {!! Form::open(['method'=>'POST', 'url'=>'other_functions']) !!}
-											{!! Form::hidden('id', $req->id, ['class' => 'form-control']) !!}
-											{!! Form::submit('Other functions', ['class' => 'btn btn-default btn-xs center-block']) !!}
-	            			            {!! Form::close() !!} -->
 
 									</td>
+
+									
 
 		                        </tr>
 		                        <tr style="border-bottom: 3px solid grey;
@@ -173,6 +170,10 @@
 					                        	@if ($req->comment_operator != '')
 					                        	<b>Comment operator:</b>
 					                        	<i>{{ $req->comment_operator }}</i><br>
+					                        	@endif
+					                        	@if ($req->standard_comment != '')
+					                        	<b>Material comment :</b>
+					                        	<i>{{ $req->standard_comment }}</i><br>
 					                        	@endif
 					                        </td>
 					                        <td  colspan="2" style="padding: 1px; text-align: left;">

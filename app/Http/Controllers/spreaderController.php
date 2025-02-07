@@ -111,6 +111,8 @@ class spreaderController extends Controller {
 		      -- ,m5.[pro_pcs_planned]
 		      -- ,m5.[pro_pcs_actual]
 		      ,ms.[g_bin_orig]
+
+		      ,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 		      
 		  FROM [mattresses] as m1
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
@@ -362,7 +364,16 @@ class spreaderController extends Controller {
 			// }
 		}
 
-		return view('spreader.index', compact('data','location','operators','operator','operator2','eff','eff2'));
+		$isSaturday = date('l') === 'Saturday';
+		// dd($isSaturday);
+		// if ($isSaturday) {
+		//     dd("Today is Saturday");
+		// } else {
+		//     dd("Today is not Saturday");
+		// }
+		
+
+		return view('spreader.index', compact('data','location','operators','operator','operator2','eff','eff2','isSaturday'));
 	}
 
 	public function operator_login (Request $request) {
@@ -1266,6 +1277,19 @@ class spreaderController extends Controller {
 				$table_update_2->num_of_cut_problems = (int)$num_of_cut_problems;
 				$table_update_2->save();
 
+				// marttres_pro update
+				$find_all_mattress_pro = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+				FROM [mattress_pros] WHERE [mattress_id] = '".$id."' "));
+
+				for ($a=0; $a < count($find_all_mattress_pro); $a++) { 
+					// dd($find_all_mattress_pro[$a]->id);
+
+					$table_update_mattress_pro = mattress_pro::findOrFail($find_all_mattress_pro[$a]->id);
+					//$table_update_mattress_pro->pro_pcs_actual = ($table_update_mattress_pro->pro_pcs_layer * $layers_a) + (int)$layers_partial;
+					$table_update_mattress_pro->pro_pcs_actual = $table_update_mattress_pro->pro_pcs_layer * $layers_a;
+					$table_update_mattress_pro->save();	
+				}
+				// dd('Stop');
 				
 				$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
 					SET NOCOUNT ON;
@@ -1369,8 +1393,8 @@ class spreaderController extends Controller {
 					// dd($find_all_mattress_pro[$a]->id);
 
 					$table_update_mattress_pro = mattress_pro::findOrFail($find_all_mattress_pro[$a]->id);
-					$table_update_mattress_pro->pro_pcs_actual = ($table_update_mattress_pro->pro_pcs_layer * $layers_a) + (int)$layers_partial;
-					// dd($table_update_mattress_pro->pro_pcs_actual);
+					//$table_update_mattress_pro->pro_pcs_actual = ($table_update_mattress_pro->pro_pcs_layer * $layers_a) + (int)$layers_partial;
+					$table_update_mattress_pro->pro_pcs_actual = $table_update_mattress_pro->pro_pcs_layer * $layers_a;
 					$table_update_mattress_pro->save();	
 				}
 				// dd('Stop');

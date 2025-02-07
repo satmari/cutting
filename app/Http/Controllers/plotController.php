@@ -101,6 +101,7 @@ class plotController extends Controller {
 		      -- ,m5.[pro_pcs_layer]
 		      -- ,m5.[pro_pcs_planned]
 		      -- ,m5.[pro_pcs_actual]
+		      ,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 		      
 		  FROM [mattresses] as m1
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]

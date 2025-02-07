@@ -8,6 +8,7 @@
         		<div class="text-center">
 		            <div class="panel panel-default">
 		            	<div class="panel-heading">
+		            		@if(Auth::user()->name != 'magacin')
 		            		<a href="{{url('/inbound_delivery_table')}}" class="btn btn-success">Available fabric</a>
 		            		&nbsp;
 		            		&nbsp;
@@ -18,6 +19,7 @@
 		            		&nbsp;
 		            		&nbsp;
 		            		&nbsp;
+		            		@endif
 		            		<a href="{{url('leftover_table')}}" class="btn btn-info" style="text-decoration: underline;">Leftover Queue</a>
 		            		
 		            	</div>

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 //use Gbrock\Table\Facades\Table;
 use Illuminate\Support\Facades\Redirect;
 
+use App\marker_line;
 use App\mattress_details;
 use App\mattress_phases;
 use App\mattress_markers;
@@ -17,6 +18,7 @@ use App\mattress_pro;
 use App\marker_change;
 use App\mattress;
 use App\mattress_eff;
+use App\pro_skeda;
 use App\o_roll;
 use App\paspul;
 use App\paspul_line;
@@ -34,6 +36,8 @@ use App\skeda_comments;
 use App\inbound_delivery;
 use App\fabric_reservation;
 use App\leftover_table;
+
+use App\material_comments;
 
 // use DB;
 use Illuminate\Support\Facades\DB;
@@ -143,6 +147,7 @@ class plannerController extends Controller {
 	      -- ,m5.[pro_pcs_planned]
 	      -- ,m5.[pro_pcs_actual]
 	      ,ms.[g_bin_orig]
+	      ,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 	      
 		  FROM [mattresses] as m1
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
@@ -304,6 +309,7 @@ class plannerController extends Controller {
 			      -- ,m5.[pro_pcs_planned]
 			      -- ,m5.[pro_pcs_actual]
 			      ,ms.[g_bin_orig]
+			      ,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
@@ -403,6 +409,164 @@ class plannerController extends Controller {
 			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [mattress_split_requests] WHERE status = 'TO_SPLIT'"));	
 		}
 
+		if ($location == 'TO_CHANGE') {
+			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				   m2.[position]
+				  ,m1.[id]
+			      ,m1.[mattress]
+			      ,m1.[g_bin]
+			      ,m1.[material]
+			      ,m1.[dye_lot]
+			      ,m1.[color_desc]
+			      ,m1.[width_theor_usable]
+			      ,m1.[skeda]
+			      ,m1.[skeda_item_type]
+			      ,m1.[skeda_status]
+			      ,m1.[spreading_method]
+			      ,m1.[created_at]
+			      ,m1.[updated_at]
+			      --,'|'
+			      ,m2.[layers]
+			      ,m2.[layers_a]
+			      ,m2.[length_mattress]
+			      ,m2.[cons_planned]
+			      ,m2.[cons_actual]
+			      ,m2.[extra]
+			      ,m2.[pcs_bundle]
+			      ,m2.[layers_partial]
+			      ,m2.[position]
+			      ,m2.[priority]
+			      ,m2.[call_shift_manager]
+			      ,m2.[test_marker]
+			      ,m2.[tpp_mat_keep_wastage]
+			      ,m2.[printed_marker]
+			      ,m2.[mattress_packed]
+			      ,m2.[all_pro_for_main_plant]
+			      ,m2.[bottom_paper]
+			      ,m2.[layers_a_reasons]
+			      ,m2.[comment_office]
+			      ,m2.[comment_operator]
+			      ,m2.[minimattress_code]
+			      ,m2.[printed_nalog]
+			      ,m2.[layer_limit]
+			      ,m2.[overlapping]
+			      ,m2.[req_time]
+			      --,'|'
+			      ,m3.[marker_id]
+			      ,m3.[marker_name]
+			      ,m3.[marker_name_orig]
+			      ,m3.[marker_length]
+			      ,m3.[marker_width]
+			      ,m3.[min_length]
+			      --,'|'
+			      ,m4.[status]
+			      ,m4.[location]
+			      ,m4.[device]
+			      ,m4.[active]
+			      ,m4.[operator1]
+			      ,m4.[operator2]
+			      --,'|'
+			      -- ,m5.[style_size]
+			      -- ,m5.[pro_id]
+			      -- ,m5.[pro_pcs_layer]
+			      -- ,m5.[pro_pcs_planned]
+			      -- ,m5.[pro_pcs_actual]
+			      ,ms.[g_bin_orig]
+			      ,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
+
+			  FROM [mattresses] as m1
+			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+			  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
+			  LEFT JOIN [mattress_split_requests] as ms ON ms.[mattress_id_new] = m1.[id]
+			  WHERE m4.[status] = '".$location."' AND m4.[active] = '1' 
+			  ORDER BY m2.[position] asc"));
+			// dd($data);
+			$pros= '';
+			$skus= '';
+			$sku_s= '';
+			$location_all= '';
+			for ($i=0; $i < count($data) ; $i++) { 
+			
+				$id = $data[$i]->id;
+				// dd($id);
+
+				if (($data[$i]->skeda_item_type == 'MS') OR ($data[$i]->skeda_item_type == 'MM')) {
+					
+					$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+						ps.[pro]
+						,ps.[style_size]
+						,ps.[sku]
+						,po.[location_all]
+						--,*
+					  FROM [mattress_pros] as mp
+					  JOIN [pro_skedas] as ps ON ps.[pro_id] = mp.[pro_id]
+					  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+					WHERE mp.[mattress_id] = '".$id."' "));
+					
+					for ($x=0; $x < count($prom); $x++) { 
+
+						$pros .= $prom[$x]->pro." ";
+						$skus .= $prom[$x]->style_size." ";
+						$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+						$sku_s .= $test." ";
+						// $sku_s .= $prom[$x]->sku." ";
+						if ($prom[$x]->location_all == 'Valy') {
+							$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+						} else {
+							$location_all .= $prom[$x]->location_all." ";
+						}
+					}
+
+					$data[$i]->pro = trim($pros);
+					$data[$i]->style_size = trim($skus);
+					$data[$i]->sku = trim($sku_s);
+					$data[$i]->location_all = trim($location_all);
+					$pros = '';
+					$skus = '';
+					$sku_s = '';
+					$location_all = '';
+
+				} else {
+
+					$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+						ps.[pro]
+						,ps.[style_size]
+						,ps.[sku]
+						,po.[location_all]
+						--,*
+					  FROM  [pro_skedas] as ps 
+					  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+					WHERE ps.[skeda] = '".$data[$i]->skeda."' "));
+					// dd($prom);
+
+					for ($x=0; $x < count($prom); $x++) { 
+
+						$pros .= $prom[$x]->pro." ";
+						$skus .= $prom[$x]->style_size." ";
+						$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+						$sku_s .= $test." ";
+						// $sku_s .= $prom[$x]->sku." ";
+						if ($prom[$x]->location_all == 'Valy') {
+							$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+						} else {
+							$location_all .= $prom[$x]->location_all." ";
+						}
+					}
+
+					$data[$i]->pro = trim($pros);
+					$data[$i]->style_size = trim($skus);
+					$data[$i]->sku = trim($sku_s);
+					$data[$i]->location_all = trim($location_all);
+					$pros = '';
+					$skus = '';
+					$sku_s = '';
+					$location_all = '';
+				}
+			}
+		}
+
 		if ($location == 'PLOT') {
 			$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 				   m2.[position]
@@ -466,6 +630,7 @@ class plannerController extends Controller {
 			      -- ,m5.[pro_pcs_planned]
 			      -- ,m5.[pro_pcs_actual]
 			      ,ms.[g_bin_orig]
+			      ,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
@@ -623,6 +788,7 @@ class plannerController extends Controller {
 				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
 				WHERE t3.id = m1.id)
 				as color
+				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -733,6 +899,7 @@ class plannerController extends Controller {
 				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
 				WHERE t3.id = m1.id)
 				as color
+				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
@@ -848,6 +1015,7 @@ class plannerController extends Controller {
 				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
 				WHERE t3.id = m1.id)
 				as color
+				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -957,6 +1125,7 @@ class plannerController extends Controller {
 				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
 				WHERE t3.id = m1.id)
 				as color
+				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -1066,6 +1235,7 @@ class plannerController extends Controller {
 				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
 				WHERE t3.id = m1.id)
 				as color
+				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -1176,6 +1346,7 @@ class plannerController extends Controller {
 				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
 				WHERE t3.id = m1.id)
 				as color
+				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -1284,6 +1455,7 @@ class plannerController extends Controller {
 				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
 				WHERE t3.id = m1.id)
 				as color
+				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
@@ -1393,6 +1565,7 @@ class plannerController extends Controller {
 				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
 				WHERE t3.id = m1.id)
 				as color
+				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
@@ -1468,7 +1641,7 @@ class plannerController extends Controller {
 		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
 		      ,m4.[status]
 		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
-		      ,(SELECT 
+		      /*,(SELECT 
 					TOP 1 x.average_of_min_per_meter_minm
 				
 					FROM (
@@ -1492,7 +1665,25 @@ class plannerController extends Controller {
 						TOP 1 average_of_min_per_meter_minm
 					  FROM [cutting_smv_by_materials]
 					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-			 	) as average_of_min_per_meter_minm_m,
+			 	) as average_of_min_per_meter_minm_m,*/
+				,(SELECT 
+					TOP 1 x.average_min_per_layer
+				
+					FROM (
+						SELECT 
+						*,
+						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers
+						FROM [cutting_tubolare_smvs]) as x
+					WHERE	
+							x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+							
+			 	) as average_min_per_layer,
+				/*(SELECT 
+						ROUND(AVG(average_min_per_layer),3)
+				  FROM [cutting_tubolare_smvs] ) as average_of_tubolare_smv_all,*/
+				'0,167' as average_of_tubolare_smv_all,
 				(SELECT 
 						ROUND(AVG(average_of_min_per_meter_minm),3)
 				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
@@ -1502,6 +1693,8 @@ class plannerController extends Controller {
 				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
 				WHERE t3.id = m1.id)
 				as color
+				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
+
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -1512,32 +1705,25 @@ class plannerController extends Controller {
 			$tub_req_time = [];
 			foreach ($tub as $line) {
 
-				if ($line->average_of_min_per_meter_minm_c != 0) {
-					// dd('test');
+				if ($line->average_min_per_layer != 0) {
+					
 			        if (array_key_exists($line->priority, $tub_req_time)) {
-			            $tub_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+			            $tub_req_time[$line->priority] += round((float)$line->average_min_per_layer * (float)$line->layers_a,0);
 			        } else { 
-			            $tub_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        }
-
-				} else if ($line->average_of_min_per_meter_minm_m != 0) {
-
-					if (array_key_exists($line->priority, $tub_req_time)) {
-			            $tub_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        } else { 
-			            $tub_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+			            $tub_req_time[$line->priority] = round((float)$line->average_min_per_layer * (float)$line->layers_a,0);
 			        }
 
 				} else {
 
 					if (array_key_exists($line->priority, $tub_req_time)) {
-			            $tub_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+			            $tub_req_time[$line->priority] += round((float)$line->average_of_tubolare_smv_all * (float)$line->layers_a,0);
 			        } else {
-			            $tub_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+			            $tub_req_time[$line->priority] = round((float)$line->average_of_tubolare_smv_all * (float)$line->layers_a,0);
 			        }
 				}
 			}
 			// dd($tub_req_time);
+			// $tub_req_time = 0;
 			
 			$tub_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 				SUM(m3.[marker_length]) as sum_m_length,
@@ -1610,6 +1796,7 @@ class plannerController extends Controller {
 				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
 				WHERE t3.id = m1.id)
 				as color
+				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
@@ -1730,6 +1917,7 @@ class plannerController extends Controller {
 		      -- ,m5.[pro_pcs_planned]
 		      -- ,m5.[pro_pcs_actual]
 		      ,ms.[g_bin_orig]
+		      ,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 		      
 			  FROM [mattresses] as m1
 			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
@@ -2013,6 +2201,20 @@ class plannerController extends Controller {
 
 	public function plan_mattress_line ($id) {
 
+		$user = User::find(Auth::id());
+		$operator = Session::get('operator');
+		if (!isset($operator) OR $operator == '') {
+			// return redirect('/spreader');
+			if ($user->is('admin')) {
+				
+				$operator = 'admin';
+				Session::set('operator', $operator);
+			} else {
+				$msg ='Operator must be logged!';
+				return view('planner.error',compact('msg', 'operator', 'operators'));	
+			}
+		}
+
 		// dd($id);
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 			   m2.[position]
@@ -2111,7 +2313,111 @@ class plannerController extends Controller {
 		$comment_office = $data[0]->comment_office;
 		$tpa_number = $data[0]->tpa_number;
 
-		return view('planner.plan_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office'));
+		$selected_marker = $marker_name;
+
+
+		// find mattress_pro
+		$pro_m = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+			 FROM [mattress_pros] 
+		  	WHERE [mattress_id] = '".$id."'
+		  "));
+		// dd($pro_m);
+
+		if (($skeda_item_type == 'MW') OR ($skeda_item_type == 'MB')) {
+			// continue
+
+		} else {
+			if (!isset($pro_m[0]->id)) {
+				// dd('no mattress_pro');
+
+				
+
+				$new_marker_reqs = marker_line::where('marker_name', $selected_marker)->get();
+				$new_marker_reqSizes = [];
+				foreach ($new_marker_reqs as $record) {
+				    $new_marker_reqSizes = array_merge($new_marker_reqSizes, explode(',', $record->style_size));
+				}
+				$new_marker_reqSizes = array_unique($new_marker_reqSizes);
+				// dd(['new_marker_reqSizes' => $new_marker_reqSizes]); // Ensure this is placed properly
+
+				$skeda_req = pro_skeda::where('skeda', $skeda)->get();
+				$skeda_reqSizes = [];
+				foreach ($skeda_req as $record) {
+				    $skeda_reqSizes = array_merge($skeda_reqSizes, explode(',', $record->style_size));
+				}
+				$skeda_reqSizes = array_unique($skeda_reqSizes);
+
+				// dd(['new_marker_reqSizes' => $new_marker_reqSizes, 'skeda_reqSizes' => $skeda_reqSizes]);
+
+				// Check if all sizes from the first table are found in the second table
+				$missingSizes = array_diff($new_marker_reqSizes, $skeda_reqSizes);
+
+				if (empty($missingSizes)) {
+				    // dd('All style_size values from the new_marker_req can fit in the skeda_req');
+
+				    $markers = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+							id, marker_name, marker_width, marker_length, min_length
+						FROM [marker_headers] 
+						WHERE marker_name = '".$selected_marker."'  AND (status = 'ACTIVE' OR status = 'USELESS') "));
+					// dd($markers);
+
+					if (!isset($markers[0]->id)) {
+						
+						$msg = 'Selected marker has the status NOT ACTIVE.';
+						return view('planner.error',compact('msg'));
+
+						// dd('Selected marker has the status USELESS, please choose a marker with lower width.');
+					}
+
+					$find_in_marker_lines = DB::connection('sqlsrv')->select(DB::raw("SELECT style_size, pcs_on_layer FROM marker_lines WHERE marker_name = '".$selected_marker."' "));
+					// dd($find_in_marker_lines);
+
+					$mattress_pro_array[] = '';
+					$marker_pcs_per_layer[] = '';
+
+					// Gordon -> ask pro, Fiorano -> ask pro
+					foreach ($find_in_marker_lines as $line) {
+			   			$style_size = $line->style_size;
+			   			$pro_pcs_layer = (float)$line->pcs_on_layer;
+
+			   			array_push($marker_pcs_per_layer, $style_size.'#'.$pro_pcs_layer);
+
+
+			   			$find_in_pro_skedas = DB::connection('sqlsrv')->select(DB::raw("SELECT pro_id,pro FROM pro_skedas WHERE skeda = '".$skeda."' AND style_size = '".$style_size."' "));
+			   			// dd($find_in_pro_skedas);
+
+
+			   			// multiple selection for Fiorano
+			   			// for Gordon is fine
+						if (!isset($find_in_pro_skedas[0])) {
+			   				dd('can not find pro for ths mattress');
+			   			}  else {
+			   				// dd($find_in_pro_skedas);
+				   			$pro_id = $find_in_pro_skedas[0]->pro_id;
+				   			$pro = $find_in_pro_skedas[0]->pro;
+				   			array_push($mattress_pro_array, $style_size.'#'.$pro_id.'#'.$pro);
+						} 	
+					
+		   				   		
+		   			}
+			   		$marker_pcs_per_layer = array_filter($marker_pcs_per_layer);
+			   		$mattress_pro_array = array_filter($mattress_pro_array);
+
+			   		// dd($mattress_pro_array);
+
+					return view('planner.plan_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office'
+						,'selected_marker','marker_pcs_per_layer','mattress_pro_array'));
+
+		   		} else {
+					$msg ='Some style_size values from the new_marker_req do not fit in the skeda_req, missing '.implode(', ', $missingSizes).' ';
+					return view('planner.error',compact('msg', 'operator', 'operators'));
+				    // dd('Some style_size values from the new_marker_req do not fit in the skeda_req, missing '.implode(', ', $missingSizes).'');
+				}
+			}
+		}
+
+		return view('planner.plan_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office'
+				,'selected_marker'));
 	}
 
 	public function plan_mattress_line_confirm(Request $request) {
@@ -2122,14 +2428,15 @@ class plannerController extends Controller {
 		
 		$id = $input['id'];
 		$mattress = $input['mattress'];
+		$g_bin = $input['g_bin'];
+		$skeda_item_type = $input['skeda_item_type'];
 		$pcs_bundle = (int)$input['pcs_bundle'];
 		$mandatory_to_ins = $input['mandatory_to_ins'];
 		$priority = (int)$input['priority'];
 		$comment_office = $input['comment_office'];
 		$bottom_paper = $input['bottom_paper'];
-		$skeda_item_type = $input['skeda_item_type'];
 		$spreading_method = $input['spreading_method'];
-
+		
 		if (isset($input['call_shift_manager'])) {
 			$call_shift_manager = (int)$input['call_shift_manager'];
 		} else {
@@ -2147,33 +2454,113 @@ class plannerController extends Controller {
 		// }
 		
 		$location = $input['location'];
+		
+		if (isset($input['mattressProArray'])) {
+
+			$mattressProArray = isset($input['mattressProArray']) ? json_decode($input['mattressProArray'], true) : [];
+		    $markerPcsPerLayer = isset($input['markerPcsPerLayer']) ? json_decode($input['markerPcsPerLayer'], true) : [];
+		    $selected_marker = isset($input['selected_marker']) ? $input['selected_marker'] : null;
+
+		    // Extract line quantities (line-0, line-1, etc.)
+		    $lineQuantities = [];
+		    foreach ($input as $key => $value) {
+		        if (preg_match('/^line-(\d+)$/', $key, $matches)) {
+		            $lineIndex = (int)$matches[1]; // Extract the index
+		            $lineQuantities[$lineIndex] = (int)$value; // Store the quantity
+		        }
+		    }
+		    // dd($lineQuantities);
+
+		    // Combine mattressProArray with lineQuantities
+		    $structuredLines = [];
+		    foreach ($mattressProArray as $index => $line) {
+		        $parts = explode('#', $line);
+		        $key = isset($parts[0]) ? $parts[0] : null;
+		        $secondValue = isset($parts[1]) ? $parts[1] : null;
+		        $thirdValue = isset($parts[2]) ? $parts[2] : null;
+
+		        // Add quantity from lineQuantities
+		        $structuredLines[] = [
+		            'line_key' => $key,
+		            'second_value' => $secondValue,
+		            'third_value' => $thirdValue,
+		            'quantity' => isset($lineQuantities[$index]) ? $lineQuantities[$index] : 0,
+		        ];
+		    }
+		    // dd($structuredLines);
+
+		    foreach ($structuredLines as $item) {
+			    // Access each element
+
+			    $style_size = $item['line_key'];
+			    $pro_id = $item['second_value'];
+			    $pro = $item['third_value'];
+			    $pro_pcs_layer = (float)$item['quantity'];
+
+			    $met_det = mattress_details::where('mattress_id','=',$id)->get();
+			    $layers_a = $met_det[0]->layers_a;
+			    // dd($layers_a);
+
+			    $table1 = new mattress_pro;
+				$table1->mattress_id = $id;
+				$table1->mattress = $mattress;
+				$table1->style_size = $style_size;
+				$table1->pro_id = $pro_id;
+				$table1->pro_pcs_layer = $pro_pcs_layer;
+				$table1->pro_pcs_planned = $table1->pro_pcs_layer * (float)$layers_a;
+				$table1->pro_pcs_actual = $table1->pro_pcs_layer * (float)$layers_a;
+				$table1->save();
+				// dd($table1);
+			}
+		}
+		
+		// dd('stop');
 
 		// Gbin check !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		// $g_bin = 'G000000001';
 
+		// dd($g_bin);
+
 		if ($skeda_item_type == 'MM') {
 			$g_bin = NULL;
-
 		} else {
-			$find_g_bin = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-					TOP 1 g_bin
-				FROM [mattresses] ORDER BY g_bin desc"));
-			// dd($find_g_bin);
-			if (isset($find_g_bin[0])) {
-				if ($find_g_bin[0]->g_bin == NULL) {
-					$bin = 29999;			
-				} else {
-					$bin = (int)substr($find_g_bin[0]->g_bin, -8);	
-				}
-			}
+			if ($g_bin == '') {
+				// Gordon
 			
-			// dd($bin);
-			$num = str_pad($bin+1, 9, 0, STR_PAD_LEFT);
-			// dd("G".$num);
+				$find_g_bin = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+						TOP 1 g_bin
+					FROM [mattresses] ORDER BY g_bin desc"));
+				// dd($find_g_bin);
+				if (isset($find_g_bin[0])) {
+					if ($find_g_bin[0]->g_bin == NULL) {
+						$bin = 29999;			
+					} else {
+						$bin = (int)substr($find_g_bin[0]->g_bin, -8);	
+					}
+				}
+				
+				// dd($bin);
+				$num = str_pad($bin+1, 9, 0, STR_PAD_LEFT);
+				// dd("G".$num);
 
-			$g_bin = "G".$num;
-			// dd($g_bin);
+				$g_bin = "G".$num;
+				// dd($g_bin);
+
+				$check_g_bin = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+						TOP 1 g_bin
+					FROM [mattresses] 
+					WHERE g_bin = '".$g_bin."' "));
+
+				if (isset($check_g_bin[0]->g_bin)) {
+					dd('problem to create g_bin, try again');
+				} 
+				
+			} else {
+				// Fiorano , bin was imported before
+				$g_bin = $g_bin;
+			}
 		}
+		// dd($g_bin);
 
 		// verify userId
 		if (Auth::check())
@@ -2236,20 +2623,6 @@ class plannerController extends Controller {
 		catch (\Illuminate\Database\QueryException $e) {
 			dd("Problem to save in mattress_details");
 		}
-		// dd("STOP");
-		// all mattress_phases for this mattress set to NOT ACTIVE
-		// $find_all_mattress_phasses = DB::connection('sqlsrv')->select(DB::raw("SELECT [id] FROM [mattress_phases] 
-		// WHERE [mattress_id] = '".$id."' "));
-		
-		// if (isset($find_all_mattress_phasses[0])) {
-		// 	// dd($find_all_mattress_phasses);
-		// 	for ($i=0; $i < count($find_all_mattress_phasses); $i++) { 
-
-		// 			$table3 = mattress_phases::findOrFail($find_all_mattress_phasses[$i]->id);
-		// 			$table3->active = 0;
-		// 			$table3->save();
-		// 	}	
-		// }
 
 		$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
 			SET NOCOUNT ON;
@@ -2286,7 +2659,6 @@ class plannerController extends Controller {
 		$table3_new->id_status = $id.'-'.$status;
 		// $table3_new->pre_position = $pre_position;
 		$table3_new->save();
-	
 
 		// reorder position of NOT_SET
 		$reorder_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
@@ -2793,7 +3165,7 @@ class plannerController extends Controller {
 
 	   		foreach ($find_in_marker_lines as $line) {
 	   			$style_size = $line->style_size;
-	   			$pro_pcs_layer = $line->pcs_on_layer;
+	   			$pro_pcs_layer = (float)$line->pcs_on_layer;
 
 	   			if (isset($skeda)) {
 		   				
@@ -3004,6 +3376,386 @@ class plannerController extends Controller {
 		$table_update->save();
 
 		return Redirect::to('/plan_mattress/TO_SPLIT');
+	}
+
+	public function change_marker_all($id) {
+		// dd($id);
+
+		$find_marker = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				mm.[marker_name], mm.[marker_id], mm.[mattress], mm.[id], mm.[marker_length], mm.[marker_width], mm.[min_length],
+				md.[requested_width],md.[requested_length],md.[id] as mattress_details_id,
+				m.[width_theor_usable], m.[g_bin]
+				,(SELECT TOP 1 
+						LEFT(style_size, CHARINDEX(' ', style_size + ' ') - 1) AS style
+					FROM [mattress_pros]
+					WHERE mattress_id = mm.mattress_id
+					) as style
+			FROM [mattress_markers] as mm
+			JOIN [mattress_details] as md ON md.[mattress_id] = mm.[mattress_id]
+			JOIN [mattresses] as m ON m.[id] = mm.[mattress_id]
+			WHERE mm.[mattress_id] = ".(int)$id." "));
+
+		// dd($find_marker);
+
+		if ((!isset($find_marker[0]->marker_name)) OR ($find_marker[0]->marker_name != '')) {
+			
+			$existing_marker = $find_marker[0]->marker_name;
+			$existing_marker_id = $find_marker[0]->marker_id;
+			$existing_mattress_marker_id = $find_marker[0]->id;
+			$mattress_details_id = $find_marker[0]->mattress_details_id;
+			$existing_marker_length = $find_marker[0]->marker_length;
+			$existing_marker_width = $find_marker[0]->marker_width;
+			$requested_width = $find_marker[0]->requested_width;
+			$requested_length = $find_marker[0]->requested_length;
+			$width_theor_usable = $find_marker[0]->width_theor_usable;
+			$existing_min_length = $find_marker[0]->min_length;
+			$mattress = $find_marker[0]->mattress;
+			$g_bin = $find_marker[0]->g_bin;
+			$style = $find_marker[0]->style;
+
+			// marker list
+			$markers = DB::connection('sqlsrv')->select(DB::raw("SELECT
+				CONCAT(mh.marker_name, ' ', mh.marker_width, ' ', mh.marker_length, ' -> ', mh.status) AS marker
+				FROM [marker_headers] as mh
+				JOIN [marker_lines] as ml ON ml.marker_header_id = mh.id 
+				WHERE (mh.[status] = 'ACTIVE' OR mh.[status] = 'USELESS')
+				AND ml.style = '".$style."' 
+				GROUP BY
+					mh.marker_name,mh.marker_width,mh.marker_length, mh.status "
+			));
+			// dd($markers);
+
+			// $markers = (object)(array_filter($markers));
+			// $markers = array_filter($markers);
+			// dd($markers);
+
+			// print_r(array_filter($markers));
+			// dd("stop");
+			return view('planner.change_marker_all',compact('id','mattress','g_bin','existing_marker','existing_mattress_marker_id', 
+				'existing_marker_id', 'mattress_details_id' ,'existing_marker_length', 'existing_marker_width','markers', 'requested_width', 'requested_length' ,'style','width_theor_usable', 'existing_min_length'));
+
+		} else {
+			$msg = 'Marker is not liked with mattress!';
+			return view('planner.error',compact('msg'));
+		}
+	}
+
+	public function change_marker_all_post(Request $request) {
+
+		$this->validate($request, ['selected_marker'=>'required']);
+
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+
+		$user = User::find(Auth::id());
+		$operator = Session::get('operator');
+		if (!isset($operator) OR $operator == '') {
+			// return redirect('/spreader');
+			if ($user->is('admin')) {
+				
+				$operator = 'admin';
+				Session::set('operator', $operator);
+			} else {
+				$msg ='Operator must be logged!';
+				return view('planner.error',compact('msg', 'operator', 'operators'));	
+			}
+		}
+
+		$id = (int)$input['id'];
+		$mattress = $input['mattress'];
+		// dd($mattress);
+		$existing_marker = $input['existing_marker'];
+		$existing_marker_id = $input['existing_marker_id'];
+		$mattress_details_id = $input['mattress_details_id'];
+		$existing_mattress_marker_id = $input['existing_mattress_marker_id'];
+		$existing_marker_length = $input['existing_marker_length'];
+		$existing_marker_width = $input['existing_marker_width'];
+		$existing_min_length = $input['existing_min_length'];
+		$selected_marker_full = $input['selected_marker'];
+		$style = $input['style'];
+		
+		$selected_marker_array = explode(' ',$selected_marker_full);
+		$selected_marker = $selected_marker_array[0];
+		// dd($selected_marker);
+
+		$find_skeda = mattress::findOrFail($id);
+		$skeda = $find_skeda->skeda;
+		// dd($skeda);
+
+		
+		$new_marker_reqs = marker_line::where('marker_name', $selected_marker)->get();
+		$new_marker_reqSizes = [];
+		foreach ($new_marker_reqs as $record) {
+		    $new_marker_reqSizes = array_merge($new_marker_reqSizes, explode(',', $record->style_size));
+		}
+		$new_marker_reqSizes = array_unique($new_marker_reqSizes);
+		// dd(['new_marker_reqSizes' => $new_marker_reqSizes]); // Ensure this is placed properly
+
+		$skeda_req = pro_skeda::where('skeda', $skeda)->get();
+		$skeda_reqSizes = [];
+		foreach ($skeda_req as $record) {
+		    $skeda_reqSizes = array_merge($skeda_reqSizes, explode(',', $record->style_size));
+		}
+		$skeda_reqSizes = array_unique($skeda_reqSizes);
+
+		// dd(['new_marker_reqSizes' => $new_marker_reqSizes, 'skeda_reqSizes' => $skeda_reqSizes]);
+
+		// Check if all sizes from the first table are found in the second table
+		$missingSizes = array_diff($new_marker_reqSizes, $skeda_reqSizes);
+
+		// If there are no missing sizes, the first table fits in the second table
+		if (empty($missingSizes)) {
+		    // dd('All style_size values from the new_marker_req can fit in the skeda_req');
+
+		    $markers = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					id, marker_name, marker_width, marker_length, min_length
+				FROM [marker_headers] 
+				WHERE marker_name = '".$selected_marker."'  AND (status = 'ACTIVE' OR status = 'USELESS') "));
+			// dd($markers);
+
+			if (!isset($markers[0]->id)) {
+				
+				$msg = 'Selected marker has the status NOT ACTIVE.';
+				return view('planner.error',compact('msg'));
+
+				// dd('Selected marker has the status USELESS, please choose a marker with lower width.');
+			}
+
+
+			$find_in_marker_lines = DB::connection('sqlsrv')->select(DB::raw("SELECT style_size, pcs_on_layer FROM marker_lines WHERE marker_name = '".$selected_marker."' "));
+			// dd($find_in_marker_lines);
+
+			$mattress_pro_array[] = '';
+			$marker_pcs_per_layer[] = '';
+
+
+			// Gordon -> ask pro, Fiorano -> ask pro
+			foreach ($find_in_marker_lines as $line) {
+	   			$style_size = $line->style_size;
+	   			$pro_pcs_layer = (float)$line->pcs_on_layer;
+
+	   			array_push($marker_pcs_per_layer, $style_size.'#'.$pro_pcs_layer);
+
+
+	   			$find_in_pro_skedas = DB::connection('sqlsrv')->select(DB::raw("SELECT pro_id,pro FROM pro_skedas WHERE skeda = '".$skeda."' AND style_size = '".$style_size."' "));
+	   			// dd($find_in_pro_skedas);
+
+
+	   			// multiple selection for Fiorano
+	   			// for Gordon is fine
+				if (!isset($find_in_pro_skedas[0])) {
+	   				dd('can not find pro for ths mattress');
+	   			}  else {
+	   				// dd($find_in_pro_skedas);
+		   			$pro_id = $find_in_pro_skedas[0]->pro_id;
+		   			$pro = $find_in_pro_skedas[0]->pro;
+		   			array_push($mattress_pro_array, $style_size.'#'.$pro_id.'#'.$pro);
+				} 	
+				
+	   				   		
+	   		}
+	   		$marker_pcs_per_layer = array_filter($marker_pcs_per_layer);
+	   		$mattress_pro_array = array_filter($mattress_pro_array);
+
+	   	
+
+			return view('planner.replace_conf',compact('id', 'mattress' , 'existing_marker', 'existing_marker_id','mattress_details_id' , 'existing_mattress_marker_id',
+				'existing_marker_length','existing_marker_width','existing_min_length','existing_marker_width','existing_min_length',
+				'selected_marker','style','skeda',
+				'marker_pcs_per_layer','mattress_pro_array'
+   			));
+
+
+		} else {
+			$msg ='Some style_size values from the new_marker_req do not fit in the skeda_req, missing '.implode(', ', $missingSizes).' ';
+			return view('planner.error',compact('msg', 'operator', 'operators'));
+		    // dd('Some style_size values from the new_marker_req do not fit in the skeda_req, missing '.implode(', ', $missingSizes).'');
+
+		}
+
+	}
+
+	public function change_marker_all_post_check(Request $request) {
+
+		// Validate the request inputs
+	    $this->validate($request, [
+	        'id' => 'required',
+	        'mattressProArray' => 'required|string', // Expecting JSON-encoded string
+	        'markerPcsPerLayer' => 'required|string', // Expecting JSON-encoded string
+	    ]);
+
+	    // Get all input data
+	    $input = $request->all();
+	    // dd($input);
+
+	    // Decode the JSON strings into arrays
+	    $mattressProArray = isset($input['mattressProArray']) ? json_decode($input['mattressProArray'], true) : [];
+	    $markerPcsPerLayer = isset($input['markerPcsPerLayer']) ? json_decode($input['markerPcsPerLayer'], true) : [];
+
+	    // Debug: Check the decoded arrays
+	    // dd($mattressProArray, $markerPcsPerLayer);
+
+	    // Extract line quantities (line-0, line-1, etc.)
+	    $lineQuantities = [];
+	    foreach ($input as $key => $value) {
+	        if (preg_match('/^line-(\d+)$/', $key, $matches)) {
+	            $lineIndex = (int)$matches[1]; // Extract the index
+	            $lineQuantities[$lineIndex] = (int)$value; // Store the quantity
+	        }
+	    }
+
+	    // Debug: Check lineQuantities after processing
+	    // dd($lineQuantities);
+
+	    // Combine mattressProArray with lineQuantities
+	    $structuredLines = [];
+	    foreach ($mattressProArray as $index => $line) {
+	        $parts = explode('#', $line);
+	        $key = isset($parts[0]) ? $parts[0] : null;
+	        $secondValue = isset($parts[1]) ? $parts[1] : null;
+	        $thirdValue = isset($parts[2]) ? $parts[2] : null;
+
+	        // Add quantity from lineQuantities
+	        $structuredLines[] = [
+	            'line_key' => $key,
+	            'second_value' => $secondValue,
+	            'third_value' => $thirdValue,
+	            'quantity' => isset($lineQuantities[$index]) ? $lineQuantities[$index] : 0,
+	        ];
+	    }
+
+	    // Debug: Check final structured lines
+	    // dd($structuredLines);
+
+	    $id = $input['id'];
+	    $mattress = isset($input['mattress']) ? $input['mattress'] : null;
+	    $selected_marker = isset($input['selected_marker']) ? $input['selected_marker'] : null;
+	    $existing_marker = isset($input['existing_marker']) ? $input['existing_marker'] : null;
+	    $existing_marker_id = isset($input['existing_marker_id']) ? $input['existing_marker_id'] : null;
+	    $mattress_details_id = isset($input['mattress_details_id']) ? $input['mattress_details_id'] : null;
+	    $existing_mattress_marker_id = isset($input['existing_mattress_marker_id']) ? $input['existing_mattress_marker_id'] : null;
+	    $existing_marker_length = isset($input['existing_marker_length']) ? $input['existing_marker_length'] : null;
+	    $existing_marker_width = isset($input['existing_marker_width']) ? $input['existing_marker_width'] : null;
+	    $existing_min_length = isset($input['existing_min_length']) ? $input['existing_min_length'] : null;
+	    $skeda = isset($input['skeda']) ? $input['skeda'] : null;
+	    
+	    // dd($selected_marker);
+	    $markers = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				id, marker_name, marker_width, marker_length, min_length
+			FROM [marker_headers] 
+			WHERE marker_name = '".$selected_marker."'  AND (status = 'ACTIVE' OR status = 'USELESS') 
+		"));
+
+		// save
+		// dd('stop');
+
+		$table4 = mattress_markers::findOrFail($existing_mattress_marker_id);
+		$table4->mattress_id;
+		$table4->mattress;
+		$table4->marker_id = (int)$markers[0]->id;
+		$table4->marker_name = $markers[0]->marker_name;
+		// $table4->marker_name_orig = $input['existing_marker'];
+		$table4->marker_width = round((float)$markers[0]->marker_width,3);
+		$table4->marker_length = round((float)$markers[0]->marker_length,3);
+		$table4->min_length = round((float)$markers[0]->min_length,3);
+		$table4->save();
+		// dd($table4);
+
+		$table2 = mattress_details::findOrFail($mattress_details_id);
+		$table2->cons_actual = $table2->layers_a * ((float)$markers[0]->marker_length + ($table2->extra/100));
+		$table2->printed_marker = 0;
+		$table2->printed_nalog = 0;
+		$table2->save();
+		// dd($table2);
+
+		$deletedRows = mattress_pro::where('mattress_id', $id)->delete();
+		foreach ($structuredLines as $item) {
+		    // Access each element
+
+		    $style_size = $item['line_key'];
+		    $pro_id = $item['second_value'];
+		    $pro = $item['third_value'];
+		    $pro_pcs_layer = (float)$item['quantity'];
+
+		    $table1 = new mattress_pro;
+			$table1->mattress_id = $id;
+			$table1->mattress = $mattress;
+			$table1->style_size = $style_size;
+			$table1->pro_id = $pro_id;
+			$table1->pro_pcs_layer = $pro_pcs_layer;
+			$table1->pro_pcs_planned = $table1->pro_pcs_layer * (float)$table2->layers_a;
+			$table1->pro_pcs_actual = $table1->pro_pcs_layer * (float)$table2->layers_a;
+			$table1->save();
+			// dd($table1);
+		}
+
+		// dd('stop');
+		// add to marker log
+		$table7_new = new marker_change;
+		$table7_new->mattress_id = $table4->mattress_id;
+		$table7_new->mattress = $table4->mattress;
+		$table7_new->marker_id_orig = (int)$existing_marker_id;
+		$table7_new->marker_name_orig = $existing_marker;
+		$table7_new->marker_length_orig = round((float)$existing_marker_length,3);
+		$table7_new->marker_width_orig = round((float)$existing_marker_width,3);
+		$table7_new->min_length_orig = round((float)$existing_min_length,3);
+		$table7_new->marker_id_new = (int)$markers[0]->id;
+		$table7_new->marker_name_new = $markers[0]->marker_name;
+		$table7_new->marker_length_new = round((float)$markers[0]->marker_length,3);
+		$table7_new->marker_width_new = round((float)$markers[0]->marker_width,3);
+		$table7_new->min_length_new = round((float)$markers[0]->min_length,3);
+		$table7_new->save();
+		// dd($table7_new);
+
+		// dd('stop');
+		// change mattress_phases
+		$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
+			SET NOCOUNT ON;
+			UPDATE [mattress_phases]
+			SET active = 0, id_status = ''+cast([mattress_id] as varchar )+'-'+[status]
+			WHERE mattress_id = '".$id."' AND active = 1;
+			SELECT TOP 1 mattress,location,device  FROM [mattress_phases] WHERE mattress_id = '".$id."' ORDER BY id desc;
+		"));
+		$mattress = $mattress_phases_not_active[0]->mattress;
+		$device = $mattress_phases_not_active[0]->device;
+		$location = $mattress_phases_not_active[0]->location;
+
+		$date = date('Y-m-d H:i:s');
+		$status = "TO_CUT";
+
+		// $find_position = mattress_details::where('mattress_id','=',$id)->get();
+		// $pre_position = $find_position[0]->position;
+
+		$user = User::find(Auth::id());
+		$operator = Session::get('operator');
+		if (!isset($operator) OR $operator == '') {
+			// return redirect('/spreader');
+			if ($user->is('admin')) {
+				
+				$operator = 'admin';
+				Session::set('operator', $operator);
+			} else {
+				$msg ='Operator must be logged!';
+				return view('planner.error',compact('msg', 'operator', 'operators'));	
+			}
+		}
+		
+		$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
+		$table3_new->mattress_id = $id;
+		$table3_new->mattress = $mattress;
+		$table3_new->status = $status;
+		$table3_new->location = $location;
+		$table3_new->device = $device;
+		$table3_new->active = 1;
+		$table3_new->operator1 = $operator;
+		$table3_new->operator2;
+		$table3_new->date = $date;
+		$table3_new->id_status = $id.'-'.$status;
+		// $table3_new->pre_position = $pre_position;
+		$table3_new->save();
+
+		return Redirect::to('/plan_mattress/TO_CHANGE');
+
 	}
 
 	public function edit_mattress($id) {
@@ -4253,7 +5005,7 @@ class plannerController extends Controller {
 			 JOIN [marker_lines] as ml ON ml.[marker_header_id] = mh.[id]
 			 WHERE ml.[marker_name] = '".$marker."' AND ml.[style_size] = '".$style_size."' "));
 
-		$pc_per_layer = $pc_per_layer_markers[0]->pcs_on_layer;
+		$pc_per_layer = (float)$pc_per_layer_markers[0]->pcs_on_layer;
 		$layer_limit = round(ceil($layer_limit / $pc_per_layer),0);
 
 		// dd($layer_limit);
@@ -4454,7 +5206,7 @@ class plannerController extends Controller {
    			$mattress_pro_array[] = '';
 	   		foreach ($find_in_marker_lines as $line) {
 	   			$style_size = $line->style_size;
-	   			$pro_pcs_layer = $line->pcs_on_layer;
+	   			$pro_pcs_layer = (float)$line->pcs_on_layer;
 
 	   			if (isset($skeda)) {
 		   				
@@ -5345,6 +6097,7 @@ class plannerController extends Controller {
 			'bin','pasbin','rewound_length','rewound_length_a',/*'rewound_sum',*/'rewound_length_p','rewound_roll_unit_of_measure','unit_cons','kotur_actual'));
 	}
 
+	// ne koristi se
 	/*
 	public function plan_paspul_line_confirm(Request $request) {
 
@@ -5542,278 +6295,290 @@ class plannerController extends Controller {
 		$input = $request->all(); // change use (delete or comment user Requestl; )
 		// dd($input);
 		
-		$paspul_roll_id = $input['paspul_roll_id'];
-		$paspul_roll = $input['paspul_roll'];
-		$priority = $input['priority'];
-		$comment_office = $input['comment_office'];
-		$skeda = $input['skeda'];
-		$skeda_item_type = $input['skeda_item_type'];
+		if ($input['action'] == 'plan') {
+			
+			$paspul_roll_id = $input['paspul_roll_id'];
+			$paspul_roll = $input['paspul_roll'];
+			$priority = $input['priority'];
+			$comment_office = $input['comment_office'];
+			$skeda = $input['skeda'];
+			$skeda_item_type = $input['skeda_item_type'];
 
-		if (isset($input['final_roll'])) {
-			$final_roll = 'YES';
-		} else {
-			$final_roll = 'NO';
-		}
-
-		if ($skeda_item_type == "PA") {
-			if (isset($input['bin'])) {
-				$pas_bin = $input['bin'];
-			}else if (isset($input['bins'])) {
-				$pas_bin = $input['bins'][0];
+			if (isset($input['final_roll'])) {
+				$final_roll = 'YES';
 			} else {
-				$msg ='Pas bin must be selected!';
-				return view('planner.error',compact('msg'));
-			}	
-		} else {
-			$pas_bin = '';
-		}
-		
-		// dd($pas_bin);
+				$final_roll = 'NO';
+			}
 
-		$rewound_length_partialy = (float)$input['rewound_length_partialy'];
-		
-		if ($rewound_length_partialy < 0) {
-			dd("rewound_length_partialy must be > 0");
-		}
-
-		// verify userId
-		if (Auth::check())
-		{
-		    $userId = Auth::user()->id;
-		    $device = Auth::user()->name;
-		} else {
-			// dd('User is not autenticated');
-			$msg ='User is not autenticated';
-			return view('prw.error',compact('msg'));
-		}
-
-		// find new child roll
-		$no_of_paspul_rewound_rolls = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT([paspul_rewound_roll]) as no
-		FROM [paspul_rewounds]
-		WHERE [paspul_roll] = '".$paspul_roll."' "));
-
-		$number = (int)$no_of_paspul_rewound_rolls[0]->no;
-		$no = $number + 1;
-		$no = str_pad($no, 2, '0', STR_PAD_LEFT);
-		// dd($no);
-
-		// $find_sum_rewound_length_partialy = DB::connection('sqlsrv')->select(DB::raw("SELECT SUM([rewound_length_partialy]) as rewound_sum
-		// FROM [paspul_rewounds]
-		// WHERE [paspul_roll] = '".$paspul_roll."' "));
-		// $rewound_length_all = round($find_sum_rewound_length_partialy[0]->rewound_sum,2) + round($rewound_length_partialy,2);
-		// // dd($rewound_length_all);
-
-		// $find_rewound_length_planned = DB::connection('sqlsrv')->select(DB::raw("SELECT rewound_length_p
-		// FROM [paspuls]
-		// WHERE [id] = '".$paspul_roll_id."' "));
-		// $rewound_length_p = round($find_rewound_length_planned[0]->rewound_length_p,2);
-		// dd($rewound_length_p);
-
-		// if ($rewound_length_all > $rewound_length_p) {
-		// 	dd("sum of already rewound_length plus new rewound_length is more than rewound length");
-		// }
-		
-
-		// save planned length to father
-		$table = paspul::findOrFail($paspul_roll_id);
-		$still_possible_to_plan = (float)$table->rewound_length - (float)$table->rewound_length_p;
-		
-		if ($still_possible_to_plan < $rewound_length_partialy) {
-			dd('you can not plan more length then is avilable ('.$still_possible_to_plan.' meters)');
-
-		} 
-		// dd($still_possible_to_plan);
-
-		if ($still_possible_to_plan == $rewound_length_partialy ) {
-			$final_roll = 'YES';
-		}
-
-		if ($final_roll == 'YES') {
-				
-			// save to paspul father 
-			 	$location = "PRW";
-				//$position = 0; // auto ??????????????????????????????????????
-				$position = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 position 
-				FROM 
-				(
-				SELECT position 
-				FROM [paspuls] as p
-				JOIN [paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND active = '1'
-				WHERE pl.[location] = '".$location."'
-				) SQ
-				ORDER BY position desc"));
-
-				if (isset($position[0])) {
-					$position = (int)$position[0]->position;
+			if ($skeda_item_type == "PA") {
+				if (isset($input['bin'])) {
+					$pas_bin = $input['bin'];
+				}else if (isset($input['bins'])) {
+					$pas_bin = $input['bins'][0];
 				} else {
-					$position = 0;
-				}
-				$position = $position + 1;
+					$msg ='Pas bin must be selected!';
+					return view('planner.error',compact('msg'));
+				}	
+			} else {
+				$pas_bin = '';
+			}
+			
+			// dd($pas_bin);
 
-				//-----
-				$status = 'TO_REWIND';
-				$location = 'PRW'; 
-				$device = strtoupper($device); //null or insert  
-				$active = 1;
-				$operator1 = Session::get('operator');
-				$operator2;
-				//-----
-				
-				$paspul_lines_not_active = DB::connection('sqlsrv')->update(DB::raw("
-					UPDATE [paspul_lines]
-					SET active = 0, id_status = ''+cast([paspul_roll_id] as varchar )+'-'+[status]
-					WHERE [paspul_roll_id] = '".$paspul_roll_id."' AND active = 1
-				"));
+			$rewound_length_partialy = (float)$input['rewound_length_partialy'];
+			
+			if ($rewound_length_partialy < 0) {
+				dd("rewound_length_partialy must be > 0");
+			}
 
-				// sum all rewound_length_partialy for all rolls
-				$find_rewound_length_partialy = DB::connection('sqlsrv')->select(DB::raw("SELECT SUM([rewound_length_partialy]) as rewound_sum
-				FROM [paspul_rewounds]
-				WHERE [paspul_roll_id] = '".$paspul_roll_id."' "));
-				$rewound_length_a = (int)$find_rewound_length_partialy[0]->rewound_sum + (int)$rewound_length_partialy;
+			// verify userId
+			if (Auth::check())
+			{
+			    $userId = Auth::user()->id;
+			    $device = Auth::user()->name;
+			} else {
+				// dd('User is not autenticated');
+				$msg ='User is not autenticated';
+				return view('prw.error',compact('msg'));
+			}
 
-				$table = paspul::findOrFail($paspul_roll_id);
-				$table->rewound_length_a = $rewound_length_a;
-				$table->position = $position;
-				$table->pasbin = $pas_bin;
-				$table->comment_office = $comment_office;
-				$table->priority = $priority;
-				$table->save();
+			// find new child roll
+			$no_of_paspul_rewound_rolls = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT([paspul_rewound_roll]) as no
+			FROM [paspul_rewounds]
+			WHERE [paspul_roll] = '".$paspul_roll."' "));
 
-				// reorder position of PRW
-				$reorder_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-						p.[id], p.[paspul_roll], p.[position], 
-						pl.[location], pl.[active], pl.[paspul_roll_id]
-					 FROM [paspuls] as p
-					 INNER JOIN [paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND pl.[active] = 1
-					 WHERE pl.[location] = 'PRW'
-					 ORDER BY p.[position] asc"));
-				// dd($reorder_position);
+			$number = (int)$no_of_paspul_rewound_rolls[0]->no;
+			$no = $number + 1;
+			$no = str_pad($no, 2, '0', STR_PAD_LEFT);
+			// dd($no);
 
-				if (isset($reorder_position[0])) {
-					for ($i=0; $i < count($reorder_position); $i++) { 
+		
+			// save planned length to father
+			$table = paspul::findOrFail($paspul_roll_id);
+			$still_possible_to_plan = (float)$table->rewound_length - (float)$table->rewound_length_p;
+			
+			if ($still_possible_to_plan < $rewound_length_partialy) {
+				dd('you can not plan more length then is avilable ('.$still_possible_to_plan.' meters)');
 
-						$table1 = paspul::findOrFail($reorder_position[$i]->id);
-						$table1->position = $i+1;
-						$table1->save();
-					}
-				}
+			} 
+			// dd($still_possible_to_plan);
 
-				if ((date('H') >= 0) AND (date('H') < 6)) {
-				   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
-				} else {
-					$date = date('Y-m-d H:i:s');
-				}
+			if ($still_possible_to_plan == $rewound_length_partialy ) {
+				$final_roll = 'YES';
+			}
 
-				$table_p = new paspul_line;
-				$table_p->paspul_roll_id = $table->id;
-				$table_p->paspul_roll = $table->paspul_roll;
-				$table_p->status = $status;
-				$table_p->location = $location;
-				$table_p->device = $device;
-				$table_p->active = $active;
-				$table_p->operator1 = Session::get('operator');
-				$table_p->operator2;
-				$table_p->date = $date;
-				$table_p->id_status = $table_p->paspul_roll_id.'-'.$table_p->status;
-				$table_p->save();
-			//	
-
-			// save to paspul_rewound
-				$rewound_roll_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				 		COUNT(p.[id]) as no
-				 	FROM [paspul_rewounds] as p
-				 	WHERE p.[status] = 'TO_REWIND'
-				 	"));
-				$number = (int)$rewound_roll_position[0]->no;
-				$rewound_roll_position = $number + 1;
-
-				if ($rewound_length_partialy > 0) {
-					$table_r = new paspul_rewound;
-					$table_r->paspul_rewound_roll = $table->paspul_roll."-".$no;
-					$table_r->rewound_length_partialy = $rewound_length_partialy;
-					$table_r->kotur_partialy;
-					$table_r->status = "TO_REWIND";
-					$table_r->paspul_roll_id = $paspul_roll_id;
-					$table_r->paspul_roll = $table->paspul_roll;
-					$table_r->sap_su = $table->sap_su;
-					$table_r->material = $table->material;
-					$table_r->color_desc = $table->color_desc;
-					$table_r->dye_lot = $table->dye_lot;
-					$table_r->paspul_type = $table->paspul_type;
-					$table_r->width = $table->width;
-					$table_r->kotur_width = $table->kotur_width;
-					$table_r->kotur_width_without_tension = $table->kotur_width_without_tension;
-					$table_r->kotur_planned = $table->kotur_planned;
-					// $table_r->kotur_actual = $table->kotur_actual;
-					$table_r->rewound_length = $table->rewound_length;
+			if ($final_roll == 'YES') {
 					
-					$table_r->pasbin = $pas_bin;
-					$table_r->skeda_item_type = $table->skeda_item_type;
-					$table_r->skeda = $table->skeda;
-					$table_r->skeda_status = $table->skeda_status;
-					$table_r->rewound_roll_unit_of_measure = $table->rewound_roll_unit_of_measure;
-					$table_r->position = $rewound_roll_position;
-					$table_r->priority = $priority;
-					$table_r->comment_office = $comment_office;
-					$table_r->comment_operator = $table->comment_operator;
-					$table_r->call_shift_manager = $table->call_shift_manager;
-					$table_r->rewinding_method = $table->rewinding_method;
-					$table_r->tpa_number = $table->tpa_number;
-					$table_r->save();			
-				}				
-			//
-				
-		} else {
+				// save to paspul father 
+				 	$location = "PRW";
+					//$position = 0; // auto ??????????????????????????????????????
+					$position = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 position 
+					FROM 
+					(
+					SELECT position 
+					FROM [paspuls] as p
+					JOIN [paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND active = '1'
+					WHERE pl.[location] = '".$location."'
+					) SQ
+					ORDER BY position desc"));
 
-			// save to paspul_rewound
-				$rewound_roll_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				 		COUNT(p.[id]) as no
-				 	FROM [paspul_rewounds] as p
-				 	WHERE p.[status] = 'TO_REWIND'
-				 	"));
-				$number = (int)$rewound_roll_position[0]->no;
-				$rewound_roll_position = $number + 1;
+					if (isset($position[0])) {
+						$position = (int)$position[0]->position;
+					} else {
+						$position = 0;
+					}
+					$position = $position + 1;
 
-				if ($rewound_length_partialy > 0) {
-					$table_r = new paspul_rewound;
-					$table_r->paspul_rewound_roll = $table->paspul_roll."-".$no;
-					$table_r->rewound_length_partialy = $rewound_length_partialy;
-					$table_r->kotur_partialy;
-					$table_r->status = "TO_REWIND";
-					$table_r->paspul_roll_id = $paspul_roll_id;
-					$table_r->paspul_roll = $table->paspul_roll;
-					$table_r->sap_su = $table->sap_su;
-					$table_r->material = $table->material;
-					$table_r->color_desc = $table->color_desc;
-					$table_r->dye_lot = $table->dye_lot;
-					$table_r->paspul_type = $table->paspul_type;
-					$table_r->width = $table->width;
-					$table_r->kotur_width = $table->kotur_width;
-					$table_r->kotur_width_without_tension = $table->kotur_width_without_tension;
-					$table_r->kotur_planned = $table->kotur_planned;
-					// $table_r->kotur_actual = $table->kotur_actual;
-					$table_r->rewound_length = $table->rewound_length;
-					$table_r->pasbin = $pas_bin;
-					$table_r->skeda_item_type = $table->skeda_item_type;
-					$table_r->skeda = $table->skeda;
-					$table_r->skeda_status = $table->skeda_status;
-					$table_r->rewound_roll_unit_of_measure = $table->rewound_roll_unit_of_measure;
-					$table_r->position = $rewound_roll_position;
-					$table_r->priority = $priority;
-					$table_r->comment_office = $comment_office;
-					$table_r->comment_operator = $table->comment_operator;
-					$table_r->call_shift_manager = $table->call_shift_manager;
-					$table_r->rewinding_method = $table->rewinding_method;
-					$table_r->tpa_number = $table->tpa_number;
-					$table_r->save();			
-				}				
-			//
-		}
+					//-----
+					$status = 'TO_REWIND';
+					$location = 'PRW'; 
+					$device = strtoupper($device); //null or insert  
+					$active = 1;
+					$operator1 = Session::get('operator');
+					$operator2;
+					//-----
+					
+					$paspul_lines_not_active = DB::connection('sqlsrv')->update(DB::raw("
+						UPDATE [paspul_lines]
+						SET active = 0, id_status = ''+cast([paspul_roll_id] as varchar )+'-'+[status]
+						WHERE [paspul_roll_id] = '".$paspul_roll_id."' AND active = 1
+					"));
 
-		$table_f = paspul::findOrFail($paspul_roll_id);
-		$table_f->rewound_length_p = (float)$table_f->rewound_length_p + $rewound_length_partialy;
-		$table_f->save();
+					// sum all rewound_length_partialy for all rolls
+					$find_rewound_length_partialy = DB::connection('sqlsrv')->select(DB::raw("SELECT SUM([rewound_length_partialy]) as rewound_sum
+					FROM [paspul_rewounds]
+					WHERE [paspul_roll_id] = '".$paspul_roll_id."' "));
+					$rewound_length_a = (int)$find_rewound_length_partialy[0]->rewound_sum + (int)$rewound_length_partialy;
+
+					$table = paspul::findOrFail($paspul_roll_id);
+					$table->rewound_length_a = $rewound_length_a;
+					$table->position = $position;
+					$table->pasbin = $pas_bin;
+					$table->comment_office = $comment_office;
+					$table->priority = $priority;
+					$table->save();
+
+					// reorder position of PRW
+					$reorder_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+							p.[id], p.[paspul_roll], p.[position], 
+							pl.[location], pl.[active], pl.[paspul_roll_id]
+						 FROM [paspuls] as p
+						 INNER JOIN [paspul_lines] as pl ON pl.[paspul_roll_id] = p.[id] AND pl.[active] = 1
+						 WHERE pl.[location] = 'PRW'
+						 ORDER BY p.[position] asc"));
+					// dd($reorder_position);
+
+					if (isset($reorder_position[0])) {
+						for ($i=0; $i < count($reorder_position); $i++) { 
+
+							$table1 = paspul::findOrFail($reorder_position[$i]->id);
+							$table1->position = $i+1;
+							$table1->save();
+						}
+					}
+
+					if ((date('H') >= 0) AND (date('H') < 6)) {
+					   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
+					} else {
+						$date = date('Y-m-d H:i:s');
+					}
+
+					$table_p = new paspul_line;
+					$table_p->paspul_roll_id = $table->id;
+					$table_p->paspul_roll = $table->paspul_roll;
+					$table_p->status = $status;
+					$table_p->location = $location;
+					$table_p->device = $device;
+					$table_p->active = $active;
+					$table_p->operator1 = Session::get('operator');
+					$table_p->operator2;
+					$table_p->date = $date;
+					$table_p->id_status = $table_p->paspul_roll_id.'-'.$table_p->status;
+					$table_p->save();
+				//	
+
+				// save to paspul_rewound
+					$rewound_roll_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					 		COUNT(p.[id]) as no
+					 	FROM [paspul_rewounds] as p
+					 	WHERE p.[status] = 'TO_REWIND'
+					 	"));
+					$number = (int)$rewound_roll_position[0]->no;
+					$rewound_roll_position = $number + 1;
+
+					if ($rewound_length_partialy > 0) {
+						$table_r = new paspul_rewound;
+						$table_r->paspul_rewound_roll = $table->paspul_roll."-".$no;
+						$table_r->rewound_length_partialy = $rewound_length_partialy;
+						$table_r->kotur_partialy;
+						$table_r->status = "TO_REWIND";
+						$table_r->paspul_roll_id = $paspul_roll_id;
+						$table_r->paspul_roll = $table->paspul_roll;
+						$table_r->sap_su = $table->sap_su;
+						$table_r->material = $table->material;
+						$table_r->color_desc = $table->color_desc;
+						$table_r->dye_lot = $table->dye_lot;
+						$table_r->paspul_type = $table->paspul_type;
+						$table_r->width = $table->width;
+						$table_r->kotur_width = $table->kotur_width;
+						$table_r->kotur_width_without_tension = $table->kotur_width_without_tension;
+						$table_r->kotur_planned = $table->kotur_planned;
+						// $table_r->kotur_actual = $table->kotur_actual;
+						$table_r->rewound_length = $table->rewound_length;
+						$table_r->pasbin = $pas_bin;
+						$table_r->skeda_item_type = $table->skeda_item_type;
+						$table_r->skeda = $table->skeda;
+						$table_r->skeda_status = $table->skeda_status;
+						$table_r->rewound_roll_unit_of_measure = $table->rewound_roll_unit_of_measure;
+						$table_r->position = $rewound_roll_position;
+						$table_r->priority = $priority;
+						$table_r->comment_office = $comment_office;
+						$table_r->comment_operator = $table->comment_operator;
+						$table_r->call_shift_manager = $table->call_shift_manager;
+						$table_r->rewinding_method = $table->rewinding_method;
+						$table_r->tpa_number = $table->tpa_number;
+						$table_r->save();			
+					}				
+				//
+					
+			} else {
+
+				// save to paspul_rewound
+					$rewound_roll_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					 		COUNT(p.[id]) as no
+					 	FROM [paspul_rewounds] as p
+					 	WHERE p.[status] = 'TO_REWIND'
+					 	"));
+					$number = (int)$rewound_roll_position[0]->no;
+					$rewound_roll_position = $number + 1;
+
+					if ($rewound_length_partialy > 0) {
+						$table_r = new paspul_rewound;
+						$table_r->paspul_rewound_roll = $table->paspul_roll."-".$no;
+						$table_r->rewound_length_partialy = $rewound_length_partialy;
+						$table_r->kotur_partialy;
+						$table_r->status = "TO_REWIND";
+						$table_r->paspul_roll_id = $paspul_roll_id;
+						$table_r->paspul_roll = $table->paspul_roll;
+						$table_r->sap_su = $table->sap_su;
+						$table_r->material = $table->material;
+						$table_r->color_desc = $table->color_desc;
+						$table_r->dye_lot = $table->dye_lot;
+						$table_r->paspul_type = $table->paspul_type;
+						$table_r->width = $table->width;
+						$table_r->kotur_width = $table->kotur_width;
+						$table_r->kotur_width_without_tension = $table->kotur_width_without_tension;
+						$table_r->kotur_planned = $table->kotur_planned;
+						// $table_r->kotur_actual = $table->kotur_actual;
+						$table_r->rewound_length = $table->rewound_length;
+						$table_r->pasbin = $pas_bin;
+						$table_r->skeda_item_type = $table->skeda_item_type;
+						$table_r->skeda = $table->skeda;
+						$table_r->skeda_status = $table->skeda_status;
+						$table_r->rewound_roll_unit_of_measure = $table->rewound_roll_unit_of_measure;
+						$table_r->position = $rewound_roll_position;
+						$table_r->priority = $priority;
+						$table_r->comment_office = $comment_office;
+						$table_r->comment_operator = $table->comment_operator;
+						$table_r->call_shift_manager = $table->call_shift_manager;
+						$table_r->rewinding_method = $table->rewinding_method;
+						$table_r->tpa_number = $table->tpa_number;
+						$table_r->save();			
+					}				
+				//
+			}
+
+			$table_f = paspul::findOrFail($paspul_roll_id);
+			$table_f->rewound_length_p = (float)$table_f->rewound_length_p + $rewound_length_partialy;
+			$table_f->save();
+
+
+		} elseif ($input['action'] == 'save') {
+
+			$paspul_roll_id = $input['paspul_roll_id'];
+			$paspul_roll = $input['paspul_roll'];
+			$priority = $input['priority'];
+			$comment_office = $input['comment_office'];
+			$dye_lot = $input['dye_lot'];
 		
+			if (isset($input['call_shift_manager'])) {
+				$call_shift_manager = (int)$input['call_shift_manager'];
+			} else {
+				$call_shift_manager = 0;
+			}
+			
+			$table = paspul::findOrFail($paspul_roll_id);
+			$table->dye_lot 	= $dye_lot;
+			$table->priority 	= $priority;
+			$table->comment_office 		= $comment_office;
+			$table->call_shift_manager 	= $call_shift_manager;
+			$table->save();
+
+
+
+		} else {
+			dd('error u glavi');
+		}
 
 		return redirect('/plan_paspul/BOARD');
 	}
@@ -9251,7 +10016,7 @@ class plannerController extends Controller {
 	public function reserve_material($id) {
 
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT i.*
-			,(SELECT r.qty_reserved_m FROM fabric_reservations as r
+			,(SELECT SUM(r.qty_reserved_m) FROM fabric_reservations as r
 				WHERE r.material = i.material 
 					AND r.bagno = i.bagno 
 					AND r.document_no = i.document_no) as qty_reserved_m 
@@ -9412,9 +10177,9 @@ class plannerController extends Controller {
 					AND r.[bagno] = i.[bagno] 
 					AND r.[document_no] = i.[document_no]) as qty_reserved_m
 			
-			FROM [inbound_deliveries] as i 
+			FROM [inbound_deliveries] as i
 			WHERE i.[id] = '".$id."'
-			ORDER BY i.id asc"));		
+			ORDER BY i.id asc"));
 		// dd($data);
 		if (isset($data[0]->id)) {
 			
@@ -9433,6 +10198,73 @@ class plannerController extends Controller {
 		}
 		
 		return redirect('inbound_delivery_table');
+	}
+
+	public function delete_reservation_q($id) {	
+
+		$reservation = DB::connection('sqlsrv')->select(DB::raw("SELECT *	
+				FROM [fabric_reservations] 
+				WHERE id = '".$id."' "));
+
+		$skeda = $reservation[0]->skeda;
+		$document_no = $reservation[0]->document_no;
+		$material = $reservation[0]->material;
+		$qty_reserved_m = $reservation[0]->qty_reserved_m;
+
+
+
+		return view('planner.delete_reservation', compact('id','skeda','document_no','material','qty_reserved_m'));
+	}
+
+	public function delete_reservation($id) {
+		// dd($id);
+
+		// $reservations = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+		// 		FROM [fabric_reservations] 
+		// 		WHERE id = '".$id."' "));
+		// dd($reservations);
+
+		$table = fabric_reservation::findOrFail($id);
+		// dd($table->inbd_id);
+		// dd((int)$table->qty_reserved_m);
+
+		// $inbound_delivery = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+		// 		FROM [inbound_deliveries] 
+		// 		WHERE id = '".$reservations[0]->inbd_id."' "));
+		// dd($inbound_delivery);
+
+		$table1 = inbound_delivery::findOrFail($table->inbd_id);
+		// dd($table1);
+		// dd((int)$table1->qty_received_m);
+
+		$reservations_all = DB::connection('sqlsrv')->select(DB::raw("SELECT SUM(qty_reserved_m) as qty_reserved_m_q
+				FROM [fabric_reservations] 
+				WHERE inbd_id = '".$table->inbd_id."' "));
+		// dd($reservations_all);
+
+		if (isset($reservations_all[0]->qty_reserved_m_q)) {
+			$qty_reserved_m_q = (int)$reservations_all[0]->qty_reserved_m_q;
+		} else {
+			$qty_reserved_m_q = 0;
+		}
+		// dd($qty_reserved_m_q);
+
+
+
+		if ($table->qty_reserved_m == $qty_reserved_m_q) {
+			// dd('complete reservations');
+			$table1->reserve_status = 'Not Reserved';
+		} else {
+			// dd('partial reservations');
+			$table1->reserve_status = 'Partially Reserved';
+		}
+		$table1->save();
+
+		$delete = fabric_reservation::where('id', $id)->delete();
+
+
+		return redirect('fabric_reservation_table');
+
 	}
 
 	public function update_skeda_status() {
@@ -9484,6 +10316,17 @@ class plannerController extends Controller {
 					// set Leftover to Check
 					// dd('nothnig reserved');
 					$skeda_status = 'Leftover to Check';
+
+					$check_if_mat_b_partialy_reserved = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+					  FROM [inbound_deliveries] 
+					  WHERE document_no = '".$line->document_no."' AND material = '".$line->material."' AND bagno = '".$line->bagno."' 
+					  AND reserve_status = 'Partially Reserved'
+					  "));
+					
+					if (isset($check_if_mat_b_partialy_reserved[0]->id)) {
+						$skeda_status = 'Completed';
+					}
+
 				}
 			}
 			// dd($skeda_status);
@@ -9505,7 +10348,7 @@ class plannerController extends Controller {
 		$table->skeda_status = $skeda_status;
 		$table->save();
 
-		return redirect('fabric_reservation_table');
+		return redirect('leftover_table');
 	}
 
 	public function declare_leftover($id) {
@@ -9592,10 +10435,100 @@ class plannerController extends Controller {
 		$table2->skeda_status = $skeda_status;
 		$table2->save();
 
-		return redirect('fabric_reservation_table');
+		return redirect('leftover_table');
+	}
+
+// MATERIAL COMMENTS
+
+	public function material_comment_table () {
+
+		// dd('test');
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+				  FROM [material_comments]
+				  ORDER BY id asc"));
+		// dd($data);
+		return view('planner.material_comment_table', compact('data'));
+	}
+
+	public function material_comment_new() {
+
+		return view('planner.material_comment_new');
+	}
+
+	public function material_comment_new_post(Request $request) {
+
+		$this->validate($request, ['material'=>'required','standard_comment'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl;)
+		// dd($input);
+
+		$material = trim($input['material']);
+		$standard_comment = trim($input['standard_comment']);
+
+		// dd($standard_comment);
+
+		$table = new material_comments;
+		$table->material = $material;
+		$table->standard_comment = $standard_comment;
+		$table->save();
+
+		// dd('test');
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+				  FROM [material_comments]
+				  ORDER BY id asc"));
+		// dd($data);
+		return view('planner.material_comment_table', compact('data'));
+	}
+
+	public function material_comment_edit($id) {
+
+		$data = material_comments::findOrFail($id);
+		return view('planner.material_comment_edit', compact('data'));
+	}
+
+	public function material_comment_edit_post(Request $request) {
+
+		$this->validate($request, ['material'=>'required','standard_comment'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl;)
+		// dd($input);
+
+		$id = $input['id'];
+		$material = trim($input['material']);
+		$standard_comment = trim($input['standard_comment']);
+
+		$data = material_comments::findOrFail($id);
+		$data->material = $material;
+		$data->standard_comment = $standard_comment;
+		$data->save();
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+				  FROM [material_comments]
+				  ORDER BY id asc"));
+		// dd($data);
+		return view('planner.material_comment_table', compact('data'));
+
+
+	}
+
+	public function material_comment_delete_post(Request $request) {
+
+		$this->validate($request, ['id'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl;)
+		// dd($input);
+
+		$id = $input['id'];
+
+		$delete = material_comments::where('id', $id)->delete();
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT *
+				  FROM [material_comments]
+				  ORDER BY id asc"));
+		// dd($data);
+		return view('planner.material_comment_table', compact('data'));
+
 	}
 
 
-	
+
 }	
+
 

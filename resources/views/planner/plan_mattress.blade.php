@@ -83,6 +83,10 @@
 					 <a href="{{ url('plan_mattress/TO_SPLIT')}}" style="background-color:brown; color:white !important;" class="btn btn-danger
 					 @if ($location == 'TO_SPLIT') plan_menu_a @endif "
 					 ><span class="glyphicon glyphicon-flag">&nbsp;<b>TO SPLIT</b></span></a>
+
+					 <a href="{{ url('plan_mattress/TO_CHANGE')}}" style="background-color:yellow; color:red !important;" class="btn btn-danger
+					 @if ($location == 'TO_CHANGE') plan_menu_a @endif "
+					 ><span class="glyphicon glyphicon-flag">&nbsp;<b>TO CHANGE</b></span></a>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				</div>
 
@@ -275,6 +279,10 @@
 					                        	<b>Comment operator:</b>
 					                        	<i>{{ $req->comment_operator }}</i><br>
 					                        	@endif
+					                        	@if ($req->standard_comment != '')
+					                        	<b>Material comment :</b>
+					                        	<i>{{ $req->standard_comment }}</i><br>
+					                        	@endif
 					                        	
 					                        </td>
 					                        <td  colspan="3" style="padding: 1px; text-align: left;">
@@ -388,6 +396,10 @@
 					                        	@if ($req->comment_operator != '')
 					                        	<b>Comment operator:</b>
 					                        	<i>{{ $req->comment_operator }}</i><br>
+					                        	@endif
+					                        	@if ($req->standard_comment != '')
+					                        	<b>Material comment :</b>
+					                        	<i>{{ $req->standard_comment }}</i><br>
 					                        	@endif
 					                        	
 					                        </td>
@@ -569,6 +581,11 @@
 					                        	<b>Comment operator:</b>
 					                        	<i>{{ $req->comment_operator }}</i><br>
 					                        	@endif
+					                        	@if ($req->standard_comment != '')
+					                        	<b>Material comment:</b>
+					                        	<i>{{ $req->standard_comment }}</i><br>
+					                        	@endif
+
 					                        </td>
 					                        @if ($location == 'MM1' OR $location == 'CUT')
 						                        <td  colspan="3" style="padding: 1px; text-align: left;">
@@ -747,6 +764,10 @@
 					                        	<b>Comment operator:</b>
 					                        	<i>{{ $req->comment_operator }}</i><br>
 					                        	@endif
+					                        	@if ($req->standard_comment != '')
+					                        	<b>Material comment:</b>
+					                        	<i>{{ $req->standard_comment }}</i><br>
+					                        	@endif
 					                        </td>
 					                        @if ($location == 'MM1' OR $location == 'CUT')
 						                        <td  colspan="3" style="padding: 1px; text-align: left;">
@@ -907,6 +928,10 @@
 					                        	@if ($req->comment_operator != '')
 					                        	<b>Comment operator:</b>
 					                        	<i>{{ $req->comment_operator }}</i><br>
+					                        	@endif
+					                        	@if ($req->standard_comment != '')
+					                        	<b>Material comment:</b>
+					                        	<i>{{ $req->standard_comment }}</i><br>
 					                        	@endif
 					                        	
 					                        </td>
@@ -1069,6 +1094,10 @@
 					                        	@if ($req->comment_operator != '')
 					                        	<b>Comment operator:</b>
 					                        	<i>{{ $req->comment_operator }}</i><br>
+					                        	@endif
+					                        	@if ($req->standard_comment != '')
+					                        	<b>Material comment:</b>
+					                        	<i>{{ $req->standard_comment }}</i><br>
 					                        	@endif
 					                        	
 					                        </td>
@@ -1235,6 +1264,10 @@
 					                        	<b>Comment operator:</b>
 					                        	<i>{{ $req->comment_operator }}</i><br>
 					                        	@endif
+					                        	@if ($req->standard_comment != '')
+					                        	<b>Material comment:</b>
+					                        	<i>{{ $req->standard_comment }}</i><br>
+					                        	@endif
 					                        	
 					                        </td>
 					                        <td  colspan="3" style="padding: 1px; text-align: left;">
@@ -1395,6 +1428,10 @@
 					                        	<b>Comment operator:</b>
 					                        	<i>{{ $req->comment_operator }}</i><br>
 					                        	@endif
+					                        	@if ($req->standard_comment != '')
+					                        	<b>Material comment:</b>
+					                        	<i>{{ $req->standard_comment }}</i><br>
+					                        	@endif
 					                        	
 					                        </td>
 					                        <td  colspan="3" style="padding: 2px; text-align: left;">
@@ -1456,6 +1493,157 @@
 				                       		<td><a href="{{ url('split_mattress/'.$req->id) }}" class="btn btn-warning btn-xs center-block" >Split mattress</a></td>
 				                       		<td><a href="{{ url('split_mattress_delete/'.$req->id) }}" class="btn btn-danger btn-xs center-block" >Delete</a></td>
 				                        </tr>
+				                    @endforeach
+			                  	</tbody>
+                        @endif
+
+                        @if ($location == 'TO_CHANGE')
+		                           
+ 								<thead>
+			                       <tr>	
+			                       		<!-- <th >Position</th> -->
+			                       		<th >G-bin</th>
+			                            <th >Mattress</th>
+			                            <th >Marker</th>
+			                            <th >Marker Length [m]</th>
+			                            <th >Extra [cm]</th>
+			                            <th >Mattress Width [cm]</th>
+			                            <th >Layers Planned</th>
+			                            <th >Layers Actual</th>
+			                            <th >PRO</th>
+			                            <th >Destination</th>
+			                            <th >SKU</th>
+			                            <th >Material</th>
+			                            <th >Dye Lot</th>
+			                            <th >Color Desc</th>
+			                            <th >Skeda</th>
+			                            <th >Actual Cons [m]</th>
+			                            <th >Spreading Method</th>
+			                            <th >Pcs per Bundle</th>
+			                            <th >Overlapping</th>
+			                            <!-- <th >Shift Manager Needed</th>
+			                            <th ><span class="glyphicon glyphicon-text-size">&nbsp; &nbsp;<b>Test Marker</b></span></th> -->
+			                            <th >Location</th>
+			                            <th >Priority</th>
+			                            <th >Status</th>
+			                            
+			                            <th></th>
+			                            
+			                    	</tr>
+			                  	</thead>
+			                  	<tbody class="connectedSortable_table searchable" 
+				                    @if (($location == 'SP0') OR ($location == 'SP1') OR ($location == 'SP2') OR ($location == 'SP3') OR ($location == 'SP4') OR ($location == 'MS1') OR ($location == 'MS2') OR ($location == 'MS3') OR ($location == 'MM1') OR ($location == 'CUT') OR ($location == 'PSO') OR ($location == 'DELETED') OR ($location == 'COMPLETED'))
+				                        id="sortable10"
+				                    @endif
+				                    >
+				                    	
+				                    @foreach ($data as $req)
+				                        <tr class="ss" id="item[]={{ $req->id }} " style="border-top: 3px solid grey;
+				                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
+											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
+				                            
+				                            {{--<td>{{ $req->position }}</td>--}}
+				                            <td class=""><span>{{ $req->g_bin}}</span></td>
+						        	    	<td class=""><span>{{ $req->mattress}}</span></td>
+				                            <td style="min-width: 200px;">{{ $req->marker_name}}</td>
+				                            <td>{{ round($req->marker_length,3)}}</td>
+				                            <td>{{ round($req->extra,0)}}</td>
+				                            @if (($req->skeda_item_type == 'MB') OR ($req->skeda_item_type == 'MW'))
+				                            	<td>{{ round($req->width_theor_usable,3)}}</td>
+				                            @else
+				                            	<td>{{ round($req->marker_width,3)}}</td>
+				                            @endif
+				                            <td>{{ round($req->layers,0)}}</td>
+				                            <td>{{ round($req->layers_a,0)}}</td>
+				                            <td style="width: 75px;">{{ $req->pro}}</td>
+				                            <td style="width: 60px;">{{ $req->location_all}}</td>
+				                            <td style="min-width: 138px;">{{ $req->sku}}</td>
+				                            <td>{{ $req->material}}</td>
+				                            <td>{{ $req->dye_lot}}</td>
+				                            <td>{{ $req->color_desc}}</td>
+				                            <td style="width: 120px;">{{ $req->skeda}}</td>
+				                            <td>{{ round($req->cons_actual,3)}}</td>
+				                            <td style="width: 50px;">{{ $req->spreading_method}}</td>
+				                            <td >{{ round($req->pcs_bundle,0)}}</td>
+				                            <td>{{ $req->overlapping}}</td>
+				                            <td>{{ $req->location}}</td>
+				                            <td class="
+					                            @if ($req->priority == 7) tt_priority
+					                            @elseif ($req->priority == 6) ts_priority
+					                            @elseif ($req->priority == 5) ss_priority
+					                            @elseif ($req->priority == 4) fs_priority
+					                            @elseif ($req->priority == 3) top_priority
+							        	    	@elseif ($req->priority == 2) high_priority
+							        	    	@endif
+							        	    	">
+							        	    	@if ($req->priority == 7)Test
+							        	    	@elseif ($req->priority == 6)3rd shift
+							        	    	@elseif ($req->priority == 5)2nd shift
+							        	    	@elseif ($req->priority == 4)1st shift
+							        	    	@elseif ($req->priority == 3)Top
+							        	    	@elseif ($req->priority == 2)Flash
+						        	    		@elseif ($req->priority == 1)Normal
+							        	    	@endif</td>
+				                            <td>{{ $req->status}}</td>
+				                            
+				                            @if ($location == 'MM1')
+				                            	<td>{{ $req->layer_limit}}</td>
+				                            @endif
+				                            
+				                            
+											@if ($location == 'NOT_SET')
+											<td><a href="{{ url('plan_mattress_line/'.$req->id) }}" class="btn btn-success btn-xs center-block">Plan mattress</a></td>
+											<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">Modal</button> -->
+											@elseif ($location  == 'ON_HOLD')
+											<td><a href="{{ url('change_marker/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Change marker</a></td>
+											@elseif ($location  == 'TO_CHANGE')
+											<td><a href="{{ url('change_marker_all/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Change marker</a></td>
+											@elseif ($location != 'DELETED')
+											<td><a href="{{ url('edit_mattress_line/'.$req->id) }}" class="btn btn-warning btn-xs center-block">Edit mattress</a></td>
+											@else
+
+											@endif
+											
+											@if (($location == 'NOT_SET') OR (substr($location,0 ,2) == 'SP') OR (substr($location,0 ,2) == 'MS') OR (substr($location,0 ,2) == 'MM') OR (substr($location,0 ,2) == 'CU')  )
+											<td><a href="{{ url('delete_mattress/'.$req->id) }}" class="btn btn-danger btn-xs center-block">Delete</a></td>
+											@endif
+
+				                        </tr>
+				                        @if ($location != 'NOT_SET') 
+
+				                        <tr style="border-bottom: 3px solid grey;
+					                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
+											box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
+					                        ">
+					                        <td class=""><span>{{ $req->g_bin}}</span></td>
+						        	    	<td class=""><span>{{ $req->mattress}}</span></td>
+						        	    	<td class=""><span>{{ $req->g_bin_orig}}</span></td>
+
+					                        <td  colspan="18" style="padding: 5px; text-align: left;">
+					                        	@if ($req->comment_office != '')
+					                        	<b>Comment office:</b>
+					                        	<i>{{ $req->comment_office }}</i><br>
+					                        	@endif
+					                        	@if ($req->comment_operator != '')
+					                        	<b>Comment operator:</b>
+					                        	<i>{{ $req->comment_operator }}</i><br>
+					                        	@endif
+					                        	@if ($req->standard_comment != '')
+					                        	<b>Material comment:</b>
+					                        	<i>{{ $req->standard_comment }}</i><br>
+					                        	@endif
+					                        	
+					                        </td>
+					                        <td  colspan="3" style="padding: 1px; text-align: left;">
+					                        	@if ($req->call_shift_manager == 1 )
+					                        		<b><span class="glyphicon glyphicon-earphone"></span>&nbsp; &nbsp;<b>Call shift manager</b></b>
+					                        	@endif
+					                        	@if ($req->test_marker == 1)
+					                        		<br><b><span class="glyphicon glyphicon-text-size"></span>&nbsp; &nbsp;<b>Test Marker</b></b>
+					                        	@endif
+					                        </td>
+				                    	</tr>
+				                        @endif
 				                    @endforeach
 			                  	</tbody>
                         @endif
@@ -2239,7 +2427,7 @@
 		<div class="col-md-1 8musketara" style="width: 12.499999995%;text-align: center;">
 			<span style="font-size: x-large"><b>TUB</b>&nbsp;&nbsp;&nbsp;</span> ({{round($tub_m,2)}} kg)
 			<br><br>
-			<!-- <div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
+			<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
 				@foreach ($tub_req_time as  $key => $tub_req_time_line)
 					<ul style="padding: 0;margin: 0;list-style: none;">
 						<li> 
@@ -2261,7 +2449,7 @@
 						</li>
 					</ul>
 				@endforeach
-			</div> -->
+			</div>
 			<ul id="sortable8" class="connectedSortable_ul_1" style='background-color:#8fe3a266; !important'>
             	@foreach ($tub as $req7)
             	    <li class="ui-state-default
@@ -2301,24 +2489,20 @@
             	    	Comment office: {{$req7->comment_office}}<br />
             	    	<b>Status: {{$req7->status }}<br />
             	    	Dest: {{$req7->destination}}<br />
-            	    	<!-- @if ($req7->average_of_min_per_meter_minm_c != 0) 
-            	    		Spread SMV (by cat): {{ round($req7->average_of_min_per_meter_minm_c,2) }}
-            	    	@elseif ($req7->average_of_min_per_meter_minm_m != 0)  
-            	    		Spread SMV (by mat): {{ round($req7->average_of_min_per_meter_minm_m,2) }}
+            	    	@if ($req7->average_min_per_layer != 0) 
+            	    		Spread SMV (TUB): {{ round($req7->average_min_per_layer,2) }}
             	    	@else 
-            	    		Spread SMV (by avg):{{ round($req7->average_of_min_per_meter_minm_all,2) }}
+            	    		Spread SMV (TUB avg):{{ round($req7->average_min_per_layer,2) }}
             	    	@endif
             	    	<br />
 
             	    	Req. time: 
-            	    	@if ($req7->average_of_min_per_meter_minm_c != 0) 
-            	    		{{ round($req7->average_of_min_per_meter_minm_c*$req7->cons_actual,0) }}
-            	    	@elseif ($req7->average_of_min_per_meter_minm_m != 0)  
-            	    		{{ round($req7->average_of_min_per_meter_minm_m*$req7->cons_actual,0) }}
+            	    	@if ($req7->average_min_per_layer != 0) 
+            	    		{{ round($req7->average_min_per_layer*$req7->layers_a,0) }}
             	    	@else 
-            	    		{{ round($req7->average_of_min_per_meter_minm_all*$req7->cons_actual,0) }}
+            	    		{{ round($req7->average_min_per_layer*$req7->layers_a,0) }}
             	    	@endif
-            	    	 min --><b />
+            	    	 min <b />
             	    	">
             	    	<span class="">{{$req7->g_bin}}<br><a href="{{ url('edit_mattress_line/'.$req7->id) }}">{{$req7->mattress}}</a></span>
 

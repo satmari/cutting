@@ -117,7 +117,7 @@ class foController extends Controller {
 			WHERE operator = '".$operator."' COLLATE Latin1_General_CI_AI 
 			AND ( [device] like '%TO%' )"));
 		if (!isset($check_op)) {
-			dd("Wrong operator, call Atila !");
+			dd("Wrong operator, call IT !");
 		}
 
 
@@ -138,7 +138,7 @@ class foController extends Controller {
 			WHERE operator = '".$operator."' COLLATE Latin1_General_CI_AI 
 			AND ( [device] like '%TO%' )"));
 		if (!isset($check_op)) {
-			dd("Wrong operator, call Atila !");
+			dd("Wrong operator, call IT !");
 		}
 
 		$operator2 = Session::get('operator2');
