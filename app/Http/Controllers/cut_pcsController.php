@@ -203,7 +203,7 @@ class cut_pcsController extends Controller {
 			}
 		}
 
-
+		
 		return Redirect::to('http://172.27.161.172/bbstock2/production');
 
 	}

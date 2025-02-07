@@ -17,7 +17,11 @@
 	<!-- <link href="{{ asset('/css/app.css') }}" rel="stylesheet"> -->
 	<!-- <link href="{{ asset('/css/css.css') }}" rel="stylesheet"> -->
 	<!-- <link href="{{ asset('/css/custom.css') }}" rel="stylesheet"> -->
-	<link href="{{ asset('/css/custom.css') }}" rel='stylesheet' type='text/css'>
+	@if (config('app.global_variable') == 'gordon')
+		<link href="{{ asset('/css/custom.css') }}" rel='stylesheet' type='text/css'>
+	@else
+		<link href="{{ asset('/css/customf.css') }}" rel='stylesheet' type='text/css'>
+	@endif
 	<!-- <link href="{{ asset('/css/jquery.dataTables.min.css') }}" rel='stylesheet' type='text/css'> -->
 	<link href="{{ asset('/css/jquery-ui.min.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/app.css') }}" rel='stylesheet' type='text/css'>
@@ -61,7 +65,7 @@
 				@if (config('app.global_variable') == 'gordon')
 					<a class="navbar-brand" href="{{ url('/') }}"><b>Cutting</b></a>
 				@else
-					<a class="navbar-brand" href="{{ url('/') }}"><b>Cutting F</b></a>
+					<a class="navbar-brand" href="{{ url('/') }}"><b>Cutting Fiorano</b></a>
 				@endif
 				<a class="navbar-brand" href="#">|</a>
 			</div>
