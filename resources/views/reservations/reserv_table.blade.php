@@ -46,12 +46,14 @@
                             <th><b>Item</b></th>
                             <th><b>Variant</b></th>
                             <th><b>Batch</b></th>
-                            <th><b>Balance</b></th>
-                            <th><b>Count of rolls</b></th>
-                            <th><b>Not Reserved Qty</b></th>
-                            <th><b>Not Reserved rolls</b></th>
-                            <th><b>Reserved Qty</b></th>
-                            <th><b>Reserved rolls</b></th>
+                            {{--<th><b>Balance</b></th>--}}
+                            {{--<th><b>Count of rolls</b></th>--}}
+                            <th><b>Free Qty</b></th>
+                            <th><b>Free rolls</b></th>
+                            <th><b>Remaining Reserved Qty</b></th>
+                            <th><b>Remaining Reserved rolls</b></th>
+                            <th><b>Originally Reserved Qty</b></th>
+                            <th><b>Originally Reserved rolls</b></th>
                             <th></th>
 
                             
@@ -65,12 +67,14 @@
                             <td>{{ $req->variant }}</td>
                             <td>{{ $req->batch }}</td>
                             {{--<td>{{ floatval(round($req->bal,2)) }}</td>--}}
-                            <td>{{ str_replace(".", ",", floatval($req->bal)) }}</td>
-                            <td>{{ $req->coun }}</td>
+                            {{--<td>{{ str_replace(".", ",", floatval($req->bal)) }}</td>--}}
+                            {{--<td>{{ $req->coun }}</td>--}}
                             <td>{{ str_replace(".", ",", floatval($req->reserv_not)) }}</td>
                             <td>{{ $req->coun_not }}</td>
                             <td>{{ str_replace(".", ",", floatval($req->reserv_yes)) }}</td>
                             <td>{{ $req->coun_yes }}</td>
+                            <td>{{ str_replace(".", ",", floatval($req->reserv_all)) }}</td>
+                            <td>{{ $req->coun_all }}</td>
 
                             <td>
 
@@ -80,7 +84,7 @@
                                     {!! Form::hidden('variant', $req->variant) !!}
                                     {!! Form::hidden('batch', $req->batch) !!}
 
-                                    {!! Form::submit('Reserve', ['class' => 'btn-xs  btn-success']) !!}
+                                    {!! Form::submit('Edit', ['class' => 'btn-xs  btn-success']) !!}
 
                                     @include('errors.list')
                                 {!! Form::close() !!}

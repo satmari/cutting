@@ -1,7 +1,8 @@
 <?php
 
 return [
-
+	
+	'global_variable' => env('APP_GLOBAL_VARIABLE'),
 	/*
 	|--------------------------------------------------------------------------
 	| Application Debug Mode
@@ -13,7 +14,8 @@ return [
 	|
 	*/
 
-	'debug' => env('APP_DEBUG'),
+	'debug' => env('APP_DEBUG', false),
+	// 'debug' => env('APP_DEBUG'),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -146,11 +148,13 @@ return [
 		'App\Providers\EventServiceProvider',
 		'App\Providers\RouteServiceProvider',
 
-		//'Collective\Html\HtmlServiceProvider',
-		'Illuminate\Html\HtmlServiceProvider',
-		'Maatwebsite\Excel\ExcelServiceProvider',
-		'Bican\Roles\RolesServiceProvider',	
+		//'Illuminate\Html\HtmlServiceProvider',
 
+		'Collective\Html\HtmlServiceProvider',
+		'Bican\Roles\RolesServiceProvider',	
+		'Maatwebsite\Excel\ExcelServiceProvider',
+		'Gbrock\Table\Providers\TableServiceProvider',
+		
 	],
 
 	/*
@@ -199,11 +203,14 @@ return [
 		'Validator' => 'Illuminate\Support\Facades\Validator',
 		'View'      => 'Illuminate\Support\Facades\View',
 
-		
 		'Form'      => 'Illuminate\Html\FormFacade',
         'Html'      => 'Illuminate\Html\HtmlFacade',
-        'Excel' 	=> 'Maatwebsite\Excel\Facades\Excel',
 
+        'Excel' 	=> 'Maatwebsite\Excel\Facades\Excel',
+        'Table'     => 'Gbrock\Table\Facades\Table',      	
 	],
+
+
+	
 
 ];

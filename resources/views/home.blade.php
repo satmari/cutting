@@ -9,6 +9,11 @@
 
 				<div class="panel-body">
 					Welcome, this is new Cutting application. 
+					@if (Auth::guest())
+					<p></p>
+					<p>Please login first.</p>
+					@endif
+
 				</div>
 			</div>
 		</div>

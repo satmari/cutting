@@ -12,7 +12,7 @@
 
 				<div class="panel-body">
 					<div class="">
-						<a href="{{url('/')}}" class="btn btn-default center-block">Back</a>
+						<a href="{{url('/reservation')}}" class="btn btn-default center-block">Back</a>
 					</div>
 				</div>
 			</div>

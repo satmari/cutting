@@ -74,6 +74,6 @@ return [
 	|
 	*/
 
-	'prefix' => 'cutting',
+	'prefix' => 'bbstock2',
 
 ];
