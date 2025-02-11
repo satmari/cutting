@@ -240,32 +240,41 @@
                         <br>
                         @include('errors.list')
 
+                        @if (isset($mattress_pro_array))
+                            <!-- {{ json_encode(array_values($mattress_pro_array)) }} <br>
+                            {{ json_encode(array_values($marker_pcs_per_layer)) }} -->
+                        @endif
+
                 {!! Form::close() !!}
 
 @if (isset($mattress_pro_array))
     <script>
         
-        // Pass PHP arrays to JavaScript
-        const mattressProArray = {!! json_encode(array_values($mattress_pro_array)) !!};
-        const markerPcsPerLayer = {!! json_encode(array_combine(
-            array_map(function ($item) {
-                return explode('#', $item)[0]; 
-            }, $mattress_pro_array),
-            array_map(function ($item) {
-                return (int)explode('#', $item)[1]; 
-            }, $marker_pcs_per_layer)
-        )) !!};
+        const mattressProArray = <?php echo json_encode(array_values($mattress_pro_array)); ?>;
 
+        const markerPcsPerLayer = <?php 
+            $result = [];
+            foreach ($marker_pcs_per_layer as $item) {
+                $parts = explode('#', $item);
+                $key = isset($parts[0]) ? $parts[0] : ''; // Ensure key exists
+                $value = isset($parts[1]) ? (int) $parts[1] : 0;
+
+                // Sum up values instead of overwriting
+                if (!isset($result[$key])) {
+                    $result[$key] = 0;
+                }
+                $result[$key] += $value; // Sum instead of overwrite
+            }
+            echo json_encode($result);
+        ?>;
 
         // Track the counts per size across all lines
         const currentCounts = Object.fromEntries(Object.keys(markerPcsPerLayer).map(key => [key, 0]));
-
-        // Track individual line counts
         const lineCounts = Array(mattressProArray.length).fill(0);
 
-        function renderLines() {
+        function renderLines1() {
             const container = document.getElementById('lines-container');
-            container.innerHTML = ''; // Clear existing content
+            container.innerHTML = '';
 
             mattressProArray.forEach((item, index) => {
                 const [key, secondValue, thirdValue] = item.split('#');
@@ -304,7 +313,61 @@
             });
 
             renderCurrentCounts();
-            updateHiddenInputs(); // Update hidden inputs
+            updateHiddenInputs();
+        }
+
+        function renderLines() {
+            const container = document.getElementById('lines-container');
+            container.innerHTML = '';
+
+            let previousSize = null;
+
+            mattressProArray.forEach((item, index) => {
+                const [key, secondValue, thirdValue] = item.split('#');
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'line';
+
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = `${key} - ${thirdValue}`;
+
+                const decreaseButton = document.createElement('button');
+                decreaseButton.type = 'button';
+                decreaseButton.textContent = '-';
+                decreaseButton.addEventListener('click', () => updateCount(key, index, -1));
+
+                const countSpan = document.createElement('span');
+                countSpan.textContent = 0;
+                countSpan.id = `count-${index}`;
+
+                const increaseButton = document.createElement('button');
+                increaseButton.type = 'button';
+                increaseButton.textContent = '+';
+                increaseButton.addEventListener('click', () => updateCount(key, index, 1));
+
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = `line-${index}`;
+                hiddenInput.id = `input-${index}`;
+                hiddenInput.value = 0;
+
+                lineDiv.appendChild(nameSpan);
+                lineDiv.appendChild(decreaseButton);
+                lineDiv.appendChild(countSpan);
+                lineDiv.appendChild(increaseButton);
+                lineDiv.appendChild(hiddenInput);
+                container.appendChild(lineDiv);
+
+                // Insert a bold line if the next item is a different size or if it's the last item
+                if (index === mattressProArray.length - 1 || mattressProArray[index + 1].split('#')[0] !== key) {
+                    const boldLine = document.createElement('div');
+                    boldLine.style.borderTop = '2px solid black'; // Bold effect
+                    boldLine.style.margin = '8px 0';
+                    container.appendChild(boldLine);
+                }
+            });
+
+            renderCurrentCounts();
+            updateHiddenInputs();
         }
 
         function updateCount(key, index, change) {
@@ -321,82 +384,57 @@
                 document.getElementById(`input-${index}`).value = newLineCount;
 
                 renderCurrentCounts();
-                updateHiddenInputs(); // Update hidden inputs
+                updateHiddenInputs();
                 toggleSubmitButton();
             }
         }
 
-        function updateCount(key, index, change) {
-          const currentSizeTotal = currentCounts[key]; // Total for the size
-          const maxCount = markerPcsPerLayer[key]; // Max for the size
-          const currentLineCount = lineCounts[index]; // Current line's count
-          const newLineCount = currentLineCount + change;
-
-          // Ensure the new total does not exceed the max and is >= 0
-          if (newLineCount >= 0 && currentSizeTotal + change <= maxCount) {
-            // Update the counts
-            currentCounts[key] += change;
-            lineCounts[index] = newLineCount;
-
-            // Update the UI
-            document.getElementById(`count-${index}`).textContent = newLineCount;
-            document.getElementById(`input-${index}`).value = newLineCount;
-            renderCurrentCounts(); // Update the summary
-            toggleSubmitButton(); // Check if submit button should be shown
-          }
-        }
-
         function renderCurrentCounts() {
-          const summaryContainer = document.getElementById('counts-summary');
-          summaryContainer.innerHTML = ''; // Clear the previous summary
+            const summaryContainer = document.getElementById('counts-summary');
+            summaryContainer.innerHTML = '';
 
-          Object.keys(currentCounts).forEach(key => {
-            const countDisplay = document.createElement('span');
-            countDisplay.textContent = `${key}: ${currentCounts[key]} (Max: ${markerPcsPerLayer[key]})`;
-            summaryContainer.appendChild(countDisplay);
-          });
+            Object.keys(currentCounts).forEach(key => {
+                const countDisplay = document.createElement('span');
+                countDisplay.textContent = `${key}: ${currentCounts[key]} (Max: ${markerPcsPerLayer[key]})`;
+                summaryContainer.appendChild(countDisplay);
+            });
         }
 
         function toggleSubmitButton() {
-          const allMaxed = Object.keys(markerPcsPerLayer).every(
-            key => currentCounts[key] === markerPcsPerLayer[key]
-          );
+            const allMaxed = Object.keys(markerPcsPerLayer).every(
+                key => currentCounts[key] === markerPcsPerLayer[key]
+            );
 
-          const submitButton = document.getElementById('submit-button');
-          submitButton.disabled = !allMaxed;
+            const submitButton = document.getElementById('submit-button');
+            submitButton.disabled = !allMaxed;
         }
 
         function autoPopulate() {
-          Object.keys(markerPcsPerLayer).forEach(size => {
-            const maxCount = markerPcsPerLayer[size];
-            let remaining = maxCount - currentCounts[size];
+            Object.keys(markerPcsPerLayer).forEach(size => {
+                const maxCount = markerPcsPerLayer[size];
+                let remaining = maxCount - currentCounts[size];
 
-            if (remaining > 0) {
-              mattressProArray.forEach((item, index) => {
-                const [key, _] = item.split('#');
+                if (remaining > 0) {
+                    mattressProArray.forEach((item, index) => {
+                        const [key, _] = item.split('#');
 
-                if (key === size && remaining > 0) {
-                  const currentLineCount = lineCounts[index];
-                  const availableSpace = Math.min(remaining, maxCount - currentLineCount);
-                  updateCount(size, index, availableSpace);
-                  remaining -= availableSpace;
+                        if (key === size && remaining > 0) {
+                            const currentLineCount = lineCounts[index];
+                            const availableSpace = Math.min(remaining, maxCount - currentLineCount);
+                            updateCount(size, index, availableSpace);
+                            remaining -= availableSpace;
+                        }
+                    });
                 }
-              });
-            }
-          });
+            });
         }
 
         function updateHiddenInputs() {
-            const mattressProArrayInput = document.getElementById('mattressProArrayInput');
-            const markerPcsPerLayerInput = document.getElementById('markerPcsPerLayerInput');
-
-            // Convert JavaScript objects/arrays into JSON strings for posting
-            mattressProArrayInput.value = JSON.stringify(mattressProArray);
-            markerPcsPerLayerInput.value = JSON.stringify(markerPcsPerLayer);
+            document.getElementById('mattressProArrayInput').value = JSON.stringify(mattressProArray);
+            document.getElementById('markerPcsPerLayerInput').value = JSON.stringify(markerPcsPerLayer);
         }
 
         document.getElementById('auto-populate-button').addEventListener('click', autoPopulate);
-
         renderLines();
     </script>
 @endif

@@ -72,197 +72,7 @@ class importController extends Controller {
 	}
 
 	public function postImportConsPo (Request $request) {
-		/*
-	    $getSheetName = Excel::load(Request::file('file1'))->getSheetNames();
-	    
-	    foreach($getSheetName as $sheetName)
-	    {
-	        Excel::filter('chunk')->selectSheets($sheetName)->load(Request::file('file1'))->chunk(50, function ($reader)
-	            
-	            {
-	                $readerarray = $reader->toArray();
-	                //var_dump($readerarray);
-	                foreach($readerarray as $row)
-	                {
-						$po = $row['po'];
-						// dd($row['po']);
-
-								
-								$data = DB::connection('sqlsrv1')->select(DB::raw("SELECT case when COMP.[Status] = 3 then 'Released' else 'Check status' end as [Status],
-									      COMP.[Prod_ Order No_],
-									      COM2.[Item No_],
-									      COM2.[Variant Code],
-									      cast(COMP.[Quantity] as float) as [Qty per], 
-									      PO.[Cutting Prod_ line], 
-									      case when PO.[To be finished] = 1 then 'Yes' else 'No' end as [To be finished],
-									      cast(SL.OrderedQty as float) as OrderedQty, 
-									      cast(COMP.[Quantity] * SL.OrderedQty as float) as [Theorethical Consumption MT],
-									      cast(COMP.[Quantity] * SL.OrderedQty * 0.03 as float) as [Possible overcons MT 3%]
-
-									  FROM [Gordon_LIVE].[dbo].[GORDON\$Prod_ Order Component] as COMP left join
-									  
-									  (SELECT [No_]
-									      ,[Description 2]
-
-									  FROM [Gordon_LIVE].[dbo].[GORDON\$Item]) as ITM on ITM.[No_] = COMP.[Item No_] left join
-									  
-									  (SELECT [Status],
-									      [Prod_ Order No_],
-									      ([Item No_]) as [Item No_],
-									      ([Variant Code]) as [Variant Code],
-									      ([Quantity]) as Quantity
-
-									  FROM [Gordon_LIVE].[dbo].[GORDON\$Prod_ Order Component]
-									  where [PfsHorz Component Group] = 'MTRLS' and [Prod_ Order No_] not like 'C%' and [Prod_ Order No_] not like 'S%' and [status] = 3
-									  group by [Status],[Item No_],[Variant Code],[Quantity],
-									       [Prod_ Order No_]
-
-									      ) as COM2 on COM2.[Prod_ Order No_] = COMP.[Prod_ Order No_] and COM2.[Item No_] = COMP.[Item No_] and COM2.[Variant Code] = COMP.[Variant Code] right join
-									      
-									      (SELECT [Status]
-									      ,[Prod_ Order No_]
-									      --,[Item No_]
-									      --,[Variant Code]
-									      ,max([Quantity]) as Quantity
-									      ,[Location Code]
-
-									  FROM [Gordon_LIVE].[dbo].[GORDON\$Prod_ Order Component] as POC left join
-									  
-									  (SELECT [No_]
-									      ,[Description 2]
-
-									  FROM [Gordon_LIVE].[dbo].[GORDON\$Item]) as ITM on ITM.[No_] = POC.[Item No_]
-									  where [PfsHorz Component Group] = 'MTRLS' and [Prod_ Order No_] not like 'C%' and [Prod_ Order No_] not like 'S%'
-									  and [status] = 3 and [Quantity] <> 0 and ITM.[Description 2] = 'fabric'
-									  group by [Status]
-									      ,[Prod_ Order No_]
-									      --,[Item No_]
-									      --,[Variant Code]
-									      ,[Location Code]--,[Quantity]
-									      --having [quantity] = max([quantity])
-									) as MX on MX.[Prod_ Order No_] = COMP.[Prod_ Order No_] and MX.[Quantity] = COMP.[Quantity] left join
-
-									(SELECT 
-									      [Shortcut Dimension 2 Code]
-									      ,[To be finished]
-									      ,[Cutting Prod_ Line]
-									   
-									  FROM [Gordon_LIVE].[dbo].[GORDON\$Production Order]
-									  where [Status] = 3
-									  group by [Shortcut Dimension 2 Code]
-									      ,[To be finished] 
-									      ,[Cutting Prod_ Line]) as PO on PO.[Shortcut Dimension 2 Code] = COMP.[Prod_ Order No_] left join
-									      
-									      (SELECT 
-									      [Shortcut Dimension 2 Code]
-
-									      ,sum([PfsOrder Quantity]) as OrderedQty
-									    
-									  FROM [Gordon_LIVE].[dbo].[GORDON\$Sales Line]
-									  group by  [Shortcut Dimension 2 Code]) as SL on SL.[Shortcut Dimension 2 Code] = COMP.[Prod_ Order No_]
-									  
-									  where --[PfsHorz Component Group] = 'MTRLS' and 
-										COMP.[Prod_ Order No_] not like 'C%' and COMP.[Prod_ Order No_] not like 'S%' and COMP.[Prod_ Order No_] like '%".$po."'
-										and ITM.[Description 2] = 'fabric' and COMP.[Quantity] <> 0 and comp.[status] = 3
-									  group by COMP.[Status]
-									      ,COMP.[Prod_ Order No_]
-									      ,COM2.[ITem No_]
-									      ,COM2.[Variant Code],COMP.[Quantity], PO.[Cutting Prod_ line], PO.[To be finished],SL.OrderedQty
-									  order by [Prod_ Order No_]"));
-
-
-										// dd($data[0]->{"Prod_ Order No_"});
-
-
-
-										if (!isset($data[0])) {
-											$msg = "Problem to get PO"; 
-											return view('cons.error', compact('msg'));
-
-										} else {
-											
-											$po = $data[0]->{"Prod_ Order No_"};
-
-											$po = substr($po, -6);
-											// dd($po);
-											$status = $data[0]->{"Status"};
-											$to_be_finished = $data[0]->{"To be finished"};
-											$cut_prod_line = $data[0]->{"Cutting Prod_ line"};
-											$order_qty = (int)$data[0]->{"OrderedQty"};
-
-											$main_item = $data[0]->{"Item No_"};
-											$main_variant = $data[0]->{"Variant Code"};
-											$qty_per = round($data[0]->{"Qty per"},3);
-
-											$teo_cons = round($data[0]->{"Theorethical Consumption MT"},3);
-											$teo_cons_eur = NULL;
-
-											$over_cons = round($data[0]->{"Possible overcons MT 3%"},3);
-											$over_cons_eur = NULL;
-											$percentage = 0.03;
-
-											$extra_item = NULL;
-											$extra_variant = NULL;
-											$extra_consumed = NULL;
-											$extra_consumed_eur = NULL;
-
-											$error = NULL;
-
-													
-											try {
-												$table = new Consumption;
-
-												$table->po = $po;
-												$table->status = $status;
-												$table->to_be_finished = $to_be_finished;
-												$table->cut_prod_line = $cut_prod_line;
-												$table->order_qty = $order_qty;
-
-												$table->main_item = $main_item;
-												$table->main_variant = $main_variant;
-												$table->qty_per = $qty_per;
-
-												$table->teo_cons = $teo_cons;
-												$table->teo_cons_eur = $teo_cons_eur;
-
-												$table->over_cons = $over_cons;
-												$table->over_cons_eur = $over_cons_eur;
-												$table->percentage = $percentage;
-
-												$table->extra_item = $extra_item;
-												$table->extra_variant = $extra_variant;
-												$table->extra_consumed = $extra_consumed;
-												$table->extra_consumed_eur = $extra_consumed_eur;
-
-												$table->error = $error;
-
-												$table->save();
-												}
-											catch (\Illuminate\Database\QueryException $e) {
-													$msg = "Problem to save, check if PO already exist."; 
-													return view('cons.error', compact('msg'));
-												}
-
-										}
-
-
-						// Remove po from local db 
-						$data = DB::connection('sqlsrv')->select(DB::raw("SELECT id, po FROM consumptions WHERE po = '".$po."' "));
-						// dd($data[0]->id);
-
-
-						if (isset($data[0]->id)) {
-							$l = Consumption::findOrFail($data[0]->id);
-					    	$l->delete();									
-						}
-
-	                }
-
-	            });
-	    }
-
-		return redirect('/');
-		*/
+		
 	}
 
 	public function postImportUpdatePass(Request $request) {
@@ -1748,6 +1558,8 @@ class importController extends Controller {
 						   			$mattress_pro_array[] = '';
 						   			// $mattress_style_size_array[] = '';
 
+
+						   			/////// this will be changed 2025.02.11 later
 							   		foreach ($find_in_marker_lines as $line) {
 							   			$style_size = $line->style_size;
 							   			$pro_pcs_layer = (float)$line->pcs_on_layer;
@@ -1803,6 +1615,7 @@ class importController extends Controller {
 								   			// array_push($mattress_style_size_array, $style_size.'#'.$pro_pcs_layer);
 							   			}
 							   		}
+							   		///////////
 						   		}
 					   		}
 						}
@@ -2158,9 +1971,8 @@ class importController extends Controller {
 								// print_r('<br>');
 								// print_r('<br>');
 
-								//////////////// this will be changed
-
-
+								//////////////// this will be changed 2025.02.11
+								/*
 								$mattress_pro_array = array_filter($mattress_pro_array);
 								for ($i=1; $i <= count($mattress_pro_array) ; $i++) {
 									// print_r('i: '.$i);
@@ -2202,7 +2014,7 @@ class importController extends Controller {
 										continue;
 									}
 								}
-
+								*/
 								/////////////////////
 
 
@@ -2236,30 +2048,54 @@ class importController extends Controller {
 	                $mp_success = 0;
 	                $mp_error = 0;
 
-	                // dd($mattress_pro_array);
-	                // dd($mattress_style_size_array);
+	                $mp_all_error = 0;
 
+					$mattressSummary = [];
+					$resultArray = [];
 
 
 	                foreach($readerarray as $row) {
 	                	// dd($row);
+
+	                	$key = $row['mattress'] . '#' . $row['style_size'];
+
+					    if (isset($mattressSummary[$key])) {
+					        $mattressSummary[$key] += (float)$row['pro_pcs_layer'];
+					    } else {
+					        $mattressSummary[$key] = (float)$row['pro_pcs_layer'];
+					    }
+
+
 	                	$mp_lines = $mp_lines + 1;
 
 	                	$mattress_data = mattress::where('mattress', $row['mattress'])->firstOrFail();
+	                	// dd($mattress_data);
 	                	$mattress_id = $mattress_data->id;
 	                	$skeda = $mattress_data->skeda;
 	                	$mattress = $row['mattress'];
 	                	$style_size = $row['style_size'];
 	                	$pro = $row['pro'];
+	                	// dd($pro);
+
+	                	$mattress_phases_table = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM mattress_phases 
+								WHERE mattress_id = '".$mattress_id."' AND
+									status = 'NOT_SET' AND 
+									active = 1 "));
+	                	// dd($mattress_phases_table);
+	                	if (!isset($mattress_phases_table[0]->id)) {
+	                		var_dump('mp_error: mattress: '.$row['mattress'].', have status different then NOT_SET </br>');
+	                		$mp_error = $mp_error + 1;
+	                		continue;
+	                	}
 	                	
 	                	$pro_data =  DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM pro_skedas 
 								WHERE pro = '".$pro."' AND
 									skeda = '".$skeda."' AND 
 									style_size = '".$style_size."' 
 									"));
-
+	                	// dd($pro_data);
 	                	if (!isset($pro_data[0]->id)) {
-	                		var_dump('mp_error: pro: '.$pro.', with style_size: '.$style_size.' doesnt exist in pro table</br>');
+	                		var_dump('mp_error: pro: '.$pro.', with style_size: '.$style_size.' doesnt exist in pro table </br>');
 	                		$mp_error = $mp_error + 1;
 	                		continue;
 
@@ -2267,11 +2103,12 @@ class importController extends Controller {
 	                		$pro_id = $pro_data[0]->pro_id;
 	                	}
 	                	// var_dump($pro_data->pro_id);
-	                	
+	                	// dd($pro_id);
 
-	                	$pro_details_data = mattress_details::where('id', $mattress_id)->firstOrFail();
+	                	$pro_details_data = mattress_details::where('mattress_id', $mattress_id)->firstOrFail();
 	                	// dd($pro_details_data);
 	                	$layers_a = $pro_details_data->layers_a;
+	                	// dD($layers_a);
 
 	                	$pro_pcs_layer = (float)$row['pro_pcs_layer'];
 	                	// var_dump($pro_pcs_layer);
@@ -2320,27 +2157,112 @@ class importController extends Controller {
 
 							$mp_exist = $mp_exist + 1;
 						}
-
-						
-
-
 	                }
+
+	                foreach ($mattressSummary as $key => $totalProPcsLayer) {
+					    $resultArray[] = $key . '#' . $totalProPcsLayer;
+
+					}
+					// dd($resultArray);
+
+					$resultData = [];
+					foreach ($resultArray as $line) {
+					    list($mattress, $styleSize, $proPcsLayer) = explode('#', $line);
+					    $key = $mattress . '#' . $styleSize;
+					    $resultData[$key] = (int) $proPcsLayer;
+					}
+					// dd($resultData);
+						
+					// Step 1: Extract mattresses from resultArray
+					$mattressList = [];
+					foreach ($resultArray as $line) {
+					    list($mattress, $styleSize, $proPcsLayer) = explode('#', $line);
+					    $mattressList[$mattress] = true; // Store unique mattresses
+					}
+					// dd($mattressList);
+
+					// Step 2: Query for marker names for these mattresses
+					$placeholders = implode(",", array_fill(0, count($mattressList), "?"));
+					$mattressKeys = array_keys($mattressList);
+					// dd($mattressKeys);
+
+					$markerQuery = "SELECT mm.mattress, mm.marker_name, ml.style_size, ml.pcs_on_layer 
+					                FROM marker_lines AS ml
+					                JOIN mattress_markers AS mm ON mm.marker_name = ml.marker_name
+					                WHERE mm.mattress IN ($placeholders)
+					                ORDER BY mm.mattress ASC";
+					$markerResults = DB::select(DB::raw($markerQuery), $mattressKeys);
+					// dd($markerResults);
+
+					// Step 3: Store data in a single lookup array for faster comparisons
+					$markerData = [];
+					foreach ($markerResults as $row) {
+					    $key = $row->mattress . '#' . $row->style_size;
+					    $markerData[$key] = (int) $row->pcs_on_layer;
+					}
+					// dd($markerData);
+
+					
+					// ✅ **Main Check: Ensure all database entries exist in resultArray**
+					$missingInResultArray = array_diff_key($markerData, $resultData);
+					if (!empty($missingInResultArray)) {
+					    echo("The following items are missing in the MPO sheet:<br>");
+					    foreach ($missingInResultArray as $key => $expected) {
+					        echo("$key (Expected: ".$expected.")<br>");
+
+					        // delete mattress
+					    	list($mattress, $styleSize) = explode('#', $key);    
+					    	$delete = mattress_pro::where('mattress',$mattress)->delete();
+					    }
+					    
+					    dd('stoping error in MPO sheet');
+					}
+
+
+					// ✅ **Check for mismatches**
+					// var_dump("<br>");
+					foreach ($markerData as $key => $expected) {
+					    if (!isset($resultData[$key])) {
+					        continue; // Already reported missing values
+					    }
+
+					    if ($resultData[$key] !== $expected) {
+					        echo("Mismatch: $key (Expected: $expected, Found: ".$resultData[$key].")<br>");
+
+					        // delete mattresses
+					        list($mattress, $styleSize) = explode('#', $key);    
+					    	$delete = mattress_pro::where('mattress',$mattress)->delete();
+					    	dd('stoping error in MPO sheet');
+
+					    } else {
+					        // var_dump("Match: $key<br>");
+					    }
+					}
+
+					// dd('stop');
+
 
 	                Session::set('mp_lines', $mp_lines);
 					Session::set('mp_exist', $mp_exist);
 					Session::set('mp_success', $mp_success);
 					Session::set('mp_error', $mp_error);
 
+					Session::set('mp_all_error', $mp_all_error);
+
 					$mp_lines = 0;
 	                $mp_exist = 0;
 	                $mp_success = 0;
 	                $mp_error = 0;
+
+	                $mp_all_error = 0;
+
+
 	            });
 			}
 	    }
 	    
-	// ERROR HANDLING
-	    // Error on PRO 
+	// ERROR HANDLING FOR ALL
+	    // Error on PRO
 		    $pro_lines = Session::get('pro_lines');
 		    $pro_exist = Session::get('pro_exist');
 		    $pro_success = Session::get('pro_success');
@@ -2484,7 +2406,6 @@ class importController extends Controller {
 			Session::set('m_success', NULL);
 			Session::set('m_error', NULL);
 		//
-
 
 		// Error on MP (mattress pro)
 			$mp_lines = Session::get('mp_lines');

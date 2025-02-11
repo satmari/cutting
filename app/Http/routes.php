@@ -794,7 +794,7 @@ return Response::json($retun_array);
 Route::any('getpodata', function() {
 	$term = Input::get('term');
 
-	// $data = DB::connection('sqlsrv1')->select(DB::raw("SELECT TOP 10 (RIGHT([No_],6)) as po FROM [Gordon_LIVE].[dbo].[GORDON\$Production Order] WHERE [Status] = '3' AND [No_] like '%".$term."%'"));
+	
 	$data = DB::connection('sqlsrv4')->select(DB::raw("SELECT DISTINCT (CASE WHEN po like '%-%' THEN substring(po, 1,6) ELSE substring (po, 4,6)	END) as po
 		FROM [trebovanje].[dbo].[sap_coois] WHERE po like '%".$term."%'"));
 	// var_dump($data);

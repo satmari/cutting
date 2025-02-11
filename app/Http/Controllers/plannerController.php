@@ -2388,16 +2388,25 @@ class plannerController extends Controller {
 
 
 			   			// multiple selection for Fiorano
-			   			// for Gordon is fine
-						if (!isset($find_in_pro_skedas[0])) {
-			   				dd('can not find pro for ths mattress');
-			   			}  else {
-			   				// dd($find_in_pro_skedas);
-				   			$pro_id = $find_in_pro_skedas[0]->pro_id;
-				   			$pro = $find_in_pro_skedas[0]->pro;
-				   			array_push($mattress_pro_array, $style_size.'#'.$pro_id.'#'.$pro);
-						} 	
-					
+			   			// for Gordon is fine but not for Fiorano
+						// if (!isset($find_in_pro_skedas[0])) {
+			   			//		dd('can not find pro for ths mattress');
+			   			// }  else {
+			   			//		// dd($find_in_pro_skedas);
+				  		//		$pro_id = $find_in_pro_skedas[0]->pro_id;
+				  		//		$pro = $find_in_pro_skedas[0]->pro;
+				  		//		array_push($mattress_pro_array, $style_size.'#'.$pro_id.'#'.$pro);
+						// }	
+
+						// If no records found, stop execution
+					    if (empty($find_in_pro_skedas)) {
+					        dd('Cannot find pro for this mattress');
+					    }
+
+					    // Loop through all found results and add them to the array
+					    foreach ($find_in_pro_skedas as $pro_data) {
+					        $mattress_pro_array[] = $style_size . '#' . $pro_data->pro_id . '#' . $pro_data->pro;
+					    }
 		   				   		
 		   			}
 			   		$marker_pcs_per_layer = array_filter($marker_pcs_per_layer);
@@ -10310,7 +10319,8 @@ class plannerController extends Controller {
 					// someting already reserved for this material and bagno
 					// set Still in Use
 					// dd('someting already reserved for this material and bagno');
-					$skeda_status = 'Still in Use';
+					// $skeda_status = 'Still in Use';
+					$skeda_status = 'Completed';
 				} else {
 					// nothnig reserved
 					// set Leftover to Check
