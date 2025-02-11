@@ -2330,8 +2330,6 @@ class plannerController extends Controller {
 			if (!isset($pro_m[0]->id)) {
 				// dd('no mattress_pro');
 
-				
-
 				$new_marker_reqs = marker_line::where('marker_name', $selected_marker)->get();
 				$new_marker_reqSizes = [];
 				foreach ($new_marker_reqs as $record) {
