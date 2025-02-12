@@ -467,7 +467,7 @@ class importController extends Controller {
 				if (substr($st[0],0,1) == 1) {
 					$style = $st[0];
 				} else {
-					$style = $st[0];
+					$style = $st[1];
 				}
 
 				if ($style == 'F') {
