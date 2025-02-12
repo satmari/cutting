@@ -444,19 +444,52 @@ class importController extends Controller {
 
    			// dd($model);
 
-   			$exist = strpos($variant, "_");
+   			// $exist = strpos($variant, "_");
    			// dd($exist);
 
-   			$st = explode('_', $model);
-			if (isset($st[1])) {
-				$style = $st[1];
-			} else {
-				$style = "";
-			}
+   			// dd(config('app.global_variable'));
 
-			if ($style == 'F') {
-				$style = $st[2];
-			}
+   			if (config('app.global_variable') == 'gordon') {
+   				$st = explode('_', $model);
+
+				if (isset($st[1])) {
+					$style = $st[1];
+				} else {
+					$style = "";
+				}
+
+				if ($style == 'F') {
+					$style = $st[2];
+				}
+   			} else if (config('app.global_variable') == 'fiorano' {
+   				$st = explode('_', $model);
+
+				if (substr($st[0],0,1) == 1) {
+					$style = $st[0];
+				} else {
+					$style = $st[0];
+				}
+
+				if ($style == 'F') {
+					$style = $st[2];
+				}
+
+			} else {
+
+				$st = explode('_', $model);
+
+				if (isset($st[1])) {
+					$style = $st[1];
+				} else {
+					$style = "";
+				}
+
+				if ($style == 'F') {
+					$style = $st[2];
+				}
+   			}
+   			// dd($style);
+   			
 			// print_r("Style: ".$style);
 			// print_r('<br>');
 
@@ -510,8 +543,11 @@ class importController extends Controller {
 
 	   			// dd($model);
 
-	   			$exist = strpos($variant, "_");
+	   			// $exist = strpos($variant, "_");
 	   			// dd($exist);
+
+
+	   			dd(config('app.global_variable'));
 
 	   			$st = explode('_', $model);
 				// dd($ex[1]);
