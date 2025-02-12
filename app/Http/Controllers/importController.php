@@ -547,15 +547,46 @@ class importController extends Controller {
 	   			// dd($exist);
 
 
-	   			dd(config('app.global_variable'));
+	   			if (config('app.global_variable') == 'gordon') {
+	   				$st = explode('_', $model);
 
-	   			$st = explode('_', $model);
-				// dd($ex[1]);
-				$style = $st[1];
+					if (isset($st[1])) {
+						$style = $st[1];
+					} else {
+						$style = "";
+					}
 
-				if ($style == 'F') {
-					$style = $st[2];
-				}
+					if ($style == 'F') {
+						$style = $st[2];
+					}
+	   			} else if (config('app.global_variable') == 'fiorano') {
+	   				$st = explode('_', $model);
+
+					if (substr($st[0],0,1) == 1) {
+						$style = $st[0];
+					} else {
+						$style = $st[1];
+					}
+
+					if ($style == 'F') {
+						$style = $st[2];
+					}
+
+				} else {
+
+					$st = explode('_', $model);
+
+					if (isset($st[1])) {
+						$style = $st[1];
+					} else {
+						$style = "";
+					}
+
+					if ($style == 'F') {
+						$style = $st[2];
+					}
+	   			}
+	   			// dd($style);
 				// print_r("Style: ".$style);
 				// print_r('<br>');
 
