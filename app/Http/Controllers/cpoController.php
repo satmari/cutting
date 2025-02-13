@@ -84,8 +84,8 @@ class cpoController extends Controller {
 			      (SELECT [mandatory_to_ins] FROM [cutting].[dbo].[mattress_details] as d
 				  JOIN [cutting].[dbo].[mattresses] as m ON m.id = d.mattress_id
 				  WHERE m.g_bin = p.g_bin) as [mandatory_to_ins]
-			FROM [cutting].[dbo].[parts] as p
-			LEFT JOIN [cutting].[dbo].[part_g_bin_statuses] as s ON s.[g_bin] = p.[g_bin]
+			FROM [parts] as p
+			LEFT JOIN [part_g_bin_statuses] as s ON s.[g_bin] = p.[g_bin]
 			
 			WHERE (s.[status] != 'Ready for production' AND s.[status] != 'Not checked') OR s.[status] is NULL
 			GROUP BY	p.[g_bin],
@@ -158,8 +158,8 @@ class cpoController extends Controller {
 				      (SELECT [mandatory_to_ins] FROM [cutting].[dbo].[mattress_details] as d
 				  		JOIN [cutting].[dbo].[mattresses] as m ON m.id = d.mattress_id
 				  		WHERE m.g_bin = p.g_bin) as [mandatory_to_ins]
-				FROM [cutting].[dbo].[parts] as p
-				LEFT JOIN [cutting].[dbo].[part_g_bin_statuses] as s ON s.[g_bin] = p.[g_bin]
+				FROM [parts] as p
+				LEFT JOIN [part_g_bin_statuses] as s ON s.[g_bin] = p.[g_bin]
 				WHERE s.[status] = 'Ready for production' OR s.[status] = 'Not checked'
 				GROUP BY	p.[g_bin],
 							p.[style],
