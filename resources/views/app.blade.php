@@ -5,9 +5,9 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	@if (config('app.global_variable') == 'gordon')
-	<title>Cutting App - Gordon1</title>
+	<title>Cutting App - Gordon</title>
 	@elseif (config('app.global_variable') == 'fiorano')
-	<title>Cutting App - Fiorano2</title>
+	<title>Cutting App - Fiorano</title>
 	@else 
 	<title>Cutting App - Adrianatex</title>
 	@endif

@@ -85,7 +85,7 @@
                         <tr><td>TPA number</td><td><b>{{ $tpa_number }} </b></td></tr>
                         </table>
                         
-                        @if (isset($mattress_pro_array))
+                        @if (isset($mattress_pro_array) AND ($skeda_item_type != 'MT') )
                           <h4>Mattress ratio by PRO</h4>
                           <input type="hidden" id="mattressProArrayInput" name="mattressProArray" value="">
                           <input type="hidden" id="markerPcsPerLayerInput" name="markerPcsPerLayer" value="">
@@ -232,7 +232,7 @@
                         
                         <hr>
                         <br>
-                        @if (isset($mattress_pro_array))
+                        @if (isset($mattress_pro_array) AND ($skeda_item_type != 'MT'))
                             {!! Form::submit('Save', ['id'=>'submit-button','class' => 'btn  btn-success center-block','disabled'=>'disabled']) !!}
                         @else
                             {!! Form::submit('Save', ['id'=>'submit-button','class' => 'btn  btn-success center-block']) !!}
@@ -240,14 +240,11 @@
                         <br>
                         @include('errors.list')
 
-                        @if (isset($mattress_pro_array))
-                            <!-- {{ json_encode(array_values($mattress_pro_array)) }} <br>
-                            {{ json_encode(array_values($marker_pcs_per_layer)) }} -->
-                        @endif
+                       
 
                 {!! Form::close() !!}
 
-@if (isset($mattress_pro_array))
+@if (isset($mattress_pro_array) AND ($skeda_item_type != 'MT'))
     <script>
         
         const mattressProArray = <?php echo json_encode(array_values($mattress_pro_array)); ?>;
