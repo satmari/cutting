@@ -26,7 +26,13 @@
 						<div class="panel-body">
                         <p>Choose printer: <span style="color:red;">*</span></p>
                             
-                            {!! Form::select('printer', array('Cutting A4'=>'Cutting A4','Magacin A4'=>'Magacin A4','Workstudy A4'=>'Workstudy A4','IT'=>'IT'), '',array('class' => 'form-control')) !!} 
+                            @if (config('app.global_variable') == 'gordon')
+								{!! Form::select('printer', array('Cutting A4'=>'Cutting A4','Magacin A4'=>'Magacin A4','Workstudy A4'=>'Workstudy A4','IT'=>'IT'), '',array('class' => 'form-control')) !!} 
+							@elseif (config('app.global_variable') == 'fiorano')
+								{!! Form::select('printer', array('SBR-PRT05'=>'SBR-PRT05','SBR-PRT10'=>'SBR-PRT10'), '',array('class' => 'form-control')) !!} 
+							@else
+								
+							@endif
                         </div>
 						<hr>
 						{!! Form::submit('Print nalog', ['class' => 'btn  btn-success center-block']) !!}
