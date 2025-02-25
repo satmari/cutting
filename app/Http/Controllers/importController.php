@@ -562,7 +562,7 @@ class importController extends Controller {
 	   			} else if (config('app.global_variable') == 'fiorano') {
 	   				$st = explode('_', $model);
 
-					if (substr($st[0],0,1) == 1) {
+					if ((substr($st[0],0,1) == 1) OR (substr($st[0],0,1) == 0)){
 						$style = $st[0];
 					} else {
 						$style = $st[1];
