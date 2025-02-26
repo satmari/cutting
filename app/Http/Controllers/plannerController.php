@@ -7806,18 +7806,26 @@ class plannerController extends Controller {
 		$material = $data[0]->material;
 
 		$fabric = trim(substr($material, 0,11));
-		$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
-			 FROM [settings].[dbo].[fabrics]
-		  WHERE [fabric] = '".$fabric."' "));
-		// dd($fabric_data);
 
-		if(isset($fabric_data[0]->sp_parameter)) {
-			$spreading_profile = $fabric_data[0]->sp_parameter;
+		if (config('app.global_variable') == 'gordon') {
+   			$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
+				 FROM [settings].[dbo].[fabrics]
+			  WHERE [fabric] = '".$fabric."' "));
+			// dd($fabric_data);
+
+			if(isset($fabric_data[0]->sp_parameter)) {
+				$spreading_profile = $fabric_data[0]->sp_parameter;
+			} else {
+				$spreading_profile = '';
+			}
+
+   		} else if (config('app.global_variable') == 'fiorano') {
+   			$spreading_profile = '';
+
 		} else {
 			$spreading_profile = '';
 		}
 		// dd('spreading profile: '.$spreading_profile);
-
 
 		$dye_lot = $data[0]->dye_lot;
 		$color_desc = $data[0]->color_desc;
@@ -8215,14 +8223,21 @@ class plannerController extends Controller {
 		$mattress = $data[0]->mattress;
 		$material = $data[0]->material;
 
-		$fabric = trim(substr($material, 0,11));
-		$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
-			 FROM [settings].[dbo].[fabrics]
-		  WHERE [fabric] = '".$fabric."' "));
-		// dd($fabric_data);
+		if (config('app.global_variable') == 'gordon') {
+   			$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
+				 FROM [settings].[dbo].[fabrics]
+			  WHERE [fabric] = '".$fabric."' "));
+			// dd($fabric_data);
 
-		if(isset($fabric_data[0]->sp_parameter)) {
-			$spreading_profile = $fabric_data[0]->sp_parameter;
+			if(isset($fabric_data[0]->sp_parameter)) {
+				$spreading_profile = $fabric_data[0]->sp_parameter;
+			} else {
+				$spreading_profile = '';
+			}
+
+   		} else if (config('app.global_variable') == 'fiorano') {
+   			$spreading_profile = '';
+
 		} else {
 			$spreading_profile = '';
 		}
@@ -8486,13 +8501,22 @@ class plannerController extends Controller {
 				$g_bin = $data[0]->g_bin;
 				$material = $data[0]->material;
 				$fabric = trim(substr($material, 0,11));
-				$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
-					 FROM [settings].[dbo].[fabrics]
-				  WHERE [fabric] = '".$fabric."' "));
-				// dd($fabric_data);
 
-				if(isset($fabric_data[0]->sp_parameter)) {
-					$spreading_profile = $fabric_data[0]->sp_parameter;
+				if (config('app.global_variable') == 'gordon') {
+		   			$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
+						 FROM [settings].[dbo].[fabrics]
+					  WHERE [fabric] = '".$fabric."' "));
+					// dd($fabric_data);
+
+					if(isset($fabric_data[0]->sp_parameter)) {
+						$spreading_profile = $fabric_data[0]->sp_parameter;
+					} else {
+						$spreading_profile = '';
+					}
+
+		   		} else if (config('app.global_variable') == 'fiorano') {
+		   			$spreading_profile = '';
+
 				} else {
 					$spreading_profile = '';
 				}
@@ -8973,15 +8997,26 @@ class plannerController extends Controller {
 					${"mattress_{$x}"} = $data[0]->mattress;
 					${"material_{$x}"} = $data[0]->material;
 					$fabric = trim(substr(${"material_{$x}"}, 0,11));
-					$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
-						 FROM [settings].[dbo].[fabrics]
-					  WHERE [fabric] = '".$fabric."' "));
-					// dd($fabric_data);
-					if(isset($fabric_data[0]->sp_parameter)) {
-						${"spreading_profile_{$x}"} = $fabric_data[0]->sp_parameter;
+
+					if (config('app.global_variable') == 'gordon') {
+			   			$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
+							 FROM [settings].[dbo].[fabrics]
+						  WHERE [fabric] = '".$fabric."' "));
+						// dd($fabric_data);
+						if(isset($fabric_data[0]->sp_parameter)) {
+							${"spreading_profile_{$x}"} = $fabric_data[0]->sp_parameter;
+						} else {
+							${"spreading_profile_{$x}"} = '';
+						}
+
+			   		} else if (config('app.global_variable') == 'fiorano') {
+			   			${"spreading_profile_{$x}"} = '';
+
 					} else {
 						${"spreading_profile_{$x}"} = '';
 					}
+					
+					
 					
 					${"dye_lot_{$x}"} = '0-O';
 					${"color_desc_{$x}"} = $data[0]->color_desc;
@@ -9239,14 +9274,22 @@ class plannerController extends Controller {
 				${"id_{$x}"} = $data[0]->id;
 				${"mattress_{$x}"} = $data[0]->mattress;
 				${"material_{$x}"} = $data[0]->material;
-
 				$fabric = trim(substr(${"material_{$x}"}, 0,11));
-				$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
-					 FROM [settings].[dbo].[fabrics]
-				  WHERE [fabric] = '".$fabric."' "));
-				// dd($fabric_data);
-				if(isset($fabric_data[0]->sp_parameter)) {
-					${"spreading_profile_{$x}"} = $fabric_data[0]->sp_parameter;
+				
+				if (config('app.global_variable') == 'gordon') {
+		   			$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
+						 FROM [settings].[dbo].[fabrics]
+					  WHERE [fabric] = '".$fabric."' "));
+					// dd($fabric_data);
+					if(isset($fabric_data[0]->sp_parameter)) {
+						${"spreading_profile_{$x}"} = $fabric_data[0]->sp_parameter;
+					} else {
+						${"spreading_profile_{$x}"} = '';
+					}
+
+		   		} else if (config('app.global_variable') == 'fiorano') {
+		   			${"spreading_profile_{$x}"} = '';
+
 				} else {
 					${"spreading_profile_{$x}"} = '';
 				}
