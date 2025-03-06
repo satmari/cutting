@@ -7804,7 +7804,6 @@ class plannerController extends Controller {
 		$mattress = $data[0]->mattress;
 		$g_bin = $data[0]->g_bin;
 		$material = $data[0]->material;
-
 		$fabric = trim(substr($material, 0,11));
 
 		if (config('app.global_variable') == 'gordon') {
@@ -8222,6 +8221,7 @@ class plannerController extends Controller {
 		$id = $data[0]->id;
 		$mattress = $data[0]->mattress;
 		$material = $data[0]->material;
+		$fabric = trim(substr($material, 0,11));
 
 		if (config('app.global_variable') == 'gordon') {
    			$fabric_data = DB::connection('sqlsrv5')->select(DB::raw("SELECT [sp_parameter]
