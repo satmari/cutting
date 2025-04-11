@@ -19,7 +19,6 @@
 					<div class="panel-body">
 						{!! Form::submit('Complete request', ['class' => 'btn btn-success center-block']) !!}
 					</div>
-
 					@include('errors.list')
 
 				{!! Form::close() !!}

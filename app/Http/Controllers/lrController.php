@@ -297,7 +297,7 @@ class lrController extends Controller {
 		} else {
 			$last_used = 'not used';
 		}
-
+		
 		return view('lr.o_roll_print', compact('last_used'));
 	}
 

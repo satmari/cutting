@@ -647,7 +647,8 @@ class requestController extends Controller {
 
 	public function req_cut_part_table() {
 
-		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM req_cut_parts WHERE status = 'Pending' ORDER BY created_at asc"));
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM req_cut_parts WHERE (status = 'Pending' OR
+		 status = 'Partially Delivered') ORDER BY created_at asc"));
 		return view('requests.req_cut_part_table', compact('data'));
 	}
 
@@ -660,7 +661,12 @@ class requestController extends Controller {
 	
 	public function edit_req_cut_part_status($id) {
 		// dd($id);
-		return view('requests.req_cut_part_status', compact('id'));
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT status, comment_cut FROM req_cut_parts WHERE id = '".$id."' "));
+		// dd($data[0]->status);
+		$status = $data[0]->status;
+		$comment_cut = $data[0]->comment_cut;
+
+		return view('requests.req_cut_part_status', compact('id','status','comment_cut'));
 	}
 
 	public function req_cut_part_status(Request $request) {	
@@ -668,13 +674,39 @@ class requestController extends Controller {
 		$this->validate($request, ['id'=>'required']);
 		$input = $request->all();
 		$id = $input['id'];
-		// $comment = $input['comment'];
+		
+		$comment_cut = $input['comment'];
 
 		try {
 			$table = req_cut_part::findOrFail($id);
 
 			$table->status = "Completed";
-			// $table->comment = $comment;
+			$table->comment_cut = $comment_cut;
+			$table->save();
+		}
+		catch (\Illuminate\Database\QueryException $e) {
+			$msg = "Problem to save"; 
+			return view('requests.error', compact('msg'));
+		}
+
+		return Redirect::to('req_cut_part_table/');
+	}
+
+	public function req_cut_part_status_p(Request $request) {	
+
+		$this->validate($request, ['id'=>'required']);
+		$input = $request->all();
+		// dd($input);
+
+		$id = $input['id'];
+		
+		$comment_cut = $input['comment'];
+
+		try {
+			$table = req_cut_part::findOrFail($id);
+
+			$table->status = "Partially Delivered";
+			$table->comment_cut = $comment_cut;
 			$table->save();
 		}
 		catch (\Illuminate\Database\QueryException $e) {
@@ -691,13 +723,13 @@ class requestController extends Controller {
 		$input = $request->all();
 		$id = $input['id'];
 		
-		// $comment = $input['comment'];
+		$comment_cut = $input['comment'];
 
 		try {
 			$table = req_cut_part::findOrFail($id);
 
 			$table->status = "Canceled";
-			// $table->comment = $comment;
+			$table->comment_cut = $comment_cut;
 			$table->save();
 		}
 		catch (\Illuminate\Database\QueryException $e) {

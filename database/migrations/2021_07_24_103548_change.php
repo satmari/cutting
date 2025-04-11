@@ -88,6 +88,8 @@ class Change extends Migration {
 			// $table->float('cutter_shrink_x')->nullable();
 			// $table->float('cutter_shrink_y')->nullable();
 
+			// $table->boolean('last_mattress')->default(0);
+
 		});
 
 		Schema::table('paspul_stocks', function($table)
@@ -200,6 +202,13 @@ class Change extends Migration {
 			// OR
             // ALTER TABLE [cutting].[dbo].[paspul_lines]
 			// ADD CONSTRAINT UQ_id_status UNIQUE ([id_status]);
+            
+        });
+
+        Schema::table('req_cut_parts', function($table) 
+		{
+            // $table->string('comment_cut')->nullable(); 
+
             
         });
 

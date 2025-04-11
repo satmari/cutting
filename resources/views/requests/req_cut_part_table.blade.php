@@ -76,7 +76,8 @@
                             <th><b>Cut part</b></th>
                             <th>Image</th>
                             <th data-sortable="true">Status</th>
-                            <th>Comment</th>
+                            <th>Line Comment</th>
+                            <th>Cut Comment</th>
                             <th data-sortable="true">Created</th>
                             <th data-sortable="true">Updated</th>
                             <th></th>
@@ -99,6 +100,7 @@
                             <td><a href="http://172.27.161.173/settings/public/storage/StyleImages/{{ $req->image }}" target="_blank" onClick="javascript:window.open('http://172.27.161.173/settings/public/storage/StyleImages/{{ $req->image }}','Windows','width=650,height=350,toolbar=no,menubar=no,scrollbars=yes,resizable=yes,location=no,directories=no,status=no');return false" )>show image</a> </td>
                             <td>{{ $req->status }}</td>
                             <td>{{ $req->comment }}</td>
+                            <td>{{ $req->comment_cut }}</td>
                             <td>{{ substr($req->created_at,0,16) }}</td>
                             <td>{{ substr($req->updated_at,0,16) }}</td>
                             

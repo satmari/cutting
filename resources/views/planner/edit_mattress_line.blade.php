@@ -66,6 +66,8 @@
                             @if ($location == 'MM1')
                                 <tr><td>Layer limit</td><td><b>{{ $layer_limit }} </b></td></tr>
                             @endif
+                            <tr><td>Cutter shrink X</td><td><b>{{ $cutter_shrink_x }} </b></td></tr>
+                            <tr><td>Cutter shrink Y</td><td><b>{{ $cutter_shrink_y }} </b></td></tr>
                             <tr><td></td><td><a href="{{url('/correct_location/'.$id) }}" class="btn btn-danger btn-xs center-blo ck">Correct location</a></td></tr>
                             </table>
 

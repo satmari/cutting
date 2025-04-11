@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <div class="text-center col-md-8 col-md-offset-2">
+        <div class="text-center col-md-10 col-md-offset-1">
             <div class="panel panel-default">
                 <div class="panel-heading"><b><big>Cut part </big></b> table requests from line <b><big>{{$line}}</big></b> from last 60 days</div>
                 <br>
@@ -52,7 +52,8 @@
                             <th><b>Qty</b></th>
                             <th><b>Cut part</b></th>
                             <th>Image</th>
-                            <th>Comment</th>
+                            <th>line Comment</th>
+                            <th>Cut Comment</th>
                             <th data-sortable="true">Status</th>
                             <th data-sortable="true">Updated</th>
                             <th data-sortable="true">Created</th>
@@ -72,6 +73,7 @@
                             <td><b>{{ $req->part }}</b></td>
                             <td><a href="http://172.27.161.173/settings/public/storage/StyleImages/{{ $req->image }}" target="_blank" onClick="javascript:window.open('http://172.27.161.173/settings/public/storage/StyleImages/{{ $req->image }}','Windows','width=650,height=350,toolbar=no,menubar=no,scrollbars=yes,resizable=yes,location=no,directories=no,status=no');return false" )>show image</a> </td>
                             <td>{{ $req->comment }}</td>
+                            <td>{{ $req->comment_cut }}</td>
                             <td>{{ $req->status }}</td>
                             <td>{{ substr($req->updated_at,0,16) }}</td>
                             <td>{{ substr($req->created_at,0,16) }}</td>

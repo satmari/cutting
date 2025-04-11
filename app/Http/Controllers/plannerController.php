@@ -3808,6 +3808,8 @@ class plannerController extends Controller {
 		      ,m2.[layer_limit]
 		      ,m2.[req_time]
 		      ,m2.[mandatory_to_ins]
+		      ,m2.[cutter_shrink_x]
+      		  ,m2.[cutter_shrink_y]
 		      --,'|'
 		      ,m3.[marker_id]
 		      ,m3.[marker_name]
@@ -3913,6 +3915,8 @@ class plannerController extends Controller {
 		$priority = $data[0]->priority;
 		$call_shift_manager = $data[0]->call_shift_manager;
 		$mandatory_to_ins = $data[0]->mandatory_to_ins;
+		$cutter_shrink_x = $data[0]->cutter_shrink_x;
+		$cutter_shrink_y = $data[0]->cutter_shrink_y;
 		// $call_shift_manager = 1;
 		$test_marker = $data[0]->test_marker;
 		$tpp_mat_keep_wastage = $data[0]->tpp_mat_keep_wastage;
@@ -3930,10 +3934,10 @@ class plannerController extends Controller {
 			$data2 = DB::connection('sqlsrv')->select(DB::raw("SELECT [o_roll],[no_of_joinings],[g_bin]
 				FROM  [o_rolls]
 				WHERE mattress_id_new = '".$id."' "));
-			return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','data2','layer_limit','cut_operator','cut_date','sp_operator','sp_date','req_time','mandatory_to_ins'));
+			return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','data2','layer_limit','cut_operator','cut_date','sp_operator','sp_date','req_time','mandatory_to_ins','cutter_shrink_x','cutter_shrink_y'));
 		}
 
-		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','cut_operator','cut_date','sp_operator','sp_date','req_time','layer_limit','mandatory_to_ins'));
+		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','cut_operator','cut_date','sp_operator','sp_date','req_time','layer_limit','mandatory_to_ins','cutter_shrink_x','cutter_shrink_y'));
 	}
 
 	public function correct_location($id) {

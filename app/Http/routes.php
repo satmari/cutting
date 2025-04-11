@@ -99,6 +99,7 @@ Route::post('/req_padprint_status1', 'requestController@req_padprint_status1');
 Route::get('/req_cut_part_status/{id}', 'requestController@edit_req_cut_part_status');
 Route::post('/req_cut_part_status', 'requestController@req_cut_part_status');
 Route::post('/req_cut_part_status_c', 'requestController@req_cut_part_status_c');
+Route::post('/req_cut_part_status_p', 'requestController@req_cut_part_status_p');
 // Route::post('/req_cut_part_status1', 'requestController@req_cut_part_status1');
 
 Route::get('req_lost', 'requestController@req_lost');

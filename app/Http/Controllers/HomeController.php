@@ -10,6 +10,14 @@ use Illuminate\Http\Request;
 //use Gbrock\Table\Facades\Table;
 use Illuminate\Support\Facades\Redirect;
 
+use App\User;
+use Bican\Roles\Models\Role;
+use Bican\Roles\Models\Permission;
+use Auth;
+
+use Session;
+use Validator;
+
 use App\mattress_details;
 use App\mattress_phases;
 use App\mattress_eff;
@@ -20,13 +28,6 @@ use App\po;
 
 use DB;
 
-use App\User;
-use Bican\Roles\Models\Role;
-use Bican\Roles\Models\Permission;
-use Auth;
-
-use Session;
-use Validator;
 
 class HomeController extends Controller {
 
@@ -279,7 +280,6 @@ class HomeController extends Controller {
 		// $final = $jedan.'-'.$dva;
 		// dd($final);
 	}
-
 
 	public function tombola() {
 		return view('tombola');	

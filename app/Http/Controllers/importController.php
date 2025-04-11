@@ -3482,7 +3482,7 @@ class importController extends Controller {
 
                 	if (isset($check_if_exist[0]->id)) {
 						
-						echo "Error: line with document_no: ".$document_no." , material: ".$material." , bagno: ".$bagno." ,preforigin: ".$preforigin." ";
+						echo "Error (line already exist): line with document_no: ".$document_no." , material: ".$material." , bagno: ".$bagno." ,preforigin: ".$preforigin." ";
 						echo "<br>";
 						continue;
 					} 
