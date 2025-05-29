@@ -558,6 +558,19 @@ html>body #sortable1 #sortable2 #sortable3 #sortable4 #sortable5 li {
     border-radius: 5px;
 }
 
+.last_mattress {
+   color: #ffff66; /* Soft yellow */
+  font-size: 4rem;
+  text-shadow:
+    0 0 15px #ffff66,
+    0 0 20px #ffff66,
+    0 0 35px #ffeb3b,
+    0 0 30px #fdd835,
+    0 0 40px #fbc02d;
+
+}
+
+
 .tableFixHead          { overflow: auto; height: 100px; }
 .tableFixHead thead th { position: sticky; top: 0; z-index: 1; }
 
