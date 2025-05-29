@@ -37,7 +37,7 @@
 
 					<div class="panel-body">	
 						@if (($status == 'TO_CUT') OR ($status == 'ON_CUT'))
-							<a href="{{ url('change_all_marker_request/'.$id) }}" class="btn btn-warning cen ter-block" >Change marker request (test)</a>
+							<a href="{{ url('change_all_marker_request/'.$id) }}" class="btn btn-warning cen ter-block" >Change marker request</a>
 						@endif
 					</div>
 					<br>

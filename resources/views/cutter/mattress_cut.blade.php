@@ -92,6 +92,7 @@
 				</div>
 				<br>
 				{!! Form::submit('Confirm cut', ['class' => 'btn  btn-danger center-block']) !!}
+				{!! Form::close() !!}
 
 	            @if (isset($success))
 				<div class="alert alert-success" role="alert">

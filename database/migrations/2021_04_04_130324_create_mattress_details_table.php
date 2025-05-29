@@ -58,6 +58,8 @@ class CreateMattressDetailsTable extends Migration {
 			$table->float('cutter_shrink_x')->nullable();
 			$table->float('cutter_shrink_y')->nullable();
 
+			$table->boolean('last_mattress')->default(0);
+
 			$table->timestamps();
 		});
 	}

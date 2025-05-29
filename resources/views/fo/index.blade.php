@@ -54,6 +54,7 @@
 			                            <th>Status</th>
 			                            <th>Updated</th>
 			                            <th></th>
+			                            <th></th>
 			                    	</tr>
 			                    </thead>
 			                    <tbody class="connectedSortable_table searchable" 
@@ -86,13 +87,23 @@
 			                            	<td><span style="color:red"><big>{{ $req->status }}</big></span></td>
 			                            @endif
 			                            <td>{{ substr($req->up,0,16) }}</td>
-			                            <td>
-			                            	@if ($req->status == 'CREATED')
-			                            		<a href="{{ url('request_material_accept/'.$req->id) }}" class="btn btn-warning btn-x s center-block">Accept</a>
-			                            	@else
-			                            		<a href="{{ url('request_material_deliver/'.$req->id) }}" class="btn btn-danger btn-x s center-block">Deliver</a>
-			                            	@endif
-			                            </td>
+			                            
+		                            	@if ($req->status == 'CREATED')
+		                            	<td>
+		                            		<a href="{{ url('request_material_accept/'.$req->id) }}" class="btn btn-success btn-x s center-block">Accept</a>
+		                            	</td>
+		                            	<td>
+		                            		<a href="{{ url('request_material_cancel/'.$req->id) }}" class="btn btn-danger btn-x s center-block" disabled>Cancel</a>
+		                            	</td>
+		                            	@elseif(($req->status == 'ACCEPTED') OR ($req->status == 'QC') OR ($req->status == 'RELAX'))
+		                            	<td>
+		                            		<a href="{{ url('request_material_deliver/'.$req->id) }}" class="btn btn-warning btn-x s center-block">Deliver</a>
+		                            	</td>
+										<td>
+		                            		<a href="{{ url('request_material_cancel/'.$req->id) }}" class="btn btn-danger btn-x s center-block" >Cancel</a>
+		                            	</td>
+		                            	@endif
+			                            
 			                        </tr>
 			                    @endforeach
 			                    </tbody>

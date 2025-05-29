@@ -1830,7 +1830,7 @@
 				@foreach ($sp0_req_time as  $key => $sp0_req_time_line)
 					<ul style="padding: 0;margin: 0;list-style: none;">
 						<li> 
-								@if ($key == 7) Test
+							@if ($key == 7) Test
 								@elseif ($key == 6) 3rd shift
 			        	    	@elseif ($key == 5) 2nd shift
 			        	    	@elseif ($key == 4) 1st shift
@@ -1859,6 +1859,11 @@
             	    @elseif ($req0->priority == 3) top_priority
         	    	@elseif ($req0->priority == 2) high_priority
         	    	@endif
+
+        	    	@if ($req0->last_mattress == '1')
+        	    		last_mattress
+        	    	@endif
+
             	    	" id="SP-{{ $req0->id }}" data-html="true" 
             	    	title="
             	    	{{$req0->mattress}}<br />
@@ -1951,6 +1956,9 @@
             	    @elseif ($req1->priority == 4) fs_priority
             	    @elseif ($req1->priority == 3) top_priority
         	    	@elseif ($req1->priority == 2) high_priority
+        	    	@endif
+        	    	@if ($req1->last_mattress == '1')
+        	    		last_mattress
         	    	@endif
             	    	" id="SP-{{ $req1->id }}" data-html="true" 
             	    	title="
@@ -2045,6 +2053,9 @@
             	    @elseif ($req2->priority == 3) top_priority
         	    	@elseif ($req2->priority == 2) high_priority
         	    	@endif
+        	    	@if ($req2->last_mattress == '1')
+        	    		last_mattress
+        	    	@endif
         	    		" id="SP-{{ $req2->id }}" data-html="true"
             	    	title="
             	    	{{$req2->mattress}}<br />
@@ -2138,6 +2149,9 @@
             	    @elseif ($req3->priority == 3) top_priority
         	    	@elseif ($req3->priority == 2) high_priority
         	    	@endif
+        	    	@if ($req3->last_mattress == '1')
+        	    		last_mattress
+        	    	@endif
             	    	" id="SP-{{ $req3->id }}" data-html="true"
             	    	title="
             	    	{{$req3->mattress}}<br />
@@ -2230,6 +2244,9 @@
             	    @elseif ($req4->priority == 3) top_priority
         	    	@elseif ($req4->priority == 2) high_priority
         	    	@endif
+        	    	@if ($req4->last_mattress == '1')
+        	    		last_mattress
+        	    	@endif
             	    	" id="SP-{{ $req4->id }}" data-html="true"
             	    	title="
             	    	{{$req4->mattress}}<br /> 
@@ -2321,6 +2338,9 @@
             	    @elseif ($req5->priority == 4) fs_priority
             	    @elseif ($req5->priority == 3) top_priority
         	    	@elseif ($req5->priority == 2) high_priority
+        	    	@endif
+        	    	@if ($req5->last_mattress == '1')
+        	    		last_mattress
         	    	@endif
             	    	" id="SP-{{ $req5->id }}" data-html="true" 
             	    	title="
@@ -2460,6 +2480,9 @@
             	    @elseif ($req7->priority == 3) top_priority
         	    	@elseif ($req7->priority == 2) high_priority
         	    	@endif
+        	    	@if ($req7->last_mattress == '1')
+        	    		last_mattress
+        	    	@endif
             	    	" id="SP-{{ $req7->id }}" data-html="true"
             	    	title="
             	    	{{$req7->mattress}}<br /> 
@@ -2546,6 +2569,9 @@
             	    @elseif ($req8->priority == 4) fs_priority
             	    @elseif ($req8->priority == 3) top_priority
         	    	@elseif ($req8->priority == 2) high_priority
+        	    	@endif
+        	    	@if ($req8->last_mattress == '1')
+        	    		last_mattress
         	    	@endif
             	    	" id="SP-{{ $req8->id }}" data-html="true"
             	    	title="

@@ -54,7 +54,7 @@
 				@if (config('app.global_variable') == 'gordon')
 					@if(Auth::check() AND (Auth::user()->level() >= 5 OR Auth::user()->level() == 3 OR Auth::user()->level() == 1 OR Auth::user()->level() == 20))
 					@else
-					<a class="navbar-brand" href="http://172.27.161.171/preparation"><b>Preparation</b></a>
+					<a class="navbar-brand" href="http://172.27.161.193/preparation"><b>Preparation</b></a>
 					<a class="navbar-brand" href="#">|</a>
 					<a class="navbar-brand" href="http://172.27.161.171/trebovanje"><b>Trebovanje</b></a>
 					<a class="navbar-brand" href="#">|</a>
@@ -162,6 +162,7 @@
 									<li role="separator" class="divider"></li>
 									<li><a href="{{ url('paspul_bin') }}">Paspul bin (excel)</a></li>
 									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('mat_con_file') }}">MATCON file</a></li>
 									<li><a href="{{ url('consumption_sap') }}">Consumption SAP</a></li>
 									<li role="separator" class="divider"></li>
 									<li><a href="{{ url('skeda_comments') }}">Skeda comments</a></li>
@@ -228,6 +229,7 @@
 									<li><a href="{{ url('paspul_bin') }}">Paspul bin (excel)</a></li>
 									<li><a href="{{ url('paspul_locations') }}">Paspul locations</a></li>
 									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('mat_con_file') }}">MATCON file</a></li>
 									<li><a href="{{ url('consumption_sap') }}">Consumption SAP</a></li>
 									<li role="separator" class="divider"></li>
 									<li><a href="{{ url('skeda_comments') }}">Skeda comments</a></li>
@@ -256,7 +258,11 @@
 								<ul class="dropdown-menu" role="menu">
 									<li><a href="{{ url('recap_by_skeda_mattress') }}"><b><sapn style="color: gray">Mattresses by skeda</span></b></a></li>
 									<li><a href="{{ url('recap_by_g_bin_mattress') }}"><b><sapn style="color: orange">Mattresses by g_bin</span></b></a></li>
+									<li><a href="{{ url('recap_by_sku_sp') }}"><b><sapn style="color: green;">Mattresses by style and color on all SP</span></b></a></li>
+									<li><a href="{{ url('recap_by_sku_sp0') }}"><b><sapn style="color: green;">Mattresses by style and color on SP0</span></b></a></li>
+									<li role="separator" class="divider"></li>
 									<li><a href="{{ url('recap_by_skeda_paspul') }}"><b><sapn style="color: blue;">Paspuls by skeda</span></b></a></li>
+									
 								</ul>
 							</li>
 							<li class="dropdown">

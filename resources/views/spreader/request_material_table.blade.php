@@ -74,6 +74,13 @@
 		                            	<td><span style="color:green"><big>{{ $req->status }}</big></span></td>
 		                            @elseif ($req->status == 'ACCEPTED')
 		                            	<td><span style="color:blue"><big>{{ $req->status }}</big></span></td>
+		                            @elseif ($req->status == 'CANCELED')
+		                            	<td>
+		                            		<span style="color:purple"><big><b>{{ $req->status }} !!!</b></big></span>
+		                            		<br>
+		                            		<span><i>{{ $req->comment_wh }}</i></span>
+		                            	</td>
+
 		                            @else
 		                            	<td><span style="color:red"><big>{{ $req->status }}</big></span></td>
 		                            @endif

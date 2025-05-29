@@ -189,6 +189,7 @@
 		                            <th >Priority</th>
 		                            <th >Status</th>
 		                            <th >Keep wastage</th>
+		                            <th >Last mattress</th>
 		                            @if (Auth::user()->name == 'MM11')
 		                            <th >Layer limit</th>
 		                            @endif
@@ -270,7 +271,14 @@
 		                            @else
 		                            	<td>NO</td>
 		                            @endif
-
+		                            <td>
+		                            	@if($req->last_mattress == 1)
+		                            		<span class='last_mattress'>YES</span>
+		                            	@else
+		                            		NO
+		                            	@endif
+		                            </td>
+                            
 		                            @if ( Auth::user()->name == 'MM11')
 		                            <td>{{$req->layer_limit}}</td>
 		                            

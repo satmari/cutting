@@ -138,17 +138,24 @@
 
                         <table style="width:100%">
                         <tr>
-                            <td style="width:49%">
+                            <td style="width:32%">
                                 <div class="panel-body">
                                 <p>Call shift manager: <!-- <span style="color:red;">*</span> --></p>
                                     {!! Form::checkbox('call_shift_manager', $call_shift_manager, $call_shift_manager , ['class' => 'form-control', 'disabled']) !!}
                                 </div>
                             </td>
                         
-                            <td style="width:49%">
+                            <td style="width:32%">
                                 <div class="panel-body">
                                 <p>Test marker:<!--  <span style="color:red;">*</span> --></p>
                                     {!! Form::checkbox('test_marker',  $test_marker, $test_marker, ['class' => 'form-control', 'disabled'])!!}
+                                </div>
+                            </td>
+
+                            <td style="width:32%">
+                                <div class="panel-body">
+                                <p>Last  mattress:<!--  <span style="color:red;">*</span> --></p>
+                                    {!! Form::checkbox('last_mattress',  $last_mattress, $last_mattress, ['class' => 'form-control', 'disabled'])!!}
                                 </div>
                             </td>
                        
@@ -197,23 +204,81 @@
 
                         <table style="width:100%">
                         <tr>
-                            <td style="width:49%">
+                            <td style="width:32%">
                                 <div class="panel-body">
                                 <p>Call shift manager: <!-- <span style="color:red;">*</span> --></p>
                                     {!! Form::checkbox('call_shift_manager', '1' , $call_shift_manager , ['class' => 'form-control']) !!}
                                 </div>
                             </td>
-                            <td style="width:49%">
+                            <td style="width:32%">
                                 <div class="panel-body">
                                 <p>Test marker:<!--  <span style="color:red;">*</span> --></p>
                                     {!! Form::checkbox('test_marker', '1', $test_marker, ['class' => 'form-control'])!!}
+                                </div>
+                            </td>
+                            <td style="width:32%">
+                                <div class="panel-body">
+                                <p>Last  mattress:<!--  <span style="color:red;">*</span> --></p>
+                                    {!! Form::checkbox('last_mattress',  '1', $last_mattress, ['class' => 'form-control'])!!}
                                 </div>
                             </td>
                        
                         </tr>
                         </table>
 
+                        @if ($location != 'TUB' AND $location != 'MM1')
                         <hr>
+                        <p>Set new location</p>
+                            <table style="width:100%">
+                                <tr>
+                                    <td style="width:12%">
+                                        <div class="panel-body">
+                                            <p>SP0: </p>
+                                            <input type="radio" value="SP0" id="sp0" name="location_new" class="form-control"
+                                                {{ $location == 'SP0' ? 'checked' : '' }} {{ $status != 'TO_LOAD' ? 'disabled' : '' }}>
+                                        </div>
+                                    </td>
+                                    <td style="width:12%">
+                                        <div class="panel-body">
+                                            <p>SP1: </p>
+                                            <input type="radio" value="SP1" id="sp1" name="location_new" class="form-control"
+                                                {{ $location == 'SP1' ? 'checked' : '' }} {{ $status != 'TO_LOAD' ? 'disabled' : '' }}>
+                                        </div>
+                                    </td>
+                                    <td style="width:12%">
+                                        <div class="panel-body">
+                                            <p>SP2: </p>
+                                            <input type="radio" value="SP2" id="sp2" name="location_new" class="form-control"
+                                                {{ $location == 'SP2' ? 'checked' : '' }} {{ $status != 'TO_LOAD' ? 'disabled' : '' }}>
+                                        </div>
+                                    </td>
+                                    <td style="width:12%">
+                                        <div class="panel-body">
+                                            <p>SP3: </p>
+                                            <input type="radio" value="SP3" id="sp3" name="location_new" class="form-control"
+                                                {{ $location == 'SP3' ? 'checked' : '' }} {{ $status != 'TO_LOAD' ? 'disabled' : '' }}>
+                                        </div>
+                                    </td>
+                                    <td style="width:12%">
+                                        <div class="panel-body">
+                                            <p>SP4: </p>
+                                            <input type="radio" value="SP4" id="sp4" name="location_new" class="form-control"
+                                                {{ $location == 'SP4' ? 'checked' : '' }} {{ $status != 'TO_LOAD' ? 'disabled' : '' }}>
+                                        </div>
+                                    </td>
+                                    <td style="width:12%">
+                                        <div class="panel-body">
+                                            <p>MS1: </p>
+                                            <input type="radio" value="MS1" id="ms1" name="location_new" class="form-control"
+                                                {{ $location == 'MS1' ? 'checked' : '' }} {{ $status != 'TO_LOAD' ? 'disabled' : '' }}>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        @endif 
+                        <hr>
+
+
                         <br>
                         {!! Form::submit('Save', ['class' => 'btn  btn-danger center-block']) !!}
                         <br>

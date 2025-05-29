@@ -28,6 +28,8 @@ class CreateMaterialRequestsTable extends Migration {
 			
 			$table->float('required_qty')->nullable();
 			$table->mediumText('comment')->nullable();
+
+			$table->mediumText('comment_wh')->nullable();
 			
 			$table->timestamps();
 		});

@@ -205,12 +205,14 @@ class Change extends Migration {
             
         });
 
-        Schema::table('req_cut_parts', function($table) 
+        Schema::table('material_requests', function($table) 
 		{
-            // $table->string('comment_cut')->nullable(); 
-
+            // $table->mediumText('comment_wh')->nullable(); 
             
         });
+
+
+
 
 
 	}

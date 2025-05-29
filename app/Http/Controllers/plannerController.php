@@ -126,6 +126,7 @@ class plannerController extends Controller {
 	      ,m2.[layer_limit]
 	      ,m2.[overlapping]
 	      ,m2.[req_time]
+	      ,m2.[last_mattress]
 	      --,'|'
 	      ,m3.[marker_id]
 	      ,m3.[marker_name]
@@ -288,6 +289,7 @@ class plannerController extends Controller {
 			      ,m2.[layer_limit]
 			      ,m2.[overlapping]
 			      ,m2.[req_time]
+			      ,m2.[last_mattress]
 			      --,'|'
 			      ,m3.[marker_id]
 			      ,m3.[marker_name]
@@ -451,6 +453,7 @@ class plannerController extends Controller {
 			      ,m2.[layer_limit]
 			      ,m2.[overlapping]
 			      ,m2.[req_time]
+			      ,m2.[last_mattress]
 			      --,'|'
 			      ,m3.[marker_id]
 			      ,m3.[marker_name]
@@ -609,6 +612,7 @@ class plannerController extends Controller {
 			      ,m2.[layer_limit]
 			      ,m2.[overlapping]
 			      ,m2.[req_time]
+			      ,m2.[last_mattress]
 			      --,'|'
 			      ,m3.[marker_id]
 			      ,m3.[marker_name]
@@ -748,6 +752,7 @@ class plannerController extends Controller {
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
 		      ,m2.[overlapping]
+		      ,m2.[last_mattress]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -859,6 +864,7 @@ class plannerController extends Controller {
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
 		      ,m2.[overlapping]
+		      ,m2.[last_mattress]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -975,6 +981,7 @@ class plannerController extends Controller {
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
 		      ,m2.[overlapping]
+		      ,m2.[last_mattress]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -1085,6 +1092,7 @@ class plannerController extends Controller {
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
 		      ,m2.[overlapping]
+		      ,m2.[last_mattress]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -1195,6 +1203,7 @@ class plannerController extends Controller {
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
 		      ,m2.[overlapping]
+		      ,m2.[last_mattress]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -1306,6 +1315,7 @@ class plannerController extends Controller {
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
 		      ,m2.[overlapping]
+		      ,m2.[last_mattress]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -1415,6 +1425,7 @@ class plannerController extends Controller {
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
 		      ,m2.[overlapping]
+		      ,m2.[last_mattress]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -1525,6 +1536,7 @@ class plannerController extends Controller {
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
 		      ,m2.[overlapping]
+		      ,m2.[last_mattress]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -1635,6 +1647,7 @@ class plannerController extends Controller {
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
 		      ,m2.[overlapping]
+		      ,m2.[last_mattress]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -1756,6 +1769,7 @@ class plannerController extends Controller {
 		      ,m2.[printed_marker]
 		      ,m2.[comment_office]
 		      ,m2.[overlapping]
+		      ,m2.[last_mattress]
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
 		      ,m3.[marker_width]
@@ -1896,6 +1910,7 @@ class plannerController extends Controller {
 		      ,m2.[printed_nalog]
 		      ,m2.[overlapping]
 		      ,m2.[req_time]
+		      ,m2.[last_mattress]
 		      --,'|'
 		      ,m3.[marker_id]
 		      ,m3.[marker_name]
@@ -2254,6 +2269,7 @@ class plannerController extends Controller {
 		      ,m2.[comment_operator]
 		      ,m2.[minimattress_code]
 		      ,m2.[tpa_number]
+		      ,m2.[last_mattress]
 		      --,'|'
 		      ,m3.[marker_id]
 		      ,m3.[marker_name]
@@ -2312,6 +2328,7 @@ class plannerController extends Controller {
 		$bottom_paper = $data[0]->bottom_paper;
 		$comment_office = $data[0]->comment_office;
 		$tpa_number = $data[0]->tpa_number;
+		$last_mattress = $data[0]->last_mattress;
 
 		$selected_marker = $marker_name;
 
@@ -2412,7 +2429,7 @@ class plannerController extends Controller {
 
 			   		// dd($mattress_pro_array);
 
-					return view('planner.plan_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office'
+					return view('planner.plan_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','last_mattress','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office'
 						,'selected_marker','marker_pcs_per_layer','mattress_pro_array'));
 
 		   		} else {
@@ -2423,7 +2440,7 @@ class plannerController extends Controller {
 			}
 		}
 
-		return view('planner.plan_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office'
+		return view('planner.plan_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','last_mattress','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office'
 				,'selected_marker'));
 	}
 
@@ -2453,6 +2470,11 @@ class plannerController extends Controller {
 			$test_marker = (int)$input['test_marker'];
 		} else {
 			$test_marker = 0;
+		}
+		if (isset($input['last_mattress'])) {
+			$last_mattress = (int)$input['last_mattress'];
+		} else {
+			$last_mattress = 0;
 		}
 		// if (isset($input['tpp_mat_keep_wastage'])) {
 		// 	$tpp_mat_keep_wastage = (int)$input['tpp_mat_keep_wastage'];
@@ -2625,6 +2647,7 @@ class plannerController extends Controller {
 			$table1->bottom_paper = $bottom_paper;
 			$table1->comment_office = $comment_office;
 			$table1->mandatory_to_ins = $mandatory_to_ins;
+			$table1->last_mattress = $last_mattress;
 			$table1->save();
 		}
 		catch (\Illuminate\Database\QueryException $e) {
@@ -3754,7 +3777,7 @@ class plannerController extends Controller {
 		$table3_new->location = $location;
 		$table3_new->device = $device;
 		$table3_new->active = 1;
-		$table3_new->operator1 = $operator;
+		$table3_new->operator1;
 		$table3_new->operator2;
 		$table3_new->date = $date;
 		$table3_new->id_status = $id.'-'.$status;
@@ -3810,6 +3833,7 @@ class plannerController extends Controller {
 		      ,m2.[mandatory_to_ins]
 		      ,m2.[cutter_shrink_x]
       		  ,m2.[cutter_shrink_y]
+      		  ,m2.[last_mattress]
 		      --,'|'
 		      ,m3.[marker_id]
 		      ,m3.[marker_name]
@@ -3917,6 +3941,7 @@ class plannerController extends Controller {
 		$mandatory_to_ins = $data[0]->mandatory_to_ins;
 		$cutter_shrink_x = $data[0]->cutter_shrink_x;
 		$cutter_shrink_y = $data[0]->cutter_shrink_y;
+		$last_mattress = $data[0]->last_mattress;
 		// $call_shift_manager = 1;
 		$test_marker = $data[0]->test_marker;
 		$tpp_mat_keep_wastage = $data[0]->tpp_mat_keep_wastage;
@@ -3924,6 +3949,7 @@ class plannerController extends Controller {
 		$comment_office = $data[0]->comment_office;
 		$tpa_number = $data[0]->tpa_number;
 		$location = $data[0]->location;
+		$status = $data[0]->status;
 		$req_time = $data[0]->req_time;
 
 		$layer_limit = $data[0]->layer_limit;
@@ -3934,10 +3960,20 @@ class plannerController extends Controller {
 			$data2 = DB::connection('sqlsrv')->select(DB::raw("SELECT [o_roll],[no_of_joinings],[g_bin]
 				FROM  [o_rolls]
 				WHERE mattress_id_new = '".$id."' "));
-			return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','data2','layer_limit','cut_operator','cut_date','sp_operator','sp_date','req_time','mandatory_to_ins','cutter_shrink_x','cutter_shrink_y'));
+			return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc',
+				'skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned',
+				'cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager',
+				'test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','data2',
+				'layer_limit','cut_operator','cut_date','sp_operator','sp_date','req_time','mandatory_to_ins',
+				'cutter_shrink_x','cutter_shrink_y','last_mattress','status'));
 		}
 
-		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc','skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned','cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','cut_operator','cut_date','sp_operator','sp_date','req_time','layer_limit','mandatory_to_ins','cutter_shrink_x','cutter_shrink_y'));
+		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc',
+				'skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned',
+				'cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager',
+				'test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location',
+				'cut_operator','cut_date','sp_operator','sp_date','req_time','layer_limit','mandatory_to_ins',
+				'cutter_shrink_x','cutter_shrink_y','last_mattress','status'));
 	}
 
 	public function correct_location($id) {
@@ -4017,6 +4053,8 @@ class plannerController extends Controller {
 		$bottom_paper = $input['bottom_paper'];
 		$req_time = round($input['req_time'],2);
 
+		$location = $input['location'];
+
 		$layer_limit = $input['layer_limit'];
 
 		if (isset($input['call_shift_manager'])) {
@@ -4028,6 +4066,11 @@ class plannerController extends Controller {
 			$test_marker = (int)$input['test_marker'];
 		} else {
 			$test_marker = 0;
+		}
+		if (isset($input['last_mattress'])) {
+			$last_mattress = (int)$input['last_mattress'];
+		} else {
+			$last_mattress = 0;
 		}
 		// if (isset($input['tpp_mat_keep_wastage'])) {
 		// 	$tpp_mat_keep_wastage = (int)$input['tpp_mat_keep_wastage'];
@@ -4089,7 +4132,6 @@ class plannerController extends Controller {
 
 		}
 
-		$location = $input['location'];
 
 	
 		$table001 = mattress::findOrFail($id);
@@ -4098,7 +4140,6 @@ class plannerController extends Controller {
 
 		$find_details_id = DB::connection('sqlsrv')->select(DB::raw("SELECT [id] FROM [mattress_details] WHERE [mattress_id] = '".$id."' "));
 		// dd($find_details_id[0]->id);
-
 		
 		$table1 = mattress_details::findOrFail($find_details_id[0]->id);
 		$table1->pcs_bundle = $pcs_bundle;
@@ -4114,10 +4155,110 @@ class plannerController extends Controller {
 			$table1->comment_office = Session::get('operator').'->'.$comment_office;
 		}
 		$table1->req_time = $req_time;
+		$table1->last_mattress = $last_mattress;
+
+		$mandatory_to_ins = $table1->mandatory_to_ins;
+		$cutter_shrink_x = $table1->cutter_shrink_x;
+		$cutter_shrink_y = $table1->cutter_shrink_y;
+		
 		$table1->save();
 
-		// return Redirect::to('/plan_mattress/'.$location);
-		return Redirect::to('/plan_mattress/BOARD');
+		if (isset($input['location_new'])) {
+			$location_new = $input['location_new'];
+			
+			if ($location_new != $location) {
+				
+				$location_before = $location;
+				$location = $location_new;
+				// Position check
+				// $position = 1;
+				$find_position_on_location = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+							COUNT(location) as c 
+						FROM [mattress_phases] WHERE location = '".$location."' AND active = '1' "));
+				// dd($find_position_on_location[0]);
+				if (isset($find_position_on_location[0])) {
+					$position = $find_position_on_location[0]->c + 1;
+				} else {
+					$position = 1;
+				}
+				// dd($position);
+
+				// $table00 = mattress::findOrFail($id);
+				// $table00->g_bin = $g_bin;
+				// $table00->spreading_method = $spreading_method;
+				// $table00->save();
+
+				$find_details_id = DB::connection('sqlsrv')->select(DB::raw("SELECT [id] FROM [mattress_details] WHERE [mattress_id] = '".$id."' "));
+				// dd($find_details_id[0]->id);
+
+				try {
+					$table1 = mattress_details::findOrFail($find_details_id[0]->id);
+					$table1->position = $position;
+					$table1->save();
+				}
+				catch (\Illuminate\Database\QueryException $e) {
+					dd("Problem to save in mattress_details");
+				}
+
+				$mattress_phases_not_active = DB::connection('sqlsrv')->select(DB::raw("
+					SET NOCOUNT ON;
+					UPDATE [mattress_phases]
+					SET active = 0, id_status = ''+cast([mattress_id] as varchar )+'-'+[status]
+					WHERE mattress_id = '".$id."' AND active = 1;
+					SELECT TOP 1 mattress FROM [mattress_phases] WHERE mattress_id = '".$id."';
+				"));
+				$mattress = $mattress_phases_not_active[0]->mattress;
+
+				// save new mattress_phases
+				$status = "TO_LOAD";
+				$active = 1;
+
+				if ((date('H') >= 0) AND (date('H') < 6)) {
+				   	$date = date('Y-m-d H:i:s', strtotime(' -1 day'));
+				} else {
+					$date = date('Y-m-d H:i:s');
+				}
+				
+				// $find_position = mattress_details::where('mattress_id','=',$id)->get();
+				// $pre_position = $find_position[0]->position;
+				
+				$table3_new = mattress_phases::firstOrNew(['id_status' => $id.'-'.$status]);
+				$table3_new->mattress_id = $id;
+				$table3_new->mattress = $mattress;
+				$table3_new->status = $status;
+				$table3_new->location = $location;
+				$table3_new->device;
+				$table3_new->active = $active;
+				$table3_new->operator1 = Session::get('operator');
+				$table3_new->operator2;
+				$table3_new->date = $date;
+				$table3_new->id_status = $id.'-'.$status;
+				// $table3_new->pre_position = $pre_position;
+				$table3_new->save();
+
+				// reorder position of location_before
+				$reorder_position = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+						md.[id], md.[mattress_id], md.[mattress], md.[position], 
+						mp.[location], mp.[active]
+					 FROM [mattress_details] as md
+					 INNER JOIN [mattress_phases] as mp ON mp.[mattress_id] = md.[mattress_id] AND mp.[active] = 1
+					 WHERE location = '".$location_before."' 
+					 ORDER BY position asc"));
+
+				if (isset($reorder_position[0])) {
+					for ($i=0; $i < count($reorder_position); $i++) { 
+
+						$table1 = mattress_details::findOrFail($reorder_position[$i]->id);
+						$table1->position = $i+1;
+						$table1->save();
+					}
+				}
+
+			}
+		}
+
+		return Redirect::to('/plan_mattress/'.$location);
+		// return Redirect::to('/plan_mattress/BOARD');
 		
 		// $msgs = 'Succesfuly saved';
 		/*
@@ -4126,6 +4267,28 @@ class plannerController extends Controller {
 		'call_shift_manager','test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper',
 		'comment_office','location','cut_operator','cut_date','sp_operator','sp_date','req_time','msgs','layer_limit'));
 		*/
+
+		// if ($skeda_item_type == 'MM') {
+
+		// 	$layer_limit = $data[0]->layer_limit;
+		// 	$data2 = DB::connection('sqlsrv')->select(DB::raw("SELECT [o_roll],[no_of_joinings],[g_bin]
+		// 		FROM  [o_rolls]
+		// 		WHERE mattress_id_new = '".$id."' "));
+		// 	return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc',
+		// 		'skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned',
+		// 		'cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager',
+		// 		'test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','data2',
+		// 		'layer_limit','cut_operator','cut_date','sp_operator','sp_date','req_time','mandatory_to_ins',
+		// 		'cutter_shrink_x','cutter_shrink_y','last_mattress','msgs','mandatory_to_ins'));
+		// }
+
+		// return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc',
+		// 		'skeda','skeda_item_type','spreading_method','width_theor_usable','layers','layers_a','cons_planned',
+		// 		'cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager',
+		// 		'test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location',
+		// 		'cut_operator','cut_date','sp_operator','sp_date','req_time','layer_limit','mandatory_to_ins',
+		// 		'cutter_shrink_x','cutter_shrink_y','last_mattress','msgs','mandatory_to_ins'));
+
 	}
 
 	public function edit_layers_a($id) {
@@ -9951,6 +10114,352 @@ class plannerController extends Controller {
 		$table->save();
 		
 		return Redirect::to('/paspul_locations');
+	}
+
+	public function recap_by_sku_sp0() {
+
+
+		return view('planner.recap_by_sku_sp0');
+	}
+
+	public function recap_by_sku_sp0_post(Request $request) {
+		// dd('test');
+
+		$this->validate($request, ['sku'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+		
+		$sku = trim($input['sku']);
+		$sku = str_replace(' ', '%', $sku);
+		// dd($g_bin);
+		$skuLike = '%' . $sku . '%';
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			   m2.[position]
+			  ,m1.[id]
+		      ,m1.[mattress]
+		      ,m1.[g_bin]
+		      ,m1.[material]
+		      ,m1.[dye_lot]
+		      ,m1.[color_desc]
+		      ,m1.[width_theor_usable]
+		      ,m1.[skeda]
+		      ,m1.[skeda_item_type]
+		      ,m1.[skeda_status]
+		      ,m1.[spreading_method]
+		      ,m1.[created_at]
+		      ,m1.[updated_at]
+		      --,'|'
+		      ,m2.[layers]
+		      ,m2.[layers_a]
+		      ,m2.[length_mattress]
+		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
+		      ,m2.[extra]
+		      ,m2.[pcs_bundle]
+		      ,m2.[layers_partial]
+		      ,m2.[position]
+		      ,m2.[priority]
+		      ,m2.[call_shift_manager]
+		      ,m2.[test_marker]
+		      ,m2.[tpp_mat_keep_wastage]
+		      ,m2.[printed_marker]
+		      ,m2.[mattress_packed]
+		      ,m2.[all_pro_for_main_plant]
+		      ,m2.[bottom_paper]
+		      ,m2.[layers_a_reasons]
+		      ,m2.[comment_office]
+		      ,m2.[comment_operator]
+		      ,m2.[minimattress_code]
+		      ,m2.[printed_nalog]
+		      ,m2.[layer_limit]
+		      ,m2.[overlapping]
+		      --,'|'
+		      ,m3.[marker_id]
+		      ,m3.[marker_name]
+		      ,m3.[marker_name_orig]
+		      ,m3.[marker_length]
+		      ,m3.[marker_width]
+		      ,m3.[min_length]
+		      --,'|'
+		      ,m4.[status]
+		      ,m4.[location]
+		      ,m4.[device]
+		      ,m4.[active]
+		      ,m4.[operator1]
+		      ,m4.[operator2]
+		      
+		  FROM [mattresses] as m1
+		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id] AND m4.location = 'SP0'
+		  
+		  LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id] AND m4.active = '1' 
+		  LEFT JOIN [pro_skedas] as m6 ON m6.[pro_id] = m5.[pro_id]
+		  
+		  WHERE m6.sku LIKE '%$sku%'
+		  ORDER BY m1.id asc
+		  "));
+		// dd($data);
+		
+	
+		$pros= '';
+		$skus= '';
+		$sku_s= '';
+		$location_all= '';
+		for ($i=0; $i < count($data) ; $i++) { 
+		
+			$id = $data[$i]->id;
+			// dd($id);
+
+			if (($data[$i]->skeda_item_type == 'MS') OR ($data[$i]->skeda_item_type == 'MM')) {
+				
+				$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					ps.[pro]
+					,ps.[style_size]
+					,ps.[sku]
+					,po.[location_all]
+					--,*
+				  FROM [mattress_pros] as mp
+				  JOIN [pro_skedas] as ps ON ps.[pro_id] = mp.[pro_id]
+				  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+				WHERE mp.[mattress_id] = '".$id."' "));
+				
+				for ($x=0; $x < count($prom); $x++) { 
+
+					$pros .= $prom[$x]->pro." ";
+					$skus .= $prom[$x]->style_size." ";
+					$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+					$sku_s .= $test." ";
+					// $sku_s .= $prom[$x]->sku." ";
+					if ($prom[$x]->location_all == 'Valy') {
+						$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+					} else {
+						$location_all .= $prom[$x]->location_all." ";
+					}
+				}
+
+				$data[$i]->pro = trim($pros);
+				$data[$i]->style_size = trim($skus);
+				$data[$i]->sku = trim($sku_s);
+				$data[$i]->location_all = trim($location_all);
+				$pros = '';
+				$skus = '';
+				$sku_s = '';
+				$location_all = '';
+
+			} else {
+
+				$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					ps.pro
+					,ps.style_size
+					,ps.sku
+					,po.[location_all]
+					--,*
+				  FROM  [pro_skedas] as ps 
+				  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+				WHERE ps.[skeda] = '".$data[$i]->skeda."' "));
+				// dd($prom);
+
+				for ($x=0; $x < count($prom); $x++) { 
+
+					$pros .= $prom[$x]->pro." ";
+					$skus .= $prom[$x]->style_size." ";
+					$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+					$sku_s .= $test." ";
+					// $sku_s .= $prom[$x]->sku." ";
+					if ($prom[$x]->location_all == 'Valy') {
+						$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+					} else {
+						$location_all .= $prom[$x]->location_all." ";
+					}
+				}
+
+				$data[$i]->pro = trim($pros);
+				$data[$i]->style_size = trim($skus);
+				$data[$i]->sku = trim($sku_s);
+				$data[$i]->location_all = trim($location_all);
+				$pros = '';
+				$skus = '';
+				$sku_s = '';
+				$location_all = '';
+			}
+		}
+
+		return view('planner.recap_by_sku_sp0_post', compact('data','sku'));
+	}
+
+	public function recap_by_sku_sp() {
+
+
+		return view('planner.recap_by_sku_sp');
+	}
+
+	public function recap_by_sku_sp_post(Request $request) {
+		// dd('test');
+
+		$this->validate($request, ['sku'=>'required']);
+		$input = $request->all(); // change use (delete or comment user Requestl; )
+		// dd($input);
+		
+		$sku = trim($input['sku']);
+		$sku = str_replace(' ', '%', $sku);
+		// dd($g_bin);
+		$skuLike = '%' . $sku . '%';
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+			   m2.[position]
+			  ,m1.[id]
+		      ,m1.[mattress]
+		      ,m1.[g_bin]
+		      ,m1.[material]
+		      ,m1.[dye_lot]
+		      ,m1.[color_desc]
+		      ,m1.[width_theor_usable]
+		      ,m1.[skeda]
+		      ,m1.[skeda_item_type]
+		      ,m1.[skeda_status]
+		      ,m1.[spreading_method]
+		      ,m1.[created_at]
+		      ,m1.[updated_at]
+		      --,'|'
+		      ,m2.[layers]
+		      ,m2.[layers_a]
+		      ,m2.[length_mattress]
+		      ,m2.[cons_planned]
+		      ,m2.[cons_actual]
+		      ,m2.[extra]
+		      ,m2.[pcs_bundle]
+		      ,m2.[layers_partial]
+		      ,m2.[position]
+		      ,m2.[priority]
+		      ,m2.[call_shift_manager]
+		      ,m2.[test_marker]
+		      ,m2.[tpp_mat_keep_wastage]
+		      ,m2.[printed_marker]
+		      ,m2.[mattress_packed]
+		      ,m2.[all_pro_for_main_plant]
+		      ,m2.[bottom_paper]
+		      ,m2.[layers_a_reasons]
+		      ,m2.[comment_office]
+		      ,m2.[comment_operator]
+		      ,m2.[minimattress_code]
+		      ,m2.[printed_nalog]
+		      ,m2.[layer_limit]
+		      ,m2.[overlapping]
+		      --,'|'
+		      ,m3.[marker_id]
+		      ,m3.[marker_name]
+		      ,m3.[marker_name_orig]
+		      ,m3.[marker_length]
+		      ,m3.[marker_width]
+		      ,m3.[min_length]
+		      --,'|'
+		      ,m4.[status]
+		      ,m4.[location]
+		      ,m4.[device]
+		      ,m4.[active]
+		      ,m4.[operator1]
+		      ,m4.[operator2]
+		      
+		  FROM [mattresses] as m1
+		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id] 
+		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id] AND m4.location like 'SP%'
+		  
+		  LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id] AND m4.active = '1' 
+		  LEFT JOIN [pro_skedas] as m6 ON m6.[pro_id] = m5.[pro_id]
+		  
+		  WHERE m6.sku LIKE '%$sku%'
+		  ORDER BY m1.id asc
+		  "));
+		// dd($data);
+		
+	
+		$pros= '';
+		$skus= '';
+		$sku_s= '';
+		$location_all= '';
+		for ($i=0; $i < count($data) ; $i++) { 
+		
+			$id = $data[$i]->id;
+			// dd($id);
+
+			if (($data[$i]->skeda_item_type == 'MS') OR ($data[$i]->skeda_item_type == 'MM')) {
+				
+				$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					ps.[pro]
+					,ps.[style_size]
+					,ps.[sku]
+					,po.[location_all]
+					--,*
+				  FROM [mattress_pros] as mp
+				  JOIN [pro_skedas] as ps ON ps.[pro_id] = mp.[pro_id]
+				  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+				WHERE mp.[mattress_id] = '".$id."' "));
+				
+				for ($x=0; $x < count($prom); $x++) { 
+
+					$pros .= $prom[$x]->pro." ";
+					$skus .= $prom[$x]->style_size." ";
+					$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+					$sku_s .= $test." ";
+					// $sku_s .= $prom[$x]->sku." ";
+					if ($prom[$x]->location_all == 'Valy') {
+						$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+					} else {
+						$location_all .= $prom[$x]->location_all." ";
+					}
+				}
+
+				$data[$i]->pro = trim($pros);
+				$data[$i]->style_size = trim($skus);
+				$data[$i]->sku = trim($sku_s);
+				$data[$i]->location_all = trim($location_all);
+				$pros = '';
+				$skus = '';
+				$sku_s = '';
+				$location_all = '';
+
+			} else {
+
+				$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					ps.pro
+					,ps.style_size
+					,ps.sku
+					,po.[location_all]
+					--,*
+				  FROM  [pro_skedas] as ps 
+				  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+				WHERE ps.[skeda] = '".$data[$i]->skeda."' "));
+				// dd($prom);
+
+				for ($x=0; $x < count($prom); $x++) { 
+
+					$pros .= $prom[$x]->pro." ";
+					$skus .= $prom[$x]->style_size." ";
+					$test = str_replace(' ', '&nbsp;' , $prom[$x]->sku);
+					$sku_s .= $test." ";
+					// $sku_s .= $prom[$x]->sku." ";
+					if ($prom[$x]->location_all == 'Valy') {
+						$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+					} else {
+						$location_all .= $prom[$x]->location_all." ";
+					}
+				}
+
+				$data[$i]->pro = trim($pros);
+				$data[$i]->style_size = trim($skus);
+				$data[$i]->sku = trim($sku_s);
+				$data[$i]->location_all = trim($location_all);
+				$pros = '';
+				$skus = '';
+				$sku_s = '';
+				$location_all = '';
+			}
+		}
+
+		return view('planner.recap_by_sku_sp_post', compact('data','sku'));
 	}
 
 //SKEDA COMMENTS

@@ -253,6 +253,9 @@ Route::get('mattress', 'mattressController@index');
 
 // Consumption SAP
 Route::get('consumption_sap', 'consumption_sapController@index');
+Route::get('mat_con_file', 'consumption_sapController@mat_con_file');
+Route::post('mat_con_file_post', 'consumption_sapController@mat_con_file_post');
+Route::get('mat_con_file_table', 'consumption_sapController@mat_con_file_table');
 
 // Admin & Planner
 // Route::get('plan_mattress', 'plannerController@plan_mattress');
@@ -675,9 +678,11 @@ Route::get('request_material_accept/{id}', 'foController@request_material_accept
 Route::get('request_material_accept_confirm/{id}', 'foController@request_material_accept_confirm');
 
 Route::get('request_material_deliver/{id}', 'foController@request_material_deliver');
-
 Route::get('request_material_deliver_confirm/{id}', 'foController@request_material_deliver_confirm');
 Route::get('request_material_deliver_confirm_post/{id}', 'foController@request_material_deliver_confirm_post');
+
+Route::get('request_material_cancel/{id}', 'foController@request_material_cancel');
+Route::post('request_material_cancel_confirm/', 'foController@request_material_cancel_confirm');
 
 Route::get('request_material_relax_confirm/{id}', 'foController@request_material_relax_confirm');
 Route::get('request_material_relax_confirm_post/{id}', 'foController@request_material_relax_confirm_post');
@@ -717,6 +722,10 @@ Route::get('recap_by_skeda_paspul', 'plannerController@recap_by_skeda_paspul');
 Route::post('recap_by_skeda_paspul_post', 'plannerController@recap_by_skeda_paspul_post');
 Route::get('recap_by_g_bin_mattress', 'plannerController@recap_by_g_bin_mattress');
 Route::post('recap_by_g_bin_mattress_post', 'plannerController@recap_by_g_bin_mattress_post');
+Route::get('recap_by_sku_sp0', 'plannerController@recap_by_sku_sp0');
+Route::post('recap_by_sku_sp0_post', 'plannerController@recap_by_sku_sp0_post');
+Route::get('recap_by_sku_sp', 'plannerController@recap_by_sku_sp');
+Route::post('recap_by_sku_sp_post', 'plannerController@recap_by_sku_sp_post');
 
 // Skeda Reservation
 Route::get('inbound_delivery_index', 'magacinController@inbound_delivery_index');

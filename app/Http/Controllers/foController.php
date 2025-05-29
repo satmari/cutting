@@ -484,5 +484,105 @@ class foController extends Controller {
 		return redirect('/');
 	}
 
+	public function request_material_cancel($id) {
+
+		$operator = Session::get('operator');
+		if (!isset($operator) OR $operator == '') {
+			
+			$msg ='Operator must be logged!';
+			return view('fo.error',compact('msg'));
+		}
+		$check_op = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 *
+			FROM operators
+			WHERE operator = '".$operator."' COLLATE Latin1_General_CI_AI 
+			AND ( [device] like '%TO%' )"));
+		if (!isset($check_op)) {
+			dd("Wrong operator, call IT !");
+		}
+
+
+		return view('fo.request_material_cancel',compact('id'));
+	}
+
+	public function request_material_cancel_confirm(Request $request) {
+		//
+		// $this->validate($request, ['sap_location1' => 'required']);
+		$input = $request->all(); 
+		// dd($input);
+		
+		$id = $input['id'];
+		$comment_wh = $input['comment_wh'];
+		// dd($id);
+
+		$operator = Session::get('operator');
+		if (!isset($operator) OR $operator == '') {
+			
+			$msg ='Operator must be logged!';
+			return view('fo.error',compact('msg'));
+		}
+		$check_op = DB::connection('sqlsrv')->select(DB::raw("SELECT TOP 1 *
+			FROM operators
+			WHERE operator = '".$operator."' COLLATE Latin1_General_CI_AI 
+			AND ( [device] like '%TO%' )"));
+		if (!isset($check_op)) {
+			dd("Wrong operator, call IT !");
+		}
+
+		$operator2 = Session::get('operator2');
+		if (!isset($operator2) OR $operator2 == '') {
+			$operator2 = '';
+		}
+
+		if (Auth::check())
+		{
+		    $userId = Auth::user()->id;
+		    $device = Auth::user()->name;
+		} else {
+			$msg ='Device is not autenticated';
+			return view('fo.error',compact('msg'));
+		}
+		$location = substr($device, 0,3);
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				mr.*,
+				mrp.status, mrp.location, mrp.device, mrp.operator1, mrp.operator2
+			FROM [material_requests] as mr
+			JOIN [material_request_phases] as mrp ON mrp.[material_request_id] = mr.[id]
+		 	WHERE mrp.active = '1' and mr.id = '".$id."'
+		 	ORDER by mrp.[status] desc, mrp.[created_at] desc "));		
+
+		// dd($data);
+
+		// $location 	= $data[0]->location;
+		// $device 	= $data[0]->device;
+		// $operator1	= $data[0]->operator1;
+		// $operator2 	= $data[0]->operator2;
+
+		$request_material_phases_not_active = DB::connection('sqlsrv')->update(DB::raw("
+			UPDATE [material_request_phases]
+			SET active = 0
+			WHERE material_request_id = '".$id."' AND active = 1;
+		"));
+
+		
+		$table = material_requests::firstOrNew(['id' => $id]);
+		$table->comment_wh = $comment_wh;
+		$table->save();
+
+		$status = 'CANCELED';
+
+		$table_phases = material_request_phases::firstOrNew(['id_status' => $id.'-'.$status]);
+		$table_phases->material_request_id = $id;
+		$table_phases->status = $status;
+		$table_phases->location = $location;
+		$table_phases->device = $device;
+		$table_phases->active = 1;
+		$table_phases->operator1 = $operator;
+		$table_phases->operator2 = $operator2;
+		$table_phases->id_status = $id."-".$status;
+		$table_phases->save();
+
+		return redirect('/');
+	}
 	
 }

@@ -90,6 +90,7 @@ class spreaderController extends Controller {
 		      ,m2.[layer_limit]
 		      ,m2.[overlapping]
 		      ,m2.[req_time]
+		      ,m2.[last_mattress]
 		      --,'|'
 		      ,m3.[marker_id]
 		      ,m3.[marker_name]
@@ -1586,13 +1587,24 @@ class spreaderController extends Controller {
 		}
 
 		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				mr.*,
-				mrp.status, mrp.location, mrp.operator1, mrp.operator2, mrp.updated_at as up
-				,(SELECT location FROM [material_request_phases] WHERE [material_request_id] =  mr.[id] AND [status] = 'CREATED') as location_created
+			    mr.*,
+			    mrp.status, 
+			    mrp.location, 
+			    mrp.operator1, 
+			    mrp.operator2, 
+			    mrp.updated_at as up,
+			    (SELECT location 
+			     FROM [material_request_phases] 
+			     WHERE [material_request_id] = mr.[id] AND [status] = 'CREATED') as location_created
 			FROM [material_requests] as mr
 			JOIN [material_request_phases] as mrp ON mrp.[material_request_id] = mr.[id]
-		 	WHERE (mrp.[status] = 'CREATED' OR mrp.[status] = 'ACCEPTED' OR mrp.[status] = 'RELAX' OR mrp.[status] = 'QC') AND active = '1'
-		 	ORDER by mr.[created_at] asc "));
+			WHERE 
+			    (
+			        mrp.[status] IN ('CREATED', 'ACCEPTED', 'RELAX', 'QC')
+			        OR 
+			        (mrp.[status] = 'CANCELED' AND mr.[created_at] >= DATEADD(DAY, -2, GETDATE()))
+			    ) AND mrp.active = '1'
+			ORDER BY mr.[created_at] "));
 		// dd($data);
 
 		return view('spreader.request_material_table',compact('data','location'));			
