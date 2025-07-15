@@ -5,11 +5,15 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	@if (config('app.global_variable') == 'gordon')
-	<title>Cutting App - Gordon</title>
+		<title>Cutting App - Gordon</title>
 	@elseif (config('app.global_variable') == 'fiorano')
-	<title>Cutting App - Fiorano</title>
+		<title>Cutting App - Fiorano</title>
+	@elseif (config('app.global_variable') == 'adrianatex')
+		<title>Cutting App - Adrianatex</title>
+	@elseif (config('app.global_variable') == 'itaca')
+		<title>Cutting App - Itaca</title>
 	@else 
-	<title>Cutting App - Adrianatex</title>
+		<title>Cutting App - plant </title>
 	@endif
 		
 	
@@ -21,9 +25,16 @@
 	<!-- <link href="{{ asset('/css/custom.css') }}" rel="stylesheet"> -->
 	@if (config('app.global_variable') == 'gordon')
 		<link href="{{ asset('/css/custom.css') }}" rel='stylesheet' type='text/css'>
-	@else
+	@elseif (config('app.global_variable') == 'fiorano')
 		<link href="{{ asset('/css/customf.css') }}" rel='stylesheet' type='text/css'>
+	@elseif (config('app.global_variable') == 'adrianatex')
+		<link href="{{ asset('/css/customa.css') }}" rel='stylesheet' type='text/css'>
+	@elseif (config('app.global_variable') == 'itaca')
+		<link href="{{ asset('/css/customi.css') }}" rel='stylesheet' type='text/css'>
+	@else
+		<link href="{{ asset('/css/custom.css') }}" rel='stylesheet' type='text/css'>
 	@endif
+
 	<!-- <link href="{{ asset('/css/jquery.dataTables.min.css') }}" rel='stylesheet' type='text/css'> -->
 	<link href="{{ asset('/css/jquery-ui.min.css') }}" rel='stylesheet' type='text/css'>
 	<link href="{{ asset('/css/app.css') }}" rel='stylesheet' type='text/css'>
@@ -66,8 +77,14 @@
 
 				@if (config('app.global_variable') == 'gordon')
 					<a class="navbar-brand" href="{{ url('/') }}"><b>Cutting</b></a>
-				@else
+				@elseif (config('app.global_variable') == 'fiorano')
 					<a class="navbar-brand" href="{{ url('/') }}"><b>Cutting Fiorano</b></a>
+				@elseif (config('app.global_variable') == 'adrianatex')
+					<a class="navbar-brand" href="{{ url('/') }}"><b>Cutting Adrianatex</b></a>
+				@elseif (config('app.global_variable') == 'itaca')
+					<a class="navbar-brand" href="{{ url('/') }}"><b>Cutting Itaca</b></a>
+				@else
+					<a class="navbar-brand" href="{{ url('/') }}"><b>Cutting </b></a>
 				@endif
 				<a class="navbar-brand" href="#">|</a>
 			</div>

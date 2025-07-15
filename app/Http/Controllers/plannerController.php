@@ -2390,7 +2390,7 @@ class plannerController extends Controller {
 					$mattress_pro_array[] = '';
 					$marker_pcs_per_layer[] = '';
 
-					// Gordon -> ask pro, Fiorano -> ask pro
+					// Ask pro
 					foreach ($find_in_marker_lines as $line) {
 			   			$style_size = $line->style_size;
 			   			$pro_pcs_layer = (float)$line->pcs_on_layer;
@@ -2402,8 +2402,6 @@ class plannerController extends Controller {
 			   			// dd($find_in_pro_skedas);
 
 
-			   			// multiple selection for Fiorano
-			   			// for Gordon is fine but not for Fiorano
 						// if (!isset($find_in_pro_skedas[0])) {
 			   			//		dd('can not find pro for ths mattress');
 			   			// }  else {
@@ -2585,7 +2583,7 @@ class plannerController extends Controller {
 				} 
 				
 			} else {
-				// Fiorano , bin was imported before
+				// Bin was imported before
 				$g_bin = $g_bin;
 			}
 		}
@@ -3559,7 +3557,7 @@ class plannerController extends Controller {
 			$marker_pcs_per_layer[] = '';
 
 
-			// Gordon -> ask pro, Fiorano -> ask pro
+			// Ask pro
 			foreach ($find_in_marker_lines as $line) {
 	   			$style_size = $line->style_size;
 	   			$pro_pcs_layer = (float)$line->pcs_on_layer;
@@ -3571,8 +3569,8 @@ class plannerController extends Controller {
 	   			// dd($find_in_pro_skedas);
 
 
-	   			// multiple selection for Fiorano
-	   			// for Gordon is fine
+	   			// multiple selection 
+	   			
 				if (!isset($find_in_pro_skedas[0])) {
 	   				dd('can not find pro for ths mattress');
 	   			}  else {
@@ -7985,10 +7983,7 @@ class plannerController extends Controller {
 				$spreading_profile = '';
 			}
 
-   		} else if (config('app.global_variable') == 'fiorano') {
-   			$spreading_profile = '';
-
-		} else {
+   		} else {
 			$spreading_profile = '';
 		}
 		// dd('spreading profile: '.$spreading_profile);
@@ -8402,10 +8397,7 @@ class plannerController extends Controller {
 				$spreading_profile = '';
 			}
 
-   		} else if (config('app.global_variable') == 'fiorano') {
-   			$spreading_profile = '';
-
-		} else {
+   		} else {
 			$spreading_profile = '';
 		}
 		// dd('spreading profile: '.$spreading_profile);
@@ -8681,10 +8673,7 @@ class plannerController extends Controller {
 						$spreading_profile = '';
 					}
 
-		   		} else if (config('app.global_variable') == 'fiorano') {
-		   			$spreading_profile = '';
-
-				} else {
+		   		} else {
 					$spreading_profile = '';
 				}
 				// dd('spreading profile: '.$spreading_profile);
@@ -9176,10 +9165,7 @@ class plannerController extends Controller {
 							${"spreading_profile_{$x}"} = '';
 						}
 
-			   		} else if (config('app.global_variable') == 'fiorano') {
-			   			${"spreading_profile_{$x}"} = '';
-
-					} else {
+			   		} else {
 						${"spreading_profile_{$x}"} = '';
 					}
 					
@@ -9454,10 +9440,7 @@ class plannerController extends Controller {
 						${"spreading_profile_{$x}"} = '';
 					}
 
-		   		} else if (config('app.global_variable') == 'fiorano') {
-		   			${"spreading_profile_{$x}"} = '';
-
-				} else {
+		   		} else {
 					${"spreading_profile_{$x}"} = '';
 				}
 
