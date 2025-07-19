@@ -150,7 +150,7 @@ class importController extends Controller {
 						$skeda = $row['skeda'];
 						if (config('app.global_variable') == 'gordon') {
 							if (strlen($skeda) != 14) {
-								dd('Skeda mora biti 14 karaktera');
+								dd('Skeda mora biti 14 karaktera 1');
 							}
 						}
 						$log_rep = $row['reported_to_log'];
@@ -783,7 +783,7 @@ class importController extends Controller {
 							$skeda = $row['skeda'];
 							if (config('app.global_variable') == 'gordon') {
 								if (strlen($skeda) != 14) {
-									dd('Skeda mora biti 14 karaktera');
+									dd('Skeda mora biti 14 karaktera 2');
 								}
 							}
 							$sku = trim($row['sku']);
@@ -854,7 +854,7 @@ class importController extends Controller {
 							$skeda = $row['skeda'];
 							if (config('app.global_variable') == 'gordon') {
 								if (strlen($skeda) != 14) {
-									dd('Skeda mora biti 14 karaktera');
+									dd('Skeda mora biti 14 karaktera 3');
 								}
 							}
 							$sku = trim(strtoupper($row['sku']));
@@ -942,7 +942,11 @@ class importController extends Controller {
 						// print_r('PAS');
 						// dd($row);
 	                	$paspul_roll = $row['paspul_roll'];	
-	                							
+	                	
+	                	if (empty($paspul_roll)) {
+				            return; // Exit the chunk callback (and thus, the foreach)
+				        }
+        			
 						$check_paspul_roll = DB::connection('sqlsrv')->select(DB::raw("SELECT p.id, p.skeda, pl.status
 							FROM [cutting].[dbo].paspuls as p 
 							LEFT JOIN [cutting].[dbo].paspul_lines as pl ON pl.paspul_roll_id = p.id AND pl.active = 1
@@ -979,7 +983,7 @@ class importController extends Controller {
 								$skeda = $row['skeda'];
 										if (config('app.global_variable') == 'gordon') {
 									if (strlen($skeda) != 14) {
-										dd('Skeda mora biti 14 karaktera');
+										dd('Skeda mora biti 14 karaktera 4');
 									}
 								}
 								$skeda_status = 'OPEN'; // OPEN/CLOSED ???????????????????????
@@ -1073,7 +1077,7 @@ class importController extends Controller {
 							$skeda = $row['skeda'];
 							if (config('app.global_variable') == 'gordon') {
 								if (strlen($skeda) != 14) {
-									dd('Skeda mora biti 14 karaktera');
+									dd('Skeda mora biti 14 karaktera 5');
 								}
 							}
 							$skeda_status = 'OPEN'; // OPEN/CLOSED ???????????????????????
@@ -1262,7 +1266,7 @@ class importController extends Controller {
 								// print_r($find_in_mattresses[0]->skeda);
 								if (config('app.global_variable') == 'gordon') {
 									if (strlen($row['skeda']) != 14) {
-										dd('Skeda mora biti 14 karaktera');
+										dd('Skeda mora biti 14 karaktera 6');
 									}
 								}
 
@@ -1390,7 +1394,7 @@ class importController extends Controller {
 							$skeda = $row['skeda'];
 							if (config('app.global_variable') == 'gordon') {
 								if (strlen($skeda) != 14) {
-									dd('Skeda mora biti 14 karaktera');
+									dd('Skeda mora biti 14 karaktera 7');
 								}
 							}
 
@@ -2177,7 +2181,7 @@ class importController extends Controller {
 	                	$skeda = $mattress_data->skeda;
 	                	if (config('app.global_variable') == 'gordon') {
 							if (strlen($skeda) != 14) {
-								dd('Skeda mora biti 14 karaktera');
+								dd('Skeda mora biti 14 karaktera 8');
 							}
 						}
 	                	$mattress = $row['mattress'];
@@ -2555,11 +2559,11 @@ class importController extends Controller {
 
 	                	// dd($row);
 	                	$skeda = trim($row['skeda']);
-	                	if (config('app.global_variable') == 'gordon') {
-							if (strlen($skeda) != 14) {
-								dd('Skeda mora biti 14 karaktera');
-							}
-						}
+	     				//if (config('app.global_variable') == 'gordon') {
+						// 	if (strlen($skeda) != 14) {
+						// 		dd('Skeda mora biti 14 karaktera 9');
+						// 	}
+						// }
 						$pas_bin = trim($row['pas_bin']);
 						$adez_bin = trim($row['adez_bin']);
 						// dd($skeda);
@@ -2719,7 +2723,7 @@ class importController extends Controller {
 	                	$skeda = strtoupper(trim($row['skeda']));
 	                	if (config('app.global_variable') == 'gordon') {
 							if (strlen($skeda) != 14) {
-								dd('Skeda mora biti 14 karaktera');
+								dd('Skeda mora biti 14 karaktera 10');
 							}
 						}				
 
@@ -2902,7 +2906,7 @@ class importController extends Controller {
 	                	$skeda = strtoupper(trim($row['skeda']));
 	                	if (config('app.global_variable') == 'gordon') {
 							if (strlen($skeda) != 14) {
-								dd('Skeda mora biti 14 karaktera');
+								dd('Skeda mora biti 14 karaktera 11');
 							}
 						}
 	                	$paspul_type = $row['type'];
@@ -3216,7 +3220,7 @@ class importController extends Controller {
 						$skeda = $row['skeda'];
 						if (config('app.global_variable') == 'gordon') {
 							if (strlen($skeda) != 14) {
-								dd('Skeda mora biti 14 karaktera');
+								dd('Skeda mora biti 14 karaktera 12');
 							}
 						}
 
