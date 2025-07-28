@@ -26,6 +26,7 @@ use App\paspul_rewound;
 use App\mattress_split_request;
 use App\paspul_stock;
 use App\paspul_stock_log;
+use App\req_paspul;
 
 use App\print_standard_mattress;
 use App\print_mini_mattress;
@@ -7786,6 +7787,39 @@ class plannerController extends Controller {
 		return Redirect::to('/paspul_stock');
 	}
 
+	public function paspul_req_list() {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM req_paspuls 
+			WHERE status = 'Pending'
+			ORDER BY created_at desc
+			"));
+		// dd($data);
+
+		
+		return view('planner.paspul_req_list', compact('data'));
+	}
+
+	public function paspul_req_list_log() {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM req_paspuls 
+			WHERE created_at >= DATEADD(DAY, -60, GETDATE())
+			ORDER BY created_at desc
+			"));
+		// dd($data);
+
+		
+		return view('planner.paspul_req_list', compact('data'));
+	}
+
+	public function req_paspul_complete ($id) {
+
+		$req_paspul = req_paspul::findOrFail($id);
+		$req_paspul->status = 'Completed';
+		$req_paspul->save();
+
+		return Redirect::to('/paspul_req_list');
+	}
+
 	public function paspul_remove_valy() {
 		// dd('test');
 
@@ -7913,6 +7947,7 @@ class plannerController extends Controller {
 
 		return redirect('/paspul_stock');
 	}
+
 
 //PRINTING
 

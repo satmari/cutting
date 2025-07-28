@@ -267,6 +267,9 @@
 									<li><a href="{{ url('paspul_stock') }}"><b><sapn style="">Paspul stock</span></b></a></li>
 									<li><a href="{{ url('paspul_stock_log') }}"><b><sapn style="c">Paspul stock log</span></b></a></li>
 									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('paspul_req_list') }}"><b><sapn style="color: green;">Paspul request</span></b></a></li>
+									<li><a href="{{ url('paspul_req_list_log') }}"><b><sapn style="color: green;">Paspul request logs</span></b></a></li>
+									<li role="separator" class="divider"></li>
 									<li><a href="{{ url('paspul_remove_valy') }}"><b><sapn style="color: blue;">Remove RECEIVED_IN_VALY</span></b></a></li>
 								</ul>
 							</li>

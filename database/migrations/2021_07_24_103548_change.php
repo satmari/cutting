@@ -211,6 +211,13 @@ class Change extends Migration {
             
         });
 
+        Schema::table('req_cut_parts', function($table) 
+		{
+            // $table->string('sent')->nullable();
+            // $table->integer('req_qty')->nullable();
+            
+        });
+
 
 
 

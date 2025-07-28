@@ -17,6 +17,7 @@ use App\req_reprintbb;
 use App\req_padprint;
 use App\req_cut_part;
 use App\req_lost;
+use App\req_paspul;
 
 use App\User;
 use Bican\Roles\Models\Role;
@@ -738,6 +739,53 @@ class requestController extends Controller {
 		}
 
 		return Redirect::to('req_cut_part_table/');
+	}
+
+	public function req_paspul($id) {
+
+		// dd($id);
+		$table = req_cut_part::findOrFail($id);
+		$qty = $table->qty;
+		return view('requests.req_paspul', compact('id','qty'));
+
+	}
+
+	public function req_paspul_post(Request $request) {
+
+		$this->validate($request, ['id'=>'required']);
+		$input = $request->all();
+		$id = $input['id'];
+		$req_qty = (int)$input['req_qty'];
+
+		// dd($req_qty);
+		
+			$table = req_cut_part::findOrFail($id);
+			$table->sent = 'sent';			
+			$table->req_qty = $req_qty;
+			$table->save();
+
+			$table_new = new req_paspul;
+			$table_new->module = $table->module;
+			$table_new->po = $table->po;
+			$table_new->bb = $table->bb;
+			$table_new->style = $table->style;
+			$table_new->color = $table->color;
+			$table_new->size = $table->size;
+			$table_new->bagno = $table->bagno;
+			$table_new->image = $table->image;
+
+			$table_new->part = $table->part;
+			$table_new->qty = $table->qty;
+			$table_new->comment = $table->comment;
+			$table_new->status = $table->status;			
+
+			$table_new->sent = 'sent';
+			$table_new->req_qty = $req_qty;
+			$table_new->save();
+
+
+		return Redirect::to('req_cut_part_table/');
+
 	}
 
 	public function req_lost() {

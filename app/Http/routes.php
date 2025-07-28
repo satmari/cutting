@@ -119,6 +119,9 @@ Route::get('req_padprint_table', 'requestController@req_padprint_table');
 Route::get('req_padprint_table_history', 'requestController@req_padprint_table_history');
 Route::get('req_cut_part_table', 'requestController@req_cut_part_table');
 Route::get('req_cut_part_table_history', 'requestController@req_cut_part_table_history');
+Route::get('req_paspul/{id}', 'requestController@req_paspul');
+Route::post('req_paspul_post', 'requestController@req_paspul_post');
+
 Route::get('req_lost_table', 'requestController@req_lost_table');
 Route::get('req_lost_table_history', 'requestController@req_lost_table_history');
 Route::get('req_lost_table_history_line', 'requestController@req_lost_table_history_line');
@@ -340,6 +343,9 @@ Route::get('paspul_change_kotur_qty/{id}', 'plannerController@paspul_change_kotu
 Route::post('paspul_pco1_planner_confirm', 'plannerController@paspul_pco1_planner_confirm');
 Route::get('paspul_stock', 'plannerController@paspul_stock');
 Route::get('paspul_change_q/{id}', 'plannerController@paspul_change_q');
+Route::get('paspul_req_list', 'plannerController@paspul_req_list');
+Route::get('paspul_req_list_log', 'plannerController@paspul_req_list_log');
+Route::get('req_paspul_complete/{id}', 'plannerController@req_paspul_complete');
 
 Route::get('paspul_delete_line/{id}', 'plannerController@paspul_delete_line');
 Route::post('paspul_delete_line_confirm', 'plannerController@paspul_delete_line_confirm');
@@ -355,7 +361,6 @@ Route::get('paspul_stock_update_pc_kotur_post', 'plannerController@paspul_stock_
 Route::get('paspul_remove_valy', 'plannerController@paspul_remove_valy');
 Route::post('paspul_remove_valy_skeda', 'plannerController@paspul_remove_valy_skeda');
 Route::post('paspul_remove_valy_remove', 'plannerController@paspul_remove_valy_remove');
-
 
 Route::get('print_mattress/{id}', 'plannerController@print_mattress');
 Route::post('print_mattress_confirm', 'plannerController@print_mattress_confirm');
