@@ -445,7 +445,7 @@ class cutterController extends Controller {
 			 	// dd($check_pro_in_posummarry);
 
 			 	if (!isset($check_pro_in_posummarry[0]->location_all)) {
-			 		dd('Fali komesa u posummary applikaciji, javiti planerima');
+			 		dd('Missing PRO in PoSummary table');
 
 			 	} else {
 			 		if ($check_pro_in_posummarry[0]->location_all == "Subotica") {
