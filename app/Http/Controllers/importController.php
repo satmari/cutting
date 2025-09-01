@@ -2175,8 +2175,15 @@ class importController extends Controller {
 
 	                	$mp_lines = $mp_lines + 1;
 
-	                	$mattress_data = mattress::where('mattress', $row['mattress'])->firstOrFail();
+	                	// $mattress_data = mattress::where('mattress', $row['mattress'])->firstOrFail();
 	                	// dd($mattress_data);
+
+	                	$mattress_data = Mattress::where('mattress', $row['mattress'])->first();
+
+						if (!$mattress_data) {
+						    dd('Mattress not found for value: ' . $row['mattress']);
+						}
+						
 	                	$mattress_id = $mattress_data->id;
 	                	$skeda = $mattress_data->skeda;
 	                	if (config('app.global_variable') == 'gordon') {
