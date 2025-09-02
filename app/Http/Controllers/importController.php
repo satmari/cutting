@@ -2181,7 +2181,9 @@ class importController extends Controller {
 	                	$mattress_data = Mattress::where('mattress', $row['mattress'])->first();
 
 						if (!$mattress_data) {
-						    dd('Mattress not found for value: ' . $row['mattress']);
+						    var_dump('Mattress not found for value: ' . $row['mattress']);
+						    $mp_error = $mp_error + 1;
+	                		continue;
 						}
 						
 	                	$mattress_id = $mattress_data->id;
