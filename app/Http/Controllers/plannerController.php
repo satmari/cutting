@@ -6484,7 +6484,8 @@ class plannerController extends Controller {
 				$final_roll = 'NO';
 			}
 
-			if ($skeda_item_type == "PA") {
+			// Itaca and Fiorano doesent need PAS bin 
+			if ($skeda_item_type == "PA" and config('app.global_variable') == 'gordon') {
 				if (isset($input['bin'])) {
 					$pas_bin = $input['bin'];
 				}else if (isset($input['bins'])) {
