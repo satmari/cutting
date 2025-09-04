@@ -340,7 +340,8 @@ Route::get('edit_paspul_roll_line/{id}', 'plannerController@edit_paspul_roll_lin
 Route::post('edit_paspul_roll_line_confirm', 'plannerController@edit_paspul_roll_line_confirm');
 
 Route::get('paspul_change_kotur_qty/{id}', 'plannerController@paspul_change_kotur_qty');
-Route::post('paspul_pco1_planner_confirm', 'plannerController@paspul_pco1_planner_confirm');
+Route::post('paspul_change_kotur_qty_confirm', 'plannerController@paspul_change_kotur_qty_confirm');
+
 Route::get('paspul_stock', 'plannerController@paspul_stock');
 Route::get('paspul_change_q/{id}', 'plannerController@paspul_change_q');
 Route::get('paspul_req_list', 'plannerController@paspul_req_list');

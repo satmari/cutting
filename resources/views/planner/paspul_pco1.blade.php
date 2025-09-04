@@ -11,7 +11,7 @@
                     <input id="filter" type="text" class="form-control" placeholder="Type here...">
                 </div> -->
 
-                {!! Form::open(['method'=>'POST', 'url'=>'/paspul_pco1_planner_confirm']) !!}
+                {!! Form::open(['method'=>'POST', 'url'=>'/paspul_change_kotur_qty_confirm']) !!}
 
                         {!! Form::hidden('id', $id, ['class' => 'form-control']) !!}
                         {!! Form::hidden('paspul_rewound_roll', $paspul_rewound_roll, ['class' => 'form-control']) !!}

@@ -7447,7 +7447,7 @@ class plannerController extends Controller {
 			,'kotur_partialy','paspul_rewound_roll','paspul_roll_id'));
 	}
 
-	public function paspul_pco1_planner_confirm(Request $request) {
+	public function paspul_change_kotur_qty_confirm(Request $request) {
 
 
 		$this->validate($request, ['kotur_partialy' => 'required']);
@@ -7499,14 +7499,15 @@ class plannerController extends Controller {
 			$find_all_paspuls = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 					[id], [paspul_roll], [paspul_roll_id], [status] , [kotur_partialy]
 				FROM [paspul_rewounds] 
-				WHERE [paspul_roll_id] = '".$paspul_roll_id."' ")); // SKIP THIS CHILD
+				WHERE [paspul_roll_id] = '".$paspul_roll_id."' AND
+				id != '".$id."' ")); // SKIP THIS CHILD
 			// dd($find_all_paspuls);
 
 			$to_completed = 0;
 			for ($i=0; $i < count($find_all_paspuls); $i++) {
 			
 				if ($find_all_paspuls[$i]->status != "COMPLETED") {
-					$to_completed = $to_completed;
+					$to_completed = $to_completed + 1;
 				} else {
 					$to_completed = $to_completed;
 				}
@@ -7517,14 +7518,14 @@ class plannerController extends Controller {
 
 				// ALL CHILD (expt this) ARE COMPLETED
 				$no_of_child = count($find_all_paspuls);
-				$no_of_child = $no_of_child;
+				$no_of_child = $no_of_child+1;
 				// dd($no_of_child);
 
 				$sum_of_child_kotur = DB::connection('sqlsrv')->select(DB::raw("SELECT 
 					SUM(kotur_partialy) as sum_k
 					FROM [paspul_rewounds]
 					WHERE [paspul_roll_id] = '".$paspul_roll_id."' "));
-				$sum_of_child_kotur = (int)$sum_of_child_kotur[0]->sum_k;
+				$sum_of_child_kotur = (int)$sum_of_child_kotur[0]->sum_k + $kotur_partialy;
 				// dd($sum_of_child_kotur);
 				
 				$kotur_actual = (int)$sum_of_child_kotur / (int)$no_of_child;
@@ -7535,7 +7536,9 @@ class plannerController extends Controller {
 				$table->kotur_actual = $kotur_actual; // CALCULATIONS
 				$table->save();
 			}
-		} 
+		} else {
+			dd('Father paspul status is not COMPLETED, unable to change kotur qty.');
+		}
 		
 		return redirect('/');
 	}
