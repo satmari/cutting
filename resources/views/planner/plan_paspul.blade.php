@@ -104,7 +104,7 @@
 				        		@if ($req1->unit_cons != 0)
 				        			<b>{{round( (($req1->rewound_length_a  - $req1->rewound_sum) * $req1->kotur_actual)/ $req1->unit_cons ,0) }}</b></td>
 				        		@else
-				        			<span sytle="color:red"><big><b>missing mtr per pcs</b></big></span>
+				        			<span sytle="color:red"><big><b>Missing mtr per pcs</b></big></span>
 				        		@endif
 				        		
 				        	@else
@@ -188,7 +188,7 @@
 				        		@if ($req1->unit_cons != 0)
 				        			<b>{{round( (($req1->rewound_length_partialy) * $req1->kotur_planned)/ $req1->unit_cons ,0) }}</b></td>
 				        		@else
-				        			<span sytle="color:red">missing mtr per pcs</span>
+				        			<span sytle="color:red">Missing mtr per pcs</span>
 				        		@endif
 				        	@else
 				        		<b>{{round( (($req1->rewound_length_partialy) * $req1->kotur_planned)* $req1->unit_cons ,0) }}</b></td>

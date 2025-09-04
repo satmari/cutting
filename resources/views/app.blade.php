@@ -271,6 +271,8 @@
 									<li><a href="{{ url('paspul_req_list_log') }}"><b><sapn style="color: green;">Paspul request logs</span></b></a></li>
 									<li role="separator" class="divider"></li>
 									<li><a href="{{ url('paspul_remove_valy') }}"><b><sapn style="color: blue;">Remove RECEIVED_IN_VALY</span></b></a></li>
+									<li role="separator" class="divider"></li>
+									<li><a href="{{ url('search_u_cons') }}"><span style="color: red;" >Paspul unitary consumption table</span></a></li>
 								</ul>
 							</li>
 							<li class="dropdown">

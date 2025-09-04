@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
             <div class="panel panel-default">
-                <div class="panel-heading">Promeni consumption MTR per PCS:
+                <div class="panel-heading">Edit consumption MTR per PCS:
                     </div>
                 
                 @if (isset($msge))
@@ -33,7 +33,7 @@
                     </div>
                     
                     <br>
-                    {!! Form::submit('Snimi', ['class' => 'btn  btn-danger center-block']) !!}
+                    {!! Form::submit('Save', ['class' => 'btn  btn-danger center-block']) !!}
 
                     @include('errors.list')
                 {!! Form::close() !!}
