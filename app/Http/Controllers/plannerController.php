@@ -6244,7 +6244,7 @@ class plannerController extends Controller {
 		}
 
 		// Itaca and Fiorano doesent need pas bin
-		if ($skeda_item_type == 'PA' and config('app.global_variable') != 'gordon') {
+		if ($skeda_item_type == 'PA' and config('app.global_variable') == 'gordon') {
 			if (($pas_bin == '') AND ($adez_bin == '')) {
 				// dd("pas_bin is empty for this skeda");
 				$msg = 'Can not find paspul bin or adez bin for this skeda and skeda_type PA , please insert it in paspul_bin table!';
