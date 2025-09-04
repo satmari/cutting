@@ -40,7 +40,7 @@
 		                -->
 		                   		<thead>
 			                       <tr>
-			                    		<th >Position</th>
+			                    		<!-- <th >Position</th> -->
 			                            <th >Paspul rewound roll</th>
 			                            <!-- <th >SAP SU</th> -->
 			                            <th >Rewound length</th>
@@ -84,7 +84,7 @@
 											
 											 ">
 			                            
-			                            <td>{{ $req->position}}</td>
+			                            <!-- <td>{{ $req->position}}</td> -->
 			                            <td>{{ $req->paspul_rewound_roll}}</td>
 			                            {{-- <td>{{ $req->sap_su}}</td> --}}
 			                            <td><big><b>{{ round($req->rewound_length_partialy,3) }}</b></big></td>
