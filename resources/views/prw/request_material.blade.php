@@ -47,7 +47,7 @@
 				</div>
 				@endif
 
-	            <hr>
+	            <br>
 	            <br>
 	            	<a href="{{ url('prw') }}" class="btn btn-default center-bl ock">Back</a>
 	            <br>

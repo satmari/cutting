@@ -56,7 +56,7 @@
                         <p>Comment operator: </p>
                             {!! Form::textarea('comment_operator', $comment_operator , ['class' => 'form-control', 'rows' => 2]) !!}
                         </div>
-                        <hr>
+                        <br>
                         {!! Form::submit('Confirm rewound', ['class' => 'btn  btn-danger center-block']) !!}
                         <br>
                         @include('errors.list')

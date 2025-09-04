@@ -45,7 +45,7 @@
                             <hr>
 
                         <div class="panel-body">
-                        <p>Koturi <b><i>(unesite broj iskrojenih kotura)</i></b>: </p>
+                        <p>Koturi <b><i>(insert number of koturi pieces)</i></b>: </p>
                             {!! Form::number('kotur_partialy', "", ['class' => 'form-control', 'step'=>'1']) !!}
                         </div>
 

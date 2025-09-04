@@ -22,7 +22,7 @@
                         <a href="{{url('/paspul_delete_line/'.$id)}}" class="btn btn-danger btn-xs center-blo ck">Delete</a>
                         <hr>
                         <div class="panel-body">
-                        <p>Koturi <b><i>(unesite broj iskrojenih kotura)</i></b>: </p>
+                        <p>Koturi <b><i>(insert number of cut out koturi)</i></b>: </p>
                             {!! Form::number('kotur_qty', $kotur_qty, ['class' => 'form-control', 'step'=>'1']) !!}
                         </div>
 
