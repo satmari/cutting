@@ -494,6 +494,7 @@ class importController extends Controller {
 				}
    			}
    			// dd($style);
+   			$style = str_ireplace('.mdl', '', $style);
    			
 			// print_r("Style: ".$style);
 			// print_r('<br>');
@@ -610,6 +611,7 @@ class importController extends Controller {
 					}
 				}
 
+				$style = str_ireplace('.mdl', '', $style);
 				// dd($size);
 				$s = explode('::', $size);
 				$size = $s[0];
