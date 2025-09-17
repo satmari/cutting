@@ -106,18 +106,11 @@
 				@if ($location == 'BOARD_TABLE') plan_menu_a @endif"
 				><span class="glyphicon  glyphicon-modal-window" aria-hidden="true"></span>&nbsp;Planning board table</a>
 
-				@if (config('app.global_variable') == 'gordon')
+				
 					<a href="{{ url('plan_mattress/BOARD')}}" class="btn btn-default
 					@if ($location == 'BOARD') plan_menu_a @endif"
 					><span class="glyphicon  glyphicon-blackboard" aria-hidden="true"></span>&nbsp;Planning board</a>
-				@endif
-
-				@if (config('app.global_variable') == 'gordon' OR config('app.global_variable') == 'fiorano')
-					<a href="{{ url('plan_mattress/BOARDF')}}" class="btn btn-default
-					@if ($location == 'BOARDF') plan_menu_a @endif"
-					><span class="glyphicon  glyphicon-blackboard" aria-hidden="true"></span>&nbsp;Planning board Fiorano</a>
-
-				@endif
+				
 				
 
 				<br>
@@ -954,7 +947,7 @@
 		</div>
 
 	@else
-		
+
 		<div class="container-fluid">
 				<div class="row">
 					<hr>
