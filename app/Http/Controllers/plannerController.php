@@ -732,1141 +732,1270 @@ class plannerController extends Controller {
 			}
 		}
 
-		if ($location == 'BOARD') {
+		if ($location == 'BOARD' OR $location == 'BOARDF') {
 			
-			$sp0 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-			   m1.[id]
-		      ,m1.[mattress]
-		      ,m1.[material]
-		      ,m1.[g_bin]
-		      ,m1.[dye_lot]
-		      ,m1.[color_desc]
-		      ,m1.[skeda]
-		      ,m1.[spreading_method]
-		      ,m1.[width_theor_usable]
-		      ,m2.[position]
-		      ,m2.[layers]
-		      ,m2.[layers_a]
-		      ,m2.[cons_planned]
-		      ,m2.[cons_actual]
-		      ,m2.[priority]
-		      ,m2.[printed_marker]
-		      ,m2.[comment_office]
-		      ,m2.[overlapping]
-		      ,m2.[last_mattress]
-		      ,m3.[marker_name]
-		      ,m3.[marker_length]
-		      ,m3.[marker_width]
-		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
-		      ,m4.[status]
-		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
-		      ,(SELECT 
-					TOP 1 x.average_of_min_per_meter_minm
-				
-					FROM (
-						SELECT 
-						*,
-						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
-						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
-						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
-						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting_smv_by_categories]) as x
-					WHERE	x.spreading_method = (SELECT 
-												CASE 
-												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
-												ELSE 'FACE UP/DOWN'
-												END)
-							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
-							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
-			 	) as average_of_min_per_meter_minm_c,
-			 	(SELECT 
-						TOP 1 average_of_min_per_meter_minm
-					  FROM [cutting_smv_by_materials]
-					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-			 	) as average_of_min_per_meter_minm_m,
-				(SELECT 
-						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
-				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
-				FROM [pro_skedas] as t1
-				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
-				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
-				WHERE t3.id = m1.id)
-				as color
-				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
-			  FROM [mattresses] as m1
-			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			  WHERE m4.[location] = 'SP0' AND m4.[active] = 1 
-			  ORDER BY m2.[priority] desc, m1.[skeda] asc"));
-
-			$sp0_req_time = [];
-			foreach ($sp0 as $line) {
-
-				if ($line->average_of_min_per_meter_minm_c != 0) {
-					// dd('test');
-			        if (array_key_exists($line->priority, $sp0_req_time)) {
-			            $sp0_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        } else { 
-			            $sp0_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        }
-
-				} else if ($line->average_of_min_per_meter_minm_m != 0) {
-
-					if (array_key_exists($line->priority, $sp0_req_time)) {
-			            $sp0_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        } else { 
-			            $sp0_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        }
-
-				} else {
-
-					if (array_key_exists($line->priority, $sp0_req_time)) {
-			            $sp0_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        } else {
-			            $sp0_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        }
-
-				}
-			}
-			// dd($sp0_req_time);
-
-			$sp0_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				SUM(m3.[marker_length]) as sum_m_length,
-				SUM(m2.[layers_a]) as sum_m_layers,
-				SUM(m2.[cons_actual]) as sum_m_cons
-				FROM [mattresses] as m1
-				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-				WHERE m4.[location] = 'SP0' AND m4.[active] = 1"));
-			
-			$sp0_m = $sp0_m[0]->sum_m_cons;
-
-			
-			$sp1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-			   m1.[id]
-		      ,m1.[mattress]
-		      ,m1.[material]
-		      ,m1.[g_bin]
-		      ,m1.[dye_lot]
-		      ,m1.[color_desc]
-		      ,m1.[skeda]
-		      ,m1.[spreading_method]
-		      ,m1.[width_theor_usable]
-		      ,m2.[position]
-		      ,m2.[layers]
-		      ,m2.[layers_a]
-		      ,m2.[cons_planned]
-		      ,m2.[cons_actual]
-		      ,m2.[priority]
-		      ,m2.[printed_marker]
-		      ,m2.[comment_office]
-		      ,m2.[overlapping]
-		      ,m2.[last_mattress]
-		      ,m3.[marker_name]
-		      ,m3.[marker_length]
-		      ,m3.[marker_width]
-		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
-		      ,m4.[status]
-		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
-		      ,(SELECT 
-					TOP 1 x.average_of_min_per_meter_minm
-				
-					FROM (
-						SELECT 
-						*,
-						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
-						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
-						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
-						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting_smv_by_categories]) as x
-					WHERE	x.spreading_method = (SELECT 
-												CASE 
-												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
-												ELSE 'FACE UP/DOWN'
-												END)
-							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
-							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
-			 	) as average_of_min_per_meter_minm_c,
-			 	(SELECT 
-						TOP 1 average_of_min_per_meter_minm
-					  FROM [cutting_smv_by_materials]
-					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-			 	) as average_of_min_per_meter_minm_m,
-				(SELECT 
-						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
-				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
-				FROM [pro_skedas] as t1
-				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
-				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
-				WHERE t3.id = m1.id)
-				as color
-				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
-
-			  FROM [mattresses] as m1
-			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			  WHERE m4.[location] = 'SP1' AND m4.[active] = 1 
-			  ORDER BY m2.[position] asc"));
-
-			// dd($sp1);
-
-			
-			$sp1_req_time = [];
-			foreach ($sp1 as $line) {
-
-				if ($line->average_of_min_per_meter_minm_c != 0) {
-					// dd('test');
-			        if (array_key_exists($line->priority, $sp1_req_time)) {
-			            $sp1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        } else { 
-			            $sp1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        }
-
-				} else if ($line->average_of_min_per_meter_minm_m != 0) {
-
-					if (array_key_exists($line->priority, $sp1_req_time)) {
-			            $sp1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        } else { 
-			            $sp1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        }
-
-				} else {
-
-					if (array_key_exists($line->priority, $sp1_req_time)) {
-			            $sp1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        } else {
-			            $sp1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        }
-
-				}
-			}
-			// dd($sp1_req_time);
-			
-
-			$sp1_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				SUM(m3.[marker_length]) as sum_m_length,
-				SUM(m2.[layers_a]) as sum_m_layers,
-				SUM(m2.[cons_actual]) as sum_m_cons
-				FROM [mattresses] as m1
-				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-				WHERE m4.[location] = 'SP1' AND m4.[active] = 1"));
-
-			$sp1_m = $sp1_m[0]->sum_m_cons;
-
-
-			$sp2 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-			   m1.[id]
-		      ,m1.[mattress]
-		      ,m1.[material]
-		      ,m1.[g_bin]
-		      ,m1.[dye_lot]
-		      ,m1.[color_desc]
-		      ,m1.[skeda]
-		      ,m1.[spreading_method]
-		      ,m1.[width_theor_usable]
-		      ,m2.[position]
-		      ,m2.[layers]
-		      ,m2.[layers_a]
-		      ,m2.[cons_planned]
-		      ,m2.[cons_actual]
-		      ,m2.[priority]
-		      ,m2.[printed_marker]
-		      ,m2.[comment_office]
-		      ,m2.[overlapping]
-		      ,m2.[last_mattress]
-		      ,m3.[marker_name]
-		      ,m3.[marker_length]
-		      ,m3.[marker_width]
-		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
-		      ,m4.[status]
-		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
-		      ,(SELECT 
-					TOP 1 x.average_of_min_per_meter_minm
-				
-					FROM (
-						SELECT 
-						*,
-						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
-						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
-						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
-						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting_smv_by_categories]) as x
-					WHERE	x.spreading_method = (SELECT 
-												CASE 
-												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
-												ELSE 'FACE UP/DOWN'
-												END)
-							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
-							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
-			 	) as average_of_min_per_meter_minm_c,
-			 	(SELECT 
-						TOP 1 average_of_min_per_meter_minm
-					  FROM [cutting_smv_by_materials]
-					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-			 	) as average_of_min_per_meter_minm_m,
-				(SELECT 
-						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
-				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
-				FROM [pro_skedas] as t1
-				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
-				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
-				WHERE t3.id = m1.id)
-				as color
-				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
-			  FROM [mattresses] as m1
-			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			  WHERE m4.[location] = 'SP2' AND m4.[active] = 1 
-			  ORDER BY m2.[position] asc"));
-			
-			$sp2_req_time = [];
-			foreach ($sp2 as $line) {
-
-				if ($line->average_of_min_per_meter_minm_c != 0) {
-					// dd('test');
-			        if (array_key_exists($line->priority, $sp2_req_time)) {
-			            $sp2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        } else { 
-			            $sp2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        }
-
-				} else if ($line->average_of_min_per_meter_minm_m != 0) {
-
-					if (array_key_exists($line->priority, $sp2_req_time)) {
-			            $sp2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        } else { 
-			            $sp2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        }
-
-				} else {
-
-					if (array_key_exists($line->priority, $sp2_req_time)) {
-			            $sp2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        } else {
-			            $sp2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        }
-
-				}
-			}
-			// dd($sp2_req_time);
-
-			$sp2_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				SUM(m3.[marker_length]) as sum_m_length,
-				SUM(m2.[layers_a]) as sum_m_layers,
-				SUM(m2.[cons_actual]) as sum_m_cons
-				FROM [mattresses] as m1
-				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-				WHERE m4.[location] = 'SP2' AND m4.[active] = 1"));
-			
-			$sp2_m = $sp2_m[0]->sum_m_cons;
-
-			$sp3 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				m1.[id]
-		      ,m1.[mattress]
-		      ,m1.[material]
-		      ,m1.[g_bin]
-		      ,m1.[dye_lot]
-		      ,m1.[color_desc]
-		      ,m1.[skeda]
-		      ,m1.[spreading_method]
-		      ,m1.[width_theor_usable]
-		      ,m2.[position]
-		      ,m2.[layers]
-		      ,m2.[layers_a]
-		      ,m2.[cons_planned]
-		      ,m2.[cons_actual]
-		      ,m2.[priority]
-		      ,m2.[printed_marker]
-		      ,m2.[comment_office]
-		      ,m2.[overlapping]
-		      ,m2.[last_mattress]
-		      ,m3.[marker_name]
-		      ,m3.[marker_length]
-		      ,m3.[marker_width]
-		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
-		      ,m4.[status]
-		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
-		      ,(SELECT 
-					TOP 1 x.average_of_min_per_meter_minm
-				
-					FROM (
-						SELECT 
-						*,
-						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
-						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
-						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
-						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting_smv_by_categories]) as x
-					WHERE	x.spreading_method = (SELECT 
-												CASE 
-												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
-												ELSE 'FACE UP/DOWN'
-												END)
-							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
-							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
-			 	) as average_of_min_per_meter_minm_c,
-			 	(SELECT 
-						TOP 1 average_of_min_per_meter_minm
-					  FROM [cutting_smv_by_materials]
-					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-			 	) as average_of_min_per_meter_minm_m,
-				(SELECT 
-						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
-				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
-				FROM [pro_skedas] as t1
-				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
-				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
-				WHERE t3.id = m1.id)
-				as color
-				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
-			  FROM [mattresses] as m1
-			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			  WHERE m4.[location] = 'SP3' AND m4.[active] = 1 
-			  ORDER BY m2.[position] asc"));
-
-			$sp3_req_time = [];
-			foreach ($sp3 as $line) {
-
-				if ($line->average_of_min_per_meter_minm_c != 0) {
-					// dd('test');
-			        if (array_key_exists($line->priority, $sp3_req_time)) {
-			            $sp3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        } else { 
-			            $sp3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        }
-
-				} else if ($line->average_of_min_per_meter_minm_m != 0) {
-
-					if (array_key_exists($line->priority, $sp3_req_time)) {
-			            $sp3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        } else { 
-			            $sp3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        }
-
-				} else {
-
-					if (array_key_exists($line->priority, $sp3_req_time)) {
-			            $sp3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        } else {
-			            $sp3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        }
-
-				}
-			}
-			// dd($sp3_req_time);
-			
-			$sp3_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				SUM(m3.[marker_length]) as sum_m_length,
-				SUM(m2.[layers_a]) as sum_m_layers,
-				SUM(m2.[cons_actual]) as sum_m_cons
-				FROM [mattresses] as m1
-				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-				WHERE m4.[location] = 'SP3' AND m4.[active] = 1"));
-
-			$sp3_m = $sp3_m[0]->sum_m_cons;
-
-			$sp4 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-			   m1.[id]
-		      ,m1.[mattress]
-		      ,m1.[material]
-		      ,m1.[g_bin]
-		      ,m1.[dye_lot]
-		      ,m1.[color_desc]
-		      ,m1.[skeda]
-		      ,m1.[spreading_method]
-		      ,m1.[width_theor_usable]
-		      ,m2.[position]
-		      ,m2.[layers]
-		      ,m2.[layers_a]
-		      ,m2.[cons_planned]
-		      ,m2.[cons_actual]
-		      ,m2.[priority]
-		      ,m2.[printed_marker]
-		      ,m2.[comment_office]
-		      ,m2.[overlapping]
-		      ,m2.[last_mattress]
-		      ,m3.[marker_name]
-		      ,m3.[marker_length]
-		      ,m3.[marker_width]
-		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
-		      ,m4.[status]
-		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
-		      ,(SELECT 
-					TOP 1 x.average_of_min_per_meter_minm
-				
-					FROM (
-						SELECT 
-						*,
-						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
-						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
-						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
-						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting_smv_by_categories]) as x
-					WHERE	x.spreading_method = (SELECT 
-												CASE 
-												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
-												ELSE 'FACE UP/DOWN'
-												END)
-							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
-							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
-			 	) as average_of_min_per_meter_minm_c,
-			 	(SELECT 
-						TOP 1 average_of_min_per_meter_minm
-					  FROM [cutting_smv_by_materials]
-					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-			 	) as average_of_min_per_meter_minm_m,
-				(SELECT 
-						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
-				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
-				FROM [pro_skedas] as t1
-				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
-				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
-				WHERE t3.id = m1.id)
-				as color
-				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
-			  FROM [mattresses] as m1
-			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			  WHERE m4.[location] = 'SP4' AND m4.[active] = 1 
-			  ORDER BY m2.[position] asc"));
-
-			
-			$sp4_req_time = [];
-			foreach ($sp4 as $line) {
-
-				if ($line->average_of_min_per_meter_minm_c != 0) {
-					// dd('test');
-			        if (array_key_exists($line->priority, $sp4_req_time)) {
-			            $sp4_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        } else { 
-			            $sp4_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        }
-
-				} else if ($line->average_of_min_per_meter_minm_m != 0) {
-
-					if (array_key_exists($line->priority, $sp4_req_time)) {
-			            $sp4_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        } else { 
-			            $sp4_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        }
-
-				} else {
-
-					if (array_key_exists($line->priority, $sp4_req_time)) {
-			            $sp4_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        } else {
-			            $sp4_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        }
-
-				}
-			}
-			// dd($sp4_req_time);
-
-			$sp4_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				SUM(m3.[marker_length]) as sum_m_length,
-				SUM(m2.[layers_a]) as sum_m_layers,
-				SUM(m2.[cons_actual]) as sum_m_cons
-				FROM [mattresses] as m1
-				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-				WHERE m4.[location] = 'SP4' AND m4.[active] = 1"));
-			
-			$sp4_m = $sp4_m[0]->sum_m_cons;
-
-			$ms1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-			   m1.[id]
-		      ,m1.[mattress]
-		      ,m1.[material]
-		      ,m1.[g_bin]
-		      ,m1.[dye_lot]
-		      ,m1.[color_desc]
-		      ,m1.[skeda]
-		      ,m1.[spreading_method]
-		      ,m1.[width_theor_usable]
-		      ,m2.[position]
-		      ,m2.[layers]
-		      ,m2.[layers_a]
-		      ,m2.[cons_planned]
-		      ,m2.[cons_actual]
-		      ,m2.[priority]
-		      ,m2.[printed_marker]
-		      ,m2.[comment_office]
-		      ,m2.[overlapping]
-		      ,m2.[last_mattress]
-		      ,m3.[marker_name]
-		      ,m3.[marker_length]
-		      ,m3.[marker_width]
-		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
-		      ,m4.[status]
-		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
-		      ,(SELECT 
-					TOP 1 x.average_of_min_per_meter_minm
-				
-					FROM (
-						SELECT 
-						*,
-						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
-						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
-						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
-						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting_smv_by_categories]) as x
-					WHERE	x.spreading_method = (SELECT 
-												CASE 
-												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
-												ELSE 'FACE UP/DOWN'
-												END)
-							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
-							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
-			 	) as average_of_min_per_meter_minm_c,
-			 	(SELECT 
-						TOP 1 average_of_min_per_meter_minm
-					  FROM [cutting_smv_by_materials]
-					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-			 	) as average_of_min_per_meter_minm_m,
-				(SELECT 
-						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
-				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
-				FROM [pro_skedas] as t1
-				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
-				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
-				WHERE t3.id = m1.id)
-				as color
-				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
-			  FROM [mattresses] as m1
-			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			  WHERE m4.[location] = 'MS1' AND m4.[active] = 1 
-			  ORDER BY m2.[position] asc"));
-
-			$ms1_req_time = [];
-			foreach ($ms1 as $line) {
-
-				if ($line->average_of_min_per_meter_minm_c != 0) {
-					// dd('test');
-			        if (array_key_exists($line->priority, $ms1_req_time)) {
-			            $ms1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        } else { 
-			            $ms1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        }
-
-				} else if ($line->average_of_min_per_meter_minm_m != 0) {
-
-					if (array_key_exists($line->priority, $ms1_req_time)) {
-			            $ms1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        } else { 
-			            $ms1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        }
-
-				} else {
-
-					if (array_key_exists($line->priority, $ms1_req_time)) {
-			            $ms1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        } else {
-			            $ms1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        }
-				}
-			}
-			// dd($ms1_req_time);
-
-			$ms1_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				SUM(m3.[marker_length]) as sum_m_length,
-				SUM(m2.[layers_a]) as sum_m_layers,
-				SUM(m2.[cons_actual]) as sum_m_cons
-				FROM [mattresses] as m1
-				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-				WHERE m4.[location] = 'MS1' AND m4.[active] = 1"));
-			
-			$ms1_m = $ms1_m[0]->sum_m_cons;
-
-			$ms2 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-			  m1.[id]
-		      ,m1.[mattress]
-		      ,m1.[material]
-		      ,m1.[g_bin]
-		      ,m1.[dye_lot]
-		      ,m1.[color_desc]
-		      ,m1.[skeda]
-		      ,m1.[spreading_method]
-		      ,m1.[width_theor_usable]
-		      ,m2.[position]
-		      ,m2.[layers]
-		      ,m2.[layers_a]
-		      ,m2.[cons_planned]
-		      ,m2.[cons_actual]
-		      ,m2.[priority]
-		      ,m2.[printed_marker]
-		      ,m2.[comment_office]
-		      ,m2.[overlapping]
-		      ,m2.[last_mattress]
-		      ,m3.[marker_name]
-		      ,m3.[marker_length]
-		      ,m3.[marker_width]
-		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
-		      ,m4.[status]
-		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
-		      ,(SELECT 
-					TOP 1 x.average_of_min_per_meter_minm
-				
-					FROM (
-						SELECT 
-						*,
-						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
-						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
-						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
-						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting_smv_by_categories]) as x
-					WHERE	x.spreading_method = (SELECT 
-												CASE 
-												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
-												ELSE 'FACE UP/DOWN'
-												END)
-							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
-							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
-			 	) as average_of_min_per_meter_minm_c,
-			 	(SELECT 
-						TOP 1 average_of_min_per_meter_minm
-					  FROM [cutting_smv_by_materials]
-					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-			 	) as average_of_min_per_meter_minm_m,
-				(SELECT 
-						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
-				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
-				FROM [pro_skedas] as t1
-				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
-				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
-				WHERE t3.id = m1.id)
-				as color
-				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
-
-			  FROM [mattresses] as m1
-			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			  WHERE m4.[location] = 'MS2' AND m4.[active] = 1 
-			  ORDER BY m2.[position] asc"));
-
-			$ms2_req_time = [];
-			foreach ($ms2 as $line) {
-
-				if ($line->average_of_min_per_meter_minm_c != 0) {
-					// dd('test');
-			        if (array_key_exists($line->priority, $ms2_req_time)) {
-			            $ms2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        } else { 
-			            $ms2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        }
-
-				} else if ($line->average_of_min_per_meter_minm_m != 0) {
-
-					if (array_key_exists($line->priority, $ms2_req_time)) {
-			            $ms2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        } else { 
-			            $ms2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        }
-
-				} else {
-
-					if (array_key_exists($line->priority, $ms2_req_time)) {
-			            $ms2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        } else {
-			            $ms2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        }
-				}
-			}
-			// dd($ms2_req_time);
-
-			$ms2_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				SUM(m3.[marker_length]) as sum_m_length,
-				SUM(m2.[layers_a]) as sum_m_layers,
-				SUM(m2.[cons_actual]) as sum_m_cons
-				FROM [mattresses] as m1
-				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-				WHERE m4.[location] = 'MS2' AND m4.[active] = 1"));
-			
-			$ms2_m = $ms2_m[0]->sum_m_cons;
-
-			$ms3 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-			   m1.[id]
-		      ,m1.[mattress]
-		      ,m1.[material]
-		      ,m1.[g_bin]
-		      ,m1.[dye_lot]
-		      ,m1.[color_desc]
-		      ,m1.[skeda]
-		      ,m1.[spreading_method]
-		      ,m1.[width_theor_usable]
-		      ,m2.[position]
-		      ,m2.[layers]
-		      ,m2.[layers_a]
-		      ,m2.[cons_planned]
-		      ,m2.[cons_actual]
-		      ,m2.[priority]
-		      ,m2.[printed_marker]
-		      ,m2.[comment_office]
-		      ,m2.[overlapping]
-		      ,m2.[last_mattress]
-		      ,m3.[marker_name]
-		      ,m3.[marker_length]
-		      ,m3.[marker_width]
-		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
-		      ,m4.[status]
-		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
-		      ,(SELECT 
-					TOP 1 x.average_of_min_per_meter_minm
-				
-					FROM (
-						SELECT 
-						*,
-						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
-						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
-						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
-						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting_smv_by_categories]) as x
-					WHERE	x.spreading_method = (SELECT 
-												CASE 
-												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
-												ELSE 'FACE UP/DOWN'
-												END)
-							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
-							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
-			 	) as average_of_min_per_meter_minm_c,
-			 	(SELECT 
-						TOP 1 average_of_min_per_meter_minm
-					  FROM [cutting_smv_by_materials]
-					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-			 	) as average_of_min_per_meter_minm_m,
-				(SELECT 
-						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
-				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
-				FROM [pro_skedas] as t1
-				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
-				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
-				WHERE t3.id = m1.id)
-				as color
-				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
-
-			  FROM [mattresses] as m1
-			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			  WHERE m4.[location] = 'MS3' AND m4.[active] = 1 
-			  ORDER BY m2.[position] asc"));
-
-			$ms3_req_time = [];
-			foreach ($ms3 as $line) {
-
-				if ($line->average_of_min_per_meter_minm_c != 0) {
-					// dd('test');
-			        if (array_key_exists($line->priority, $ms3_req_time)) {
-			            $ms3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        } else { 
-			            $ms3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        }
-
-				} else if ($line->average_of_min_per_meter_minm_m != 0) {
-
-					if (array_key_exists($line->priority, $ms3_req_time)) {
-			            $ms3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        } else { 
-			            $ms3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        }
-
-				} else {
-
-					if (array_key_exists($line->priority, $ms3_req_time)) {
-			            $ms3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        } else {
-			            $ms3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        }
-				}
-			}
-			
-			
-			$ms3_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				SUM(m3.[marker_length]) as sum_m_length,
-				SUM(m2.[layers_a]) as sum_m_layers,
-				SUM(m2.[cons_actual]) as sum_m_cons
-				FROM [mattresses] as m1
-				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-				WHERE m4.[location] = 'MS3' AND m4.[active] = 1"));
-			
-			$ms3_m = $ms3_m[0]->sum_m_cons;
-
-			$tub = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-			   m1.[id]
-		      ,m1.[mattress]
-		      ,m1.[material]
-		      ,m1.[g_bin]
-		      ,m1.[dye_lot]
-		      ,m1.[color_desc]
-		      ,m1.[skeda]
-		      ,m1.[spreading_method]
-		      ,m1.[width_theor_usable]
-		      ,m2.[position]
-		      ,m2.[layers]
-		      ,m2.[layers_a]
-		      ,m2.[cons_planned]
-		      ,m2.[cons_actual]
-		      ,m2.[priority]
-		      ,m2.[printed_marker]
-		      ,m2.[comment_office]
-		      ,m2.[overlapping]
-		      ,m2.[last_mattress]
-		      ,m3.[marker_name]
-		      ,m3.[marker_length]
-		      ,m3.[marker_width]
-		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
-		      ,m4.[status]
-		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
-		      /*,(SELECT 
-					TOP 1 x.average_of_min_per_meter_minm
-				
-					FROM (
-						SELECT 
-						*,
-						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
-						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
-						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
-						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting_smv_by_categories]) as x
-					WHERE	x.spreading_method = (SELECT 
-												CASE 
-												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
-												ELSE 'FACE UP/DOWN'
-												END)
-							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
-							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
-			 	) as average_of_min_per_meter_minm_c,
-			 	(SELECT 
-						TOP 1 average_of_min_per_meter_minm
-					  FROM [cutting_smv_by_materials]
-					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-			 	) as average_of_min_per_meter_minm_m,*/
-				,(SELECT 
-					TOP 1 x.average_min_per_layer
-				
-					FROM (
-						SELECT 
-						*,
-						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
-						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers
-						FROM [cutting_tubolare_smvs]) as x
-					WHERE	
-							x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
-							
-			 	) as average_min_per_layer,
-				/*(SELECT 
-						ROUND(AVG(average_min_per_layer),3)
-				  FROM [cutting_tubolare_smvs] ) as average_of_tubolare_smv_all,*/
-				'0,167' as average_of_tubolare_smv_all,
-				(SELECT 
-						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
-				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
-				FROM [pro_skedas] as t1
-				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
-				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
-				WHERE t3.id = m1.id)
-				as color
-				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
-
-			  FROM [mattresses] as m1
-			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			  WHERE m4.[location] = 'TUB' AND m4.[active] = 1 
-			  ORDER BY m2.[position] asc"));
-
-			$tub_req_time = [];
-			foreach ($tub as $line) {
-
-				if ($line->average_min_per_layer != 0) {
+			//SP0
+				$sp0 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				   m1.[id]
+			      ,m1.[mattress]
+			      ,m1.[material]
+			      ,m1.[g_bin]
+			      ,m1.[dye_lot]
+			      ,m1.[color_desc]
+			      ,m1.[skeda]
+			      ,m1.[spreading_method]
+			      ,m1.[width_theor_usable]
+			      ,m2.[position]
+			      ,m2.[layers]
+			      ,m2.[layers_a]
+			      ,m2.[cons_planned]
+			      ,m2.[cons_actual]
+			      ,m2.[priority]
+			      ,m2.[printed_marker]
+			      ,m2.[comment_office]
+			      ,m2.[overlapping]
+			      ,m2.[last_mattress]
+			      ,m3.[marker_name]
+			      ,m3.[marker_length]
+			      ,m3.[marker_width]
+			      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
+			      ,m4.[status]
+			      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+			      ,(SELECT 
+						TOP 1 x.average_of_min_per_meter_minm
 					
-			        if (array_key_exists($line->priority, $tub_req_time)) {
-			            $tub_req_time[$line->priority] += round((float)$line->average_min_per_layer * (float)$line->layers_a,0);
-			        } else { 
-			            $tub_req_time[$line->priority] = round((float)$line->average_min_per_layer * (float)$line->layers_a,0);
-			        }
+						FROM (
+							SELECT 
+							*,
+							LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+							RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+							LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+							RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+							FROM [cutting_smv_by_categories]) as x
+						WHERE	x.spreading_method = (SELECT 
+													CASE 
+													WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+													ELSE 'FACE UP/DOWN'
+													END)
+								AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+								AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+								AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+				 	) as average_of_min_per_meter_minm_c,
+				 	(SELECT 
+							TOP 1 average_of_min_per_meter_minm
+						  FROM [cutting_smv_by_materials]
+						  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+				 	) as average_of_min_per_meter_minm_m,
+					(SELECT 
+							ROUND(AVG(average_of_min_per_meter_minm),3)
+					  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+					(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+					FROM [pro_skedas] as t1
+					JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+					JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+					WHERE t3.id = m1.id)
+					as color
+					,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
+				  FROM [mattresses] as m1
+				  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				  WHERE m4.[location] = 'SP0' AND m4.[active] = 1 
+				  ORDER BY m2.[priority] desc, m1.[skeda] asc"));
 
-				} else {
+				$sp0_req_time = [];
+				foreach ($sp0 as $line) {
 
-					if (array_key_exists($line->priority, $tub_req_time)) {
-			            $tub_req_time[$line->priority] += round((float)$line->average_of_tubolare_smv_all * (float)$line->layers_a,0);
-			        } else {
-			            $tub_req_time[$line->priority] = round((float)$line->average_of_tubolare_smv_all * (float)$line->layers_a,0);
-			        }
+					if ($line->average_of_min_per_meter_minm_c != 0) {
+						// dd('test');
+				        if (array_key_exists($line->priority, $sp0_req_time)) {
+				            $sp0_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        } else { 
+				            $sp0_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        }
+
+					} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+						if (array_key_exists($line->priority, $sp0_req_time)) {
+				            $sp0_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        } else { 
+				            $sp0_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        }
+
+					} else {
+
+						if (array_key_exists($line->priority, $sp0_req_time)) {
+				            $sp0_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        } else {
+				            $sp0_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        }
+
+					}
 				}
-			}
-			// dd($tub_req_time);
-			// $tub_req_time = 0;
-			
-			$tub_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				SUM(m3.[marker_length]) as sum_m_length,
-				SUM(m2.[layers_a]) as sum_m_layers,
-				SUM(m2.[cons_actual]) as sum_m_cons
-				FROM [mattresses] as m1
-				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-				WHERE m4.[location] = 'TUB' AND m4.[active] = 1"));
-			
-			$tub_m = $tub_m[0]->sum_m_cons;
+				// dd($sp0_req_time);
 
-			$mm1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-			  m1.[id]
-		      ,m1.[mattress]
-		      ,m1.[material]
-		      ,m1.[g_bin]
-		      ,m1.[dye_lot]
-		      ,m1.[color_desc]
-		      ,m1.[skeda]
-		      ,m1.[spreading_method]
-		      ,m1.[width_theor_usable]
-		      ,m2.[position]
-		      ,m2.[layers]
-		      ,m2.[layers_a]
-		      ,m2.[cons_planned]
-		      ,m2.[cons_actual]
-		      ,m2.[priority]
-		      ,m2.[printed_marker]
-		      ,m2.[comment_office]
-		      ,m2.[overlapping]
-		      ,m2.[last_mattress]
-		      ,m3.[marker_name]
-		      ,m3.[marker_length]
-		      ,m3.[marker_width]
-		      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
-		      ,m4.[status]
-		      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
-		      ,(SELECT 
-					TOP 1 x.average_of_min_per_meter_minm
+				$sp0_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					SUM(m3.[marker_length]) as sum_m_length,
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
+					FROM [mattresses] as m1
+					LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+					LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+					LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+					WHERE m4.[location] = 'SP0' AND m4.[active] = 1"));
 				
-					FROM (
-						SELECT 
-						*,
-						LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
-						RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
-						LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
-						RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
-						FROM [cutting_smv_by_categories]) as x
-					WHERE	x.spreading_method = (SELECT 
-												CASE 
-												WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
-												ELSE 'FACE UP/DOWN'
-												END)
-							AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-							AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
-							AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
-			 	) as average_of_min_per_meter_minm_c,
-			 	(SELECT 
-						TOP 1 average_of_min_per_meter_minm
-					  FROM [cutting_smv_by_materials]
-					  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
-			 	) as average_of_min_per_meter_minm_m,
-				(SELECT 
-						ROUND(AVG(average_of_min_per_meter_minm),3)
-				  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
-				(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
-				FROM [pro_skedas] as t1
-				JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
-				JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
-				WHERE t3.id = m1.id)
-				as color
-				,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
-			  FROM [mattresses] as m1
-			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-			  WHERE m4.[location] = 'MM1' AND m4.[active] = 1 
-			  ORDER BY m2.[position] asc"));
+				$sp0_m = $sp0_m[0]->sum_m_cons;
+			//
 
-			$mm1_req_time = [];
-			foreach ($mm1 as $line) {
+			//SP1
+				$sp1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				   m1.[id]
+			      ,m1.[mattress]
+			      ,m1.[material]
+			      ,m1.[g_bin]
+			      ,m1.[dye_lot]
+			      ,m1.[color_desc]
+			      ,m1.[skeda]
+			      ,m1.[spreading_method]
+			      ,m1.[width_theor_usable]
+			      ,m2.[position]
+			      ,m2.[layers]
+			      ,m2.[layers_a]
+			      ,m2.[cons_planned]
+			      ,m2.[cons_actual]
+			      ,m2.[priority]
+			      ,m2.[printed_marker]
+			      ,m2.[comment_office]
+			      ,m2.[overlapping]
+			      ,m2.[last_mattress]
+			      ,m3.[marker_name]
+			      ,m3.[marker_length]
+			      ,m3.[marker_width]
+			      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
+			      ,m4.[status]
+			      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+			      ,(SELECT 
+						TOP 1 x.average_of_min_per_meter_minm
+					
+						FROM (
+							SELECT 
+							*,
+							LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+							RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+							LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+							RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+							FROM [cutting_smv_by_categories]) as x
+						WHERE	x.spreading_method = (SELECT 
+													CASE 
+													WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+													ELSE 'FACE UP/DOWN'
+													END)
+								AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+								AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+								AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+				 	) as average_of_min_per_meter_minm_c,
+				 	(SELECT 
+							TOP 1 average_of_min_per_meter_minm
+						  FROM [cutting_smv_by_materials]
+						  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+				 	) as average_of_min_per_meter_minm_m,
+					(SELECT 
+							ROUND(AVG(average_of_min_per_meter_minm),3)
+					  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+					(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+					FROM [pro_skedas] as t1
+					JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+					JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+					WHERE t3.id = m1.id)
+					as color
+					,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
 
-				if ($line->average_of_min_per_meter_minm_c != 0) {
-					// dd('test');
-			        if (array_key_exists($line->priority, $mm1_req_time)) {
-			            $mm1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        } else { 
-			            $mm1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
-			        }
+				  FROM [mattresses] as m1
+				  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				  WHERE m4.[location] = 'SP1' AND m4.[active] = 1 
+				  ORDER BY m2.[position] asc"));
 
-				} else if ($line->average_of_min_per_meter_minm_m != 0) {
+				
+				$sp1_req_time = [];
+				foreach ($sp1 as $line) {
 
-					if (array_key_exists($line->priority, $mm1_req_time)) {
-			            $mm1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        } else { 
-			            $mm1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
-			        }
+					if ($line->average_of_min_per_meter_minm_c != 0) {
+						// dd('test');
+				        if (array_key_exists($line->priority, $sp1_req_time)) {
+				            $sp1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        } else { 
+				            $sp1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        }
 
-				} else {
+					} else if ($line->average_of_min_per_meter_minm_m != 0) {
 
-					if (array_key_exists($line->priority, $mm1_req_time)) {
-			            $mm1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        } else {
-			            $mm1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
-			        }
+						if (array_key_exists($line->priority, $sp1_req_time)) {
+				            $sp1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        } else { 
+				            $sp1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        }
 
+					} else {
+
+						if (array_key_exists($line->priority, $sp1_req_time)) {
+				            $sp1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        } else {
+				            $sp1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        }
+
+					}
 				}
-			}
-			
+				// dd($sp1_req_time);
+				
 
-			$mm1_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-				SUM(m3.[marker_length]) as sum_m_length,
-				SUM(m2.[layers_a]) as sum_m_layers,
-				SUM(m2.[cons_actual]) as sum_m_cons,
-				SUM(o.[no_of_joinings]) as o_sum
-				FROM [mattresses] as m1
-				LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-				LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-				LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-				JOIN [o_rolls] as o ON o.[mattress_id_new] = m1.[id]
-				WHERE m4.[location] = 'MM1' AND m4.[active] = 1"));
-			
-			$mm1_m = $mm1_m[0]->o_sum;
+				$sp1_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					SUM(m3.[marker_length]) as sum_m_length,
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
+					FROM [mattresses] as m1
+					LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+					LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+					LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+					WHERE m4.[location] = 'SP1' AND m4.[active] = 1"));
 
-			return view('planner.plan_mattress', compact('data','location','sp0','sp1','sp2','sp3','sp4','ms1','ms2','ms3','tub','mm1','operator','operators',
-				'sp0_m','sp1_m','sp2_m','sp3_m','sp4_m','ms1_m','ms2_m','ms3_m','tub_m','mm1_m',
-				'sp0_req_time','sp1_req_time','sp2_req_time','sp3_req_time','sp4_req_time','ms1_req_time','ms2_req_time','ms3_req_time','tub_req_time','mm1_req_time'));
+				$sp1_m = $sp1_m[0]->sum_m_cons;
+			//
+
+			//SP2
+				$sp2 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				   m1.[id]
+			      ,m1.[mattress]
+			      ,m1.[material]
+			      ,m1.[g_bin]
+			      ,m1.[dye_lot]
+			      ,m1.[color_desc]
+			      ,m1.[skeda]
+			      ,m1.[spreading_method]
+			      ,m1.[width_theor_usable]
+			      ,m2.[position]
+			      ,m2.[layers]
+			      ,m2.[layers_a]
+			      ,m2.[cons_planned]
+			      ,m2.[cons_actual]
+			      ,m2.[priority]
+			      ,m2.[printed_marker]
+			      ,m2.[comment_office]
+			      ,m2.[overlapping]
+			      ,m2.[last_mattress]
+			      ,m3.[marker_name]
+			      ,m3.[marker_length]
+			      ,m3.[marker_width]
+			      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
+			      ,m4.[status]
+			      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+			      ,(SELECT 
+						TOP 1 x.average_of_min_per_meter_minm
+					
+						FROM (
+							SELECT 
+							*,
+							LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+							RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+							LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+							RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+							FROM [cutting_smv_by_categories]) as x
+						WHERE	x.spreading_method = (SELECT 
+													CASE 
+													WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+													ELSE 'FACE UP/DOWN'
+													END)
+								AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+								AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+								AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+				 	) as average_of_min_per_meter_minm_c,
+				 	(SELECT 
+							TOP 1 average_of_min_per_meter_minm
+						  FROM [cutting_smv_by_materials]
+						  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+				 	) as average_of_min_per_meter_minm_m,
+					(SELECT 
+							ROUND(AVG(average_of_min_per_meter_minm),3)
+					  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+					(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+					FROM [pro_skedas] as t1
+					JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+					JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+					WHERE t3.id = m1.id)
+					as color
+					,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
+				  FROM [mattresses] as m1
+				  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				  WHERE m4.[location] = 'SP2' AND m4.[active] = 1 
+				  ORDER BY m2.[position] asc"));
+				
+				$sp2_req_time = [];
+				foreach ($sp2 as $line) {
+
+					if ($line->average_of_min_per_meter_minm_c != 0) {
+						// dd('test');
+				        if (array_key_exists($line->priority, $sp2_req_time)) {
+				            $sp2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        } else { 
+				            $sp2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        }
+
+					} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+						if (array_key_exists($line->priority, $sp2_req_time)) {
+				            $sp2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        } else { 
+				            $sp2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        }
+
+					} else {
+
+						if (array_key_exists($line->priority, $sp2_req_time)) {
+				            $sp2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        } else {
+				            $sp2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        }
+
+					}
+				}
+				// dd($sp2_req_time);
+
+				$sp2_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					SUM(m3.[marker_length]) as sum_m_length,
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
+					FROM [mattresses] as m1
+					LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+					LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+					LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+					WHERE m4.[location] = 'SP2' AND m4.[active] = 1"));
+				
+				$sp2_m = $sp2_m[0]->sum_m_cons;
+			//
+
+			//SP3
+				$sp3 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					m1.[id]
+			      ,m1.[mattress]
+			      ,m1.[material]
+			      ,m1.[g_bin]
+			      ,m1.[dye_lot]
+			      ,m1.[color_desc]
+			      ,m1.[skeda]
+			      ,m1.[spreading_method]
+			      ,m1.[width_theor_usable]
+			      ,m2.[position]
+			      ,m2.[layers]
+			      ,m2.[layers_a]
+			      ,m2.[cons_planned]
+			      ,m2.[cons_actual]
+			      ,m2.[priority]
+			      ,m2.[printed_marker]
+			      ,m2.[comment_office]
+			      ,m2.[overlapping]
+			      ,m2.[last_mattress]
+			      ,m3.[marker_name]
+			      ,m3.[marker_length]
+			      ,m3.[marker_width]
+			      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
+			      ,m4.[status]
+			      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+			      ,(SELECT 
+						TOP 1 x.average_of_min_per_meter_minm
+					
+						FROM (
+							SELECT 
+							*,
+							LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+							RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+							LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+							RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+							FROM [cutting_smv_by_categories]) as x
+						WHERE	x.spreading_method = (SELECT 
+													CASE 
+													WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+													ELSE 'FACE UP/DOWN'
+													END)
+								AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+								AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+								AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+				 	) as average_of_min_per_meter_minm_c,
+				 	(SELECT 
+							TOP 1 average_of_min_per_meter_minm
+						  FROM [cutting_smv_by_materials]
+						  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+				 	) as average_of_min_per_meter_minm_m,
+					(SELECT 
+							ROUND(AVG(average_of_min_per_meter_minm),3)
+					  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+					(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+					FROM [pro_skedas] as t1
+					JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+					JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+					WHERE t3.id = m1.id)
+					as color
+					,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
+				  FROM [mattresses] as m1
+				  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				  WHERE m4.[location] = 'SP3' AND m4.[active] = 1 
+				  ORDER BY m2.[position] asc"));
+
+				$sp3_req_time = [];
+				foreach ($sp3 as $line) {
+
+					if ($line->average_of_min_per_meter_minm_c != 0) {
+						// dd('test');
+				        if (array_key_exists($line->priority, $sp3_req_time)) {
+				            $sp3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        } else { 
+				            $sp3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        }
+
+					} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+						if (array_key_exists($line->priority, $sp3_req_time)) {
+				            $sp3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        } else { 
+				            $sp3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        }
+
+					} else {
+
+						if (array_key_exists($line->priority, $sp3_req_time)) {
+				            $sp3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        } else {
+				            $sp3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        }
+
+					}
+				}
+				// dd($sp3_req_time);
+				
+				$sp3_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					SUM(m3.[marker_length]) as sum_m_length,
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
+					FROM [mattresses] as m1
+					LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+					LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+					LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+					WHERE m4.[location] = 'SP3' AND m4.[active] = 1"));
+
+				$sp3_m = $sp3_m[0]->sum_m_cons;
+			//
+
+			//SP4
+				$sp4 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				   m1.[id]
+			      ,m1.[mattress]
+			      ,m1.[material]
+			      ,m1.[g_bin]
+			      ,m1.[dye_lot]
+			      ,m1.[color_desc]
+			      ,m1.[skeda]
+			      ,m1.[spreading_method]
+			      ,m1.[width_theor_usable]
+			      ,m2.[position]
+			      ,m2.[layers]
+			      ,m2.[layers_a]
+			      ,m2.[cons_planned]
+			      ,m2.[cons_actual]
+			      ,m2.[priority]
+			      ,m2.[printed_marker]
+			      ,m2.[comment_office]
+			      ,m2.[overlapping]
+			      ,m2.[last_mattress]
+			      ,m3.[marker_name]
+			      ,m3.[marker_length]
+			      ,m3.[marker_width]
+			      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
+			      ,m4.[status]
+			      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+			      ,(SELECT 
+						TOP 1 x.average_of_min_per_meter_minm
+					
+						FROM (
+							SELECT 
+							*,
+							LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+							RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+							LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+							RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+							FROM [cutting_smv_by_categories]) as x
+						WHERE	x.spreading_method = (SELECT 
+													CASE 
+													WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+													ELSE 'FACE UP/DOWN'
+													END)
+								AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+								AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+								AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+				 	) as average_of_min_per_meter_minm_c,
+				 	(SELECT 
+							TOP 1 average_of_min_per_meter_minm
+						  FROM [cutting_smv_by_materials]
+						  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+				 	) as average_of_min_per_meter_minm_m,
+					(SELECT 
+							ROUND(AVG(average_of_min_per_meter_minm),3)
+					  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+					(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+					FROM [pro_skedas] as t1
+					JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+					JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+					WHERE t3.id = m1.id)
+					as color
+					,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
+				  FROM [mattresses] as m1
+				  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				  WHERE m4.[location] = 'SP4' AND m4.[active] = 1 
+				  ORDER BY m2.[position] asc"));
+
+				$sp4_req_time = [];
+				foreach ($sp4 as $line) {
+
+					if ($line->average_of_min_per_meter_minm_c != 0) {
+						// dd('test');
+				        if (array_key_exists($line->priority, $sp4_req_time)) {
+				            $sp4_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        } else { 
+				            $sp4_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        }
+
+					} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+						if (array_key_exists($line->priority, $sp4_req_time)) {
+				            $sp4_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        } else { 
+				            $sp4_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        }
+
+					} else {
+
+						if (array_key_exists($line->priority, $sp4_req_time)) {
+				            $sp4_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        } else {
+				            $sp4_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        }
+
+					}
+				}
+				// dd($sp4_req_time);
+
+				$sp4_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					SUM(m3.[marker_length]) as sum_m_length,
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
+					FROM [mattresses] as m1
+					LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+					LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+					LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+					WHERE m4.[location] = 'SP4' AND m4.[active] = 1"));
+				
+				$sp4_m = $sp4_m[0]->sum_m_cons;
+			//
+
+			//MS1
+				$ms1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				   m1.[id]
+			      ,m1.[mattress]
+			      ,m1.[material]
+			      ,m1.[g_bin]
+			      ,m1.[dye_lot]
+			      ,m1.[color_desc]
+			      ,m1.[skeda]
+			      ,m1.[spreading_method]
+			      ,m1.[width_theor_usable]
+			      ,m2.[position]
+			      ,m2.[layers]
+			      ,m2.[layers_a]
+			      ,m2.[cons_planned]
+			      ,m2.[cons_actual]
+			      ,m2.[priority]
+			      ,m2.[printed_marker]
+			      ,m2.[comment_office]
+			      ,m2.[overlapping]
+			      ,m2.[last_mattress]
+			      ,m3.[marker_name]
+			      ,m3.[marker_length]
+			      ,m3.[marker_width]
+			      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
+			      ,m4.[status]
+			      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+			      ,(SELECT 
+						TOP 1 x.average_of_min_per_meter_minm
+					
+						FROM (
+							SELECT 
+							*,
+							LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+							RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+							LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+							RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+							FROM [cutting_smv_by_categories]) as x
+						WHERE	x.spreading_method = (SELECT 
+													CASE 
+													WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+													ELSE 'FACE UP/DOWN'
+													END)
+								AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+								AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+								AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+				 	) as average_of_min_per_meter_minm_c,
+				 	(SELECT 
+							TOP 1 average_of_min_per_meter_minm
+						  FROM [cutting_smv_by_materials]
+						  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+				 	) as average_of_min_per_meter_minm_m,
+					(SELECT 
+							ROUND(AVG(average_of_min_per_meter_minm),3)
+					  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+					(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+					FROM [pro_skedas] as t1
+					JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+					JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+					WHERE t3.id = m1.id)
+					as color
+					,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
+				  FROM [mattresses] as m1
+				  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				  WHERE m4.[location] = 'MS1' AND m4.[active] = 1 
+				  ORDER BY m2.[position] asc"));
+
+				$ms1_req_time = [];
+				foreach ($ms1 as $line) {
+
+					if ($line->average_of_min_per_meter_minm_c != 0) {
+						// dd('test');
+				        if (array_key_exists($line->priority, $ms1_req_time)) {
+				            $ms1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        } else { 
+				            $ms1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        }
+
+					} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+						if (array_key_exists($line->priority, $ms1_req_time)) {
+				            $ms1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        } else { 
+				            $ms1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        }
+
+					} else {
+
+						if (array_key_exists($line->priority, $ms1_req_time)) {
+				            $ms1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        } else {
+				            $ms1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        }
+					}
+				}
+				// dd($ms1_req_time);
+
+				$ms1_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					SUM(m3.[marker_length]) as sum_m_length,
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
+					FROM [mattresses] as m1
+					LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+					LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+					LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+					WHERE m4.[location] = 'MS1' AND m4.[active] = 1"));
+				
+				$ms1_m = $ms1_m[0]->sum_m_cons;
+			//
+
+			//MS2
+				$ms2 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				  m1.[id]
+			      ,m1.[mattress]
+			      ,m1.[material]
+			      ,m1.[g_bin]
+			      ,m1.[dye_lot]
+			      ,m1.[color_desc]
+			      ,m1.[skeda]
+			      ,m1.[spreading_method]
+			      ,m1.[width_theor_usable]
+			      ,m2.[position]
+			      ,m2.[layers]
+			      ,m2.[layers_a]
+			      ,m2.[cons_planned]
+			      ,m2.[cons_actual]
+			      ,m2.[priority]
+			      ,m2.[printed_marker]
+			      ,m2.[comment_office]
+			      ,m2.[overlapping]
+			      ,m2.[last_mattress]
+			      ,m3.[marker_name]
+			      ,m3.[marker_length]
+			      ,m3.[marker_width]
+			      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
+			      ,m4.[status]
+			      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+			      ,(SELECT 
+						TOP 1 x.average_of_min_per_meter_minm
+					
+						FROM (
+							SELECT 
+							*,
+							LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+							RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+							LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+							RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+							FROM [cutting_smv_by_categories]) as x
+						WHERE	x.spreading_method = (SELECT 
+													CASE 
+													WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+													ELSE 'FACE UP/DOWN'
+													END)
+								AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+								AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+								AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+				 	) as average_of_min_per_meter_minm_c,
+				 	(SELECT 
+							TOP 1 average_of_min_per_meter_minm
+						  FROM [cutting_smv_by_materials]
+						  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+				 	) as average_of_min_per_meter_minm_m,
+					(SELECT 
+							ROUND(AVG(average_of_min_per_meter_minm),3)
+					  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+					(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+					FROM [pro_skedas] as t1
+					JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+					JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+					WHERE t3.id = m1.id)
+					as color
+					,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
+
+				  FROM [mattresses] as m1
+				  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				  WHERE m4.[location] = 'MS2' AND m4.[active] = 1 
+				  ORDER BY m2.[position] asc"));
+
+				$ms2_req_time = [];
+				foreach ($ms2 as $line) {
+
+					if ($line->average_of_min_per_meter_minm_c != 0) {
+						// dd('test');
+				        if (array_key_exists($line->priority, $ms2_req_time)) {
+				            $ms2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        } else { 
+				            $ms2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        }
+
+					} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+						if (array_key_exists($line->priority, $ms2_req_time)) {
+				            $ms2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        } else { 
+				            $ms2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        }
+
+					} else {
+
+						if (array_key_exists($line->priority, $ms2_req_time)) {
+				            $ms2_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        } else {
+				            $ms2_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        }
+					}
+				}
+				// dd($ms2_req_time);
+
+				$ms2_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					SUM(m3.[marker_length]) as sum_m_length,
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
+					FROM [mattresses] as m1
+					LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+					LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+					LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+					WHERE m4.[location] = 'MS2' AND m4.[active] = 1"));
+				
+				$ms2_m = $ms2_m[0]->sum_m_cons;
+			//
+
+			//MS3
+				$ms3 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				   m1.[id]
+			      ,m1.[mattress]
+			      ,m1.[material]
+			      ,m1.[g_bin]
+			      ,m1.[dye_lot]
+			      ,m1.[color_desc]
+			      ,m1.[skeda]
+			      ,m1.[spreading_method]
+			      ,m1.[width_theor_usable]
+			      ,m2.[position]
+			      ,m2.[layers]
+			      ,m2.[layers_a]
+			      ,m2.[cons_planned]
+			      ,m2.[cons_actual]
+			      ,m2.[priority]
+			      ,m2.[printed_marker]
+			      ,m2.[comment_office]
+			      ,m2.[overlapping]
+			      ,m2.[last_mattress]
+			      ,m3.[marker_name]
+			      ,m3.[marker_length]
+			      ,m3.[marker_width]
+			      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
+			      ,m4.[status]
+			      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+			      ,(SELECT 
+						TOP 1 x.average_of_min_per_meter_minm
+					
+						FROM (
+							SELECT 
+							*,
+							LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+							RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+							LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+							RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+							FROM [cutting_smv_by_categories]) as x
+						WHERE	x.spreading_method = (SELECT 
+													CASE 
+													WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+													ELSE 'FACE UP/DOWN'
+													END)
+								AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+								AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+								AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+				 	) as average_of_min_per_meter_minm_c,
+				 	(SELECT 
+							TOP 1 average_of_min_per_meter_minm
+						  FROM [cutting_smv_by_materials]
+						  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+				 	) as average_of_min_per_meter_minm_m,
+					(SELECT 
+							ROUND(AVG(average_of_min_per_meter_minm),3)
+					  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+					(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+					FROM [pro_skedas] as t1
+					JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+					JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+					WHERE t3.id = m1.id)
+					as color
+					,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
+
+				  FROM [mattresses] as m1
+				  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				  WHERE m4.[location] = 'MS3' AND m4.[active] = 1 
+				  ORDER BY m2.[position] asc"));
+
+				$ms3_req_time = [];
+				foreach ($ms3 as $line) {
+
+					if ($line->average_of_min_per_meter_minm_c != 0) {
+						// dd('test');
+				        if (array_key_exists($line->priority, $ms3_req_time)) {
+				            $ms3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        } else { 
+				            $ms3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        }
+
+					} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+						if (array_key_exists($line->priority, $ms3_req_time)) {
+				            $ms3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        } else { 
+				            $ms3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        }
+
+					} else {
+
+						if (array_key_exists($line->priority, $ms3_req_time)) {
+				            $ms3_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        } else {
+				            $ms3_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        }
+					}
+				}
+				
+				$ms3_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					SUM(m3.[marker_length]) as sum_m_length,
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
+					FROM [mattresses] as m1
+					LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+					LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+					LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+					WHERE m4.[location] = 'MS3' AND m4.[active] = 1"));
+				
+				$ms3_m = $ms3_m[0]->sum_m_cons;
+			//
+
+			//TUB
+				$tub = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				   m1.[id]
+			      ,m1.[mattress]
+			      ,m1.[material]
+			      ,m1.[g_bin]
+			      ,m1.[dye_lot]
+			      ,m1.[color_desc]
+			      ,m1.[skeda]
+			      ,m1.[spreading_method]
+			      ,m1.[width_theor_usable]
+			      ,m2.[position]
+			      ,m2.[layers]
+			      ,m2.[layers_a]
+			      ,m2.[cons_planned]
+			      ,m2.[cons_actual]
+			      ,m2.[priority]
+			      ,m2.[printed_marker]
+			      ,m2.[comment_office]
+			      ,m2.[overlapping]
+			      ,m2.[last_mattress]
+			      ,m3.[marker_name]
+			      ,m3.[marker_length]
+			      ,m3.[marker_width]
+			      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
+			      ,m4.[status]
+			      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+			      /*,(SELECT 
+						TOP 1 x.average_of_min_per_meter_minm
+					
+						FROM (
+							SELECT 
+							*,
+							LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+							RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+							LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+							RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+							FROM [cutting_smv_by_categories]) as x
+						WHERE	x.spreading_method = (SELECT 
+													CASE 
+													WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+													ELSE 'FACE UP/DOWN'
+													END)
+								AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+								AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+								AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+				 	) as average_of_min_per_meter_minm_c,
+				 	(SELECT 
+							TOP 1 average_of_min_per_meter_minm
+						  FROM [cutting_smv_by_materials]
+						  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+				 	) as average_of_min_per_meter_minm_m,*/
+					,(SELECT 
+						TOP 1 x.average_min_per_layer
+					
+						FROM (
+							SELECT 
+							*,
+							LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+							RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers
+							FROM [cutting_tubolare_smvs]) as x
+						WHERE	
+								x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+								AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+								
+				 	) as average_min_per_layer,
+					/*(SELECT 
+							ROUND(AVG(average_min_per_layer),3)
+					  FROM [cutting_tubolare_smvs] ) as average_of_tubolare_smv_all,*/
+					'0,167' as average_of_tubolare_smv_all,
+					(SELECT 
+							ROUND(AVG(average_of_min_per_meter_minm),3)
+					  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+					(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+					FROM [pro_skedas] as t1
+					JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+					JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+					WHERE t3.id = m1.id)
+					as color
+					,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
+
+				  FROM [mattresses] as m1
+				  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				  WHERE m4.[location] = 'TUB' AND m4.[active] = 1 
+				  ORDER BY m2.[position] asc"));
+
+				$tub_req_time = [];
+				foreach ($tub as $line) {
+
+					if ($line->average_min_per_layer != 0) {
+						
+				        if (array_key_exists($line->priority, $tub_req_time)) {
+				            $tub_req_time[$line->priority] += round((float)$line->average_min_per_layer * (float)$line->layers_a,0);
+				        } else { 
+				            $tub_req_time[$line->priority] = round((float)$line->average_min_per_layer * (float)$line->layers_a,0);
+				        }
+
+					} else {
+
+						if (array_key_exists($line->priority, $tub_req_time)) {
+				            $tub_req_time[$line->priority] += round((float)$line->average_of_tubolare_smv_all * (float)$line->layers_a,0);
+				        } else {
+				            $tub_req_time[$line->priority] = round((float)$line->average_of_tubolare_smv_all * (float)$line->layers_a,0);
+				        }
+					}
+				}
+				// dd($tub_req_time);
+				// $tub_req_time = 0;
+				
+				$tub_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					SUM(m3.[marker_length]) as sum_m_length,
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons
+					FROM [mattresses] as m1
+					LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+					LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+					LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+					WHERE m4.[location] = 'TUB' AND m4.[active] = 1"));
+				
+				$tub_m = $tub_m[0]->sum_m_cons;
+			//
+
+			//MM1
+				$mm1 = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				  m1.[id]
+			      ,m1.[mattress]
+			      ,m1.[material]
+			      ,m1.[g_bin]
+			      ,m1.[dye_lot]
+			      ,m1.[color_desc]
+			      ,m1.[skeda]
+			      ,m1.[spreading_method]
+			      ,m1.[width_theor_usable]
+			      ,m2.[position]
+			      ,m2.[layers]
+			      ,m2.[layers_a]
+			      ,m2.[cons_planned]
+			      ,m2.[cons_actual]
+			      ,m2.[priority]
+			      ,m2.[printed_marker]
+			      ,m2.[comment_office]
+			      ,m2.[overlapping]
+			      ,m2.[last_mattress]
+			      ,m3.[marker_name]
+			      ,m3.[marker_length]
+			      ,m3.[marker_width]
+			      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
+			      ,m4.[status]
+			      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+			      ,(SELECT 
+						TOP 1 x.average_of_min_per_meter_minm
+					
+						FROM (
+							SELECT 
+							*,
+							LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+							RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+							LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+							RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+							FROM [cutting_smv_by_categories]) as x
+						WHERE	x.spreading_method = (SELECT 
+													CASE 
+													WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+													ELSE 'FACE UP/DOWN'
+													END)
+								AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+								AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+								AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+				 	) as average_of_min_per_meter_minm_c,
+				 	(SELECT 
+							TOP 1 average_of_min_per_meter_minm
+						  FROM [cutting_smv_by_materials]
+						  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+				 	) as average_of_min_per_meter_minm_m,
+					(SELECT 
+							ROUND(AVG(average_of_min_per_meter_minm),3)
+					  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+					(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+					FROM [pro_skedas] as t1
+					JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+					JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+					WHERE t3.id = m1.id)
+					as color
+					,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
+				  FROM [mattresses] as m1
+				  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				  WHERE m4.[location] = 'MM1' AND m4.[active] = 1 
+				  ORDER BY m2.[position] asc"));
+
+				$mm1_req_time = [];
+				foreach ($mm1 as $line) {
+
+					if ($line->average_of_min_per_meter_minm_c != 0) {
+						// dd('test');
+				        if (array_key_exists($line->priority, $mm1_req_time)) {
+				            $mm1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        } else { 
+				            $mm1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        }
+
+					} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+						if (array_key_exists($line->priority, $mm1_req_time)) {
+				            $mm1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        } else { 
+				            $mm1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        }
+
+					} else {
+
+						if (array_key_exists($line->priority, $mm1_req_time)) {
+				            $mm1_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        } else {
+				            $mm1_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        }
+
+					}
+				}
+				
+				$mm1_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					SUM(m3.[marker_length]) as sum_m_length,
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons,
+					SUM(o.[no_of_joinings]) as o_sum
+					FROM [mattresses] as m1
+					LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+					LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+					LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+					JOIN [o_rolls] as o ON o.[mattress_id_new] = m1.[id]
+					WHERE m4.[location] = 'MM1' AND m4.[active] = 1"));
+				
+				$mm1_m = $mm1_m[0]->o_sum;
+			//
+
+			//CUT
+				$cut = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				  m1.[id]
+			      ,m1.[mattress]
+			      ,m1.[material]
+			      ,m1.[g_bin]
+			      ,m1.[dye_lot]
+			      ,m1.[color_desc]
+			      ,m1.[skeda]
+			      ,m1.[spreading_method]
+			      ,m1.[width_theor_usable]
+			      ,m2.[position]
+			      ,m2.[layers]
+			      ,m2.[layers_a]
+			      ,m2.[cons_planned]
+			      ,m2.[cons_actual]
+			      ,m2.[priority]
+			      ,m2.[printed_marker]
+			      ,m2.[comment_office]
+			      ,m2.[overlapping]
+			      ,m2.[last_mattress]
+			      ,m3.[marker_name]
+			      ,m3.[marker_length]
+			      ,m3.[marker_width]
+			      ,(SELECT SUM([pro_pcs_actual]) FROM [mattress_pros] WHERE [mattress] = m1.mattress) as pro_pcs_actual
+			      ,m4.[status]
+			      ,(SELECT TOP 1 location_all FROM [posummary].[dbo].[pro] WHERE skeda = m1.[skeda]) as destination
+			      ,(SELECT 
+						TOP 1 x.average_of_min_per_meter_minm
+					
+						FROM (
+							SELECT 
+							*,
+							LEFT([layers_group], CHARINDEX('-', [layers_group]) - 1) AS min_layers,
+							RIGHT([layers_group], LEN([layers_group]) - CHARINDEX('-', [layers_group])) AS max_layers,
+							LEFT([length_group], CHARINDEX('to', [length_group]) - 1) AS min_length,
+							RIGHT([length_group], LEN([length_group]) - CHARINDEX('to', [length_group]) - 1) AS max_length
+							FROM [cutting_smv_by_categories]) as x
+						WHERE	x.spreading_method = (SELECT 
+													CASE 
+													WHEN  m1.[spreading_method] = 'FACE TO FACE' THEN 'FACE TO FACE'
+													ELSE 'FACE UP/DOWN'
+													END)
+								AND x.material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+								AND (x.min_layers < m2.[layers_a] AND x.max_layers >= m2.[layers_a])
+								AND (x.min_length < m3.[marker_length] AND x.max_length >= m3.[marker_length])
+				 	) as average_of_min_per_meter_minm_c,
+				 	(SELECT 
+							TOP 1 average_of_min_per_meter_minm
+						  FROM [cutting_smv_by_materials]
+						  WHERE material  like RTRIM(LTRIM(LEFT(m1.[material], 11)))+'%'
+				 	) as average_of_min_per_meter_minm_m,
+					(SELECT 
+							ROUND(AVG(average_of_min_per_meter_minm),3)
+					  FROM [cutting_smv_by_materials] ) as average_of_min_per_meter_minm_all,
+					(SELECT TOP 1 SUBSTRING(t1.sku, 9,5)
+					FROM [pro_skedas] as t1
+					JOIN [mattress_pros] as t2 ON t2.pro_id = t1.pro_id
+					JOIN [mattresses] as t3 ON t3.id = t2.mattress_id
+					WHERE t3.id = m1.id)
+					as color
+					,(SELECT TOP 1 standard_comment FROM material_comments WHERE material = SUBSTRING(m1.[material],0,12)) as standard_comment
+				  FROM [mattresses] as m1
+				  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+				  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+				  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+				  WHERE m4.[location] = 'CUT' AND m4.[active] = 1 
+				  ORDER BY m2.[position] asc"));
+				
+				$cut_req_time = [];
+				foreach ($cut as $line) {
+
+					if ($line->average_of_min_per_meter_minm_c != 0) {
+						// dd('test');
+				        if (array_key_exists($line->priority, $cut_req_time)) {
+				            $cut_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        } else { 
+				            $cut_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_c * (float)$line->cons_actual,0);
+				        }
+
+					} else if ($line->average_of_min_per_meter_minm_m != 0) {
+
+						if (array_key_exists($line->priority, $cut_req_time)) {
+				            $cut_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        } else { 
+				            $cut_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_m * (float)$line->cons_actual,0);
+				        }
+
+					} else {
+
+						if (array_key_exists($line->priority, $cut_req_time)) {
+				            $cut_req_time[$line->priority] += round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        } else {
+				            $cut_req_time[$line->priority] = round((float)$line->average_of_min_per_meter_minm_all * (float)$line->cons_actual,0);
+				        }
+
+					}
+				}
+				
+				$cut_m = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+					SUM(m3.[marker_length]) as sum_m_length,
+					SUM(m2.[layers_a]) as sum_m_layers,
+					SUM(m2.[cons_actual]) as sum_m_cons,
+					SUM(o.[no_of_joinings]) as o_sum
+					FROM [mattresses] as m1
+					LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+					LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+					LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+					JOIN [o_rolls] as o ON o.[mattress_id_new] = m1.[id]
+					WHERE m4.[location] = 'CUT' AND m4.[active] = 1"));
+				
+				$cut_m = $cut_m[0]->o_sum;
+
+
+			//
+			return view('planner.plan_mattress', compact('data','location','sp0','sp1','sp2','sp3','sp4','ms1','ms2','ms3','tub','mm1','cut',
+				'operator','operators',
+				'sp0_m','sp1_m','sp2_m','sp3_m','sp4_m','ms1_m','ms2_m','ms3_m','tub_m','mm1_m','cut_m',
+				'sp0_req_time','sp1_req_time','sp2_req_time','sp3_req_time','sp4_req_time','ms1_req_time','ms2_req_time','ms3_req_time','tub_req_time','mm1_req_time','cut_req_time'));
 		}
 
 		if ($location == 'BOARD_TABLE') {
