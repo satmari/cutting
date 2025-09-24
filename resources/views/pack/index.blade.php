@@ -49,6 +49,10 @@
 		                       <tr>
 		                    		<th >G-bin</th>
 		                            <th >Mattress</th>
+
+		                            <!-- <th >PRO</th> -->
+		                            <th >Destination</th>
+		                          
 		                            <th >Priority</th>
 		                            
 		                            <th></th>
@@ -68,8 +72,13 @@
 				                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
 											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
 		                            
-		                            <td>{{ $req->g_bin}}</td>
-		                            <td>{{ $req->mattress}}</td>
+		                            <td style="width: 240px;">{{ $req->g_bin}}</td>
+		                            <td style="width: 240px;">{{ $req->mattress}}</td>
+
+		                            
+		                            <td style="width: 60px;">{{ $req->location_all}}</td>
+		                            
+
 		                            <td class="
 			                            @if ($req->priority == 7) tt_priority
 			                            @elseif ($req->priority == 6) ts_priority

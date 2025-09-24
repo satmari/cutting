@@ -112,6 +112,54 @@ class packController extends Controller {
 		  WHERE m4.[location] = '".$location."' AND m4.active = '1' AND m2.mattress_packed = '0'
 		  ORDER BY m2.position asc"));
 		// dd($data);
+		
+		// $pros= '';
+		$skus= '';
+		$sku_s= '';
+		$location_all= '';
+		
+		for ($i=0; $i < count($data) ; $i++) { 
+			
+			$id = $data[$i]->id;
+			
+			$prom = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+				ps.[pro]
+				,ps.[style_size]
+				,ps.[sku]
+				,po.[location_all]
+				--,*
+			  FROM  [pro_skedas] as ps 
+			  LEFT JOIN [posummary].[dbo].[pro] as po ON po.[pro] = ps.[pro]
+			WHERE ps.[skeda] = '".$data[$i]->skeda."' "));
+			// dd($prom);
+			// $fg_color_code = substr($prom[0]->sku,9,4);
+			// dd($fg_color_code);
+			
+			// for ($x=0; $x < count($prom); $x++) { 
+			for ($x=0; $x < 1; $x++) { 
+
+				// $pros .= $prom[$x]->pro." ";
+				$skus .= $prom[$x]->style_size." ";
+				$test = str_replace(' ', ' ' , $prom[$x]->sku);
+				$test1 = substr($test, 8, 5);
+				$sku_s .= $test1." ";
+				// $sku_s .= $prom[$x]->sku." ";
+				if ($prom[$x]->location_all == 'Valy') {
+					$location_all .= $prom[$x]->location_all.'&nbsp;'.'&nbsp;'.'&nbsp;'.'&nbsp;'." ";
+				} else {
+					$location_all .= $prom[$x]->location_all." ";
+				}
+			}
+
+			// $data[$i]->pro = trim($pros);
+			$data[$i]->style_size = trim($skus);
+			$data[$i]->sku = trim($sku_s);
+			$data[$i]->location_all = trim($location_all);
+			$pros = '';
+			$skus = '';
+			$sku_s = '';
+			$location_all = '';
+		}
 
 		// $work_place = substr($device, 0,2);
 		$work_place = "PACK";

@@ -1670,6 +1670,7 @@ class importController extends Controller {
 
 						   			/////// this will be changed 2025.02.11 later
 							   		foreach ($find_in_marker_lines as $line) {
+							   			
 							   			$style_size = $line->style_size;
 							   			$pro_pcs_layer = (float)$line->pcs_on_layer;
 							   			// dd($style_size);

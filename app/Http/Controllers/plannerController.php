@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\ModelNotFoundException as ModelNotFoundExceptio
 use Illuminate\Database\QueryException as QueryException;
 use App\Exceptions\Handler;
 
+
 use Illuminate\Http\Request;
 //use Gbrock\Table\Facades\Table;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\File;
 
 use App\marker_line;
 use App\mattress_details;
@@ -46,6 +48,7 @@ use App\User;
 use Bican\Roles\Models\Role;
 use Bican\Roles\Models\Permission;
 use Auth;
+use Carbon\Carbon;
 
 use Session;
 use Validator;
@@ -2169,6 +2172,7 @@ class plannerController extends Controller {
 		return view('planner.plan_mattress', compact('data','location','operator','operators'));
 	}
 
+// OPERATOR
 	public function operator_login (Request $request) {
 		//
 		// $this->validate($request, ['container' => 'required']);
@@ -2197,7 +2201,9 @@ class plannerController extends Controller {
 		$operator = Session::set('operator', NULL);
 		return redirect('/plan_mattress/BOARD');
 	}
+//
 
+// REPOSITION
 	public function reposition() {
         $i = 0;
 
@@ -2341,8 +2347,9 @@ class plannerController extends Controller {
         	}	
         }
 	}
+//
 
-//MATTRESS
+// MATTRESS
 
 	public function plan_mattress_line ($id) {
 
@@ -2422,14 +2429,14 @@ class plannerController extends Controller {
 		      -- ,m5.[pro_pcs_actual]
 		      ,ms.[g_bin_orig]
 		      
-		  FROM [mattresses] as m1
-		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
-		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
-		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
-		  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
-		  LEFT JOIN [mattress_split_requests] as ms ON ms.[mattress_id_new] = m1.[id]
-		  WHERE m1.[id] = '".$id."' AND m4.[active] = '1' 
-		  ORDER BY m2.[position] asc"));
+			  FROM [mattresses] as m1
+			  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
+			  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
+			  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id]
+			  --LEFT JOIN [mattress_pros]	   as m5 ON m5.[mattress_id] = m4.[mattress_id]
+			  LEFT JOIN [mattress_split_requests] as ms ON ms.[mattress_id_new] = m1.[id]
+			  WHERE m1.[id] = '".$id."' AND m4.[active] = '1' 
+			  ORDER BY m2.[position] asc"));
 		// dd($data);
 
 		$mattress = $data[0]->mattress;
@@ -2459,15 +2466,14 @@ class plannerController extends Controller {
 		$comment_office = $data[0]->comment_office;
 		$tpa_number = $data[0]->tpa_number;
 		$last_mattress = $data[0]->last_mattress;
-
 		$selected_marker = $marker_name;
 
 
 		// find mattress_pro
 		$pro_m = DB::connection('sqlsrv')->select(DB::raw("SELECT *
-			 FROM [mattress_pros] 
+			FROM [mattress_pros] 
 		  	WHERE [mattress_id] = '".$id."'
-		  "));
+		"));
 		// dd($pro_m);
 
 		if (($skeda_item_type == 'MW') OR ($skeda_item_type == 'MB')) {
@@ -2478,6 +2484,7 @@ class plannerController extends Controller {
 				// dd('no mattress_pro');
 
 				$new_marker_reqs = marker_line::where('marker_name', $selected_marker)->get();
+
 				$new_marker_reqSizes = [];
 				foreach ($new_marker_reqs as $record) {
 				    $new_marker_reqSizes = array_merge($new_marker_reqSizes, explode(',', $record->style_size));
@@ -2646,6 +2653,14 @@ class plannerController extends Controller {
 		    }
 		    // dd($structuredLines);
 
+		    if (!empty($structuredLines)) {
+			    // Log the whole structuredLines array before inserts
+			    $logHeader = "\n[".Carbon::now()->toDateTimeString()."] structuredLines:\n";
+			    $logContent = json_encode($structuredLines, JSON_PRETTY_PRINT);
+
+			    File::append(storage_path('logs/mattress_pro_log.txt'), $logHeader.$logContent."\n");
+			}
+
 		    foreach ($structuredLines as $item) {
 			    // Access each element
 
@@ -2658,16 +2673,58 @@ class plannerController extends Controller {
 			    $layers_a = $met_det[0]->layers_a;
 			    // dd($layers_a);
 
-			    $table1 = new mattress_pro;
-				$table1->mattress_id = $id;
-				$table1->mattress = $mattress;
-				$table1->style_size = $style_size;
-				$table1->pro_id = $pro_id;
-				$table1->pro_pcs_layer = $pro_pcs_layer;
-				$table1->pro_pcs_planned = $table1->pro_pcs_layer * (float)$layers_a;
-				$table1->pro_pcs_actual = $table1->pro_pcs_layer * (float)$layers_a;
-				$table1->save();
-				// dd($table1);
+			 	// $table1 = new mattress_pro;
+				// $table1->mattress_id = $id;
+				// $table1->mattress = $mattress;
+				// $table1->style_size = $style_size;
+				// $table1->pro_id = $pro_id;
+				// $table1->pro_pcs_layer = $pro_pcs_layer;
+				// $table1->pro_pcs_planned = $table1->pro_pcs_layer * (float)$layers_a;
+				// $table1->pro_pcs_actual = $table1->pro_pcs_layer * (float)$layers_a;
+				// $table1->save();
+
+			    // Check if row already exists
+			    $existing = mattress_pro::where([
+			        'mattress_id' => $id,
+			        'style_size'  => $style_size,
+			        'pro_id'      => $pro_id,
+			    ])->first();
+
+				// Insert or update
+			    $table1 = mattress_pro::updateOrCreate(
+			        [		
+			            'mattress_id' => $id,
+			            'style_size'  => $style_size,
+			            'pro_id'      => $pro_id,
+			        ],
+			        [
+			            'mattress'        => $mattress,
+			            'pro_pcs_layer'   => $pro_pcs_layer,
+			            'pro_pcs_planned' => $pro_pcs_layer * (float)$layers_a,
+			            'pro_pcs_actual'  => $pro_pcs_layer * (float)$layers_a,
+			        ]
+			    );
+
+			    // Determine action for log
+    			$action = $existing ? 'Updated' : 'Inserted';
+				
+				// Build log line
+			    $logLine = sprintf(
+			        "[%s] %s: mattress_id=%s, mattress=%s, style_size=%s, pro_id=%s, pcs_layer=%s, pcs_planned=%s, pcs_actual=%s\n",
+			        Carbon::now()->toDateTimeString(),
+			        $action,
+			        $table1->mattress_id,
+			        $table1->mattress,
+			        $table1->style_size,
+			        $table1->pro_id,
+			        $table1->pro_pcs_layer,
+			        $table1->pro_pcs_planned,
+			        $table1->pro_pcs_actual
+			    );
+
+			    // Save log
+			    File::append(storage_path('logs/mattress_pro_log.txt'), $logLine);
+
 			}
 		}
 		
