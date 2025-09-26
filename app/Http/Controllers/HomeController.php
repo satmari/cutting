@@ -197,6 +197,12 @@ class HomeController extends Controller {
 			    return redirect('/cpo');
 		 	}
 
+		 	if ($user->is('VISKOVI')) { 
+			    // if user has at least one role
+			    // dd('cpo');
+			    return redirect('/viskovi');
+		 	}
+
 		}
 
 		return view('home');

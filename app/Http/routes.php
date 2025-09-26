@@ -766,6 +766,14 @@ Route::get('material_comment_edit/{id}', 'plannerController@material_comment_edi
 Route::post('material_comment_edit_post', 'plannerController@material_comment_edit_post');
 Route::post('material_comment_delete_post', 'plannerController@material_comment_delete_post');
 
+// VISKOVI
+Route::get('viskovi', 'viskoviController@index');
+Route::get('viskovi_add', 'viskoviController@viskovi_add');
+Route::post('viskovi_add_post', 'viskoviController@viskovi_add_post');
+Route::get('viskovi_delete/{id}', 'viskoviController@viskovi_delete');
+
+
+
 Route::get('/', 'HomeController@index');
 Route::get('home', 'HomeController@index');
 

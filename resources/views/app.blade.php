@@ -931,7 +931,18 @@
 		                    @endif
 						</ul>
 					@endif
+
+					<!-- VISKOVI -->
+					@if(Auth::user()->level() == 29)
+						<ul class="nav navbar-nav">
+							<li><a href="{{ url('viskovi') }}">Viškovi tabela</a></li>
+
+						</ul>
+					@endif
+
 				@endif
+
+
 
 				<ul class="nav navbar-nav navbar-right">
 					@if (Auth::guest())
