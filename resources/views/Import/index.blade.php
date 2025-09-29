@@ -76,7 +76,7 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">Import Skeda file (MAT, PRO, PAS) (Excel file)</div>
 					
-					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImport_skeda']]) !!}
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['postImport_skeda']]) !!}
 					
 						<div class="panel-body">
 							{!! Form::file('file4', ['class' => 'center-block']) !!}
@@ -91,7 +91,7 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">Import PAS bin (Excel file)</div>
 					
-					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImport_pas_bin']]) !!}
+					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['postImport_pas_bin']]) !!}
 					
 						<div class="panel-body">
 							{!! Form::file('file5', ['class' => 'center-block']) !!}
