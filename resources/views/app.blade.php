@@ -318,7 +318,7 @@
 						@if (isset($operators))
 						<li>
 							@if (!isset($operator))
-								<form class="form-inline" style="width:400px; padding: 8px;" 
+								<form class="form-inline" style="width:240px; padding: 8px;" 
 								action="{{ url('operator_login') }}" method="get" >
 									<select name="selected_operator" class="select form-control select-form" 
 									style="width:150px !important">
