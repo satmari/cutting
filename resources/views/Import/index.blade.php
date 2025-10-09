@@ -141,7 +141,7 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">Import paspul stock (Excel file)</div>
 					<p>Note: Excel file should contian:
-					skeda,	type,	dye lot,	length,	location,	kotur qty,	uom (meter/ploce),	kotur width,	material
+					skeda,	type,	dye lot,	length,	location,	kotur qty,	uom (meter/square),	kotur width,	material
 					</p>
 					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postImport_papsul_stock']]) !!}
 					
@@ -158,7 +158,7 @@
 				<div class="panel panel-default">
 					<div class="panel-heading">Return paspul from line (Excel file)</div>
 					<p>Note: Excel file should contian:
-					skeda,	type,	dye lot,	length,	location, kotur qty,	uom (meter/ploce),	kotur width,	material
+					skeda,	type,	dye lot,	length,	location, kotur qty,	uom (meter/square),	kotur width,	material
 					</p>
 					{!! Form::open(['files'=>True, 'method'=>'POST', 'url'=>['/postReturn_papsul_stock']]) !!}
 					

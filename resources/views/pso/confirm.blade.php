@@ -5,11 +5,11 @@
 	<div class="row vertical-center-row">
 		<div class="text-center col-md-4 col-md-offset-4">
 			<div class="panel panel-default">
-				<div class="panel-heading">Combine PLOCE mattress</div>
+				<div class="panel-heading">Combine Square mattress</div>
 				
 				
 				<div class="panel-body">
-					<p>Confirmation of sewing PLOCE</p>
+					<p>Confirmation of sewing Square</p>
 					<br>
 				<a href="{{ url('mattress_pso_confirm/'.$id) }}" class="btn btn-danger btn-l cen ter-block">
 					Confirm</a>

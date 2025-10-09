@@ -41,7 +41,7 @@
                             @if($rewound_roll_unit_of_measure = 'meter')
                                 <tr><td>Mtr per pcs</td><td><b>{{ round($unit_cons,3) }} </b></td></tr>
                             @else
-                                <tr><td>Pcs per ploce</td><td><b>{{ round($unit_cons,3) }} </b></td></tr>
+                                <tr><td>Pcs per Square</td><td><b>{{ round($unit_cons,3) }} </b></td></tr>
                             @endif
                             <tr><td>Kotur planned </td><td><b>{{ $kotur_planned }} </b></td></tr>
                             </table>

@@ -3756,7 +3756,7 @@
 					                            	@if ($req->marker_name != '') 
 					                            		{{ $req->marker_name }}
 					                            	@else
-					                            		<span>PLOCE</span>
+					                            		<span>Square</span>
 					                            	@endif
 					                            </td>
 					                            <td>{{ round($req->marker_length,3)}}</td>

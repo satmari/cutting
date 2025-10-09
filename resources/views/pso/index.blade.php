@@ -84,7 +84,7 @@
 		                           
 									<td>
 										<a href="{{ url('mattress_pso/'.$req->id) }}" class="btn btn-danger btn-xs center-block">
-										Combine ploce mattress</a>
+										Combine Square mattress</a>
 									</td>
 
 		                        </tr>

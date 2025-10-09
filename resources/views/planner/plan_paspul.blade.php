@@ -96,7 +96,7 @@
 				        	@if($req1->rewound_roll_unit_of_measure == 'meter')
 				        		<td>Mtr per pcs: <b>{{round($req1->unit_cons,2)}}</b></td>
 				        	@else
-				        		<td>Pcs per ploce: <b>{{round($req1->unit_cons,2)}}</b></td>
+				        		<td>Pcs per Square: <b>{{round($req1->unit_cons,2)}}</b></td>
 				        	@endif
 
 				        	<td>Garments qty:
@@ -180,7 +180,7 @@
 				        	@if($req1->rewound_roll_unit_of_measure == 'meter')
 				        		<td>Mtr per pcs: <b>{{round($req1->unit_cons,2)}}</b></td>
 				        	@else
-				        		<td>Pcs per ploce: <b>{{round($req1->unit_cons,2)}}</b></td>
+				        		<td>Pcs per Square: <b>{{round($req1->unit_cons,2)}}</b></td>
 				        	@endif
 
 				        	<td>Garments qty:
