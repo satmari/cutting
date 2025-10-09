@@ -1443,7 +1443,7 @@
 		 		-->
 		 		<hr>
 
-		 		<div class="col-md-of fset-2  col-md-1 8musketara" style="width: 12.499999995%;text-align: center;">
+		 		<div class="col-md-of fset-2  col-md-1 8musketara" style="width: 16.499999995%;text-align: center;">
 		 			<span style="font-size: x-large"><b>SP 0</b>&nbsp;&nbsp;&nbsp;</span> ({{round($sp0_m,2)}} m)
 					<br><br>
 					<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
@@ -1540,7 +1540,7 @@
 					</ul>
 				</div>
 
-				<div class="col-md-of fset-2  col-md-1 8musketara" style="width: 12.499999995%;text-align: center;">
+				<div class="col-md-of fset-2  col-md-1 8musketara" style="width: 16.499999995%;text-align: center;">
 					<span style="font-size: x-large"><b>SP 1</b>&nbsp;&nbsp;&nbsp;</span> ({{round($sp1_m,2)}} m)
 					<br><br>
 					<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
@@ -1637,7 +1637,7 @@
 					</ul>
 				</div>
 
-				<div class="col-md-1 8musketara" style="width: 12.499999995%;text-align: center;">
+				<div class="col-md-1 8musketara" style="width: 16.499999995%;text-align: center;">
 					<span style="font-size: x-large"><b>SP 2</b>&nbsp;&nbsp;&nbsp;</span> ({{round($sp2_m,2)}} m)
 					<br><br>
 					<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
@@ -1733,7 +1733,7 @@
 					</ul>
 				</div>
 
-				<div class="col-md-1 8musketara" style="width: 12.499999995%;text-align: center;">
+				<div class="col-md-1 8musketara" style="width: 16.499999995%;text-align: center;">
 					<span style="font-size: x-large"><b>SP 3</b>&nbsp;&nbsp;&nbsp;</span> ({{round($sp3_m,2)}} m)
 					<br><br>
 					<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
@@ -1828,7 +1828,7 @@
 					</ul>
 				</div>
 
-				<div class="col-md-1 8musketara" style="width: 12.499999995%;text-align: center;">
+				<div class="col-md-1 8musketara" style="width: 16.499999995%;text-align: center;">
 					<span style="font-size: x-large"><b>SP 4</b>&nbsp;&nbsp;&nbsp;</span> ({{round($sp4_m,2)}} m)
 					<br><br>
 					<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
@@ -1923,7 +1923,7 @@
 					</ul>
 				</div>
 
-				<div class="col-md-1 8musketara" style="width: 12.499999995%;text-align: center;">
+				<div class="col-md-1 8musketara" style="width: 16.499999995%;text-align: center;">
 					<span style="font-size: x-large"><b>MS 1</b>&nbsp;&nbsp;&nbsp;</span> ({{round($ms1_m,2)}} m)
 					<br><br>
 					<!-- <div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
@@ -2016,10 +2016,6 @@
 						@endforeach	  
 					</ul>
 				</div>
-
-				
-
-				
 
 				
 
