@@ -140,7 +140,7 @@
 							@if (isset($operators))
 							<li>
 								@if (!isset($operator))
-									<form class="form-inline" style="width:400px; padding: 8px;" 
+									<form class="form-inline" style="width:280px; padding: 8px;" 
 									action="{{ url('operator_login_planner') }}" method="get" >
 										<select name="selected_operator" class="select form-control select-form" 
 											style="width:150px !important">
@@ -157,6 +157,7 @@
 	                            <br>
 	                            <strong style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big>&nbsp;&nbsp;&nbsp;&nbsp;
 	                            <a href="{{ url('operator_logout_planner')}}" class="btn btn-danger btn-xs">Logout</a></strong>
+
 	                            @endif
 	                        </li>
 							@else
@@ -168,6 +169,7 @@
 		                    @endif
 						</ul>
 						<ul class="nav navbar-nav navbar-rig ht">
+							&nbsp;
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Tables<span class="caret"></span></a>
 								<ul class="dropdown-menu" role="menu">
@@ -204,7 +206,7 @@
 							@if (isset($operators))
 							<li>
 								@if (!isset($operator))
-									<form class="form-inline" style="width:400px; padding: 8px;" 
+									<form class="form-inline" style="width:280px; padding: 8px;" 
 									action="{{ url('operator_login_planner') }}" method="get" >
 										<select name="selected_operator" class="select form-control select-form" 
 										style="width:150px !important">
@@ -318,7 +320,7 @@
 						@if (isset($operators))
 						<li>
 							@if (!isset($operator))
-								<form class="form-inline" style="width:240px; padding: 8px;" 
+								<form class="form-inline" style="width:280px; padding: 8px;" 
 								action="{{ url('operator_login') }}" method="get" >
 									<select name="selected_operator" class="select form-control select-form" 
 									style="width:150px !important">
@@ -359,7 +361,7 @@
 						<li>
 							
 							@if (!isset($operator))
-							<form class="form-inline" style="width:400px; padding: 8px;" name="1" action="{{ url('operator_login') }}" method="get" >
+							<form class="form-inline" style="width:280px; padding: 8px;" name="1" action="{{ url('operator_login') }}" method="get" >
 								<select name="selected_operator" class="select form-control select-form" style="width:150px !important">
 	                                <option value="" selected></option>
 	                        	    @foreach ($operators as $line)
@@ -371,7 +373,7 @@
 	                            <input type="submit" value="Login" class="btn btn-success"/>
                             </form>
                             @else
-                            <form class="form-inline" style="width:400px; padding: 8px;">
+                            <form class="form-inline" style="width:280px; padding: 8px;">
 	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
 	                            <a href="{{ url('operator_logout')}}" class="btn btn-danger">Logout</a>
                         	</form>
@@ -380,7 +382,7 @@
                         <li>
 							
 							@if (!isset($operator2))
-							<form class="form-inline" style="width:400px; padding: 8px;" name="2" action="{{ url('operator_login2') }}" method="get" >
+							<form class="form-inline" style="width:280px; padding: 8px;" name="2" action="{{ url('operator_login2') }}" method="get" >
 								<select name="selected_operator2" class="select form-control select-form" style="width:150px !important">
 	                                <option value="" selected></option>
 	                        	    @foreach ($operators as $line)
@@ -392,7 +394,7 @@
 	                            <input type="submit" value="Login" class="btn btn-success"/>
                             </form>
                             @else
-                            <form class="form-inline" style="width:400px; padding: 8px;">
+                            <form class="form-inline" style="width:280px; padding: 8px;">
 	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator2 is: <b>{{ $operator2 }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
 	                            <a href="{{ url('operator_logout2')}}" class="btn btn-danger">Logout</a>
                         	</form>
@@ -402,7 +404,7 @@
 						@else
 							@if(Session::has('operator'))
 							<li>
-							<div style="width:400px; padding: 8px;">
+							<div style="width:280px; padding: 8px;">
 	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
 		                        <a href="{{ url('operator_logout')}}" class="btn btn-danger">Logout</a>
 	                        </div>
@@ -410,7 +412,7 @@
 	                        @endif
 	                        @if(Session::has('operator2'))
 							<li>
-							<div style="width:400px; padding: 8px;">
+							<div style="width:280px; padding: 8px;">
 	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator2 is: <b>{{ Session::get('operator2') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
 		                        <a href="{{ url('operator_logout2')}}" class="btn btn-danger">Logout</a>
 	                        </div>
@@ -429,7 +431,7 @@
 						@if (isset($operators))
 						<li>
 							@if (!isset($operator))
-							<form class="form-inline" style="width:400px; padding: 8px;" name="1" action="{{ url('operator_login') }}" method="get" >
+							<form class="form-inline" style="width:280px; padding: 8px;" name="1" action="{{ url('operator_login') }}" method="get" >
 								<select name="selected_operator" class="select form-control select-form" style="width:150px !important">
 	                                <option value="" selected></option>
 	                        	    @foreach ($operators as $line)
@@ -441,7 +443,7 @@
 	                            <input type="submit" value="Login" class="btn btn-success"/>
                             </form>
                             @else
-                            <form class="form-inline" style="width:400px; padding: 8px;">
+                            <form class="form-inline" style="width:280px; padding: 8px;">
 	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ $operator }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
 	                            <a href="{{ url('operator_logout')}}" class="btn btn-danger">Logout</a>
                         	</form>
@@ -450,7 +452,7 @@
                         <li>
 							
 							@if (!isset($operator2))
-							<form class="form-inline" style="width:400px; padding: 8px;" name="2" action="{{ url('operator_login2') }}" method="get" >
+							<form class="form-inline" style="width:280px; padding: 8px;" name="2" action="{{ url('operator_login2') }}" method="get" >
 								<select name="selected_operator2" class="select form-control select-form" style="width:150px !important">
 	                                <option value="" selected></option>
 	                        	    @foreach ($operators as $line)
@@ -462,7 +464,7 @@
 	                            <input type="submit" value="Login" class="btn btn-success"/>
                             </form>
                             @else
-                            <form class="form-inline" style="width:400px; padding: 8px;">
+                            <form class="form-inline" style="width:280px; padding: 8px;">
 	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator2 is: <b>{{ $operator2 }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
 	                            <a href="{{ url('operator_logout2')}}" class="btn btn-danger">Logout</a>
                         	</form>
@@ -472,7 +474,7 @@
 						@else
 							@if(Session::has('operator'))
 							<li>
-							<div style="width:400px; padding: 8px;">
+							<div style="width:280px; padding: 8px;">
 	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator is: <b>{{ Session::get('operator') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
 		                        <a href="{{ url('operator_logout')}}" class="btn btn-danger">Logout</a>
 	                        </div>
@@ -480,7 +482,7 @@
 	                        @endif
 	                        @if(Session::has('operator2'))
 							<li>
-							<div style="width:400px; padding: 8px;">
+							<div style="width:280px; padding: 8px;">
 	                            <span style="color: white;text-shadow: -1px 0 black, 0 2px black, 2px 0 black, 0 -1px black;"><big>Operator2 is: <b>{{ Session::get('operator2') }}</b></big></span>&nbsp;&nbsp;&nbsp;&nbsp;
 		                        <a href="{{ url('operator_logout2')}}" class="btn btn-danger">Logout</a>
 	                        </div>
@@ -500,7 +502,7 @@
 						@if (isset($operators))
 							<li>
 								@if (!isset($operator))
-									<form class="form-inline" style="width:400px; padding: 8px;" 
+									<form class="form-inline" style="width:280px; padding: 8px;" 
 									action="{{ url('operator_login_tub') }}" method="get" >
 										<select name="selected_operator" class="select form-control select-form" 
 										style="width:150px !important">
@@ -538,7 +540,7 @@
 							@if (isset($operators))
 								<li>
 									@if (!isset($operator))
-										<form class="form-inline" style="width:400px; padding: 8px;" 
+										<form class="form-inline" style="width:280px; padding: 8px;" 
 										action="{{ url('operator_login_lr') }}" method="get" >
 											<select name="selected_operator" class="select form-control select-form" 
 											style="width:150px !important">
@@ -576,7 +578,7 @@
 							@if (isset($operators))
 								<li>
 									@if (!isset($operator))	
-										<form class="form-inline" style="width:400px; padding: 8px;" 
+										<form class="form-inline" style="width:280px; padding: 8px;" 
 										action="{{ url('operator_login_pso') }}" method="get" >
 											<select name="selected_operator" class="select form-control select-form" 
 											style="width:150px !important">
@@ -617,7 +619,7 @@
 							@if (isset($operators))
 								<li>
 									@if (!isset($operator))
-										<form class="form-inline" style="width:400px; padding: 8px;" 
+										<form class="form-inline" style="width:280px; padding: 8px;" 
 										action="{{ url('operator_login_prw') }}" method="get" >
 								
 											<select name="selected_operator" class="select form-control select-form" 
@@ -657,7 +659,7 @@
 							@if (isset($operators))
 								<li>
 									@if (!isset($operator))
-									<form class="form-inline" style="width:400px; padding: 8px;" 
+									<form class="form-inline" style="width:280px; padding: 8px;" 
 									action="{{ url('operator_login_pco') }}" method="get" >
 										<select name="selected_operator" class="select form-control select-form" 
 										style="width:150px !important">
@@ -695,7 +697,7 @@
 							@if (isset($operators))
 							<li>
 								@if (!isset($operator))
-									<form class="form-inline" style="width:400px; padding: 8px;" 
+									<form class="form-inline" style="width:280px; padding: 8px;" 
 									action="{{ url('operator_login_pack') }}" method="get" >
 										<select name="selected_operator" class="select form-control select-form" 
 										style="width:150px !important">
@@ -733,7 +735,7 @@
 							@if (isset($operators))
 								<li>
 									@if (!isset($operator))
-										<form class="form-inline" style="width:400px; padding: 8px;" 
+										<form class="form-inline" style="width:280px; padding: 8px;" 
 										action="{{ url('operator_login_plot') }}" method="get" >
 											<select name="selected_operator" class="select form-control select-form" 
 											style="width:150px !important">
@@ -771,7 +773,7 @@
 							@if (isset($operators))
 							<li>
 								@if (!isset($operator))
-									<form class="form-inline" style="width:400px; padding: 8px;" 
+									<form class="form-inline" style="width:280px; padding: 8px;" 
 									action="{{ url('operator_login_cut') }}" method="get" >
 										<select name="selected_operator" class="select form-control select-form" 
 										style="width:150px !important">
@@ -860,7 +862,7 @@
 							@if (isset($operators))
 							<li>
 								@if (!isset($operator))
-									<form class="form-inline" style="width:400px; padding: 8px;" 
+									<form class="form-inline" style="width:280px; padding: 8px;" 
 									action="{{ url('operator_login_fo') }}" method="get" >
 										<select name="selected_operator" class="select form-control select-form" 
 										style="width:150px !important">
@@ -901,7 +903,7 @@
 							@if (isset($operators))
 							<li>
 								@if (!isset($operator))
-									<form class="form-inline" style="width:400px; padding: 8px;" 
+									<form class="form-inline" style="width:280px; padding: 8px;" 
 									action="{{ url('operator_login_cpo') }}" method="get" >
 										<select name="selected_operator" class="select form-control select-form" 
 										style="width:150px !important">
