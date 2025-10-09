@@ -45,7 +45,10 @@
 		                    <thead>
 		                       <tr>
 		                    		<!-- <th >Position</th> -->
+		                    		@if (config('app.global_variable') == 'itaca')
+		                    		@else
 		                       		<th >G-bin</th>
+		                       		@endif
 		                            <th >Mattress</th>
 		                            <th >Marker</th>
 		                            <th >Marker Length [m]</th>
@@ -63,7 +66,10 @@
 		                            <!-- <th >Spreading Method</th> -->
 		                            <!-- <th >Pcs per Bundle</th> -->
 		                            <!-- <th >Bottom Paper</th> -->
+		                            @if (config('app.global_variable') == 'itaca')
+		                    		@else
 		                            <th >All pro for Subotica</th>
+		                            @endif
 		                            <th >Priority</th>
 		                            <th >Status</th>
 		                            <th >Keep wastage</th>
@@ -88,7 +94,10 @@
 											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
 		                            
 		                            {{--<td>{{ $req->position }}</td>--}}
+		                            @if (config('app.global_variable') == 'itaca')
+		                    		@else
 		                            <td class=""><span>{{ $req->g_bin}}</span></td>
+		                            @endif
 				        	    	<td class=""><span>{{ $req->mattress}}</span></td>
 		                            <td>{{ $req->marker_name}}</td>
 		                            <td>{{ round($req->marker_length,3)}}</td>
@@ -103,9 +112,15 @@
 		                            <td>{{ $req->color_desc}} / {{ $req->fg_color_code}}</td>
 
 		                            @if ($req->all_pro_for_main_plant == 1)
+		                            	@if (config('app.global_variable') == 'itaca')
+		                    			@else
 		                            	<td>YES</td>
+		                            	@endif
 		                            @else
+		                            	@if (config('app.global_variable') == 'itaca')
+		                    			@else
 		                            	<td>NO</td>
+		                            	@endif
 		                            @endif
 		                            
 		                           <td class="
