@@ -38,6 +38,7 @@
 						@if ($location == 'MS1') plan_menu_a @endif "
 						><span class="glyphicon  glyphicon-inbox" >&nbsp;<b>MS1</b></span></a>
 						
+						
 
 					@else
 						<a href="{{ url('plan_mattress/SP4') }}" class="btn btn-primary
@@ -135,475 +136,6 @@
 
 	@if (config('app.global_variable') == 'gordon')
 	
-		<div class="container-fluid">
-				<div class="row">
-					<hr>
-
-			 		<div class="col-md-of fset-2  col-md-1 8musketara" style="width: 19.999999995%;text-align: center;">
-			 			<span style="font-size: x-large"><b>SP 0</b>&nbsp;&nbsp;&nbsp;</span> ({{round($sp0_m,2)}} m)
-						<br><br>
-						<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
-							@foreach ($sp0_req_time as  $key => $sp0_req_time_line)
-								<ul style="padding: 0;margin: 0;list-style: none;">
-									<li> 
-										@if ($key == 7) Test
-											@elseif ($key == 6) 3rd shift
-						        	    	@elseif ($key == 5) 2nd shift
-						        	    	@elseif ($key == 4) 1st shift
-						        	    	@elseif ($key == 3) Top
-						        	    	@elseif ($key == 2) Flash
-					        	    		@elseif ($key == 1) Normal
-						        	    @endif
-						        	    &nbsp;&nbsp;&nbsp;&nbsp;
-										@if ($sp0_req_time_line == 0 )
-											00 min
-										@else
-											{{ $sp0_req_time_line }} min
-										@endif
-
-									</li>
-								</ul>
-							@endforeach
-						</div>
-						<ul id="sortable0" class="connectedSortable_ul_1">
-			            	@foreach ($sp0 as $req0)
-			            	    <li class="ui-state-default
-			            	    @if ($req0->priority == 7) tt_priority
-			            	    @elseif ($req0->priority == 6) ts_priority
-			            	    @elseif ($req0->priority == 5) ss_priority
-			            	    @elseif ($req0->priority == 4) fs_priority
-			            	    @elseif ($req0->priority == 3) top_priority
-			        	    	@elseif ($req0->priority == 2) high_priority
-			        	    	@endif
-
-			        	    	@if ($req0->last_mattress == '1')
-			        	    		last_mattress
-			        	    	@endif
-
-			            	    	" id="SP-{{ $req0->id }}" data-html="true" 
-			            	    	title="
-			            	    	{{$req0->mattress}}<br />
-			            	    	<big>Gbin: {{$req0->g_bin}}</big><br />
-			            	    	Material: {{$req0->material}}<br />
-			            	    	Dye lot: {{$req0->dye_lot}}<br /> 
-			            	    	Color: {{$req0->color_desc}} / {{$req0->color}}<br /> 
-			            	    	Skeda: {{$req0->skeda}}<br /> 
-			            	    	Spreading method: {{$req0->spreading_method}}<br /> 
-			            	    	Width theor usable: {{round($req0->width_theor_usable,3)}}<br /> 
-			            	    	Layers: {{round($req0->layers_a,0)}}<br />
-			            	    	Cons actual: {{round($req0->cons_actual,3)}}<br />
-			            	    	Priority: 
-			            	    			@if ($req0->priority == 7) Test
-			            	    			@elseif ($req0->priority == 6) 3rd shift
-						        	    	@elseif ($req0->priority == 5) 2nd shift
-						        	    	@elseif ($req0->priority == 4) 1st shift
-						        	    	@elseif ($req0->priority == 3) Top
-						        	    	@elseif ($req0->priority == 2) Flash
-					        	    		@elseif ($req0->priority == 1) Normal
-						        	    	@endif
-						        	    	<br />
-			            	    	Marker: {{$req0->marker_name}}<br />
-			            	    	Marker length: {{round($req0->marker_length,3)}}<br /> 
-			            	    	Marker width: {{round($req0->marker_width,0)}}<br />
-			            	    	Mattress pcs: {{ round($req0->pro_pcs_actual,0)}}<br />
-			            	    	Comment office: {{$req0->comment_office}}<br />
-			            	    	<b>Status: {{$req0->status }}<br />
-			            	    	Dest: {{$req0->destination}}<br />
-			            	    	@if ($req0->average_of_min_per_meter_minm_c != 0) 
-			            	    		Spread SMV (by cat): {{ round($req0->average_of_min_per_meter_minm_c,2) }}
-			            	    	@elseif ($req0->average_of_min_per_meter_minm_m != 0)  
-			            	    		Spread SMV (by mat): {{ round($req0->average_of_min_per_meter_minm_m,2) }}
-			            	    	@else 
-			            	    		Spread SMV (by avg):{{ round($req0->average_of_min_per_meter_minm_all,2) }}
-			            	    	@endif
-			            	    	<br />
-
-			            	    	Req. time: 
-			            	    	@if ($req0->average_of_min_per_meter_minm_c != 0) 
-			            	    		{{ round($req0->average_of_min_per_meter_minm_c*$req0->cons_actual,0) }}
-			            	    	@elseif ($req0->average_of_min_per_meter_minm_m != 0)  
-			            	    		{{ round($req0->average_of_min_per_meter_minm_m*$req0->cons_actual,0) }}
-			            	    	@else 
-			            	    		{{ round($req0->average_of_min_per_meter_minm_all*$req0->cons_actual,0) }}
-			            	    	@endif
-
-			            	    	 min<b />
-			            	    	">
-			            	    	<span class=""><a href="{{ url('edit_mattress_line/'.$req0->id) }}">{{$req0->mattress}}</a><br>{{$req0->marker_name}}</span>
-
-			        	    	</li>
-							@endforeach	  
-						</ul>
-					</div>
-
-					<div class="col-md-of fset-2  col-md-1 8musketara" style="width: 19.999999995%;text-align: center;">
-						<span style="font-size: x-large"><b>SP 1</b>&nbsp;&nbsp;&nbsp;</span> ({{round($sp1_m,2)}} m)
-						<br><br>
-						<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
-							@foreach ($sp1_req_time as  $key => $sp1_req_time_line)
-								<ul style="padding: 0;margin: 0;list-style: none;">
-									<li> 
-											@if ($key == 7) Test
-											@elseif ($key == 6) 3rd shift
-						        	    	@elseif ($key == 5) 2nd shift
-						        	    	@elseif ($key == 4) 1st shift
-						        	    	@elseif ($key == 3) Top
-						        	    	@elseif ($key == 2) Flash
-					        	    		@elseif ($key == 1) Normal
-						        	    @endif
-						        	    &nbsp;&nbsp;&nbsp;&nbsp;
-										@if ($sp1_req_time_line == 0 )
-											00 min
-										@else
-											{{ $sp1_req_time_line }} min
-										@endif
-
-									</li>
-								</ul>
-							@endforeach
-						</div>
-						
-						<ul id="sortable2" class="connectedSortable_ul_1">
-			            	@foreach ($sp1 as $req1)
-			            	    <li class="ui-state-default
-			            	    @if ($req1->priority == 7) tt_priority
-			            	    @elseif ($req1->priority == 6) ts_priority
-			            	    @elseif ($req1->priority == 5) ss_priority
-			            	    @elseif ($req1->priority == 4) fs_priority
-			            	    @elseif ($req1->priority == 3) top_priority
-			        	    	@elseif ($req1->priority == 2) high_priority
-			        	    	@endif
-			        	    	@if ($req1->last_mattress == '1')
-			        	    		last_mattress
-			        	    	@endif
-			            	    	" id="SP-{{ $req1->id }}" data-html="true" 
-			            	    	title="
-			            	    	{{$req1->mattress}}<br />
-			            	    	<big>Gbin: {{$req1->g_bin}}</big><br />
-			            	    	Material: {{$req1->material}}<br />
-			            	    	Dye lot: {{$req1->dye_lot}}<br /> 
-			            	    	Color: {{$req1->color_desc}} / {{$req1->color}}<br /> 
-			            	    	Skeda: {{$req1->skeda}}<br /> 
-			            	    	Spreading method: {{$req1->spreading_method}}<br /> 
-			            	    	Width theor usable: {{round($req1->width_theor_usable,3)}}<br /> 
-			            	    	Layers: {{round($req1->layers_a,0)}}<br />
-			            	    	Cons actual: {{round($req1->cons_actual,3)}}<br />
-			            	    	Priority: 
-			            	    			@if ($req1->priority == 7) Test
-			            	    			@elseif ($req1->priority == 6) 3rd shift
-						        	    	@elseif ($req1->priority == 5) 2nd shift
-						        	    	@elseif ($req1->priority == 4) 1st shift
-						        	    	@elseif ($req1->priority == 3) Top
-						        	    	@elseif ($req1->priority == 2) Flash
-					        	    		@elseif ($req1->priority == 1) Normal
-						        	    	@endif
-						        	    	<br />
-			            	    	Marker: {{$req1->marker_name}}<br />
-			            	    	Marker length: {{round($req1->marker_length,3)}}<br /> 
-			            	    	Marker width: {{round($req1->marker_width,0)}}<br />
-			            	    	Mattress pcs: {{round($req1->pro_pcs_actual,0)}}<br />
-			            	    	Comment office: {{$req1->comment_office}}<br />
-			            	    	<b>Status: {{$req1->status }}<br />
-			            	    	Dest: {{$req1->destination}} <br />
-			            	    	 
-			            	    	@if ($req1->average_of_min_per_meter_minm_c != 0) 
-			            	    		Spread SMV (by cat): {{ round($req1->average_of_min_per_meter_minm_c,2) }}
-			            	    	@elseif ($req1->average_of_min_per_meter_minm_m != 0)  
-			            	    		Spread SMV (by mat): {{ round($req1->average_of_min_per_meter_minm_m,2) }}
-			            	    	@else 
-			            	    		Spread SMV (by avg):{{ round($req1->average_of_min_per_meter_minm_all,2) }}
-			            	    	@endif
-			            	    	<br />
-
-			            	    	Req. time: 
-			            	    	@if ($req1->average_of_min_per_meter_minm_c != 0) 
-			            	    		{{ round($req1->average_of_min_per_meter_minm_c*$req1->cons_actual,0) }}
-			            	    	@elseif ($req1->average_of_min_per_meter_minm_m != 0)  
-			            	    		{{ round($req1->average_of_min_per_meter_minm_m*$req1->cons_actual,0) }}
-			            	    	@else 
-			            	    		{{ round($req1->average_of_min_per_meter_minm_all*$req1->cons_actual,0) }}
-			            	    	@endif
-
-			            	    	 min<b />
-			            	    	">
-			            	    	<span class=""><a href="{{ url('edit_mattress_line/'.$req1->id) }}">{{$req1->mattress}}</a><br>{{$req1->marker_name}}</span>
-
-			        	    	</li>
-							@endforeach	  
-						</ul>
-					</div>
-
-					<div class="col-md-1 8musketara" style="width: 19.999999995%;text-align: center;">
-						<span style="font-size: x-large"><b>SP 2</b>&nbsp;&nbsp;&nbsp;</span> ({{round($sp2_m,2)}} m)
-						<br><br>
-						<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
-							@foreach ($sp2_req_time as  $key => $sp2_req_time_line)
-								<ul style="padding: 0;margin: 0;list-style: none;">
-									<li> 
-											@if ($key == 7) Test
-											@elseif ($key == 6) 3rd shift
-						        	    	@elseif ($key == 5) 2nd shift
-						        	    	@elseif ($key == 4) 1st shift
-						        	    	@elseif ($key == 3) Top
-						        	    	@elseif ($key == 2) Flash
-					        	    		@elseif ($key == 1) Normal
-						        	    @endif
-						        	    &nbsp;&nbsp;&nbsp;&nbsp;
-										@if ($sp2_req_time_line == 0 )
-											00 min
-										@else
-											{{ $sp2_req_time_line }} min
-										@endif
-
-									</li>
-								</ul>
-							@endforeach
-						</div>
-						<ul id="sortable3" class="connectedSortable_ul_1">
-			            	@foreach ($sp2 as $req2)
-			            	    <li class="ui-state-default
-			            	    @if ($req2->priority == 7) tt_priority
-			            	    @elseif ($req2->priority == 6) ts_priority
-			            	    @elseif ($req2->priority == 5) ss_priority
-			            	    @elseif ($req2->priority == 4) fs_priority
-			            	    @elseif ($req2->priority == 3) top_priority
-			        	    	@elseif ($req2->priority == 2) high_priority
-			        	    	@endif
-			        	    	@if ($req2->last_mattress == '1')
-			        	    		last_mattress
-			        	    	@endif
-			        	    		" id="SP-{{ $req2->id }}" data-html="true"
-			            	    	title="
-			            	    	{{$req2->mattress}}<br />
-			            	    	<big>Gbin: {{$req2->g_bin}}</big><br />
-			            	    	Material: {{$req2->material}}<br />
-			            	    	Dye lot: {{$req2->dye_lot}}<br /> 
-			            	    	Color: {{$req2->color_desc}} / {{$req2->color}}<br /> 
-			            	    	Skeda: {{$req2->skeda}}<br /> 
-			            	    	Spreading method: {{$req2->spreading_method}}<br /> 
-			            	    	Width theor usable: {{round($req2->width_theor_usable,3)}}<br /> 
-			            	    	Layers: {{round($req2->layers_a,0)}}<br />
-			            	    	Cons actual: {{round($req2->cons_actual,3)}}<br />
-			            	    	Priority:
-			            	    			@if ($req2->priority == 7) Test
-			            	    			@elseif ($req2->priority == 6) 3rd shift
-						        	    	@elseif ($req2->priority == 5) 2nd shift
-						        	    	@elseif ($req2->priority == 4) 1st shift
-						        	    	@elseif ($req2->priority == 3) Top
-						        	    	@elseif ($req2->priority == 2) Flash
-					        	    		@elseif ($req2->priority == 1) Normal
-						        	    	@endif
-						        	    	<br />
-			            	    	Marker: {{$req2->marker_name}}<br /> 
-			            	    	Marker length: {{round($req2->marker_length,3)}}<br /> 
-			            	    	Marker width: {{round($req2->marker_width,0)}}<br /> 
-			            	    	Mattress pcs: {{round($req2->pro_pcs_actual,0)}}<br />
-			            	    	Comment office: {{$req2->comment_office}}<br />
-			            	    	<b>Status: {{$req2->status }}<br />
-			            	    	Dest: {{$req2->destination}}<br />
-			            	    	@if ($req2->average_of_min_per_meter_minm_c != 0) 
-			            	    		Spread SMV (by cat): {{ round($req2->average_of_min_per_meter_minm_c,2) }}
-			            	    	@elseif ($req2->average_of_min_per_meter_minm_m != 0)  
-			            	    		Spread SMV (by mat): {{ round($req2->average_of_min_per_meter_minm_m,2) }}
-			            	    	@else 
-			            	    		Spread SMV (by avg):{{ round($req2->average_of_min_per_meter_minm_all,2) }}
-			            	    	@endif
-			            	    	<br />
-
-			            	    	Req. time: 
-			            	    	@if ($req2->average_of_min_per_meter_minm_c != 0) 
-			            	    		{{ round($req2->average_of_min_per_meter_minm_c*$req2->cons_actual,0) }}
-			            	    	@elseif ($req2->average_of_min_per_meter_minm_m != 0)  
-			            	    		{{ round($req2->average_of_min_per_meter_minm_m*$req2->cons_actual,0) }}
-			            	    	@else 
-			            	    		{{ round($req2->average_of_min_per_meter_minm_all*$req2->cons_actual,0) }}
-			            	    	@endif
-
-			            	    	 min<b />
-			            	    	">
-			            	    	
-			            	    	
-			            	    	<span class=""><a href="{{ url('edit_mattress_line/'.$req2->id) }}">{{$req2->mattress}}</a><br>{{$req2->marker_name}}</span>
-
-			            	    </li>
-							@endforeach	  
-						</ul>
-					</div>
-
-					<div class="col-md-1 8musketara" style="width: 19.999999995%;text-align: center;">
-						<span style="font-size: x-large"><b>SP 3</b>&nbsp;&nbsp;&nbsp;</span> ({{round($sp3_m,2)}} m)
-						<br><br>
-						<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
-							@foreach ($sp3_req_time as  $key => $sp3_req_time_line)
-								<ul style="padding: 0;margin: 0;list-style: none;">
-									<li> 
-										@if ($key == 7) Test
-											@elseif ($key == 6) 3rd shift
-						        	    	@elseif ($key == 5) 2nd shift
-						        	    	@elseif ($key == 4) 1st shift
-						        	    	@elseif ($key == 3) Top
-						        	    	@elseif ($key == 2) Flash
-					        	    		@elseif ($key == 1) Normal
-						        	    @endif
-						        	    &nbsp;&nbsp;&nbsp;&nbsp;
-										@if ($sp3_req_time_line == 0 )
-											00 min
-										@else
-											{{ $sp3_req_time_line }} min
-										@endif
-
-									</li>
-								</ul>
-							@endforeach
-						</div>
-						<ul id="sortable4" class="connectedSortable_ul_1">
-			            	@foreach ($sp3 as $req3)
-			            	    <li class="ui-state-default
-			            	    @if ($req3->priority == 7) tt_priority
-			            	    @elseif ($req3->priority == 6) ts_priority
-			            	    @elseif ($req3->priority == 5) ss_priority
-			            	    @elseif ($req3->priority == 4) fs_priority
-			            	    @elseif ($req3->priority == 3) top_priority
-			        	    	@elseif ($req3->priority == 2) high_priority
-			        	    	@endif
-			        	    	@if ($req3->last_mattress == '1')
-			        	    		last_mattress
-			        	    	@endif
-			            	    	" id="SP-{{ $req3->id }}" data-html="true"
-			            	    	title="
-			            	    	{{$req3->mattress}}<br />
-			            	    	<big>Gbin: {{$req3->g_bin}}</big><br />
-			            	    	Material: {{$req3->material}}<br />
-			            	    	Dye lot: {{$req3->dye_lot}}<br /> 
-			            	    	Color: {{$req3->color_desc}} / {{$req3->color}}<br />  
-			            	    	Skeda: {{$req3->skeda}}<br /> 
-			            	    	Spreading method: {{$req3->spreading_method}}<br /> 
-			            	    	Width theor usable: {{round($req3->width_theor_usable,3)}}<br /> 
-			            	    	Layers: {{round($req3->layers_a,0)}}<br />
-			            	    	Cons actual: {{round($req3->cons_actual,3)}}<br /> 
-			            	    	Priority:
-			            	    	 		@if ($req3->priority == 7) Test
-			            	    	 		@elseif ($req3->priority == 6) 3rd shift
-						        	    	@elseif ($req3->priority == 5) 2nd shift
-						        	    	@elseif ($req3->priority == 4) 1st shift
-						        	    	@elseif ($req3->priority == 3) Top
-						        	    	@elseif ($req3->priority == 2) Flash
-					        	    		@elseif ($req3->priority == 1) Normal
-						        	    	@endif
-						        	    	<br />
-			            	    	Marker: {{$req3->marker_name}}<br /> 
-			            	    	Marker length: {{round($req3->marker_length,3)}}<br /> 
-			            	    	Marker width: {{round($req3->marker_width,0)}}<br /> 
-			            	    	Mattress pcs: {{round($req3->pro_pcs_actual,0)}}<br />
-			            	    	Comment office: {{$req3->comment_office}}<br />
-			            	    	<b>Status: {{$req3->status }}<br />
-			            	    	Dest: {{$req3->destination}}<br />
-			            	    	@if ($req3->average_of_min_per_meter_minm_c != 0) 
-			            	    		Spread SMV (by cat): {{ round($req3->average_of_min_per_meter_minm_c,2) }}
-			            	    	@elseif ($req3->average_of_min_per_meter_minm_m != 0)  
-			            	    		Spread SMV (by mat): {{ round($req3->average_of_min_per_meter_minm_m,2) }}
-			            	    	@else 
-			            	    		Spread SMV (by avg):{{ round($req3->average_of_min_per_meter_minm_all,2) }}
-			            	    	@endif
-			            	    	<br />
-
-			            	    	Req. time: 
-			            	    	@if ($req3->average_of_min_per_meter_minm_c != 0) 
-			            	    		{{ round($req3->average_of_min_per_meter_minm_c*$req3->cons_actual,0) }}
-			            	    	@elseif ($req3->average_of_min_per_meter_minm_m != 0)  
-			            	    		{{ round($req3->average_of_min_per_meter_minm_m*$req3->cons_actual,0) }}
-			            	    	@else 
-			            	    		{{ round($req3->average_of_min_per_meter_minm_all*$req3->cons_actual,0) }}
-			            	    	@endif
-
-			            	    	 min<b />
-			            	    	">
-			            	    	
-			            	    	<span class=""><a href="{{ url('edit_mattress_line/'.$req3->id) }}">{{$req3->mattress}}</a><br>{{$req3->marker_name}}</span>
-
-			            	    </li>
-							@endforeach	  
-						</ul>
-					</div>
-
-					<div class="col-md-1 8musketara" style="width: 19.999999995%;text-align: center;">
-						<span style="font-size: x-large"><b>CUT</b>&nbsp;&nbsp;&nbsp;</span> 
-						<br><br>
-					
-						<ul id="sortable91" class="connectedSortable_ul_1">
-			            	@foreach ($cut as $req8)
-			            	    <li class="ui-state-default
-			            	    @if ($req8->priority == 7) tt_priority
-			            	    @elseif ($req8->priority == 6) ts_priority
-			            	    @elseif ($req8->priority == 5) ss_priority
-			            	    @elseif ($req8->priority == 4) fs_priority
-			            	    @elseif ($req8->priority == 3) top_priority
-			        	    	@elseif ($req8->priority == 2) high_priority
-			        	    	@endif
-			        	    	@if ($req8->last_mattress == '1')
-			        	    		last_mattress
-			        	    	@endif
-			            	    	" id="SP-{{ $req8->id }}" data-html="true"
-			            	    	title="
-			            	    	{{$req8->mattress}}<br /> 
-			            	    	<big>Gbin: {{$req8->g_bin}}</big><br />
-			            	    	Material: {{$req8->material}}<br />
-			            	    	Dye lot: {{$req8->dye_lot}}<br /> 
-			            	    	Color: {{$req8->color_desc}} / {{$req8->color}}<br /> 
-			            	    	Skeda: {{$req8->skeda}}<br /> 
-			            	    	Spreading method: {{$req8->spreading_method}}<br /> 
-			            	    	Width theor usable: {{round($req8->width_theor_usable,3)}}<br /> 
-			            	    	Layers: {{round($req8->layers_a,0)}}<br />
-			            	    	Cons actual: {{round($req8->cons_actual,3)}}<br /> 
-			            	    	Priority: 
-			            	    			@if ($req8->priority == 7) Test
-			            	    			@elseif ($req8->priority == 6) 3rd shift
-						        	    	@elseif ($req8->priority == 5) 2nd shift
-						        	    	@elseif ($req8->priority == 4) 1st shift
-						        	    	@elseif ($req8->priority == 3) Top
-						        	    	@elseif ($req8->priority == 2) Flash
-					        	    		@elseif ($req8->priority == 1) Normal
-						        	    	@endif
-						        	    	<br />
-			            	    	Marker: {{$req8->marker_name}}<br /> 
-			            	    	Marker length: {{round($req8->marker_length,3)}}<br /> 
-			            	    	Marker width: {{round($req8->marker_width,0)}}<br />
-			            	    	Mattress pcs: {{round($req8->pro_pcs_actual,0)}}<br />
-			            	    	Comment office: {{$req8->comment_office}}<br />
-			            	    	<b>Status: {{$req8->status }}<br />
-			            	    	Dest: {{$req8->destination}}<br />
-			            	    	<!-- @if ($req8->average_of_min_per_meter_minm_c != 0) 
-			            	    		Spread SMV (by cat): {{ round($req8->average_of_min_per_meter_minm_c,2) }}
-			            	    	@elseif ($req8->average_of_min_per_meter_minm_m != 0)  
-			            	    		Spread SMV (by mat): {{ round($req8->average_of_min_per_meter_minm_m,2) }}
-			            	    	@else 
-			            	    		Spread SMV (by avg):{{ round($req8->average_of_min_per_meter_minm_all,2) }}
-			            	    	@endif
-			            	    	<br />
-
-			            	    	Req. time: 
-			            	    	@if ($req8->average_of_min_per_meter_minm_c != 0) 
-			            	    		{{ round($req8->average_of_min_per_meter_minm_c*$req8->cons_actual,0) }}
-			            	    	@elseif ($req8->average_of_min_per_meter_minm_m != 0)  
-			            	    		{{ round($req8->average_of_min_per_meter_minm_m*$req8->cons_actual,0) }}
-			            	    	@else 
-			            	    		{{ round($req8->average_of_min_per_meter_minm_all*$req8->cons_actual,0) }}
-			            	    	@endif
-			            	    	 min --><b />
-			            	    	">
-			            	    	<span class=""><a href="{{ url('edit_mattress_line/'.$req8->id) }}">{{$req8->mattress}}</a><br>{{$req8->marker_name}}</span>
-			            	    	
-
-			            	    </li>
-							@endforeach	  
-						</ul>
-					</div>
-
-				</div>
-		</div>
-
-	@elseif (config('app.global_variable') == 'fiorano')
-
 		<div class="container-fluid">
 			<div class="row">
 				<!-- <div class="col-5 col-md-2">Table NOT SET
@@ -1424,6 +956,475 @@
 			</div>
 		</div>
 
+	@elseif (config('app.global_variable') == 'fiorano')
+
+		<div class="container-fluid">
+				<div class="row">
+					<hr>
+
+			 		<div class="col-md-of fset-2  col-md-1 8musketara" style="width: 19.999999995%;text-align: center;">
+			 			<span style="font-size: x-large"><b>SP 0</b>&nbsp;&nbsp;&nbsp;</span> ({{round($sp0_m,2)}} m)
+						<br><br>
+						<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
+							@foreach ($sp0_req_time as  $key => $sp0_req_time_line)
+								<ul style="padding: 0;margin: 0;list-style: none;">
+									<li> 
+										@if ($key == 7) Test
+											@elseif ($key == 6) 3rd shift
+						        	    	@elseif ($key == 5) 2nd shift
+						        	    	@elseif ($key == 4) 1st shift
+						        	    	@elseif ($key == 3) Top
+						        	    	@elseif ($key == 2) Flash
+					        	    		@elseif ($key == 1) Normal
+						        	    @endif
+						        	    &nbsp;&nbsp;&nbsp;&nbsp;
+										@if ($sp0_req_time_line == 0 )
+											00 min
+										@else
+											{{ $sp0_req_time_line }} min
+										@endif
+
+									</li>
+								</ul>
+							@endforeach
+						</div>
+						<ul id="sortable0" class="connectedSortable_ul_1">
+			            	@foreach ($sp0 as $req0)
+			            	    <li class="ui-state-default
+			            	    @if ($req0->priority == 7) tt_priority
+			            	    @elseif ($req0->priority == 6) ts_priority
+			            	    @elseif ($req0->priority == 5) ss_priority
+			            	    @elseif ($req0->priority == 4) fs_priority
+			            	    @elseif ($req0->priority == 3) top_priority
+			        	    	@elseif ($req0->priority == 2) high_priority
+			        	    	@endif
+
+			        	    	@if ($req0->last_mattress == '1')
+			        	    		last_mattress
+			        	    	@endif
+
+			            	    	" id="SP-{{ $req0->id }}" data-html="true" 
+			            	    	title="
+			            	    	{{$req0->mattress}}<br />
+			            	    	<big>Gbin: {{$req0->g_bin}}</big><br />
+			            	    	Material: {{$req0->material}}<br />
+			            	    	Dye lot: {{$req0->dye_lot}}<br /> 
+			            	    	Color: {{$req0->color_desc}} / {{$req0->color}}<br /> 
+			            	    	Skeda: {{$req0->skeda}}<br /> 
+			            	    	Spreading method: {{$req0->spreading_method}}<br /> 
+			            	    	Width theor usable: {{round($req0->width_theor_usable,3)}}<br /> 
+			            	    	Layers: {{round($req0->layers_a,0)}}<br />
+			            	    	Cons actual: {{round($req0->cons_actual,3)}}<br />
+			            	    	Priority: 
+			            	    			@if ($req0->priority == 7) Test
+			            	    			@elseif ($req0->priority == 6) 3rd shift
+						        	    	@elseif ($req0->priority == 5) 2nd shift
+						        	    	@elseif ($req0->priority == 4) 1st shift
+						        	    	@elseif ($req0->priority == 3) Top
+						        	    	@elseif ($req0->priority == 2) Flash
+					        	    		@elseif ($req0->priority == 1) Normal
+						        	    	@endif
+						        	    	<br />
+			            	    	Marker: {{$req0->marker_name}}<br />
+			            	    	Marker length: {{round($req0->marker_length,3)}}<br /> 
+			            	    	Marker width: {{round($req0->marker_width,0)}}<br />
+			            	    	Mattress pcs: {{ round($req0->pro_pcs_actual,0)}}<br />
+			            	    	Comment office: {{$req0->comment_office}}<br />
+			            	    	<b>Status: {{$req0->status }}<br />
+			            	    	Dest: {{$req0->destination}}<br />
+			            	    	@if ($req0->average_of_min_per_meter_minm_c != 0) 
+			            	    		Spread SMV (by cat): {{ round($req0->average_of_min_per_meter_minm_c,2) }}
+			            	    	@elseif ($req0->average_of_min_per_meter_minm_m != 0)  
+			            	    		Spread SMV (by mat): {{ round($req0->average_of_min_per_meter_minm_m,2) }}
+			            	    	@else 
+			            	    		Spread SMV (by avg):{{ round($req0->average_of_min_per_meter_minm_all,2) }}
+			            	    	@endif
+			            	    	<br />
+
+			            	    	Req. time: 
+			            	    	@if ($req0->average_of_min_per_meter_minm_c != 0) 
+			            	    		{{ round($req0->average_of_min_per_meter_minm_c*$req0->cons_actual,0) }}
+			            	    	@elseif ($req0->average_of_min_per_meter_minm_m != 0)  
+			            	    		{{ round($req0->average_of_min_per_meter_minm_m*$req0->cons_actual,0) }}
+			            	    	@else 
+			            	    		{{ round($req0->average_of_min_per_meter_minm_all*$req0->cons_actual,0) }}
+			            	    	@endif
+
+			            	    	 min<b />
+			            	    	">
+			            	    	<span class=""><a href="{{ url('edit_mattress_line/'.$req0->id) }}">{{$req0->mattress}}</a><br>{{$req0->marker_name}}</span>
+
+			        	    	</li>
+							@endforeach	  
+						</ul>
+					</div>
+
+					<div class="col-md-of fset-2  col-md-1 8musketara" style="width: 19.999999995%;text-align: center;">
+						<span style="font-size: x-large"><b>SP 1</b>&nbsp;&nbsp;&nbsp;</span> ({{round($sp1_m,2)}} m)
+						<br><br>
+						<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
+							@foreach ($sp1_req_time as  $key => $sp1_req_time_line)
+								<ul style="padding: 0;margin: 0;list-style: none;">
+									<li> 
+											@if ($key == 7) Test
+											@elseif ($key == 6) 3rd shift
+						        	    	@elseif ($key == 5) 2nd shift
+						        	    	@elseif ($key == 4) 1st shift
+						        	    	@elseif ($key == 3) Top
+						        	    	@elseif ($key == 2) Flash
+					        	    		@elseif ($key == 1) Normal
+						        	    @endif
+						        	    &nbsp;&nbsp;&nbsp;&nbsp;
+										@if ($sp1_req_time_line == 0 )
+											00 min
+										@else
+											{{ $sp1_req_time_line }} min
+										@endif
+
+									</li>
+								</ul>
+							@endforeach
+						</div>
+						
+						<ul id="sortable2" class="connectedSortable_ul_1">
+			            	@foreach ($sp1 as $req1)
+			            	    <li class="ui-state-default
+			            	    @if ($req1->priority == 7) tt_priority
+			            	    @elseif ($req1->priority == 6) ts_priority
+			            	    @elseif ($req1->priority == 5) ss_priority
+			            	    @elseif ($req1->priority == 4) fs_priority
+			            	    @elseif ($req1->priority == 3) top_priority
+			        	    	@elseif ($req1->priority == 2) high_priority
+			        	    	@endif
+			        	    	@if ($req1->last_mattress == '1')
+			        	    		last_mattress
+			        	    	@endif
+			            	    	" id="SP-{{ $req1->id }}" data-html="true" 
+			            	    	title="
+			            	    	{{$req1->mattress}}<br />
+			            	    	<big>Gbin: {{$req1->g_bin}}</big><br />
+			            	    	Material: {{$req1->material}}<br />
+			            	    	Dye lot: {{$req1->dye_lot}}<br /> 
+			            	    	Color: {{$req1->color_desc}} / {{$req1->color}}<br /> 
+			            	    	Skeda: {{$req1->skeda}}<br /> 
+			            	    	Spreading method: {{$req1->spreading_method}}<br /> 
+			            	    	Width theor usable: {{round($req1->width_theor_usable,3)}}<br /> 
+			            	    	Layers: {{round($req1->layers_a,0)}}<br />
+			            	    	Cons actual: {{round($req1->cons_actual,3)}}<br />
+			            	    	Priority: 
+			            	    			@if ($req1->priority == 7) Test
+			            	    			@elseif ($req1->priority == 6) 3rd shift
+						        	    	@elseif ($req1->priority == 5) 2nd shift
+						        	    	@elseif ($req1->priority == 4) 1st shift
+						        	    	@elseif ($req1->priority == 3) Top
+						        	    	@elseif ($req1->priority == 2) Flash
+					        	    		@elseif ($req1->priority == 1) Normal
+						        	    	@endif
+						        	    	<br />
+			            	    	Marker: {{$req1->marker_name}}<br />
+			            	    	Marker length: {{round($req1->marker_length,3)}}<br /> 
+			            	    	Marker width: {{round($req1->marker_width,0)}}<br />
+			            	    	Mattress pcs: {{round($req1->pro_pcs_actual,0)}}<br />
+			            	    	Comment office: {{$req1->comment_office}}<br />
+			            	    	<b>Status: {{$req1->status }}<br />
+			            	    	Dest: {{$req1->destination}} <br />
+			            	    	 
+			            	    	@if ($req1->average_of_min_per_meter_minm_c != 0) 
+			            	    		Spread SMV (by cat): {{ round($req1->average_of_min_per_meter_minm_c,2) }}
+			            	    	@elseif ($req1->average_of_min_per_meter_minm_m != 0)  
+			            	    		Spread SMV (by mat): {{ round($req1->average_of_min_per_meter_minm_m,2) }}
+			            	    	@else 
+			            	    		Spread SMV (by avg):{{ round($req1->average_of_min_per_meter_minm_all,2) }}
+			            	    	@endif
+			            	    	<br />
+
+			            	    	Req. time: 
+			            	    	@if ($req1->average_of_min_per_meter_minm_c != 0) 
+			            	    		{{ round($req1->average_of_min_per_meter_minm_c*$req1->cons_actual,0) }}
+			            	    	@elseif ($req1->average_of_min_per_meter_minm_m != 0)  
+			            	    		{{ round($req1->average_of_min_per_meter_minm_m*$req1->cons_actual,0) }}
+			            	    	@else 
+			            	    		{{ round($req1->average_of_min_per_meter_minm_all*$req1->cons_actual,0) }}
+			            	    	@endif
+
+			            	    	 min<b />
+			            	    	">
+			            	    	<span class=""><a href="{{ url('edit_mattress_line/'.$req1->id) }}">{{$req1->mattress}}</a><br>{{$req1->marker_name}}</span>
+
+			        	    	</li>
+							@endforeach	  
+						</ul>
+					</div>
+
+					<div class="col-md-1 8musketara" style="width: 19.999999995%;text-align: center;">
+						<span style="font-size: x-large"><b>SP 2</b>&nbsp;&nbsp;&nbsp;</span> ({{round($sp2_m,2)}} m)
+						<br><br>
+						<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
+							@foreach ($sp2_req_time as  $key => $sp2_req_time_line)
+								<ul style="padding: 0;margin: 0;list-style: none;">
+									<li> 
+											@if ($key == 7) Test
+											@elseif ($key == 6) 3rd shift
+						        	    	@elseif ($key == 5) 2nd shift
+						        	    	@elseif ($key == 4) 1st shift
+						        	    	@elseif ($key == 3) Top
+						        	    	@elseif ($key == 2) Flash
+					        	    		@elseif ($key == 1) Normal
+						        	    @endif
+						        	    &nbsp;&nbsp;&nbsp;&nbsp;
+										@if ($sp2_req_time_line == 0 )
+											00 min
+										@else
+											{{ $sp2_req_time_line }} min
+										@endif
+
+									</li>
+								</ul>
+							@endforeach
+						</div>
+						<ul id="sortable3" class="connectedSortable_ul_1">
+			            	@foreach ($sp2 as $req2)
+			            	    <li class="ui-state-default
+			            	    @if ($req2->priority == 7) tt_priority
+			            	    @elseif ($req2->priority == 6) ts_priority
+			            	    @elseif ($req2->priority == 5) ss_priority
+			            	    @elseif ($req2->priority == 4) fs_priority
+			            	    @elseif ($req2->priority == 3) top_priority
+			        	    	@elseif ($req2->priority == 2) high_priority
+			        	    	@endif
+			        	    	@if ($req2->last_mattress == '1')
+			        	    		last_mattress
+			        	    	@endif
+			        	    		" id="SP-{{ $req2->id }}" data-html="true"
+			            	    	title="
+			            	    	{{$req2->mattress}}<br />
+			            	    	<big>Gbin: {{$req2->g_bin}}</big><br />
+			            	    	Material: {{$req2->material}}<br />
+			            	    	Dye lot: {{$req2->dye_lot}}<br /> 
+			            	    	Color: {{$req2->color_desc}} / {{$req2->color}}<br /> 
+			            	    	Skeda: {{$req2->skeda}}<br /> 
+			            	    	Spreading method: {{$req2->spreading_method}}<br /> 
+			            	    	Width theor usable: {{round($req2->width_theor_usable,3)}}<br /> 
+			            	    	Layers: {{round($req2->layers_a,0)}}<br />
+			            	    	Cons actual: {{round($req2->cons_actual,3)}}<br />
+			            	    	Priority:
+			            	    			@if ($req2->priority == 7) Test
+			            	    			@elseif ($req2->priority == 6) 3rd shift
+						        	    	@elseif ($req2->priority == 5) 2nd shift
+						        	    	@elseif ($req2->priority == 4) 1st shift
+						        	    	@elseif ($req2->priority == 3) Top
+						        	    	@elseif ($req2->priority == 2) Flash
+					        	    		@elseif ($req2->priority == 1) Normal
+						        	    	@endif
+						        	    	<br />
+			            	    	Marker: {{$req2->marker_name}}<br /> 
+			            	    	Marker length: {{round($req2->marker_length,3)}}<br /> 
+			            	    	Marker width: {{round($req2->marker_width,0)}}<br /> 
+			            	    	Mattress pcs: {{round($req2->pro_pcs_actual,0)}}<br />
+			            	    	Comment office: {{$req2->comment_office}}<br />
+			            	    	<b>Status: {{$req2->status }}<br />
+			            	    	Dest: {{$req2->destination}}<br />
+			            	    	@if ($req2->average_of_min_per_meter_minm_c != 0) 
+			            	    		Spread SMV (by cat): {{ round($req2->average_of_min_per_meter_minm_c,2) }}
+			            	    	@elseif ($req2->average_of_min_per_meter_minm_m != 0)  
+			            	    		Spread SMV (by mat): {{ round($req2->average_of_min_per_meter_minm_m,2) }}
+			            	    	@else 
+			            	    		Spread SMV (by avg):{{ round($req2->average_of_min_per_meter_minm_all,2) }}
+			            	    	@endif
+			            	    	<br />
+
+			            	    	Req. time: 
+			            	    	@if ($req2->average_of_min_per_meter_minm_c != 0) 
+			            	    		{{ round($req2->average_of_min_per_meter_minm_c*$req2->cons_actual,0) }}
+			            	    	@elseif ($req2->average_of_min_per_meter_minm_m != 0)  
+			            	    		{{ round($req2->average_of_min_per_meter_minm_m*$req2->cons_actual,0) }}
+			            	    	@else 
+			            	    		{{ round($req2->average_of_min_per_meter_minm_all*$req2->cons_actual,0) }}
+			            	    	@endif
+
+			            	    	 min<b />
+			            	    	">
+			            	    	
+			            	    	
+			            	    	<span class=""><a href="{{ url('edit_mattress_line/'.$req2->id) }}">{{$req2->mattress}}</a><br>{{$req2->marker_name}}</span>
+
+			            	    </li>
+							@endforeach	  
+						</ul>
+					</div>
+
+					<div class="col-md-1 8musketara" style="width: 19.999999995%;text-align: center;">
+						<span style="font-size: x-large"><b>SP 3</b>&nbsp;&nbsp;&nbsp;</span> ({{round($sp3_m,2)}} m)
+						<br><br>
+						<div style="border: 1px solid #6f6f6f;margin-bottom: 5px;border-radius: 10px;background-color: #b1b0b066; ">
+							@foreach ($sp3_req_time as  $key => $sp3_req_time_line)
+								<ul style="padding: 0;margin: 0;list-style: none;">
+									<li> 
+										@if ($key == 7) Test
+											@elseif ($key == 6) 3rd shift
+						        	    	@elseif ($key == 5) 2nd shift
+						        	    	@elseif ($key == 4) 1st shift
+						        	    	@elseif ($key == 3) Top
+						        	    	@elseif ($key == 2) Flash
+					        	    		@elseif ($key == 1) Normal
+						        	    @endif
+						        	    &nbsp;&nbsp;&nbsp;&nbsp;
+										@if ($sp3_req_time_line == 0 )
+											00 min
+										@else
+											{{ $sp3_req_time_line }} min
+										@endif
+
+									</li>
+								</ul>
+							@endforeach
+						</div>
+						<ul id="sortable4" class="connectedSortable_ul_1">
+			            	@foreach ($sp3 as $req3)
+			            	    <li class="ui-state-default
+			            	    @if ($req3->priority == 7) tt_priority
+			            	    @elseif ($req3->priority == 6) ts_priority
+			            	    @elseif ($req3->priority == 5) ss_priority
+			            	    @elseif ($req3->priority == 4) fs_priority
+			            	    @elseif ($req3->priority == 3) top_priority
+			        	    	@elseif ($req3->priority == 2) high_priority
+			        	    	@endif
+			        	    	@if ($req3->last_mattress == '1')
+			        	    		last_mattress
+			        	    	@endif
+			            	    	" id="SP-{{ $req3->id }}" data-html="true"
+			            	    	title="
+			            	    	{{$req3->mattress}}<br />
+			            	    	<big>Gbin: {{$req3->g_bin}}</big><br />
+			            	    	Material: {{$req3->material}}<br />
+			            	    	Dye lot: {{$req3->dye_lot}}<br /> 
+			            	    	Color: {{$req3->color_desc}} / {{$req3->color}}<br />  
+			            	    	Skeda: {{$req3->skeda}}<br /> 
+			            	    	Spreading method: {{$req3->spreading_method}}<br /> 
+			            	    	Width theor usable: {{round($req3->width_theor_usable,3)}}<br /> 
+			            	    	Layers: {{round($req3->layers_a,0)}}<br />
+			            	    	Cons actual: {{round($req3->cons_actual,3)}}<br /> 
+			            	    	Priority:
+			            	    	 		@if ($req3->priority == 7) Test
+			            	    	 		@elseif ($req3->priority == 6) 3rd shift
+						        	    	@elseif ($req3->priority == 5) 2nd shift
+						        	    	@elseif ($req3->priority == 4) 1st shift
+						        	    	@elseif ($req3->priority == 3) Top
+						        	    	@elseif ($req3->priority == 2) Flash
+					        	    		@elseif ($req3->priority == 1) Normal
+						        	    	@endif
+						        	    	<br />
+			            	    	Marker: {{$req3->marker_name}}<br /> 
+			            	    	Marker length: {{round($req3->marker_length,3)}}<br /> 
+			            	    	Marker width: {{round($req3->marker_width,0)}}<br /> 
+			            	    	Mattress pcs: {{round($req3->pro_pcs_actual,0)}}<br />
+			            	    	Comment office: {{$req3->comment_office}}<br />
+			            	    	<b>Status: {{$req3->status }}<br />
+			            	    	Dest: {{$req3->destination}}<br />
+			            	    	@if ($req3->average_of_min_per_meter_minm_c != 0) 
+			            	    		Spread SMV (by cat): {{ round($req3->average_of_min_per_meter_minm_c,2) }}
+			            	    	@elseif ($req3->average_of_min_per_meter_minm_m != 0)  
+			            	    		Spread SMV (by mat): {{ round($req3->average_of_min_per_meter_minm_m,2) }}
+			            	    	@else 
+			            	    		Spread SMV (by avg):{{ round($req3->average_of_min_per_meter_minm_all,2) }}
+			            	    	@endif
+			            	    	<br />
+
+			            	    	Req. time: 
+			            	    	@if ($req3->average_of_min_per_meter_minm_c != 0) 
+			            	    		{{ round($req3->average_of_min_per_meter_minm_c*$req3->cons_actual,0) }}
+			            	    	@elseif ($req3->average_of_min_per_meter_minm_m != 0)  
+			            	    		{{ round($req3->average_of_min_per_meter_minm_m*$req3->cons_actual,0) }}
+			            	    	@else 
+			            	    		{{ round($req3->average_of_min_per_meter_minm_all*$req3->cons_actual,0) }}
+			            	    	@endif
+
+			            	    	 min<b />
+			            	    	">
+			            	    	
+			            	    	<span class=""><a href="{{ url('edit_mattress_line/'.$req3->id) }}">{{$req3->mattress}}</a><br>{{$req3->marker_name}}</span>
+
+			            	    </li>
+							@endforeach	  
+						</ul>
+					</div>
+
+					<div class="col-md-1 8musketara" style="width: 19.999999995%;text-align: center;">
+						<span style="font-size: x-large"><b>CUT</b>&nbsp;&nbsp;&nbsp;</span> 
+						<br><br>
+					
+						<ul id="sortable91" class="connectedSortable_ul_1">
+			            	@foreach ($cut as $req8)
+			            	    <li class="ui-state-default
+			            	    @if ($req8->priority == 7) tt_priority
+			            	    @elseif ($req8->priority == 6) ts_priority
+			            	    @elseif ($req8->priority == 5) ss_priority
+			            	    @elseif ($req8->priority == 4) fs_priority
+			            	    @elseif ($req8->priority == 3) top_priority
+			        	    	@elseif ($req8->priority == 2) high_priority
+			        	    	@endif
+			        	    	@if ($req8->last_mattress == '1')
+			        	    		last_mattress
+			        	    	@endif
+			            	    	" id="SP-{{ $req8->id }}" data-html="true"
+			            	    	title="
+			            	    	{{$req8->mattress}}<br /> 
+			            	    	<big>Gbin: {{$req8->g_bin}}</big><br />
+			            	    	Material: {{$req8->material}}<br />
+			            	    	Dye lot: {{$req8->dye_lot}}<br /> 
+			            	    	Color: {{$req8->color_desc}} / {{$req8->color}}<br /> 
+			            	    	Skeda: {{$req8->skeda}}<br /> 
+			            	    	Spreading method: {{$req8->spreading_method}}<br /> 
+			            	    	Width theor usable: {{round($req8->width_theor_usable,3)}}<br /> 
+			            	    	Layers: {{round($req8->layers_a,0)}}<br />
+			            	    	Cons actual: {{round($req8->cons_actual,3)}}<br /> 
+			            	    	Priority: 
+			            	    			@if ($req8->priority == 7) Test
+			            	    			@elseif ($req8->priority == 6) 3rd shift
+						        	    	@elseif ($req8->priority == 5) 2nd shift
+						        	    	@elseif ($req8->priority == 4) 1st shift
+						        	    	@elseif ($req8->priority == 3) Top
+						        	    	@elseif ($req8->priority == 2) Flash
+					        	    		@elseif ($req8->priority == 1) Normal
+						        	    	@endif
+						        	    	<br />
+			            	    	Marker: {{$req8->marker_name}}<br /> 
+			            	    	Marker length: {{round($req8->marker_length,3)}}<br /> 
+			            	    	Marker width: {{round($req8->marker_width,0)}}<br />
+			            	    	Mattress pcs: {{round($req8->pro_pcs_actual,0)}}<br />
+			            	    	Comment office: {{$req8->comment_office}}<br />
+			            	    	<b>Status: {{$req8->status }}<br />
+			            	    	Dest: {{$req8->destination}}<br />
+			            	    	<!-- @if ($req8->average_of_min_per_meter_minm_c != 0) 
+			            	    		Spread SMV (by cat): {{ round($req8->average_of_min_per_meter_minm_c,2) }}
+			            	    	@elseif ($req8->average_of_min_per_meter_minm_m != 0)  
+			            	    		Spread SMV (by mat): {{ round($req8->average_of_min_per_meter_minm_m,2) }}
+			            	    	@else 
+			            	    		Spread SMV (by avg):{{ round($req8->average_of_min_per_meter_minm_all,2) }}
+			            	    	@endif
+			            	    	<br />
+
+			            	    	Req. time: 
+			            	    	@if ($req8->average_of_min_per_meter_minm_c != 0) 
+			            	    		{{ round($req8->average_of_min_per_meter_minm_c*$req8->cons_actual,0) }}
+			            	    	@elseif ($req8->average_of_min_per_meter_minm_m != 0)  
+			            	    		{{ round($req8->average_of_min_per_meter_minm_m*$req8->cons_actual,0) }}
+			            	    	@else 
+			            	    		{{ round($req8->average_of_min_per_meter_minm_all*$req8->cons_actual,0) }}
+			            	    	@endif
+			            	    	 min --><b />
+			            	    	">
+			            	    	<span class=""><a href="{{ url('edit_mattress_line/'.$req8->id) }}">{{$req8->mattress}}</a><br>{{$req8->marker_name}}</span>
+			            	    	
+
+			            	    </li>
+							@endforeach	  
+						</ul>
+					</div>
+
+				</div>
+		</div>
+	
 	@elseif (config('app.global_variable') == 'itaca')
 
 		<div class="container-fluid">
@@ -2012,14 +2013,12 @@
 					</ul>
 				</div>
 
-				
 
 			</div>
 		</div>
 
-	@else
 
-		
+	@else
 
 	@endif
 @endif
