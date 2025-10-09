@@ -44,8 +44,12 @@
 			                    		<!-- <th >Position</th> -->
 			                            <th >Paspul rewound roll</th>
 			                            
+			                            @if (config('app.global_variable') == 'itaca')
+		                       			@else
 			                            <th >PRO</th>
 			                            <th >Destination</th>
+			                            @endif
+
 			                            <th >SKU</th>
 
 			                            <th >Paspul type</th>
@@ -86,8 +90,12 @@
 			                            {{-- <td>{{ $req->position}}</td> --}}
 			                            <td>{{ $req->paspul_rewound_roll}}</td>
 
+			                            @if (config('app.global_variable') == 'itaca')
+		                       			@else
 			                            <td style="width: 75px;">{{ $req->pro}}</td>
 			                            <td style="width: 60px;">{{ $req->location_all}}</td>
+			                            @endif
+			                            
 			                            <td style="width: 120px;">{{ $req->sku}}</td>
 
 			                            <td>{{ $req->paspul_type}}</td>

@@ -46,9 +46,13 @@
 			                            <th >Rewound length</th>
 			                            
 			                            <th >Unit of measure</th>
-
+			                            
+			                            @if (config('app.global_variable') == 'itaca')
+		                       			@else
 			                            <th >PRO</th>
 			                            <th >Destination</th>
+			                            @endif
+
 			                            <th >SKU</th>
 
 			                            <th >Paspul type</th>
@@ -91,8 +95,11 @@
 			                            
 			                            <td>{{ $req->rewound_roll_unit_of_measure}}</td>
 
+			                            @if (config('app.global_variable') == 'itaca')
+		                       			@else
 			                            <td style="width: 75px;">{{ $req->pro}}</td>
 			                            <td style="width: 60px;">{{ $req->location_all}}</td>
+			                            @endif
 			                            <td style="width: 120px;">{{ $req->sku}}</td>
 
 			                            <td>{{ $req->paspul_type}}</td>

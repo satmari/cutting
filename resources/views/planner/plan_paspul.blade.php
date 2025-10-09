@@ -587,7 +587,11 @@
 						        <thead>
 						           <tr>
 						        		<th >Paspul Roll</th>
+						        		
+						        		@if (config('app.global_variable') == 'itaca')
+		                       			@else
 						                <th >SAP SU</th>
+						                @endif
 
 						                <th >Material</th>
 						                <th >Color Desc</th>
@@ -601,9 +605,12 @@
 						                
 						                <th >Rewound %</th>
 						                <th >Uom</th>
-
+						                
+						                @if (config('app.global_variable') == 'itaca')
+		                       			@else
 						                <th >PRO</th>
 						                <th >Destination</th>
+						                @endif
 						                <th >SKU</th>
 
 						                <th >Koturi Width [mm]</th>
@@ -615,7 +622,10 @@
 						                <th >Skeda Item Type</th>
 						                <th >Skeda</th>
 						                <th >Bin</th>
+						                @if (config('app.global_variable') == 'itaca')
+		                       			@else
 						                <th >TPA Number</th>
+						                @endif
 						                <th >Priority</th>
 						                <th>Planned pcs</th>
 			                            <th>Cut pcs</th>
@@ -637,7 +647,10 @@
 										box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
 							                
 							                <td class="">{{ $req->paspul_roll}}</td>
+								    		@if (config('app.global_variable') == 'itaca')
+		                       				@else
 								    		<td>{{ $req->sap_su}}</td>
+								    		@endif
 
 								    		<td>{{ $req->material}}</td>
 								    		<td>{{ $req->color_desc}}</td>
@@ -662,8 +675,11 @@
 
 								    		<td>{{ $req->rewound_roll_unit_of_measure }}</td>
 
+								    		@if (config('app.global_variable') == 'itaca')
+		                       				@else
 								    		<td style="width: 75px;">{{ $req->pro}}</td>
 								    		<td style="width: 60px;">{{ $req->location_all}}</td>
+								    		@endif
 							                <td style="width: 120px;">{{ $req->sku}}</td>
 
 							                <td>{{ round($req->kotur_width,0) }}</td>
@@ -676,7 +692,11 @@
 							                <td>{{ $req->skeda }}</td>
 							                <td>{{ $req->pasbin }}</td>
 
+							                @if (config('app.global_variable') == 'itaca')
+		                       				@else
 							                <td>{{ $req->tpa_number }}</td>
+							                @endif
+							                
 							             	<td class="
 							                        @if ($req->priority == 7) tt_priority
 							                        @elseif ($req->priority == 6) ts_priority

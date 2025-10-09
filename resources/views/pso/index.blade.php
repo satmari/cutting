@@ -47,7 +47,10 @@
 		                -->
 		                    <thead>
 		                       <tr>
+		                       		@if (config('app.global_variable') == 'itaca')
+		                       		@else
 		                    		<th >G-bin</th>
+		                    		@endif
 		                            <th >Mattress</th>
 		                            <th >Marker</th>
 		                            <th >Layers Actual</th>
@@ -68,8 +71,10 @@
 				                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
 											box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
 		                            
-		                            
+		                            @if (config('app.global_variable') == 'itaca')
+		                       		@else
 		                            <td class=""><span>{{ $req->g_bin}}</span></td>
+		                            @endif
 				        	    	<td class=""><span>{{ $req->mattress}}</span></td>
 		                            <td>{{ $req->marker_name}}</td>
 		                            <td>{{ round($req->layers_a,0)}}</td>
