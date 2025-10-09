@@ -37,12 +37,7 @@
 						<a href="{{ url('plan_mattress/MS1') }}" class="btn btn-success
 						@if ($location == 'MS1') plan_menu_a @endif "
 						><span class="glyphicon  glyphicon-inbox" >&nbsp;<b>MS1</b></span></a>
-						<a href="{{ url('plan_mattress/MS2') }}" class="btn btn-success
-						@if ($location == 'MS2') plan_menu_a @endif "
-						><span class="glyphicon glyphicon-inbox" >&nbsp;<b>MS2</b></span></a>
-						<a href="{{ url('plan_mattress/MS3') }}" class="btn btn-success
-						@if ($location == 'MS3') plan_menu_a @endif "
-						><span class="glyphicon glyphicon-inbox" >&nbsp;<b>MS3</b></span></a>
+						
 
 					@else
 						<a href="{{ url('plan_mattress/SP4') }}" class="btn btn-primary
