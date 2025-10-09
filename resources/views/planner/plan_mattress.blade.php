@@ -2069,7 +2069,10 @@
 									<thead>
 				                       <tr>	
 				                       		<!-- <th >Position</th> -->
+				                       		@if (config('app.global_variable') == 'itaca')
+				                       		@else
 				                       		<th >G-bin</th>
+				                       		@endif
 				                            <th >Mattress</th>
 				                            <th >Marker</th>
 				                            <th >Marker Length [m]</th>
@@ -2077,8 +2080,11 @@
 				                            <th >Mattress Width [cm]</th>
 				                            <th >Layers Planned</th>
 				                            <th >Layers Actual</th>
+				                            @if (config('app.global_variable') == 'itaca')
+				                       		@else
 				                            <th >PRO</th>
 				                            <th >Destination</th>
+				                            @endif
 				                            <th >SKU</th>
 				                            <th >Material</th>
 				                            <th >Dye Lot</th>
@@ -2102,7 +2108,10 @@
 												box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
 					                            
 					                            {{--<td>{{ $req->position }}</td>--}}
+					                            @if (config('app.global_variable') == 'itaca')
+				                       			@else
 					                            <td class=""><span>{{ $req->g_bin}}</span></td>
+					                            @endif
 							        	    	<td class=""><span>{{ $req->mattress}}</span></td>
 					                            <td>{{ $req->marker_name}}</td>
 					                            <td>{{ round($req->marker_length,3)}}</td>
@@ -2118,9 +2127,11 @@
 					                            @endif
 					                            <td>{{ round($req->layers,0)}}</td>
 					                            <td>{{ round($req->layers_a,0)}}</td>
-					                            
+					                            @if (config('app.global_variable') == 'itaca')
+				                       			@else
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <td style="width: 60px;">{{ $req->location_all}}</td>
+					                            @endif
 					                            <td style="width: 138px;">{{ $req->sku}}</td>
 					                            
 					                            <td>{{ $req->material}}</td>
@@ -2187,7 +2198,10 @@
 						                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
 												box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
 						                        ">
+						                        @if (config('app.global_variable') == 'itaca')
+				                       			@else
 						                        <td class=""><span>{{ $req->g_bin}}</span></td>
+						                        @endif
 							        	    	<td class=""><span>{{ $req->mattress}}</span></td>
 							        	    	<td class=""><span>{{ $req->g_bin_orig}}</span></td>
 						                        <td  colspan="13" style="padding: 5px; text-align: left;">
@@ -2228,8 +2242,11 @@
 				                            <th >Marker Length [m]</th>
 				                            <th >Mattress Width [cm]</th>
 				                            <th >Layers Actual</th>
+				                            @if (config('app.global_variable') == 'itaca')
+				                       		@else
 				                            <th >PRO</th>
 				                            <th >Destination</th>
+				                            @endif
 				                            <th >SKU</th>
 				                            <th >Material</th>
 				                            <th >Dye Lot</th>
@@ -2261,8 +2278,11 @@
 					                            	<td>{{ round($req->marker_width,3)}}</td>
 					                            @endif
 					                            <td>{{ round($req->layers_a,0)}}</td>
+					                            @if (config('app.global_variable') == 'itaca')
+				                       			@else
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <td style="width: 60px;">{{ $req->location_all}}</td>
+					                            @endif
 					                            <td style="width: 138px;">{{ $req->sku}}</td>
 					                            <td>{{ $req->material}}</td>
 					                            <td>{{ $req->dye_lot}}</td>
@@ -2721,15 +2741,21 @@
 	 								<thead>
 				                       <tr>	
 				                       		<!-- <th >Position</th> -->
+				                       		@if (config('app.global_variable') == 'itaca')
+				                       		@else
 				                       		<th >G-bin</th>
+				                       		@endif
 				                            <th >Mattress</th>
 				                            <th >Marker</th>
 				                            <th >Marker Length [m]</th>
 				                            <th >Extra [cm]</th>
 				                            <th >Mattress Width [cm]</th>
 				                            <th >Layers</th>
+				                            @if (config('app.global_variable') == 'itaca')
+				                       		@else
 				                            <th >PRO</th>
 				                            <th >Destination</th>
+				                            @endif
 				                            <th >SKU</th>
 				                            <th >Material</th>
 				                            <th >Dye Lot</th>
@@ -2758,7 +2784,10 @@
 												box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
 					                            
 					                            {{--<td>{{ $req->position }}</td>--}}
+					                            @if (config('app.global_variable') == 'itaca')
+				                       			@else
 					                            <td class=""><span>{{ $req->g_bin}}</span></td>
+					                            @endif
 							        	    	<td class=""><span>{{ $req->mattress}}</span></td>
 					                            <td style="min-width: 200px;">{{ $req->marker_name}}</td>
 					                            <td>{{ round($req->marker_length,3)}}</td>
@@ -2769,8 +2798,11 @@
 					                            	<td>{{ round($req->marker_width,3)}}</td>
 					                            @endif
 					                            <td>{{ round($req->layers_a,0)}}</td>
+					                            @if (config('app.global_variable') == 'itaca')
+				                       			@else
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <td style="width: 60px;">{{ $req->location_all}}</td>
+					                            @endif
 					                            <td style="min-width: 138px;">{{ $req->sku}}</td>
 					                            <td>{{ $req->material}}</td>
 					                            <td>{{ $req->dye_lot}}</td>
@@ -2845,7 +2877,10 @@
 						                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
 												box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
 						                        ">
+						                        @if (config('app.global_variable') == 'itaca')
+				                       			@else
 						                        <td class=""><span>{{ $req->g_bin}}</span></td>
+						                        @endif
 							        	    	<td class=""><span>{{ $req->mattress}}</span></td>
 							        	    	<td class=""><span>{{ $req->g_bin_orig}}</span></td>
 
@@ -2883,7 +2918,10 @@
 	 								<thead>
 				                       <tr>	
 				                       		<!-- <th >Position</th> -->
+				                       		@if (config('app.global_variable') == 'itaca')
+				                       		@else
 				                       		<th >G-bin</th>
+				                       		@endif
 				                            <th >Mattress</th>
 				                            <th >Marker</th>
 				                            <th >Marker Length [m]</th>
@@ -2891,7 +2929,10 @@
 				                            <th >Mattress Width [cm]</th>
 				                            <th >Layers Planned</th>
 				                            <th >Layers Actual</th>
+				                            @if (config('app.global_variable') == 'itaca')
+				                       		@else
 				                            <th >PRO</th>
+				                            @endif
 				                            <th >Destination</th>
 				                            <th >SKU</th>
 				                            <th >Material</th>
@@ -2924,7 +2965,10 @@
 												box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
 					                            
 					                            {{--<td>{{ $req->position }}</td>--}}
+					                            @if (config('app.global_variable') == 'itaca')
+				                       			@else
 					                            <td class=""><span>{{ $req->g_bin}}</span></td>
+					                            @endif
 							        	    	<td class=""><span>{{ $req->mattress}}</span></td>
 					                            <td style="min-width: 200px;">{{ $req->marker_name}}</td>
 					                            <td>{{ round($req->marker_length,3)}}</td>
@@ -2936,8 +2980,11 @@
 					                            @endif
 					                            <td>{{ round($req->layers,0)}}</td>
 					                            <td>{{ round($req->layers_a,0)}}</td>
+					                            @if (config('app.global_variable') == 'itaca')
+				                       			@else
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <td style="width: 60px;">{{ $req->location_all}}</td>
+					                            @endif
 					                            <td style="min-width: 138px;">{{ $req->sku}}</td>
 					                            <td>{{ $req->material}}</td>
 					                            <td>{{ $req->dye_lot}}</td>
@@ -2971,7 +3018,6 @@
 					                            	<td>{{ $req->layer_limit}}</td>
 					                            @endif
 					                            
-					                            
 				                            	@if (($location == 'NOT_SET') OR ($location == 'DELETED') OR ($location == 'PLOT'))
 				                            	@elseif ($req->skeda_item_type == 'MM')
 				                            	<td><a href="{{ url('print_mattress_m/'.$req->id) }}" class="btn btn-info btn-xs center-block" >Print nalog <i>(
@@ -2987,7 +3033,6 @@
 				                            		@endif
 				                            		)</i></a></td>
 				                            	@endif
-					                            
 												
 												@if ($location == 'NOT_SET')
 												<td><a href="{{ url('plan_mattress_line/'.$req->id) }}" class="btn btn-success btn-xs center-block">Plan mattress</a></td>
@@ -3011,7 +3056,10 @@
 						                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
 												box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
 						                        ">
+						                        @if (config('app.global_variable') == 'itaca')
+				                       			@else
 						                        <td class=""><span>{{ $req->g_bin}}</span></td>
+						                        @endif
 							        	    	<td class=""><span>{{ $req->mattress}}</span></td>
 							        	    	<td class=""><span>{{ $req->g_bin_orig}}</span></td>
 
@@ -3231,8 +3279,11 @@
 	                        @if ($location == 'BOARD_TABLE')
 
 	 								<thead>
-				                       <tr>
+				                       <tr>	
+				                       		@if (config('app.global_variable') == 'itaca')
+				                       		@else
 				                       		<th >G-bin</th>
+				                       		@endif
 				                            <th >Mattress</th>
 				                            <th >Marker</th>
 				                            <th >Marker Length [m]</th>
@@ -3240,8 +3291,11 @@
 				                            <th >Mattress Width [cm]</th>
 				                            <th >Layers Planned</th>
 				                            <th >Layers Actual</th>
+				                            @if (config('app.global_variable') == 'itaca')
+				                       		@else
 				                            <th >PRO</th>
 				                            <th >Destination</th>
+				                            @endif
 				                            <th >SKU</th>
 				                            <th >Material</th>
 				                            <th >Dye Lot</th>
@@ -3271,8 +3325,10 @@
 					                        <tr class="ss" id="item[]={{ $req->id }} " style="border-top: 3px solid grey;
 					                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
 												box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
-					                            
+					                            @if (config('app.global_variable') == 'itaca')
+				                       			@else
 					                            <td class=""><span>{{ $req->g_bin}}</span></td>
+					                            @endif
 							        	    	<td class=""><span>{{ $req->mattress}}</span></td>
 					                            <td style="min-width: 200px;">{{ $req->marker_name}}</td>
 					                            <td>{{ round($req->marker_length,3)}}</td>
@@ -3285,9 +3341,11 @@
 					                            
 					                            <td>{{ round($req->layers,0)}}</td>
 					                            <td>{{ round($req->layers_a,0)}}</td>
-
+					                            @if (config('app.global_variable') == 'itaca')
+				                       			@else
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <td style="width: 60px;">{{ $req->location_all}}</td>
+					                            @endif
 					                            <td style="min-width: 138px;">{{ $req->sku}}</td>
 					                            <td>{{ $req->material}}</td>
 					                            <td>{{ $req->dye_lot}}</td>
@@ -3359,7 +3417,10 @@
 						                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
 												box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
 						                        ">
+						                        @if (config('app.global_variable') == 'itaca')
+				                       			@else
 						                        <td class=""><span>{{ $req->g_bin}}</span></td>
+						                        @endif
 							        	    	<td class=""><span>{{ $req->mattress}}</span></td>
 							        	    	<td class=""><span>{{ $req->g_bin_orig}}</span></td>
 
@@ -3396,7 +3457,10 @@
 	                        	<thead>
 				                       <tr>	
 				                       		<!-- <th >Position</th> -->
+				                       		@if (config('app.global_variable') == 'itaca')
+				                       		@else
 				                       		<th >G-bin (orig)</th>
+				                       		@endif
 				                            <th >Mattress (orig)</th>
 				                            <th >Marker (orig)</th>
 				                            <th >Marker width (orig)</th>
@@ -3420,8 +3484,10 @@
 					                        <tr class="ss" id="item[]={{ $req->id }} " style="border-top: 3px solid grey;
 					                        	-webkit-box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1); 
 												box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
-					                            
+					                            @if (config('app.global_variable') == 'itaca')
+				                       			@else
 							        	    	<td >{{ $req->g_bin_orig}}</td>
+							        	    	@endif
 							        	    	<td >{{ $req->mattress_orig}}</td>
 							        	    	<td >{{ $req->marker_name_orig}}</td>
 							        	    	<td >{{ round($req->marker_width,0)}}</td>
@@ -3446,7 +3512,10 @@
 	 								<thead>
 				                       <tr>	
 				                       		<!-- <th >Position</th> -->
+				                       		@if (config('app.global_variable') == 'itaca')
+				                       		@else
 				                       		<th >G-bin</th>
+				                       		@endif
 				                            <th >Mattress</th>
 				                            <th >Marker</th>
 				                            <th >Marker Length [m]</th>
@@ -3454,8 +3523,11 @@
 				                            <th >Mattress Width [cm]</th>
 				                            <th >Layers Planned</th>
 				                            <th >Layers Actual</th>
+				                            @if (config('app.global_variable') == 'itaca')
+				                       		@else
 				                            <th >PRO</th>
 				                            <th >Destination</th>
+				                            @endif
 				                            <th >SKU</th>
 				                            <th >Material</th>
 				                            <th >Dye Lot</th>
@@ -3487,7 +3559,10 @@
 												box-shadow: inset 2px 13px 18px 6px rgba(0,0,0,0.1);">
 					                            
 					                            {{--<td>{{ $req->position }}</td>--}}
+					                            @if (config('app.global_variable') == 'itaca')
+				                       			@else
 					                            <td class=""><span>{{ $req->g_bin}}</span></td>
+					                            @endif
 							        	    	<td class=""><span>{{ $req->mattress}}</span></td>
 					                            <td style="min-width: 200px;">{{ $req->marker_name}}</td>
 					                            <td>{{ round($req->marker_length,3)}}</td>
@@ -3499,8 +3574,11 @@
 					                            @endif
 					                            <td>{{ round($req->layers,0)}}</td>
 					                            <td>{{ round($req->layers_a,0)}}</td>
+					                            @if (config('app.global_variable') == 'itaca')
+				                       			@else
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <td style="width: 60px;">{{ $req->location_all}}</td>
+					                            @endif
 					                            <td style="min-width: 138px;">{{ $req->sku}}</td>
 					                            <td>{{ $req->material}}</td>
 					                            <td>{{ $req->dye_lot}}</td>
@@ -3559,7 +3637,10 @@
 						                        -webkit-box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1); 
 												box-shadow: inset 1px -22px 21px 1px rgba(0,0,0,0.1);
 						                        ">
+						                        @if (config('app.global_variable') == 'itaca')
+				                       			@else
 						                        <td class=""><span>{{ $req->g_bin}}</span></td>
+						                        @endif
 							        	    	<td class=""><span>{{ $req->mattress}}</span></td>
 							        	    	<td class=""><span>{{ $req->g_bin_orig}}</span></td>
 
