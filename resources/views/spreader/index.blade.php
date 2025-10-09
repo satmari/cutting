@@ -51,6 +51,7 @@
 		            	OR (Auth::user()->name == 'MS21') OR (Auth::user()->name == 'MS22') OR (Auth::user()->name == 'MS23')
 		            	OR (Auth::user()->name == 'MS31') OR (Auth::user()->name == 'MS32') OR (Auth::user()->name == 'MS33')
 		            	)
+		            		@if (config('app.global_variable') == 'gordon')
 			            	<div class="input-group">
 			            		<span class="input-group-addon" style="">
 			            			Efficiency1: &nbsp; <big><b>{{ $eff}} </b></big>
@@ -60,7 +61,11 @@
 			            		</span>
 			            		
 			                </div>
+			                @else
+			                @endif
+
 		                @else
+		                	@if (config('app.global_variable') == 'gordon')
 			                <div class="input-group">
 			            		<!-- <span class="input-group-addon">
 			            			Efficiency: &nbsp; &nbsp; <big><b>{{ $eff}} </b></big>
@@ -124,6 +129,8 @@
 									</script>
 				            		<!-- </div> -->
 				                </div>
+				            @else
+			                @endif
 		                @endif
 
 		        	 	<div class="input-group"> <span class="input-group-addon">Filter</span>
@@ -165,7 +172,10 @@
 		                            	<th >Mattress</th>
 		                            @else 
 		                            	<th >Pos</th>
+		                            	@if (config('app.global_variable') == 'gordon')
 			                            <th >G-bin</th>
+			                            @else
+			                            @endif
 			                            <th >Skeda</th>
 		                            @endif
 		                            <th >Marker</th>
@@ -175,8 +185,11 @@
 		                            <th >Layers</th>
 		                            <th >Req. time [min]</th>
 		                            <!-- <th >Layers in last shift</th> -->
+		                            @if (config('app.global_variable') == 'gordon')
 		                            <th >PRO</th>
 		                            <th >Destination</th>
+		                            @else
+		                            @endif
 		                            <th >SKU</th>
 		                            <th >Material</th>
 		                            <th >Dye Lot</th>
@@ -222,7 +235,10 @@
 		                            	
 		                            @else
 		                            	<td>{{ $req->position}}</td>
+		                            	@if (config('app.global_variable') == 'gordon')
 		                            	<td class=""><span>{{ $req->g_bin}}</span></td>
+		                            	@else
+		                            	@endif
 		                            	<td class=""><span>{{ $req->skeda}}</span></td>
 		                            @endif
 
@@ -237,8 +253,11 @@
 		                            <td>{{ round($req->layers_a,0)}}</td>
 		                            <td>{{ round($req->req_time,2)}}</td>
 		                            <!-- <td></td> -->
+		                            @if (config('app.global_variable') == 'gordon')
 		                            <td style="width: 75px;">{{ $req->pro}}</td>
 		                            <td style="width: 60px;">{{ $req->location_all}}</td>
+		                            @else
+		                            @endif
 		                            <td style="min-width: 138px; max-width: 140px;">{{ $req->sku}}</td>
 		                            <td>{{ $req->material}}</td>
 		                            <td>{{ $req->dye_lot}}</td>
