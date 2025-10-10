@@ -361,9 +361,12 @@ class pssController extends Controller {
 		// dd($input);
 
 		$skeda = $input['skeda'];
-		if (strlen($skeda) != 14 ){
-    		dd('Skeda, must be 14 characters');		
-    	}
+
+		if (config('app.global_variable') == 'gordon') {
+			if (strlen($skeda) != 14) {
+				dd('Skeda must be 14 characters');
+			}
+		}		
 
 		$paspul_type = $input['paspul_type'];
 		$skeda_paspul_type = $skeda.'_'.$paspul_type;
