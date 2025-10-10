@@ -289,16 +289,20 @@
 									
 								</ul>
 							</li>
-							<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Phase adv<span class="caret"></span></a>
-								<ul class="dropdown-menu" role="menu">
-									<li><a href="{{ url('cutting_xml') }}"><b><sapn style="color: gray">Cutting XML</span></b></a></li>
-									<li><a href="{{ url('cutting_bansek_xml') }}"><b><sapn style="color: orange">Bansek XML</span></b></a></li>
-									<li><a href="{{ url('cutting_bansek_errors') }}"><b><sapn style="color: red">Bansek XML - errors</span></b></a></li>
-								</ul>
-							</li>
-							<li><a href="{{ url('cpo') }}">Cut parts inspection</a></li>
-							<li><a href="{{ url('fabric_reservation') }}">Fabric reservation</a></li>
+							@if (config('app.global_variable') == 'gordon')
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Phase adv<span class="caret"></span></a>
+									<ul class="dropdown-menu" role="menu">
+										<li><a href="{{ url('cutting_xml') }}"><b><sapn style="color: gray">Cutting XML</span></b></a></li>
+										<li><a href="{{ url('cutting_bansek_xml') }}"><b><sapn style="color: orange">Bansek XML</span></b></a></li>
+										<li><a href="{{ url('cutting_bansek_errors') }}"><b><sapn style="color: red">Bansek XML - errors</span></b></a></li>
+									</ul>
+								</li>
+								
+								<li><a href="{{ url('cpo') }}">Cut parts inspection</a></li>
+								<li><a href="{{ url('fabric_reservation') }}">Fabric reservation</a></li>
+							@else
+							@endif
 							
 						</ul>
 					@endif

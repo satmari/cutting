@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
             <div class="panel panel-default">
-                <div class="panel-heading">Pretraga paspul cons tabele:
+                <div class="panel-heading">Serch paspul cons table:
                     </div>
                 
                 @if (isset($msge))
@@ -24,7 +24,7 @@
 
                 {!! Form::open(['method'=>'POST', 'url'=>'/search_u_cons_post']) !!}
                     <div class="panel-body">
-                    <p>Pretraga po skedi: <span style="color:green;"></span></p>
+                    <p>Search by skeda: <span style="color:green;"></span></p>
                         <select name="skeda" class="chosen">
                             <option value="" selected></option>
                             @foreach ($skeda as $line)
@@ -35,7 +35,7 @@
                         </select>
                     </div>
                     <div class="panel-body">
-                    <p>Pretraga po paspul tip-u: <span style="color:green;"></span></p>
+                    <p>Search by paspul type: <span style="color:green;"></span></p>
                         <select name="paspul_type" class="chosen">
                             <option value="" selected></option>
                             @foreach ($paspul_type as $line)
@@ -46,7 +46,7 @@
                         </select>
                     </div>
                     <div class="panel-body">
-                    <p>Pretraga po modelu: <span style="color:green;"></span></p>
+                    <p>Search by stype: <span style="color:green;"></span></p>
                         <select name="style" class="chosen">
                             <option value="" selected></option>
                             @foreach ($style as $line)
@@ -58,10 +58,10 @@
                     </div>
                     <br>
                     <div class="panel-body">
-                    <p>* Ukoliko ne izaberete ni jedan fiter, prikazace se cela tabela.</p>
+                    <p>* If you not choose any filter, it will be wisible full consumption table.</p>
                         
                     </div>
-                    {!! Form::submit('Trazi', ['class' => 'btn  btn-danger center-block']) !!}
+                    {!! Form::submit('Search', ['class' => 'btn  btn-danger center-block']) !!}
 
                     @include('errors.list')
 
