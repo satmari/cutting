@@ -2735,42 +2735,112 @@ class plannerController extends Controller {
 
 		// dd($g_bin);
 
+
+// SET GBIN
 		if ($skeda_item_type == 'MM') {
 			$g_bin = NULL;
 		} else {
 			if ($g_bin == '') {
-				// Gordon
-			
-				$find_g_bin = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-						TOP 1 g_bin
-					FROM [mattresses] ORDER BY g_bin desc"));
-				// dd($find_g_bin);
-				if (isset($find_g_bin[0])) {
-					if ($find_g_bin[0]->g_bin == NULL) {
-						$bin = 29999;			
-					} else {
-						$bin = (int)substr($find_g_bin[0]->g_bin, -8);	
+				// Gordon and Itaca case
+				
+				if (config('app.global_variable') == 'gordon') {
+
+					$find_g_bin = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+							TOP 1 g_bin
+						FROM [mattresses] ORDER BY g_bin desc"));
+					// dd($find_g_bin);
+					if (isset($find_g_bin[0])) {
+						if ($find_g_bin[0]->g_bin == NULL) {
+							$bin = 29999;			
+						} else {
+							$bin = (int)substr($find_g_bin[0]->g_bin, -8);	
+						}
 					}
+					
+					// dd($bin);
+					$num = str_pad($bin+1, 9, 0, STR_PAD_LEFT);
+					// dd("G".$num);
+
+					$g_bin = "G".$num;
+					// dd($g_bin);
+
+					$check_g_bin = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+							TOP 1 g_bin
+						FROM [mattresses] 
+						WHERE g_bin = '".$g_bin."' "));
+
+					if (isset($check_g_bin[0]->g_bin)) {
+						dd('problem to create g_bin, try again');
+					}
+
+				} elseif (config('app.global_variable') == 'itaca') {
+
+					$find_g_bin = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+							TOP 1 g_bin
+						FROM [mattresses] ORDER BY g_bin desc"));
+					// dd($find_g_bin);
+					if (isset($find_g_bin[0])) {
+						if ($find_g_bin[0]->g_bin == NULL) {
+							$bin = 00000;			
+						} else {
+							$bin = (int)substr($find_g_bin[0]->g_bin, -8);	
+						}
+					}
+					
+					// dd($bin);
+					$num = str_pad($bin+1, 9, 0, STR_PAD_LEFT);
+					// dd("G".$num);
+
+					$g_bin = "I".$num;
+					// dd($g_bin);
+
+					$check_g_bin = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+							TOP 1 g_bin
+						FROM [mattresses] 
+						WHERE g_bin = '".$g_bin."' "));
+
+					if (isset($check_g_bin[0]->g_bin)) {
+						dd('problem to create g_bin, try again');
+					}
+
+				} elseif (config('app.global_variable') == 'fiorano') {
+
+					$find_g_bin = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+							TOP 1 g_bin
+						FROM [mattresses] ORDER BY g_bin desc"));
+					// dd($find_g_bin);
+					if (isset($find_g_bin[0])) {
+						if ($find_g_bin[0]->g_bin == NULL) {
+							$bin = 00000;			
+						} else {
+							$bin = (int)substr($find_g_bin[0]->g_bin, -8);	
+						}
+					}
+					
+					// dd($bin);
+					$num = str_pad($bin+1, 9, 0, STR_PAD_LEFT);
+					
+
+					$g_bin = "F".$num;
+					// dd($g_bin);
+
+					$check_g_bin = DB::connection('sqlsrv')->select(DB::raw("SELECT 
+							TOP 1 g_bin
+						FROM [mattresses] 
+						WHERE g_bin = '".$g_bin."' "));
+
+					if (isset($check_g_bin[0]->g_bin)) {
+						dd('problem to create g_bin, try again');
+					}
+				
+
+				} else {
+
+					$g_bin = '';
 				}
 				
-				// dd($bin);
-				$num = str_pad($bin+1, 9, 0, STR_PAD_LEFT);
-				// dd("G".$num);
-
-				$g_bin = "G".$num;
-				// dd($g_bin);
-
-				$check_g_bin = DB::connection('sqlsrv')->select(DB::raw("SELECT 
-						TOP 1 g_bin
-					FROM [mattresses] 
-					WHERE g_bin = '".$g_bin."' "));
-
-				if (isset($check_g_bin[0]->g_bin)) {
-					dd('problem to create g_bin, try again');
-				} 
-				
 			} else {
-				// Bin was imported before
+				// Bin was imported before (Fiorano)
 				$g_bin = $g_bin;
 			}
 		}
