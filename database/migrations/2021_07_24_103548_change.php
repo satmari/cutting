@@ -218,6 +218,17 @@ class Change extends Migration {
             
         });
 
+        Schema::table('skeda_ratio_imports', function($table) 
+		{
+   			// $table->float('size_2_3y')->nullable();
+			// $table->float('size_4_5y')->nullable();
+			// $table->float('size_6_7y')->nullable();
+			// $table->float('size_8_9y')->nullable();
+			// $table->float('size_10_11y')->nullable();
+			// $table->float('size_12_13y')->nullable();
+            
+        });
+
 
 
 

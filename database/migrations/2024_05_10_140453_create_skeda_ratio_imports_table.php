@@ -44,6 +44,13 @@ class CreateSkedaRatioImportsTable extends Migration {
 			$table->float('size_6')->nullable();
 			$table->float('size_12')->nullable();
 			$table->float('size_34')->nullable();
+
+			$table->float('size_2_3y')->nullable();
+			$table->float('size_4_5y')->nullable();
+			$table->float('size_6_7y')->nullable();
+			$table->float('size_8_9y')->nullable();
+			$table->float('size_10_11y')->nullable();
+			$table->float('size_12_13y')->nullable();
 			
 			$table->timestamps();
 		});

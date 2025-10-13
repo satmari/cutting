@@ -1688,7 +1688,7 @@ class importController extends Controller {
 
 							   			if (!isset($find_in_pro_skedas[0])) {
 
-							   				var_dump('m_err_3: skeda: '.$skeda.' , style_size: '.$style_size.'</br>');
+							   				var_dump('m_err_3: This skeda: '.$skeda.' and style_size: '.$style_size.', are missing in PRO sheet</br>');
 							   				// dd($style_size);
 							   				// dd($skeda);
 							   				// dd("Pro id not found in pro skeda");
@@ -3262,6 +3262,13 @@ class importController extends Controller {
 						$size_12 = round((float)$row['size_12'],2);
 						$size_34 = round((float)$row['size_34'],2);
 
+						$size_2_3y = round((float)$row['size_2_3y'],2);
+						$size_4_5y = round((float)$row['size_4_5y'],2);
+						$size_6_7y = round((float)$row['size_6_7y'],2);
+						$size_8_9y = round((float)$row['size_8_9y'],2);
+						$size_10_11y = round((float)$row['size_10_11y'],2);
+						$size_12_13y = round((float)$row['size_12_13y'],2);
+
 						
 						$check_if_exist = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [skeda_ratio_imports]
 							WHERE skeda = '".$skeda."' AND 
@@ -3291,7 +3298,13 @@ class importController extends Controller {
 								  size_5 = '".$size_5."' AND 
 								  size_6 = '".$size_6."' AND 
 								  size_12 = '".$size_12."' AND 
-								  size_34 = '".$size_34."' 
+								  size_34 = '".$size_34."' AND
+								  size_2_3y = '".$size_2_3y."' AND 
+								  size_4_5y = '".$size_4_5y."' AND 
+								  size_6_7y = '".$size_6_7y."' AND 
+								  size_8_9y = '".$size_8_9y."' AND 
+								  size_10_11y = '".$size_10_11y."' AND 
+								  size_12_13y = '".$size_12_13y."' 
 
 
 							"));
@@ -3335,13 +3348,20 @@ class importController extends Controller {
 						$table->size_6 = $size_6;
 						$table->size_12 = $size_12;
 						$table->size_34 = $size_34;
+
+						$table->size_2_3y = $size_2_3y;
+						$table->size_4_5y = $size_4_5y;
+						$table->size_6_7y = $size_6_7y;
+						$table->size_8_9y = $size_8_9y;
+						$table->size_10_11y = $size_10_11y;
+						$table->size_12_13y = $size_12_13y;
 												
 						$table->save();
 						
 	                }
 	            });
 	    }
-	    dd('Succesfuly imported,  (please close this page/tab because if you refresh it will import again) ');
+	    dd('Succesfuly imported');
 		// return redirect('/');
 	}
 
