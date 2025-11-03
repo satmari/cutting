@@ -2132,7 +2132,7 @@
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <td style="width: 60px;">{{ $req->location_all}}</td>
 					                            @endif
-					                            <td style="width: 138px;">{{ $req->sku}}</td>
+					                            <td style="width: 100px;">{{ $req->sku}}</td>
 					                            
 					                            <td>{{ $req->material}}</td>
 					                            <td>{{ $req->dye_lot}}</td>
@@ -2283,7 +2283,7 @@
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <td style="width: 60px;">{{ $req->location_all}}</td>
 					                            @endif
-					                            <td style="width: 138px;">{{ $req->sku}}</td>
+					                            <td style="width: 100px;">{{ $req->sku}}</td>
 					                            <td>{{ $req->material}}</td>
 					                            <td>{{ $req->dye_lot}}</td>
 					                            <td>{{ $req->color_desc}}</td>
@@ -2437,7 +2437,7 @@
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <td style="width: 60px;">{{ $req->location_all}}</td>
 					                            @endif
-					                            <td style="min-width: 138px;">{{ $req->sku}}</td>
+					                            <td style="min-width: 100px;">{{ $req->sku}}</td>
 					                            <td>{{ $req->material}}</td>
 					                            <td>{{ $req->dye_lot}}</td>
 					                            <td>{{ $req->color_desc}}</td>
@@ -2623,7 +2623,7 @@
 					                            
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <td style="width: 60px;">{{ $req->location_all}}</td>
-					                            <td style="min-width: 138px;">{{ $req->sku}}</td>
+					                            <td style="min-width: 100px;">{{ $req->sku}}</td>
 					                            <td>{{ $req->material}}</td>
 					                            <td>{{ $req->dye_lot}}</td>
 					                            <td>{{ $req->color_desc}}</td>
@@ -2803,7 +2803,7 @@
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <td style="width: 60px;">{{ $req->location_all}}</td>
 					                            @endif
-					                            <td style="min-width: 138px;">{{ $req->sku}}</td>
+					                            <td style="min-width: 100px;">{{ $req->sku}}</td>
 					                            <td>{{ $req->material}}</td>
 					                            <td>{{ $req->dye_lot}}</td>
 					                            <td>{{ $req->color_desc}}</td>
@@ -2985,7 +2985,7 @@
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <td style="width: 60px;">{{ $req->location_all}}</td>
 					                            @endif
-					                            <td style="min-width: 138px;">{{ $req->sku}}</td>
+					                            <td style="min-width: 100px;">{{ $req->sku}}</td>
 					                            <td>{{ $req->material}}</td>
 					                            <td>{{ $req->dye_lot}}</td>
 					                            <td>{{ $req->color_desc}}</td>
@@ -3164,7 +3164,7 @@
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <td style="width: 60px;">{{ $req->location_all}}</td>
 					                            @endif
-					                            <td style="min-width: 138px;">{{ $req->sku}}</td>
+					                            <td style="min-width: 100px;">{{ $req->sku}}</td>
 					                            <td>{{ $req->material}}</td>
 					                            <td>{{ $req->dye_lot}}</td>
 					                            <td>{{ $req->color_desc}}</td>
@@ -3346,7 +3346,7 @@
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <td style="width: 60px;">{{ $req->location_all}}</td>
 					                            @endif
-					                            <td style="min-width: 138px;">{{ $req->sku}}</td>
+					                            <td style="min-width: 100px;">{{ $req->sku}}</td>
 					                            <td>{{ $req->material}}</td>
 					                            <td>{{ $req->dye_lot}}</td>
 					                            <td>{{ $req->color_desc}}</td>
@@ -3579,7 +3579,7 @@
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <td style="width: 60px;">{{ $req->location_all}}</td>
 					                            @endif
-					                            <td style="min-width: 138px;">{{ $req->sku}}</td>
+					                            <td style="min-width: 100px;">{{ $req->sku}}</td>
 					                            <td>{{ $req->material}}</td>
 					                            <td>{{ $req->dye_lot}}</td>
 					                            <td>{{ $req->color_desc}}</td>
@@ -3769,7 +3769,7 @@
 					                            <td>{{ $req->location}}</td>
 					                            <td style="width: 75px;">{{ $req->pro}}</td>
 					                            <!-- <td style="width: 100px;">{{ $req->style_size}}</td> -->
-					                            <td style="min-width: 138px;">{{ $req->sku}}</td>
+					                            <td style="min-width: 100px;">{{ $req->sku}}</td>
 					                            @if ($location == 'MM1')
 					                            	<td>{{ $req->layer_limit}}</td>
 					                            @endif
