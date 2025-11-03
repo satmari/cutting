@@ -46,7 +46,7 @@
                         </select>
                     </div>
                     <div class="panel-body">
-                    <p>Search by stype: <span style="color:green;"></span></p>
+                    <p>Search by style: <span style="color:green;"></span></p>
                         <select name="style" class="chosen">
                             <option value="" selected></option>
                             @foreach ($style as $line)

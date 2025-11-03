@@ -266,15 +266,19 @@
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Paspul stock<span class="caret"></span></a>
 								<ul class="dropdown-menu" role="menu">
-									<li><a href="{{ url('paspul_stock') }}"><b><sapn style="">Paspul stock</span></b></a></li>
-									<li><a href="{{ url('paspul_stock_log') }}"><b><sapn style="c">Paspul stock log</span></b></a></li>
-									<li role="separator" class="divider"></li>
-									<li><a href="{{ url('paspul_req_list') }}"><b><sapn style="color: green;">Paspul request</span></b></a></li>
-									<li><a href="{{ url('paspul_req_list_log') }}"><b><sapn style="color: green;">Paspul request logs</span></b></a></li>
-									<li role="separator" class="divider"></li>
-									<li><a href="{{ url('paspul_remove_valy') }}"><b><sapn style="color: blue;">Remove RECEIVED_IN_VALY</span></b></a></li>
-									<li role="separator" class="divider"></li>
-									<li><a href="{{ url('search_u_cons') }}"><span style="color: red;" >Paspul unitary consumption table</span></a></li>
+									@if (config('app.global_variable') == 'gordon')
+										<li><a href="{{ url('paspul_stock') }}"><b><sapn style="">Paspul stock</span></b></a></li>
+										<li><a href="{{ url('paspul_stock_log') }}"><b><sapn style="c">Paspul stock log</span></b></a></li>
+										<li role="separator" class="divider"></li>
+										<li><a href="{{ url('paspul_req_list') }}"><b><sapn style="color: green;">Paspul request</span></b></a></li>
+										<li><a href="{{ url('paspul_req_list_log') }}"><b><sapn style="color: green;">Paspul request logs</span></b></a></li>
+										<li role="separator" class="divider"></li>
+										<li><a href="{{ url('paspul_remove_valy') }}"><b><sapn style="color: blue;">Remove RECEIVED_IN_VALY</span></b></a></li>
+										<li role="separator" class="divider"></li>
+										<li><a href="{{ url('search_u_cons') }}"><span style="color: red;" >Paspul unitary consumption table</span></a></li>
+									@else
+										<li><a href="{{ url('search_u_cons') }}"><span style="color: red;" >Paspul unitary consumption table</span></a></li>
+									@endif
 								</ul>
 							</li>
 							<li class="dropdown">
