@@ -736,7 +736,7 @@ class tubController extends Controller {
 			WHERE operator = '".$operator."' COLLATE Latin1_General_CI_AI 
 			AND ( [device] like '%TUB%' )"));
 		if (!isset($check_op)) {
-			dd("Wrong operator, call IT or Sanja !");
+			dd("Wrong operator, call IT !");
 		}
 
 		$operator2 = Session::get('operator2');
@@ -1014,10 +1014,21 @@ class tubController extends Controller {
 			$simple_fabric = trim(substr($data[0]->material,0,11));
 			// dd($simple_fabric);
 
+			//////// mq_weight
+			/*
 			$mq_weight = DB::connection('sqlsrv3')->select(DB::raw("SELECT [fabric],[mq_weight]
 				FROM [settings].[dbo].[fabrics] WHERE fabric = '".$simple_fabric."' "));
 			// dd($mq_weight[0]->mq_weight);
 			if (!isset($mq_weight[0]->mq_weight)) {
+				dd('Fabric consumption does not exist in settings - fabric');
+			}
+			*/
+
+			///////  lm_weigth
+			$lm_weight = DB::connection('sqlsrv3')->select(DB::raw("SELECT [fabric],[lm_weight]
+				FROM [settings].[dbo].[fabrics] WHERE fabric = '".$simple_fabric."' "));
+			// dd($lm_weight[0]->lm_weight);
+			if (!isset($lm_weight[0]->lm_weight)) {
 				dd('Fabric consumption does not exist in settings - fabric');
 			}
 
@@ -1069,7 +1080,9 @@ class tubController extends Controller {
 				$table_update_2->layers_a = (float)$layers_a;
 				//*$table_update_2->cons_actual = (float)$layers_a * ((float)$data[0]->marker_length + ((float)$data[0]->extra / 100));
 				// $cons_planned_new = ((round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * (float)$row['layers']) * ((float)$mq_weight[0]->mq_weight/1000) * (((float)$update_mattress->width_theor_usable*2)/100);
-				$table_update_2->cons_actual = ((float)$layers_a * ((float)$data[0]->marker_length + ((float)$data[0]->extra / 100))) * ((float)$mq_weight[0]->mq_weight/1000) * (((float)$data[0]->width_theor_usable*2)/100);
+				// $table_update_2->cons_actual = ((float)$layers_a * ((float)$data[0]->marker_length + ((float)$data[0]->extra / 100))) * ((float)$mq_weight[0]->mq_weight/1000) * (((float)$data[0]->width_theor_usable*2)/100);
+				$table_update_2->cons_actual = ((float)$layers_a * ((float)$data[0]->marker_length + ((float)$data[0]->extra / 100))) * ((float)$lm_weight[0]->lm_weight/1000);
+
 				$table_update_2->position = $position;
 				$table_update_2->all_pro_for_main_plant = $all_pro_for_main_plant;
 				$table_update_2->comment_operator = $comment_operator;
@@ -1166,7 +1179,9 @@ class tubController extends Controller {
 				$table_update_4->layers_a = (float)$layers_a;
 				//*$table_update_4->cons_actual = (float)$layers_a * ((float)$data[0]->marker_length + ((float)$data[0]->extra / 100));
 				// $cons_planned_new = ((round((float)$length_mattress_new,3) + ((float)$row['extra'] / 100)) * (float)$row['layers']) * ((float)$mq_weight[0]->mq_weight/1000) * (((float)$update_mattress->width_theor_usable*2)/100);
-				$table_update_4->cons_actual = ((float)$layers_a * ((float)$data[0]->marker_length + ((float)$data[0]->extra / 100))) * ((float)$mq_weight[0]->mq_weight/1000) * (((float)$data[0]->width_theor_usable*2)/100);
+				// $table_update_4->cons_actual = ((float)$layers_a * ((float)$data[0]->marker_length + ((float)$data[0]->extra / 100))) * ((float)$mq_weight[0]->mq_weight/1000) * (((float)$data[0]->width_theor_usable*2)/100);
+				$table_update_4->cons_actual = ((float)$layers_a * ((float)$data[0]->marker_length + ((float)$data[0]->extra / 100))) * ((float)$lm_weight[0]->lm_weight/1000);
+				
 				$table_update_4->position = $position;
 				$table_update_4->all_pro_for_main_plant = $all_pro_for_main_plant;
 				$table_update_4->comment_operator = $comment_operator;
