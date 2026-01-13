@@ -435,25 +435,29 @@ class cutterController extends Controller {
 				WHERE pro_id = '".$pro_id[$i]."' "));
 				
 				// print_r($check_pro_skeda[0]->pro."<br>");
-					
-				$check_pro_in_posummarry = DB::connection('sqlsrv6')->select(DB::raw("SELECT 
-  					[location_all]
-				FROM [pro]
-				WHERE pro = '".$check_pro_skeda[0]->pro."' "));
+				
+				if (config('app.global_variable') == 'gordon') {
+					$check_pro_in_posummarry = DB::connection('sqlsrv6')->select(DB::raw("SELECT 
+	  					[location_all]
+					FROM [pro]
+					WHERE pro = '".$check_pro_skeda[0]->pro."' "));
 
-				// print_r($check_pro_in_posummarry[0]->location_all."<br>");
-			 	// dd($check_pro_in_posummarry);
+					// print_r($check_pro_in_posummarry[0]->location_all."<br>");
+				 	// dd($check_pro_in_posummarry);
 
-			 	if (!isset($check_pro_in_posummarry[0]->location_all)) {
-			 		dd('Missing PRO in PoSummary table');
+				 	if (!isset($check_pro_in_posummarry[0]->location_all)) {
+				 		dd('Missing PRO in PoSummary table');
 
-			 	} else {
-			 		if ($check_pro_in_posummarry[0]->location_all == "Subotica") {
-						$out_su = $out_su + 0; 
-					} else {	
-						$out_su = $out_su + 1;
-					}	
-			 	}
+				 	} else {
+				 		if ($check_pro_in_posummarry[0]->location_all == "Subotica") {
+							$out_su = $out_su + 0; 
+						} else {	
+							$out_su = $out_su + 1;
+						}	
+				 	}
+				} else {
+					$out_su = 0;
+				}
 			}
 
 			// print_r("final: ".$out_su."<br>");
