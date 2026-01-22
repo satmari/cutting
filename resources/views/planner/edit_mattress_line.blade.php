@@ -37,7 +37,7 @@
                         {!! Form::hidden('tpp_mat_keep_wastage', $tpp_mat_keep_wastage, ['class' => 'form-control']) !!}
                         {!! Form::hidden('tpa_number', $tpa_number, ['class' => 'form-control']) !!}
                         {!! Form::hidden('location', $location, ['class' => 'form-control']) !!}
-                        
+                        {!! Form::hidden('extra', $extra, ['class' => 'form-control']) !!}
                         {!! Form::hidden('layer_limit', $layer_limit, ['class' => 'form-control']) !!}
                         
 
@@ -63,6 +63,7 @@
                             <tr><td>TPP mat. keep wastage</td><td><b>@if ($tpp_mat_keep_wastage == 0) NO @else YES @endif</b></td></tr>
                             <tr><td>TPA number</td><td><b>{{ $tpa_number }} </b></td></tr>
                             <tr><td>Mandatory to inspect </td><td><b>{{ $mandatory_to_ins }} </b></td></tr>
+                            <tr><td>Extra </td><td><b>{{ $extra }} </b></td></tr>
                             @if ($location == 'MM1')
                                 <tr><td>Layer limit</td><td><b>{{ $layer_limit }} </b></td></tr>
                             @endif
@@ -184,6 +185,11 @@
                         <div class="panel-body">
                         <p>Required time: <span style="color:red;">*</span></p>
                            {!! Form::number('req_time', round($req_time,2), ['class' => 'form-control','step' => '0.01']) !!}
+                        </div>
+
+                        <div class="panel-body">
+                        <p>Extra (cm): <span style="color:red;">*</span></p>
+                           {!! Form::number('extra', round($extra,0), ['class' => 'form-control']) !!}
                         </div>
 
                         <div class="panel-body">

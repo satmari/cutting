@@ -34,7 +34,7 @@ class cutting_xml extends Controller {
 	{
 		//
 		$data = DB::connection('sqlsrv6')->select(DB::raw("SELECT TOP 10000 * FROM [posummary].[dbo].[cutting_outputs] ORDER BY date desc"));
-		return view('cutting_xml.table', compact('data'));
+		return view('cutting_xml.tablea', compact('data'));
 	}
 
 	public function cutting_bansek_xml()
@@ -48,7 +48,7 @@ class cutting_xml extends Controller {
 	{
 		//
 		$data = DB::connection('sqlsrv6')->select(DB::raw("SELECT TOP 10000 * FROM [posummary].[dbo].[cutting_bansek_outputs] ORDER BY date desc"));
-		return view('cutting_xml.tablem', compact('data'));
+		return view('cutting_xml.tablema', compact('data'));
 	}
 
 	public function cutting_bansek_errors()

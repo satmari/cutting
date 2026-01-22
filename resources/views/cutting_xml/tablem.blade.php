@@ -5,8 +5,8 @@
 	<div class="row vertical-center-row">
 		<div class="text-center col-md-5 col-md-offset-4">
 			<div class="panel panel-default">
-				<div class="panel-heading">Bansek phase adv &nbsp; &nbsp; &nbsp; &nbsp;
-					<a class="" href="cutting_bansek_xml_all"><b>Last 10000 lines</b></a>
+				<div class="panel-heading"><b>Bansek phase adv - UNDO</b> &nbsp; &nbsp; &nbsp; &nbsp;
+					<a class="" href="cutting_bansek_xml_all">Bansek phase adv - Log (last 10000)</a>
 				</div>
 
 				

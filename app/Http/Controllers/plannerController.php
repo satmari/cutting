@@ -4206,6 +4206,7 @@ class plannerController extends Controller {
 		$location = $data[0]->location;
 		$status = $data[0]->status;
 		$req_time = $data[0]->req_time;
+		$extra = $data[0]->extra;
 
 		$layer_limit = $data[0]->layer_limit;
 
@@ -4220,7 +4221,7 @@ class plannerController extends Controller {
 				'cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager',
 				'test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location','data2',
 				'layer_limit','cut_operator','cut_date','sp_operator','sp_date','req_time','mandatory_to_ins',
-				'cutter_shrink_x','cutter_shrink_y','last_mattress','status'));
+				'cutter_shrink_x','cutter_shrink_y','last_mattress','status','extra'));
 		}
 
 		return view('planner.edit_mattress_line', compact( 'id','mattress','g_bin','material','dye_lot','color_desc',
@@ -4228,7 +4229,7 @@ class plannerController extends Controller {
 				'cons_actual','marker_name','marker_length','marker_width','pcs_bundle','priority','call_shift_manager',
 				'test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location',
 				'cut_operator','cut_date','sp_operator','sp_date','req_time','layer_limit','mandatory_to_ins',
-				'cutter_shrink_x','cutter_shrink_y','last_mattress','status'));
+				'cutter_shrink_x','cutter_shrink_y','last_mattress','status','extra'));
 	}
 
 	public function correct_location($id) {
@@ -4309,7 +4310,7 @@ class plannerController extends Controller {
 		$req_time = round($input['req_time'],2);
 
 		$location = $input['location'];
-
+		$extra = (int)$input['extra'];
 		$layer_limit = $input['layer_limit'];
 
 		if (isset($input['call_shift_manager'])) {
@@ -4402,7 +4403,7 @@ class plannerController extends Controller {
 		$table1->priority = $priority;
 		$table1->call_shift_manager = $call_shift_manager;
 		$table1->test_marker = $test_marker;
-		// $table1->tpp_mat_keep_wastage = $tpp_mat_keep_wastage;
+		$table1->extra = $extra;
 		$table1->bottom_paper = $bottom_paper;
 		if ($comment_office == '') {
 			$table1->comment_office = '';
@@ -4543,7 +4544,6 @@ class plannerController extends Controller {
 		// 		'test_marker','tpp_mat_keep_wastage','tpa_number','bottom_paper','comment_office','location',
 		// 		'cut_operator','cut_date','sp_operator','sp_date','req_time','layer_limit','mandatory_to_ins',
 		// 		'cutter_shrink_x','cutter_shrink_y','last_mattress','msgs','mandatory_to_ins'));
-
 	}
 
 	public function edit_layers_a($id) {

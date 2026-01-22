@@ -5,8 +5,8 @@
 	<div class="row vertical-center-row">
 		<div class="text-center col-md-5 col-md-offset-4">
 			<div class="panel panel-default">
-				<div class="panel-heading"><b>Cut phase adv - UNDO</b> &nbsp; &nbsp; &nbsp; &nbsp;
-					<a class="" href="cutting_xml_all">Cut phase adv - Log (last 10000)</a>
+				<div class="panel-heading"><a class="" href="cutting_xml">Cut phase adv - UNDO</a> &nbsp; &nbsp; &nbsp; &nbsp;
+					<b>Cut phase adv - Log (last 10000)</b>
 				</div>
 
 				
