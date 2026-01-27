@@ -8247,6 +8247,7 @@ class plannerController extends Controller {
 		      ,m2.[tpp_mat_keep_wastage]
 		      ,m2.[tpa_number]
 		      ,m2.[cons_actual]
+		      ,m2.[extra]
 		      --,'|'
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
@@ -8299,6 +8300,7 @@ class plannerController extends Controller {
 		}
 		// dd($pcs_bundle);
 
+		$extra = $data[0]->extra;
 		$bottom_paper = $data[0]->bottom_paper;
 		$comment_office = $data[0]->comment_office;
 
@@ -8496,6 +8498,7 @@ class plannerController extends Controller {
 		$table->dye_lot = $dye_lot;
 		$table->pcs_bundle = $pcs_bundle;
 		$table->bottom_paper = $bottom_paper;
+		$table->extra = $extra;
 		$table->tpp_mat_keep_wastage = $tpp_mat_keep_wastage;
 
 		$table->layers = $layers;
@@ -8661,6 +8664,7 @@ class plannerController extends Controller {
 		      ,m2.[tpa_number]
 		      ,m2.[printed_nalog]
 		      ,m2.[layer_limit]
+		      ,m2.[extra]
 		      --,'|'
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
@@ -8708,6 +8712,7 @@ class plannerController extends Controller {
 		// $layers = round($data[0]->layers,0);
 		$pcs_bundle = round($data[0]->pcs_bundle,0);
 		$bottom_paper = $data[0]->bottom_paper;
+		$extra = $data[0]->extra;
 		$comment_office = $data[0]->comment_office;
 
 		$marker_name = $data[0]->marker_name;
@@ -8809,6 +8814,7 @@ class plannerController extends Controller {
 		$table->bottom_paper_0 = $bottom_paper;
 		$table->tpp_mat_keep_wastage_0 = $tpp_mat_keep_wastage;
 		$table->layer_limit_0 = $layer_limit;
+		$table->extra_0 = $extra;
 
 		$table->padprint_item_0 = $padprint_item;
 		$table->padprint_color_0 = $padprint_color;
@@ -8873,6 +8879,7 @@ class plannerController extends Controller {
 		      ,m2.[tpp_mat_keep_wastage]
 		      ,m2.[tpa_number]
 		      ,m2.[printed_nalog]
+		      ,m2.[extra]
 		      --,'|'
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
@@ -8937,6 +8944,7 @@ class plannerController extends Controller {
 				      ,m2.[tpa_number]
 				      ,m2.[printed_nalog]
 				      ,m2.[cons_actual]
+				      ,m2.[extra]
 				      --,'|'
 				      ,m3.[marker_name]
 				      ,m3.[marker_length]
@@ -9003,6 +9011,7 @@ class plannerController extends Controller {
 
 				$tpp_mat_keep_wastage = $data[0]->tpp_mat_keep_wastage;
 				$tpa_number = $data[0]->tpa_number;
+				$extra = $data[0]->extra;
 
 				if ($tpp_mat_keep_wastage == 1) {
 					$tpp_mat_keep_wastage = "YES"."-".$tpa_number;
@@ -9199,6 +9208,7 @@ class plannerController extends Controller {
 				$table->comment_office = $comment_office;
 
 				$table->comment_office = $comment_office;
+				$table->extra = $extra;
 				$table->printer = $printer;
 
 				$table->pro_0 = $pro_0;
@@ -9352,6 +9362,7 @@ class plannerController extends Controller {
 		      ,m2.[tpa_number]
 		      ,m2.[printed_nalog]
 		      ,m2.[layer_limit]
+		      ,m2.[extra]
 		      --,'|'
 		      ,m3.[marker_name]
 		      ,m3.[marker_length]
@@ -9364,7 +9375,7 @@ class plannerController extends Controller {
 		  LEFT JOIN [mattress_details] as m2 ON m2.[mattress_id] = m1.[id]
 		  LEFT JOIN [mattress_markers] as m3 ON m3.[mattress_id] = m2.[mattress_id]
 		  LEFT JOIN [mattress_phases]  as m4 ON m4.[mattress_id] = m3.[mattress_id] AND m4.[active] = '1'
-		  WHERE (m4.[status] = 'TO_LOAD' OR m4.[status] = 'COMPLETED') AND m1.[skeda_item_type] = 'MM' AND (m2.[printed_nalog] IS NULL OR m2.[printed_nalog] = 0)"));
+		  WHERE /*(m4.[status] = 'TO_LOAD' OR m4.[status] = 'COMPLETED') AND */ m1.[skeda_item_type] = 'MM' AND (m2.[printed_nalog] IS NULL OR m2.[printed_nalog] = 0)"));
 		// dd($data);
 
 		return view('planner.print_mattress_multiple_mm', compact('data'));
@@ -9428,6 +9439,7 @@ class plannerController extends Controller {
 				      ,m2.[tpa_number]
 				      ,m2.[printed_nalog]
 				      ,m2.[layer_limit]
+				      ,m2.[extra]
 				      --,'|'
 				      ,m3.[marker_name]
 				      ,m3.[marker_length]
@@ -9478,6 +9490,7 @@ class plannerController extends Controller {
 					${"bottom_paper_{$x}"} = $data[0]->bottom_paper;
 					${"tpp_mat_keep_wastage_{$x}"} = $data[0]->tpp_mat_keep_wastage;
 					${"layer_limit_{$x}"} = $data[0]->layer_limit;
+					${"extra_{$x}"} = $data[0]->extra;
 
 					${"comment_office_{$x}"} = $data[0]->comment_office;
 
@@ -9579,6 +9592,7 @@ class plannerController extends Controller {
 				$table->padprint_item_0 = $padprint_item_0;
 				$table->padprint_color_0 = $padprint_color_0;
 				$table->comment_office_0 = $comment_office_0;
+				$table->extra_0 = $extra_0;
 
 				$table->comment_office_0 = $comment_office_0;
 				
@@ -9630,6 +9644,7 @@ class plannerController extends Controller {
 				$table->padprint_item_1 = $padprint_item_1;
 				$table->padprint_color_1 = $padprint_color_1;
 				$table->comment_office_1 = $comment_office_1;
+				$table->extra_1 = $extra_1;
 
 				$table->comment_office_1 = $comment_office_1;
 				
@@ -9702,6 +9717,7 @@ class plannerController extends Controller {
 				      ,m2.[tpa_number]
 				      ,m2.[printed_nalog]
 				      ,m2.[layer_limit]
+				      ,m2.[extra]
 				      --,'|'
 				      ,m3.[marker_name]
 				      ,m3.[marker_length]
@@ -9753,6 +9769,7 @@ class plannerController extends Controller {
 				${"layer_limit_{$x}"} = $data[0]->layer_limit;
 
 				${"comment_office_{$x}"} = $data[0]->comment_office;
+				${"extra_{$x}"} = $data[0]->extra;
 
 				${"marker_name_{$x}"} = $data[0]->marker_name;
 				${"marker_length_{$x}"} = round($data[0]->marker_length,3);
@@ -9845,6 +9862,7 @@ class plannerController extends Controller {
 				$table1->padprint_item_0 = $padprint_item_0;
 				$table1->padprint_color_0 = $padprint_color_0;
 				$table1->comment_office_0 = $comment_office_0;
+				$table1->extra_0 = $extra_0;
 
 				$table1->pro_0 = $pro_0;
 				$table1->style_size_0 = $style_size_0;

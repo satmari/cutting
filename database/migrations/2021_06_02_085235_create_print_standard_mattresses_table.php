@@ -40,6 +40,8 @@ class CreatePrintStandardMattressesTable extends Migration {
 			$table->string('padprint_color')->nullable();
 			$table->text('comment_office')->nullable();
 
+			$table->string('extra')->nullable();
+
 			$table->string('printer')->nullable();
 
 			$table->string('pro_0')->nullable();

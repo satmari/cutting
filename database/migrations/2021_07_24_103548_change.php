@@ -166,6 +166,9 @@ class Change extends Migration {
 		{
             // $table->string('spreading_profile_0')->nullable();
             // $table->string('spreading_profile_1')->nullable();
+
+            $table->string('extra_0')->nullable();
+            $table->string('extra_1')->nullable();
             
 			
         });
@@ -173,6 +176,7 @@ class Change extends Migration {
         Schema::table('print_standard_mattresses', function($table) 
 		{
             // $table->string('spreading_profile')->nullable();
+            $table->string('extra')->nullable();
             
         });
 

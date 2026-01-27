@@ -38,6 +38,7 @@ class CreatePrintMiniMattressesTable extends Migration {
 			$table->string('layers_0')->nullable();
 			$table->string('padprint_item_0')->nullable();
 			$table->string('padprint_color_0')->nullable();
+			$table->string('extra_0')->nullable();
 			$table->text('comment_office_0')->nullable();
 
 			$table->string('o_roll_0_0')->nullable();
@@ -80,6 +81,7 @@ class CreatePrintMiniMattressesTable extends Migration {
 			$table->string('layers_1')->nullable();
 			$table->string('padprint_item_1')->nullable();
 			$table->string('padprint_color_1')->nullable();
+			$table->string('extra_1')->nullable();
 			$table->text('comment_office_1')->nullable();
 
 			$table->string('o_roll_0_1')->nullable();
