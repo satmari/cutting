@@ -522,6 +522,24 @@ class importController extends Controller {
 			// dd($size);
    			// print_r('style:'.$style.' size: '.$size.' qty: '.$qty.' model: '.$model.' variant: '.$variant);
    			// print_r('<br>');
+   			if (config('app.global_variable') == 'fiorano') {
+
+			    $size_check = strtoupper($size);
+
+			    // zamena _ i - u isti format radi lakše kontrole
+			    $size_check = str_replace('_', '-', $size_check);
+
+			    if ($size_check == 'XSS' || $size_check == 'XS-S') {
+			        $size = 'XS/S';
+			    } else if ($size_check == 'SM' || $size_check == 'S-M') {
+			        $size = 'S/M';
+			    } else if ($size_check == 'ML' || $size_check == 'M-L') {
+			        $size = 'M/L';
+			    } else if ($size_check == 'LXL' || $size_check == 'L-XL') {
+			        $size = 'L/XL';
+			    }
+			}
+
 
    			$style_size = $style.' '.$size;
    			// dd($style_size);
@@ -619,6 +637,24 @@ class importController extends Controller {
 				$size = str_replace(":" , "" , $size);
 				// print_r("Size: ".$size);
 				// dd($size);
+
+				if (config('app.global_variable') == 'fiorano') {
+
+				    $size_check = strtoupper($size);
+
+				    // zamena _ i - u isti format radi lakše kontrole
+				    $size_check = str_replace('_', '-', $size_check);
+
+				    if ($size_check == 'XSS' || $size_check == 'XS-S') {
+				        $size = 'XS/S';
+				    } else if ($size_check == 'SM' || $size_check == 'S-M') {
+				        $size = 'S/M';
+				    } else if ($size_check == 'ML' || $size_check == 'M-L') {
+				        $size = 'M/L';
+				    } else if ($size_check == 'LXL' || $size_check == 'L-XL') {
+				        $size = 'L/XL';
+				    }
+				}
 
 	   			// print_r('style:'.$style.' size: '.$size.' qty: '.$qty.' model: '.$model.' variant: '.$variant);
 	   			// print_r('<br>');
@@ -1415,11 +1451,7 @@ class importController extends Controller {
 							// mattresses
 							$g_bin; //not mandatory / progressive 
 
-							//  Gordon / Fiorano / Adrianatex
-							// if (isset($row['sap_bin'])) {
-							// 	$g_bin = $row['sap_bin'];
-							// }
-
+						
 							$material = $row['material'];
 							$dye_lot = $row['dye_lot'];
 							$color_desc = $row['color_desc'];
