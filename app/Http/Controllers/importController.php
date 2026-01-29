@@ -522,7 +522,7 @@ class importController extends Controller {
 			// dd($size);
    			// print_r('style:'.$style.' size: '.$size.' qty: '.$qty.' model: '.$model.' variant: '.$variant);
    			// print_r('<br>');
-   			if (config('app.global_variable') == 'fiorano') {
+   			if ((config('app.global_variable') == 'fiorano') OR (config('app.global_variable') == 'gordon')) {
 
 			    $size_check = strtoupper($size);
 
@@ -638,7 +638,7 @@ class importController extends Controller {
 				// print_r("Size: ".$size);
 				// dd($size);
 
-				if (config('app.global_variable') == 'fiorano') {
+				if ((config('app.global_variable') == 'fiorano') OR (config('app.global_variable') == 'gordon')) {
 
 				    $size_check = strtoupper($size);
 
