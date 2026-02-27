@@ -2736,7 +2736,7 @@ class plannerController extends Controller {
 		// dd($g_bin);
 
 
-// SET GBIN
+		// SET GBIN
 		if ($skeda_item_type == 'MM') {
 			$g_bin = NULL;
 		} else {
@@ -3857,7 +3857,6 @@ class plannerController extends Controller {
 		    // dd('Some style_size values from the new_marker_req do not fit in the skeda_req, missing '.implode(', ', $missingSizes).'');
 
 		}
-
 	}
 
 	public function change_marker_all_post_check(Request $request) {
@@ -4040,7 +4039,6 @@ class plannerController extends Controller {
 		$table3_new->save();
 
 		return Redirect::to('/plan_mattress/TO_CHANGE');
-
 	}
 
 	public function edit_mattress($id) {

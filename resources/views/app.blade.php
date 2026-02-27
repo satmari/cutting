@@ -128,9 +128,9 @@
 						<ul class="nav navbar-nav">
 							<li><a href="{{ url('/wastage_wh') }}">TPP wastage (wh)</a></li>
 						</ul>
-						<ul class="nav navbar-nav">
+						<!-- <ul class="nav navbar-nav">
 							<li><a href="{{ url('/inbound_delivery_index') }}">Inbound deliveries</a></li>
-						</ul>
+						</ul> -->
 					@endif
 
 					<!-- admin -->
@@ -304,7 +304,7 @@
 								</li>
 								
 								<li><a href="{{ url('cpo') }}">Cut parts inspection</a></li>
-								<li><a href="{{ url('fabric_reservation') }}">Fabric reservation</a></li>
+								<!-- <li><a href="{{ url('fabric_reservation') }}">Fabric reservation</a></li> -->
 							@else
 							@endif
 							

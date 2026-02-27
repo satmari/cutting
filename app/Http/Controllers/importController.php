@@ -72,7 +72,6 @@ class importController extends Controller {
 	}
 
 	public function postImportConsPo (Request $request) {
-		
 	}
 
 	public function postImportUpdatePass(Request $request) {
@@ -2521,7 +2520,7 @@ class importController extends Controller {
 			}
 	    }
 	    
-	// ERROR HANDLING FOR ALL
+		// ERROR HANDLING FOR ALL
 	    // Error on PRO
 		    $pro_lines = Session::get('pro_lines');
 		    $pro_exist = Session::get('pro_exist');
