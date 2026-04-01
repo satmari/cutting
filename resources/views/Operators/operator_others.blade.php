@@ -8,7 +8,7 @@
 				<div class="panel-heading">Operators table &nbsp; &nbsp; &nbsp;
 
 				@if((Auth::check() && Auth::user()->name == "admin") OR ( Auth::check() && Auth::user()->name == "planner"))
-					<a href="{{ url('operator_create_others') }}" class="btn btn-success btn-xs ">Add new operator for Relax and Inspe</a>
+					<a href="{{ url('operator_create_others') }}" class="btn btn-success btn-xs ">Add new operator for Paspul,Relax and Inspection</a>
 					
 				@endif
 

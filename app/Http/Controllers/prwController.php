@@ -1410,9 +1410,9 @@ class prwController extends Controller {
 		$table_c = paspul_rewound::findOrFail($paspul_rewound_roll_id);
 		// dd($table_c->rewound_length_partialy);
 
-		if ($rewound_length_partialy > $table_c->rewound_length_partialy) {
-			dd("Rewound length cannot be greater than planned rewound length");
-		}
+		// if ($rewound_length_partialy > $table_c->rewound_length_partialy) {
+		// 	dd("Rewound length cannot be greater than planned rewound length");
+		// }
 
 		$still_possible_to_plan = (float)$table->rewound_length - (float)$table->rewound_length_p;
 		// dd($still_possible_to_plan);

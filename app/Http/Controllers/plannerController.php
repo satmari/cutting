@@ -2201,7 +2201,6 @@ class plannerController extends Controller {
 		$operator = Session::set('operator', NULL);
 		return redirect('/plan_mattress/BOARD');
 	}
-//
 
 // REPOSITION
 	public function reposition() {
@@ -2347,9 +2346,8 @@ class plannerController extends Controller {
         	}	
         }
 	}
-//
 
-// MATTRESS
+//MATTRESS
 
 	public function plan_mattress_line ($id) {
 
@@ -8207,7 +8205,6 @@ class plannerController extends Controller {
 		return redirect('/paspul_stock');
 	}
 
-
 //PRINTING
 
 	public function print_mattress ($id) {
@@ -11385,7 +11382,6 @@ class plannerController extends Controller {
 		return view('planner.material_comment_table', compact('data'));
 
 	}
-
 
 
 }	

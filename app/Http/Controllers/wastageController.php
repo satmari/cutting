@@ -664,7 +664,7 @@ class wastageController extends Controller {
 		$id = $forminput['id'];
 		$pass = $forminput['pass'];
 
-		if ($pass == 'peckes') {
+		if ($pass == 'pecaljka') {
 
 			$table = wastage::findOrFail($id);
 			$table->delete();
@@ -672,7 +672,7 @@ class wastageController extends Controller {
 			return Redirect::to('/');	
 
 		} else {
-			dd("Password is not correct!!!");
+			dd("Password was changed, please check with Zlatko.");
 		}
 	}
 

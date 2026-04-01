@@ -57,7 +57,7 @@ class pssController extends Controller {
 		$count_sub = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT(s.[id]) as r
 			FROM [cutting].[dbo].[paspul_stocks] as s
 			INNER JOIN [cutting].[dbo].[paspul_locations] as l ON l.[location] = s.[location]
-			WHERE l.[plant] = 'Subotica' and s.[location] != 'JUST_CUT' and s.[location] != 'READY_FOR_KIKINDA' and s.[location] != 'READY_FOR_SENTA' and s.[location] != 'READY_FOR_VALY' and s.[location] != 'RECEIVED_IN_SUBOTICA' "));
+			WHERE l.[plant] = 'Subotica' and s.[location] != 'JUST_CUT' and s.[location] != 'READY_FOR_KIKINDA' and s.[location] != 'READY_FOR_SENTA' and s.[location] != 'READY_FOR_VALY' and s.[location] != 'RECEIVED_IN_SUBOTICA' and s.[location] != 'STOCK FOR SE' "));
 		if (isset($count_sub[0]->r)) {
 			$count_sub = $count_sub[0]->r;
 		} else {
@@ -94,6 +94,16 @@ class pssController extends Controller {
 			$count_rse = 0;
 		}
 
+		$count_sfs = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT(s.[id]) as r
+			FROM [cutting].[dbo].[paspul_stocks] as s
+			INNER JOIN [cutting].[dbo].[paspul_locations] as l ON l.[location] = s.[location]
+			WHERE l.[plant] = 'Subotica' and s.[location] = 'STOCK FOR SE' "));
+		if (isset($count_sfs[0]->r)) {
+			$count_sfs = $count_sfs[0]->r;
+		} else {
+			$count_sfs = 0;
+		}
+
 		$count_rva = DB::connection('sqlsrv')->select(DB::raw("SELECT COUNT(s.[id]) as r
 			FROM [cutting].[dbo].[paspul_stocks] as s
 			INNER JOIN [cutting].[dbo].[paspul_locations] as l ON l.[location] = s.[location]
@@ -104,7 +114,7 @@ class pssController extends Controller {
 			$count_rva = 0;
 		}
 
-		return view('pss.index', compact('location','count_just_cut','count_sub','count_received_in_subotica','count_rki','count_rse','count_rva'));
+		return view('pss.index', compact('location','count_just_cut','count_sub','count_received_in_subotica','count_rki','count_rse','count_rva','count_sfs'));
 	}
 
 	public function paspul_table_just_cut () {
@@ -138,6 +148,7 @@ class pssController extends Controller {
 			s.[location] != 'READY_FOR_KIKINDA' and 
 			s.[location] != 'READY_FOR_SENTA'  and 
 			s.[location] != 'READY_FOR_VALY' and 
+			s.[location] != 'STOCK FOR SE' and 
 			s.[location] != 'RECEIVED_IN_SUBOTICA'  
 		"));
 		// dd($data);
@@ -203,6 +214,22 @@ class pssController extends Controller {
 		LEFT JOIN [cutting].[dbo].[paspul_stock_u_cons] as k ON k.skeda = s.skeda and k.paspul_type = s.paspul_type
 		WHERE	l.[plant] = 'Subotica' and
 				s.[location] = 'READY_FOR_VALY'
+		"));
+		// dd($data);
+		return view('pss.table', compact('data'));
+	}
+
+	public function paspul_table_stock_for_se () {
+
+		$data = DB::connection('sqlsrv')->select(DB::raw("SELECT s.* ,
+				k.[mtr_per_pcs] as [unit_cons],
+				s.[fg_color_code] 
+		FROM [cutting].[dbo].[paspul_stocks] as s
+		INNER JOIN [cutting].[dbo].[paspul_locations] as l ON l.[location] = s.[location]
+		--LEFT JOIN [cutting].[dbo].[paspul_stock_by_keys] as k ON k.[pas_key] = s.[pas_key]
+		LEFT JOIN [cutting].[dbo].[paspul_stock_u_cons] as k ON k.skeda = s.skeda and k.paspul_type = s.paspul_type
+		WHERE	l.[plant] = 'Subotica' and
+				s.[location] = 'STOCK FOR SE'
 		"));
 		// dd($data);
 		return view('pss.table', compact('data'));
@@ -780,9 +807,60 @@ class pssController extends Controller {
 		}
 		
 
-		
+		// CHECK IS LOCATION TO IS 'READY_FOR_KIKINDA' OR 'STOCK FOR SE'
+		if ($location_to == 'READY_FOR_KIKINDA') {
+			// "pas_one" => "1BO16C000002-A_3_T08/1711_4"
+
+			$pa_skeda = DB::connection('sqlsrv')->select(DB::raw("SELECT skeda FROM [cutting].[dbo].[paspul_stocks] 
+				WHERE [pas_key] = '".$pas_one."' and [location] = '".$location_from."'  "));
+			// dd($pa_skeda);
+			$p_skeda = $pa_skeda[0]->skeda;
+			// dd($p_skeda);
+
+			$des_in_posum = DB::connection('sqlsrv6')->select(DB::raw("SELECT location_all  FROM [posummary].[dbo].[pro]
+				WHERE [skeda] = '".$p_skeda."'  "));
+			// dd($des_in_posum);
+			$d_in_posum = $des_in_posum[0]->location_all;
+			// dd($d_in_posum);
+
+			if ($d_in_posum == 'Kikinda') {
+				// continue
+			} else {
+				//stop
+				// $msge = 'This function READY_FOR_KIKINDA must have paspul that has destination (posummary) Kikinda';
+				$msge = 'Ova lokacija READY_FOR_KIKINDA mora sadrzati paspul koji ima destinaciju Kikinda u posummary tabeli';
+				return view('pss.paspul_loc_to_loc_su_to', compact('location_from', 'pas_one', 'qty', 'op', 'to', 'msge'));
+			}
+
+		  
+		}
+
+		if ($location_to == 'STOCK FOR SE') {
+			
+			$pa_skeda = DB::connection('sqlsrv')->select(DB::raw("SELECT skeda FROM [cutting].[dbo].[paspul_stocks] 
+				WHERE [pas_key] = '".$pas_one."' and [location] = '".$location_from."'  "));
+			// dd($pa_skeda);
+			$p_skeda = $pa_skeda[0]->skeda;	
+			// dd($p_skeda);
+
+			$des_in_posum = DB::connection('sqlsrv6')->select(DB::raw("SELECT location_all  FROM [posummary].[dbo].[pro]
+				WHERE [skeda] = '".$p_skeda."'  "));
+			// dd($des_in_posum);
+			$d_in_posum = $des_in_posum[0]->location_all;
+			// dd($d_in_posum);
+
+			if ($d_in_posum == 'Senta') {
+				// continue
+			} else {
+				//stop
+				// $msge = 'This location STOCK FOR SE must have paspul that has destination (posummary) Senta';
+				$msge = 'Ova lokacija STOCK FOR SE mora sadrzati paspul koji ima destinaciju Senta u posummary tabeli';
+				return view('pss.paspul_loc_to_loc_su_to', compact('location_from', 'pas_one', 'qty', 'op', 'to', 'msge'));
+			}
+		}
 
 
+		// CHECK IF EXIST IN LOCATION
 		$pa_old = DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [cutting].[dbo].[paspul_stocks] 
 		WHERE [pas_key] = '".$pas_one."' and [location] = '".$location_from."'  "));
 
@@ -863,6 +941,8 @@ class pssController extends Controller {
 // JUST_CUT TO LOC 
 	public function paspul_jc_to_loc_su_from() {
 
+		$plant = 'Subotica';
+
 		$location_from = "JUST_CUT";
 		$pas_keys =  DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [cutting].[dbo].[paspul_stocks] as s
 		WHERE s.[location] = '".$location_from."' "));
@@ -873,6 +953,8 @@ class pssController extends Controller {
 
 // JUST_CUT TO READY_FOR_KIKINDA
 	public function paspul_jc_to_rk_su_from() {
+
+		$plant = 'Kikinda';
 
 		$location_from = "JUST_CUT";
 		$pas_keys =  DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [cutting].[dbo].[paspul_stocks] as s
@@ -887,6 +969,8 @@ class pssController extends Controller {
 // JUST_CUT TO READY_FOR_SENTA
 	public function paspul_jc_to_rs_su_from() {
 
+		$plant = 'Senta';
+
 		$location_from = "JUST_CUT";
 		$pas_keys =  DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [cutting].[dbo].[paspul_stocks] as s
 		WHERE s.[location] = '".$location_from."' "));
@@ -899,6 +983,8 @@ class pssController extends Controller {
 
 // JUST_CUT TO READY_FOR_VALY
 	public function paspul_jc_to_rv_su_from() {
+
+		$plant = 'Valy';
 
 		$location_from = "JUST_CUT";
 		$pas_keys =  DB::connection('sqlsrv')->select(DB::raw("SELECT * FROM [cutting].[dbo].[paspul_stocks] as s

@@ -540,6 +540,9 @@ Route::get('paspul_table_stock_ready_se', 'pssController@paspul_table_stock_read
 Route::get('paspul_table_stock_ready_va', 'pssController@paspul_table_stock_ready_va');
 Route::get('paspul_table_log/{tip}', 'pssController@paspul_table_log');
 
+Route::get('paspul_table_stock_for_se', 'pssController@paspul_table_stock_for_se');
+
+
 Route::get('search_u_cons', 'pssController@search_u_cons');
 Route::post('search_u_cons_post', 'pssController@search_u_cons_post');
 Route::get('table_u_cons', 'pssController@table_u_cons');
@@ -573,7 +576,7 @@ Route::post('paspul_loc_to_prod_su_qty_post', 'pssController@paspul_loc_to_prod_
 Route::post('paspul_loc_to_prod_su_op_post', 'pssController@paspul_loc_to_prod_su_op_post');
 Route::post('paspul_loc_to_prod_su_to_post', 'pssController@paspul_loc_to_prod_su_to_post');
 
-Route::get('paspul_loc_to_del_su_from', 'pssController@paspul_loc_to_del_su_from');
+// Route::get('paspul_loc_to_del_su_from', 'pssController@paspul_loc_to_del_su_from');
 Route::post('paspul_loc_to_del_su_from_post', 'pssController@paspul_loc_to_del_su_from_post');
 Route::post('paspul_loc_to_del_su_pas_post', 'pssController@paspul_loc_to_del_su_pas_post');
 Route::post('paspul_loc_to_del_su_qty_post', 'pssController@paspul_loc_to_del_su_qty_post');

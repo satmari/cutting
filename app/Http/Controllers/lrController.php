@@ -157,7 +157,6 @@ class lrController extends Controller {
 		$material = $check_gbin[0]->material;
 
 		return view('lr.o_roll_lr_scan',compact('id', 'mattress', 'g_bin', 'skeda', 'material'));
-
 	}
 
 	public function o_roll_lr_scan(Request $request) {
@@ -284,7 +283,6 @@ class lrController extends Controller {
 		// return Redirect::to('/lr');
 		$success = "Roll successfuly saved";
 		return view('lr.index', compact('operators','operator', 'success'));
-
 	}
 
 	public function o_roll_print() {
